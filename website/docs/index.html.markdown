@@ -65,3 +65,9 @@ The following arguments are supported in the `provider` block:
   requirement when working with GitLab CE or GitLab Enterprise e.g. https://my.gitlab.server/api/v3/.
   It is optional to provide this value and it can also be sourced from the `GITLAB_BASE_URL` environment variable.
   The value must end with a slash.
+
+* `cacert_file` - (Optional) This is a file containing the ca cert to verify the gitlab instance.  This is available
+  for use when working with GitLab CE or Gitlab Enterprise with a locally-issued or self-signed certificate chain.
+
+* `insecure` - (Optional; boolean, defaults to false) When set to true this disables SSL verification of the connection to the
+  GitLab instance.
