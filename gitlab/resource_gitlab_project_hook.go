@@ -89,10 +89,13 @@ func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) e
 		MergeRequestsEvents:   gitlab.Bool(d.Get("merge_requests_events").(bool)),
 		TagPushEvents:         gitlab.Bool(d.Get("tag_push_events").(bool)),
 		NoteEvents:            gitlab.Bool(d.Get("note_events").(bool)),
-		BuildEvents:           gitlab.Bool(d.Get("build_events").(bool)),
 		PipelineEvents:        gitlab.Bool(d.Get("pipeline_events").(bool)),
 		WikiPageEvents:        gitlab.Bool(d.Get("wiki_page_events").(bool)),
 		EnableSSLVerification: gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
+	}
+
+	if v, ok := d.GetOk("build_events"); ok {
+		options.BuildEvents = gitlab.Bool(v.(bool))
 	}
 
 	if v, ok := d.GetOk("token"); ok {
@@ -158,10 +161,13 @@ func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) e
 		MergeRequestsEvents:   gitlab.Bool(d.Get("merge_requests_events").(bool)),
 		TagPushEvents:         gitlab.Bool(d.Get("tag_push_events").(bool)),
 		NoteEvents:            gitlab.Bool(d.Get("note_events").(bool)),
-		BuildEvents:           gitlab.Bool(d.Get("build_events").(bool)),
 		PipelineEvents:        gitlab.Bool(d.Get("pipeline_events").(bool)),
 		WikiPageEvents:        gitlab.Bool(d.Get("wiki_page_events").(bool)),
 		EnableSSLVerification: gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
+	}
+
+	if d.HasChange("build_events") {
+		options.BuildEvents = gitlab.Bool(d.Get("build_events").(bool))
 	}
 
 	if d.HasChange("token") {
