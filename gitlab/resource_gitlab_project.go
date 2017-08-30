@@ -23,6 +23,16 @@ func resourceGitlabProject() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"path": {
+				Type:     schema.TypeString,
+				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					if new == "" {
+						return true
+					}
+					return old == new
+				},
+			},
 			"namespace_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -80,6 +90,7 @@ func resourceGitlabProject() *schema.Resource {
 
 func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) {
 	d.Set("name", project.Name)
+	d.Set("path", project.Path)
 	d.Set("description", project.Description)
 	d.Set("default_branch", project.DefaultBranch)
 	d.Set("issues_enabled", project.IssuesEnabled)
@@ -102,6 +113,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		WikiEnabled:          gitlab.Bool(d.Get("wiki_enabled").(bool)),
 		SnippetsEnabled:      gitlab.Bool(d.Get("snippets_enabled").(bool)),
 		Visibility:           stringToVisibilityLevel(d.Get("visibility_level").(string)),
+	}
+
+	if v, ok := d.GetOk("path"); ok {
+		options.Path = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("namespace_id"); ok {
@@ -150,6 +165,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
+	}
+
+	if d.HasChange("path") && (d.Get("path").(string) != "") {
+		options.Path = gitlab.String(d.Get("path").(string))
 	}
 
 	if d.HasChange("description") {

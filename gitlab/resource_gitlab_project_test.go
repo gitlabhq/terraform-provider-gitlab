@@ -26,6 +26,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
+						Path:                 fmt.Sprintf("foo.%d", rInt),
 						Description:          "Terraform acceptance tests",
 						IssuesEnabled:        true,
 						MergeRequestsEnabled: true,
@@ -42,6 +43,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
+						Path:        fmt.Sprintf("foo.%d", rInt),
 						Description: "Terraform acceptance tests!",
 						Visibility:  gitlab.PublicVisibility,
 					}),
@@ -54,6 +56,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
+						Path:                 fmt.Sprintf("foo.%d", rInt),
 						Description:          "Terraform acceptance tests",
 						IssuesEnabled:        true,
 						MergeRequestsEnabled: true,
@@ -91,6 +94,7 @@ func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource
 
 type testAccGitlabProjectExpectedAttributes struct {
 	Name                 string
+	Path                 string
 	Description          string
 	DefaultBranch        string
 	IssuesEnabled        bool
@@ -104,6 +108,9 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 	return func(s *terraform.State) error {
 		if project.Name != want.Name {
 			return fmt.Errorf("got repo %q; want %q", project.Name, want.Name)
+		}
+		if project.Path != want.Path {
+			return fmt.Errorf("got repo %q; want %q", project.Path, want.Path)
 		}
 		if project.Description != want.Description {
 			return fmt.Errorf("got description %q; want %q", project.Description, want.Description)
@@ -163,19 +170,21 @@ func testAccGitlabProjectConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
+  path = "foo.%d"
   description = "Terraform acceptance tests"
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
 }
-	`, rInt)
+	`, rInt, rInt)
 }
 
 func testAccGitlabProjectUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
+  path = "foo.%d"
   description = "Terraform acceptance tests!"
 
   # So that acceptance tests can be run in a gitlab organization
@@ -187,5 +196,5 @@ resource "gitlab_project" "foo" {
   wiki_enabled = false
   snippets_enabled = false
 }
-	`, rInt)
+	`, rInt, rInt)
 }
