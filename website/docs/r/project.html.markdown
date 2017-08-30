@@ -29,6 +29,8 @@ The following arguments are supported:
 
 * `name` - (Required) The name of the project.
 
+* `path` - (Optional) The path of the repository.
+
 * `namespace_id` - (Optional) The namespace (group or user) of the project. Defaults to your user.
   See [`gitlab_group`](group.html) for an example.
 
