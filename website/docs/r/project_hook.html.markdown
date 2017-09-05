@@ -44,7 +44,7 @@ the hook.
 
 * `tag_push_events` - (Optional) Invoke the hook for tag push events.
 
-* `note_events` - (Optional) Invoke the hook for tag push events.
+* `note_events` - (Optional) Invoke the hook for notes events.
 
 * `build_events` - (Optional) Invoke the hook for build events.
 
