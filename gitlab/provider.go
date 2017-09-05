@@ -29,6 +29,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project":      resourceGitlabProject(),
 			"gitlab_project_hook": resourceGitlabProjectHook(),
 			"gitlab_deploy_key":   resourceGitlabDeployKey(),
+			"gitlab_user":         resourceGitlabUser(),
 		},
 
 		ConfigureFunc: providerConfigure,
