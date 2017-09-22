@@ -26,27 +26,14 @@ func validateValueFunc(values []string) schema.SchemaValidateFunc {
 	}
 }
 
-func stringToVisibilityLevel(s string) *gitlab.VisibilityLevelValue {
-	lookup := map[string]gitlab.VisibilityLevelValue{
+func stringToVisibilityLevel(s string) *gitlab.VisibilityValue {
+	lookup := map[string]gitlab.VisibilityValue{
 		"private":  gitlab.PrivateVisibility,
 		"internal": gitlab.InternalVisibility,
 		"public":   gitlab.PublicVisibility,
 	}
 
 	value, ok := lookup[s]
-	if !ok {
-		return nil
-	}
-	return &value
-}
-
-func visibilityLevelToString(v gitlab.VisibilityLevelValue) *string {
-	lookup := map[gitlab.VisibilityLevelValue]string{
-		gitlab.PrivateVisibility:  "private",
-		gitlab.InternalVisibility: "internal",
-		gitlab.PublicVisibility:   "public",
-	}
-	value, ok := lookup[v]
 	if !ok {
 		return nil
 	}

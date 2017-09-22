@@ -46,7 +46,7 @@ the hook.
 
 * `note_events` - (Optional) Invoke the hook for notes events.
 
-* `build_events` - (Optional) Invoke the hook for build events.
+* `job_events` - (Optional) Invoke the hook for job events.
 
 * `pipeline_events` - (Optional) Invoke the hook for pipeline events.
 

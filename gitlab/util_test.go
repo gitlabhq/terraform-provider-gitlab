@@ -39,7 +39,7 @@ func TestGitlab_validation(t *testing.T) {
 func TestGitlab_visbilityHelpers(t *testing.T) {
 	cases := []struct {
 		String string
-		Level  gitlab.VisibilityLevelValue
+		Level  gitlab.VisibilityValue
 	}{
 		{
 			String: "private",
@@ -57,8 +57,8 @@ func TestGitlab_visbilityHelpers(t *testing.T) {
 			t.Fatalf("got %v expected %v", level, tc.Level)
 		}
 
-		sv := visibilityLevelToString(tc.Level)
-		if sv == nil || *sv != tc.String {
+		sv := string(tc.Level)
+		if sv == "" || sv != tc.String {
 			t.Fatalf("got %v expected %v", sv, tc.String)
 		}
 	}

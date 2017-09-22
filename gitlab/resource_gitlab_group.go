@@ -66,7 +66,7 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if v, ok := d.GetOk("visibility_level"); ok {
-		options.VisibilityLevel = stringToVisibilityLevel(v.(string))
+		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab group %q", options.Name)
@@ -131,7 +131,7 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("visibility_level") {
-		options.VisibilityLevel = stringToVisibilityLevel(d.Get("visibility_level").(string))
+		options.Visibility = stringToVisibilityLevel(d.Get("visibility_level").(string))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

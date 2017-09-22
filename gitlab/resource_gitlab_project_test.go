@@ -31,7 +31,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeRequestsEnabled: true,
 						WikiEnabled:          true,
 						SnippetsEnabled:      true,
-						VisibilityLevel:      20,
+						Visibility:           gitlab.PublicVisibility,
 					}),
 				),
 			},
@@ -41,9 +41,9 @@ func TestAccGitlabProject_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
-						Name:            fmt.Sprintf("foo-%d", rInt),
-						Description:     "Terraform acceptance tests!",
-						VisibilityLevel: 20,
+						Name:        fmt.Sprintf("foo-%d", rInt),
+						Description: "Terraform acceptance tests!",
+						Visibility:  gitlab.PublicVisibility,
 					}),
 				),
 			},
@@ -59,7 +59,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeRequestsEnabled: true,
 						WikiEnabled:          true,
 						SnippetsEnabled:      true,
-						VisibilityLevel:      20,
+						Visibility:           gitlab.PublicVisibility,
 					}),
 				),
 			},
@@ -97,7 +97,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 	MergeRequestsEnabled bool
 	WikiEnabled          bool
 	SnippetsEnabled      bool
-	VisibilityLevel      gitlab.VisibilityLevelValue
+	Visibility           gitlab.VisibilityValue
 }
 
 func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
@@ -129,8 +129,8 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 			return fmt.Errorf("got snippets_enabled %t; want %t", project.SnippetsEnabled, want.SnippetsEnabled)
 		}
 
-		if project.VisibilityLevel != want.VisibilityLevel {
-			return fmt.Errorf("got default branch %q; want %q", project.VisibilityLevel, want.VisibilityLevel)
+		if project.Visibility != want.Visibility {
+			return fmt.Errorf("got visibility %q; want %q", project.Visibility, want.Visibility)
 		}
 
 		return nil

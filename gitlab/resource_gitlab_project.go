@@ -86,7 +86,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
-	d.Set("visibility_level", visibilityLevelToString(project.VisibilityLevel))
+	d.Set("visibility_level", string(project.Visibility))
 
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
@@ -101,6 +101,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		MergeRequestsEnabled: gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
 		WikiEnabled:          gitlab.Bool(d.Get("wiki_enabled").(bool)),
 		SnippetsEnabled:      gitlab.Bool(d.Get("snippets_enabled").(bool)),
+		Visibility:           stringToVisibilityLevel(d.Get("visibility_level").(string)),
 	}
 
 	if v, ok := d.GetOk("namespace_id"); ok {
@@ -109,10 +110,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
-	}
-
-	if v, ok := d.GetOk("visibility_level"); ok {
-		options.VisibilityLevel = stringToVisibilityLevel(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", options.Name)
@@ -164,7 +161,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if d.HasChange("visibility_level") {
-		options.VisibilityLevel = stringToVisibilityLevel(d.Get("visibility_level").(string))
+		options.Visibility = stringToVisibilityLevel(d.Get("visibility_level").(string))
 	}
 
 	if d.HasChange("issues_enabled") {

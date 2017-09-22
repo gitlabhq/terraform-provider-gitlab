@@ -55,7 +55,7 @@ func resourceGitlabProjectHook() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"build_events": {
+			"job_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
@@ -89,7 +89,7 @@ func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) e
 		MergeRequestsEvents:   gitlab.Bool(d.Get("merge_requests_events").(bool)),
 		TagPushEvents:         gitlab.Bool(d.Get("tag_push_events").(bool)),
 		NoteEvents:            gitlab.Bool(d.Get("note_events").(bool)),
-		BuildEvents:           gitlab.Bool(d.Get("build_events").(bool)),
+		JobEvents:             gitlab.Bool(d.Get("job_events").(bool)),
 		PipelineEvents:        gitlab.Bool(d.Get("pipeline_events").(bool)),
 		WikiPageEvents:        gitlab.Bool(d.Get("wiki_page_events").(bool)),
 		EnableSSLVerification: gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
@@ -137,7 +137,7 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("merge_requests_events", hook.MergeRequestsEvents)
 	d.Set("tag_push_events", hook.TagPushEvents)
 	d.Set("note_events", hook.NoteEvents)
-	d.Set("build_events", hook.BuildEvents)
+	d.Set("job_events", hook.JobEvents)
 	d.Set("pipeline_events", hook.PipelineEvents)
 	d.Set("wiki_page_events", hook.WikiPageEvents)
 	d.Set("enable_ssl_verification", hook.EnableSSLVerification)
@@ -158,7 +158,7 @@ func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) e
 		MergeRequestsEvents:   gitlab.Bool(d.Get("merge_requests_events").(bool)),
 		TagPushEvents:         gitlab.Bool(d.Get("tag_push_events").(bool)),
 		NoteEvents:            gitlab.Bool(d.Get("note_events").(bool)),
-		BuildEvents:           gitlab.Bool(d.Get("build_events").(bool)),
+		JobEvents:             gitlab.Bool(d.Get("job_events").(bool)),
 		PipelineEvents:        gitlab.Bool(d.Get("pipeline_events").(bool)),
 		WikiPageEvents:        gitlab.Bool(d.Get("wiki_page_events").(bool)),
 		EnableSSLVerification: gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
