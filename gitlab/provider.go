@@ -23,6 +23,18 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GITLAB_BASE_URL", ""),
 				Description: descriptions["base_url"],
 			},
+			"cacert_file": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "",
+				Description: descriptions["cacert_file"],
+			},
+			"insecure": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: descriptions["insecure"],
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"gitlab_group":        resourceGitlabGroup(),
@@ -42,13 +54,19 @@ func init() {
 		"token": "The OAuth token used to connect to GitLab.",
 
 		"base_url": "The GitLab Base API URL",
+
+		"cacert_file": "A file containing the ca certificate to use in case ssl certificate is not from a standard chain",
+
+		"insecure": "Disable SSL verification of API calls",
 	}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		Token:   d.Get("token").(string),
-		BaseURL: d.Get("base_url").(string),
+		Token:      d.Get("token").(string),
+		BaseURL:    d.Get("base_url").(string),
+		CACertFile: d.Get("cacert_file").(string),
+		Insecure:   d.Get("insecure").(bool),
 	}
 
 	return config.Client()
