@@ -62,6 +62,6 @@ The following arguments are supported in the `provider` block:
   it can also be sourced from the `GITLAB_TOKEN` environment variable.
 
 * `base_url` - (Optional) This is the target GitLab base API endpoint. Providing a value is a
-  requirement when working with GitLab CE or GitLab Enterprise e.g. https://my.gitlab.server/api/v3/.
+  requirement when working with GitLab CE or GitLab Enterprise e.g. https://my.gitlab.server/api/v4/.
   It is optional to provide this value and it can also be sourced from the `GITLAB_BASE_URL` environment variable.
   The value must end with a slash.
