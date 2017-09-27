@@ -17,6 +17,9 @@ func resourceGitlabProject() *schema.Resource {
 		Read:   resourceGitlabProjectRead,
 		Update: resourceGitlabProjectUpdate,
 		Delete: resourceGitlabProjectDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -26,6 +29,8 @@ func resourceGitlabProject() *schema.Resource {
 			"namespace_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
+				ForceNew: true,
+				Computed: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
@@ -87,6 +92,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
 	d.Set("visibility_level", string(project.Visibility))
+	d.Set("namespace_id", project.Namespace.ID)
 
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)

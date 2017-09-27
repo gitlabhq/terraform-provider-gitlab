@@ -67,6 +67,46 @@ func TestAccGitlabProject_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_project.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_nestedImport(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectInGroupConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_project.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -157,6 +197,26 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
+}
+
+func testAccGitlabProjectInGroupConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foogroup-%d"
+  path = "foogroup-%d"
+  visibility_level = "public"
+}
+
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+  namespace_id = "${gitlab_group.foo.id}"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectConfig(rInt int) string {
