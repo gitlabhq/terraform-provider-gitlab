@@ -15,6 +15,9 @@ func resourceGitlabGroup() *schema.Resource {
 		Read:   resourceGitlabGroupRead,
 		Update: resourceGitlabGroupUpdate,
 		Delete: resourceGitlabGroupDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -42,8 +45,8 @@ func resourceGitlabGroup() *schema.Resource {
 			"visibility_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
-				Default:      "private",
 			},
 		},
 	}
@@ -101,6 +104,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("description", group.Description)
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
+	d.Set("visibility_level", group.Visibility)
 
 	return nil
 }
@@ -130,8 +134,10 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
 	}
 
-	if d.HasChange("visibility_level") {
-		options.Visibility = stringToVisibilityLevel(d.Get("visibility_level").(string))
+	// Always set visibility ; workaround for
+	// https://gitlab.com/gitlab-org/gitlab-ce/issues/38459
+	if v, ok := d.GetOk("visibility_level"); ok {
+		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
