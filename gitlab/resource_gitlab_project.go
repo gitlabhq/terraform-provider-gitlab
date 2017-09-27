@@ -3,7 +3,9 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -196,5 +198,36 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
 
 	_, err := client.Projects.DeleteProject(d.Id())
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Wait for the project to be deleted.
+	// Deleting a project in gitlab is async.
+	stateConf := &resource.StateChangeConf{
+		Pending: []string{"Deleting"},
+		Target:  []string{"Deleted"},
+		Refresh: func() (interface{}, string, error) {
+			out, response, err := client.Projects.GetProject(d.Id())
+			if err != nil {
+				if response.StatusCode == 404 {
+					return out, "Deleted", nil
+				} else {
+					log.Printf("[ERROR] Received error: %#v", err)
+					return out, "Error", err
+				}
+			}
+			return out, "Deleting", nil
+		},
+
+		Timeout:    10 * time.Minute,
+		MinTimeout: 3 * time.Second,
+		Delay:      5 * time.Second,
+	}
+
+	_, err = stateConf.WaitForState()
+	if err != nil {
+		return fmt.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
+	}
+	return nil
 }
