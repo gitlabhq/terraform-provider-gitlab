@@ -3,11 +3,28 @@
 BACKWARDS INCOMPATIBILITIES:
 
 * This provider now uses the v4 api. It means that if you set up a custom API url, you need to update it to use the /api/v4 url. As a side effect, we no longer support Gitlab < 9.0. [GH-20]
+* We now support Parent ID for `gitlab_groups`. However, due to a limitation in
+  the gitlab API, changing a Parent ID requires destroying and recreating the
+  group. Since previous versions of this provider did not support it, there are
+  chances that terraform will try do delete all your nested group when you
+  update to 0.2.0. A workaround to prevent this is to use the `ignore_changes`
+  lifecycle parameter. [GH-28]
+
+```
+resource "gitlab_group" "nested_group" {
+  name = "bar-name-%d"
+  path = "bar-path-%d"
+  lifecycle {
+    ignore_changes = ["parent_id"]
+  }
+}
+```
 
 IMPROVEMENTS:
 
 * Add `cacert_file` and `insecure` options to the provider. [GH-5]
 * Fix race conditions with `gitlab_projects` deletion. [GH-19]
+* Add `parent_id` argument to `gitlab_group`. [GH-28]
 
 ## 0.1.0 (June 20, 2017)
 
