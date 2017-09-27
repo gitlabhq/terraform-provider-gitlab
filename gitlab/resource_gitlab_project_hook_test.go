@@ -44,7 +44,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 						MergeRequestsEvents:   true,
 						TagPushEvents:         true,
 						NoteEvents:            true,
-						BuildEvents:           true,
+						JobEvents:             true,
 						PipelineEvents:        true,
 						WikiPageEvents:        true,
 						EnableSSLVerification: false,
@@ -100,7 +100,7 @@ type testAccGitlabProjectHookExpectedAttributes struct {
 	MergeRequestsEvents   bool
 	TagPushEvents         bool
 	NoteEvents            bool
-	BuildEvents           bool
+	JobEvents             bool
 	PipelineEvents        bool
 	WikiPageEvents        bool
 	EnableSSLVerification bool
@@ -136,8 +136,8 @@ func testAccCheckGitlabProjectHookAttributes(hook *gitlab.ProjectHook, want *tes
 			return fmt.Errorf("got note_events %t; want %t", hook.NoteEvents, want.NoteEvents)
 		}
 
-		if hook.BuildEvents != want.BuildEvents {
-			return fmt.Errorf("got build_events %t; want %t", hook.BuildEvents, want.BuildEvents)
+		if hook.JobEvents != want.JobEvents {
+			return fmt.Errorf("got job_events %t; want %t", hook.JobEvents, want.JobEvents)
 		}
 
 		if hook.PipelineEvents != want.PipelineEvents {
@@ -212,7 +212,7 @@ resource "gitlab_project_hook" "foo" {
   merge_requests_events = true
   tag_push_events = true
   note_events = true
-  build_events = true
+  job_events = true
   pipeline_events = true
   wiki_page_events = true
 }
