@@ -1,6 +1,9 @@
 package gitlab
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -18,10 +21,11 @@ func Provider() terraform.ResourceProvider {
 				Description: descriptions["token"],
 			},
 			"base_url": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("GITLAB_BASE_URL", ""),
-				Description: descriptions["base_url"],
+				Type:         schema.TypeString,
+				Optional:     true,
+				DefaultFunc:  schema.EnvDefaultFunc("GITLAB_BASE_URL", ""),
+				Description:  descriptions["base_url"],
+				ValidateFunc: validateApiURLVersion,
 			},
 			"cacert_file": {
 				Type:        schema.TypeString,
@@ -70,4 +74,12 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 
 	return config.Client()
+}
+
+func validateApiURLVersion(value interface{}, key string) (ws []string, es []error) {
+	v := value.(string)
+	if strings.HasSuffix(v, "/api/v3") || strings.HasSuffix(v, "/api/v3/") {
+		es = append(es, fmt.Errorf("terraform-gitlab-provider does not support v3 api; please upgrade to /api/v4 in %s", v))
+	}
+	return
 }
