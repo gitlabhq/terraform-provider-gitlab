@@ -1,4 +1,8 @@
-## 0.1.1 (Unreleased)
+## 0.2.0 (Unreleased)
+
+BACKWARDS INCOMPATIBILITIES:
+
+* This provider now uses the v4 api. It means that if you set up a custom API url, you need to update it to use the /api/v4 url. As a side effect, we no longer support Gitlab < 9.0. [GH-20]
 
 IMPROVEMENTS:
 
