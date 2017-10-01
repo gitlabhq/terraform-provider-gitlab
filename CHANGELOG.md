@@ -20,11 +20,19 @@ resource "gitlab_group" "nested_group" {
 }
 ```
 
+FEATURES:
+
+* **New Resource:** `gitlab_user` [GH-23]
+* **New Resource:** `gitlab_label` [GH-22]
+
 IMPROVEMENTS:
 
 * Add `cacert_file` and `insecure` options to the provider. [GH-5]
-* Fix race conditions with `gitlab_projects` deletion. [GH-19]
+* Fix race conditions with `gitlab_project` deletion. [GH-19]
 * Add `parent_id` argument to `gitlab_group`. [GH-28]
+* Add support for `gitlab_project` import. [GH-30]
+* Add support for `gitlab_groups` import. [GH-31]
+* Add `path` argument for `gitlab_project`. [GH-21]
 
 ## 0.1.0 (June 20, 2017)
 
