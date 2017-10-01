@@ -62,6 +62,26 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabGroupConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_group.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
