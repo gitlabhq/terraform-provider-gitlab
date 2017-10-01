@@ -82,6 +82,80 @@ func TestAccGitlabGroup_import(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_nested(t *testing.T) {
+	var group gitlab.Group
+	var group2 gitlab.Group
+	var nestedGroup gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabNestedGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests",
+						LFSEnabled:  true,
+						Parent:      &group,
+					}),
+				),
+			},
+			{
+				Config: testAccGitlabNestedGroupChangeParentConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests - new parent",
+						LFSEnabled:  true,
+						Parent:      &group2,
+					}),
+				),
+			},
+			{
+				Config: testAccGitlabNestedGroupRemoveParentConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests - updated",
+						LFSEnabled:  true,
+					}),
+				),
+			},
+			{
+				Config: testAccGitlabNestedGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests",
+						LFSEnabled:  true,
+						Parent:      &group,
+					}),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -108,6 +182,7 @@ type testAccGitlabGroupExpectedAttributes struct {
 	Name                 string
 	Path                 string
 	Description          string
+	Parent               *gitlab.Group
 	LFSEnabled           bool
 	RequestAccessEnabled bool
 }
@@ -132,6 +207,16 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 
 		if group.RequestAccessEnabled != want.RequestAccessEnabled {
 			return fmt.Errorf("got request_access_enabled %t; want %t", group.RequestAccessEnabled, want.RequestAccessEnabled)
+		}
+
+		if want.Parent != nil {
+			if group.ParentID != want.Parent.ID {
+				return fmt.Errorf("got parent_id %d; want %d", group.ParentID, want.Parent.ID)
+			}
+		} else {
+			if group.ParentID != 0 {
+				return fmt.Errorf("got parent_id %d; want %d", group.ParentID, 0)
+			}
 		}
 
 		return nil
@@ -188,4 +273,102 @@ resource "gitlab_group" "foo" {
   visibility_level = "public"
 }
   `, rInt, rInt)
+}
+
+func testAccGitlabNestedGroupConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+resource "gitlab_group" "foo2" {
+  name = "foo2-name-%d"
+  path = "foo2-path-%d"
+  description = "Terraform acceptance tests - parent2"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+resource "gitlab_group" "nested_foo" {
+  name = "nfoo-name-%d"
+  path = "nfoo-path-%d"
+  parent_id = "${gitlab_group.foo.id}"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabNestedGroupRemoveParentConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+resource "gitlab_group" "foo2" {
+  name = "foo2-name-%d"
+  path = "foo2-path-%d"
+  description = "Terraform acceptance tests - parent2"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+resource "gitlab_group" "nested_foo" {
+  name = "nfoo-name-%d"
+  path = "nfoo-path-%d"
+  description = "Terraform acceptance tests - updated"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabNestedGroupChangeParentConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+resource "gitlab_group" "foo2" {
+  name = "foo2-name-%d"
+  path = "foo2-path-%d"
+  description = "Terraform acceptance tests - parent2"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+resource "gitlab_group" "nested_foo" {
+  name = "nfoo-name-%d"
+  path = "nfoo-path-%d"
+  description = "Terraform acceptance tests - new parent"
+  parent_id = "${gitlab_group.foo2.id}"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt, rInt, rInt, rInt, rInt)
 }

@@ -48,6 +48,8 @@ enable users to request access to the group.
   Valid values are `private`, `internal`, `public`.
   Groups are created as private by default.
 
+* `parent_id` - (Optional) Integer, id of the parent group (creates a nested group).
+
 ## Attributes Reference
 
 The resource exports the following attributes:

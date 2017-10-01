@@ -48,6 +48,12 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
+			"parent_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				ForceNew: true,
+				Default:  0,
+			},
 		},
 	}
 }
@@ -70,6 +76,10 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("parent_id"); ok {
+		options.ParentID = gitlab.Int(v.(int))
 	}
 
 	log.Printf("[DEBUG] create gitlab group %q", options.Name)
@@ -105,6 +115,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
+	d.Set("parent_id", group.ParentID)
 
 	return nil
 }
