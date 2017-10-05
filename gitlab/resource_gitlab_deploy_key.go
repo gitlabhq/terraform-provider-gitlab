@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -30,6 +31,9 @@ func resourceGitlabDeployKey() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return old == strings.TrimSpace(new)
+				},
 			},
 			"can_push": {
 				Type:     schema.TypeBool,
@@ -46,7 +50,7 @@ func resourceGitlabDeployKeyCreate(d *schema.ResourceData, meta interface{}) err
 	project := d.Get("project").(string)
 	options := &gitlab.AddDeployKeyOptions{
 		Title:   gitlab.String(d.Get("title").(string)),
-		Key:     gitlab.String(d.Get("key").(string)),
+		Key:     gitlab.String(strings.TrimSpace(d.Get("key").(string))),
 		CanPush: gitlab.Bool(d.Get("can_push").(bool)),
 	}
 

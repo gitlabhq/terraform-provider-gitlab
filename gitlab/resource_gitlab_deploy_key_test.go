@@ -22,7 +22,7 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with default options
 			{
-				Config: testAccGitlabDeployKeyConfig(rInt),
+				Config: testAccGitlabDeployKeyConfig(rInt, ""),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabDeployKeyExists("gitlab_deploy_key.foo", &deployKey),
 					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
@@ -44,7 +44,7 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 			},
 			// Update the project deployKey to toggle the options back
 			{
-				Config: testAccGitlabDeployKeyConfig(rInt),
+				Config: testAccGitlabDeployKeyConfig(rInt, ""),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabDeployKeyExists("gitlab_deploy_key.foo", &deployKey),
 					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
@@ -52,6 +52,22 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 						Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1",
 					}),
 				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabDeployKeyDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and deployKey with newline as suffix
+			{
+				Config: testAccGitlabDeployKeyConfig(rInt, "\\n"),
 			},
 		},
 	})
@@ -131,7 +147,7 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabDeployKeyConfig(rInt int) string {
+func testAccGitlabDeployKeyConfig(rInt int, suffix string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
@@ -145,9 +161,9 @@ resource "gitlab_project" "foo" {
 resource "gitlab_deploy_key" "foo" {
   project = "${gitlab_project.foo.id}"
   title = "deployKey-%d"
-  key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1"
+  key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1%s"
 }
-  `, rInt, rInt)
+  `, rInt, rInt, suffix)
 }
 
 func testAccGitlabDeployKeyUpdateConfig(rInt int) string {
