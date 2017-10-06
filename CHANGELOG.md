@@ -7,7 +7,7 @@ BACKWARDS INCOMPATIBILITIES:
   the gitlab API, changing a Parent ID requires destroying and recreating the
   group. Since previous versions of this provider did not support it, there are
   chances that terraform will try do delete all your nested group when you
-  update to 0.2.0. A workaround to prevent this is to use the `ignore_changes`
+  update to 1.0.0. A workaround to prevent this is to use the `ignore_changes`
   lifecycle parameter. [GH-28]
 
 ```
