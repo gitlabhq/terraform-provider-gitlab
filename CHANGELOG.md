@@ -33,6 +33,7 @@ IMPROVEMENTS:
 * Add support for `gitlab_project` import. [GH-30]
 * Add support for `gitlab_groups` import. [GH-31]
 * Add `path` argument for `gitlab_project`. [GH-21]
+* Fix indempotency issue with `gitlab_deploy_key` and white spaces. [GH-34]
 
 ## 0.1.0 (June 20, 2017)
 
