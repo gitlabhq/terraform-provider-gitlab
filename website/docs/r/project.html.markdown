@@ -63,3 +63,13 @@ The following additional attributes are exported:
   repository via HTTP.
 
 * `web_url` - URL that can be used to find the project in a browser.
+
+## Importing projects
+
+You can import a project state using `terraform import <resource> <id>`.  The
+`id` can be whatever the [get single project api](get_single_project) takes for
+its `:id` value, so for example:
+
+    terraform import gitlab_project.example richardc/example
+
+[get_single_project]: https://docs.gitlab.com/ee/api/projects.html#get-single-project
