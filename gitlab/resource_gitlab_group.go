@@ -109,6 +109,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	d.SetId(fmt.Sprintf("%d", group.ID))
 	d.Set("name", group.Name)
 	d.Set("path", group.Path)
 	d.Set("description", group.Description)
