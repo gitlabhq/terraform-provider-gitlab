@@ -94,6 +94,7 @@ func resourceGitlabProject() *schema.Resource {
 }
 
 func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) {
+	d.SetId(fmt.Sprintf("%d", project.ID))
 	d.Set("name", project.Name)
 	d.Set("path", project.Path)
 	d.Set("description", project.Description)
