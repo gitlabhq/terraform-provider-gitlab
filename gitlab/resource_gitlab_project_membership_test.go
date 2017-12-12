@@ -50,6 +50,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 func testAccCheckGitlabProjectMembershipExists(n string, membership *gitlab.ProjectMember) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
+		conn := testAccProvider.Meta().(*gitlab.Client)
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
@@ -59,15 +60,13 @@ func testAccCheckGitlabProjectMembershipExists(n string, membership *gitlab.Proj
 			return fmt.Errorf("No project ID is set")
 		}
 
-		userID := rs.Primary.Attributes["userID"]
+		userID := rs.Primary.Attributes["user_id"]
+		id, _ := strconv.Atoi(userID)
 		if userID == "" {
 			return fmt.Errorf("No user id is set")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		user_ID, err := strconv.Atoi(userID)
-		gotProjectMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, user_ID)
+		gotProjectMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, id)
 		if err != nil {
 			return err
 		}
@@ -133,55 +132,45 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 }
 
 func testAccGitlabProjectMembershipConfig(rInt int) string {
-	return fmt.Sprintf(`resource "gitlab_project" "foo" {
-		name = "foo-%d"
-		description = "Terraform acceptance tests"
+	return fmt.Sprintf(`resource "gitlab_project_membership" "foo" {
+project_id = "${gitlab_project.foo.id}"
+user_id = "${gitlab_user.test.id}"
+access_level = "developer"
+}
 
-		# So that acceptance tests can be run in a gitlab organziation with no billing
-		visibility_level ="public"
-	}
+resource "gitlab_project" "foo" {
+name = "foo%d"
+description = "Terraform acceptance tests"
+visibility_level ="public"
+}
 
-	resource "gitlab_user" "foo" {
-		name = "foo %d"
-		username = "listest%d"
-		password = "test%dtt"
-		email = "listest%d@ssss.com"
-		is_admin = false
-		projects_limit = 20
-		can_create_group = false
-	}
-
-	resource "gitlab_project_membership" "foo" {
-		project_id = "${gitlab_project.foo.id}"
-		user_id = "${gitlab_user.foo.id}"
-		access_level = "developer"
-	}
-	`, rInt, rInt, rInt, rInt, rInt)
+resource "gitlab_user" "test" {
+name = "foo%d"
+username = "listest%d"
+password = "test%dtt"
+email = "listest%d@ssss.com"
+}
+`, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectMembershipUpdateConfig(rInt int) string {
-	return fmt.Sprintf(`resource "gitlab_project" "foo" {
-		name = "foo-%d"
-		description = Terraform acceptance tests"
+	return fmt.Sprintf(`resource "gitlab_project_membership" "foo" {
+project_id = "${gitlab_project.foo.id}"
+user_id = "${gitlab_user.test.id}"
+access_level = "guest"
+}
 
-		# So that acceptance tests can be run in  a gitlab organization with no billing
-		visibility_level ="public"
-	}
+resource "gitlab_project" "foo" {
+name = "foo%d"
+description = "Terraform acceptance tests"
+visibility_level ="public"
+}
 
-	resource "gitlab_user" "foo" {
-		name = "foo %d"
-		username = "listest%d"
-		password = "test%dtt"
-		email = "listest%d@ssss.com"
-		is_admin = false
-		projects_limit = 20
-		can_creat_group = false
-	}
-
-	resource "gitlab_project_membership" "foo" {
-		project_id = "${gitlab_project.foo.id}"
-		user_id = "${gitlab_user.foo.id}"
-		access_level = "guest"
-	}
-	`, rInt, rInt, rInt, rInt, rInt)
+resource "gitlab_user" "test" {
+name = "foo%d"
+username = "listest%d"
+password = "test%dtt"
+email = "listest%d@ssss.com"
+}
+`, rInt, rInt, rInt, rInt, rInt)
 }
