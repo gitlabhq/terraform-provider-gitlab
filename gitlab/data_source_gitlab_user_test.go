@@ -29,21 +29,21 @@ func TestAccDataGitlabUser_basic(t *testing.T) {
 func testAccDataSourceGitlabUser(src, n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		srcR := s.RootModule().Resources[src]
-		srcA := srcR.Primary.Attributes
+		user := s.RootModule().Resources[src]
+		userResource := user.Primary.Attributes
 
-		r := s.RootModule().Resources[n]
-		a := r.Primary.Attributes
+		search := s.RootModule().Resources[n]
+		searchResource := search.Primary.Attributes
 
-		if a["id"] == "" {
-			return fmt.Errorf("Expected to get a user email from Gitlab")
+		if searchResource["email"] == "" {
+			return fmt.Errorf("Expected to get user email from Gitlab")
 		}
 
-		testAtts := []string{"id", "email"}
+		testAttributes := []string{"email"}
 
-		for _, att := range testAtts {
-			if a[att] != srcA[att] {
-				return fmt.Errorf("Expected the user %s to be: %s, but got: %s", att, srcA[att], a[att])
+		for _, attribute := range testAttributes {
+			if searchResource[attribute] != userResource[attribute] {
+				return fmt.Errorf("Expected the user %s to be: %s, but got: %s", attribute, userResource[attribute], searchResource[attribute])
 			}
 		}
 		return nil
@@ -52,12 +52,15 @@ func testAccDataSourceGitlabUser(src, n string) resource.TestCheckFunc {
 
 func testAccDataGitlabUserConfig(userEmail string) string {
 	return fmt.Sprintf(`
-resource "gitlab_user" "foo"{
-	email = "%s"
+resource "gitlab_user" "foo" {
+  name             = "foo %s"
+  username         = "listest%s"
+  password         = "test%stt"
+  email            = "listest%s@ssss.com"
 }
 
 data "gitlab_user" "foo" {
-	name = "${gitlab_user.foo.email}"
+	email = "${gitlab_user.foo.email}"
 }
-	`, userEmail)
+	`, userEmail, userEmail, userEmail, userEmail)
 }
