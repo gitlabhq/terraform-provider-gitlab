@@ -1,3 +1,4 @@
+---
 layout: "gitlab"
 page_title: "GitLab: gitlab_datasource_user"
 sidebar_current: "docs-gitlab-data-source-user"
