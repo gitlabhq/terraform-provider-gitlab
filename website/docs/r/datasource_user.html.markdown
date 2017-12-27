@@ -28,11 +28,11 @@ The following arguments are supported:
 
 The following attributes are exported:
 
-* `name` - (Required) The name of the user.
+* `name` - The name of the user.
 
-* `username` - (Required) The username of the user.
+* `username` - The username of the user.
 
-* `email` - (Required) The e-mail address of the user.
+* `email` - The e-mail address of the user.
 
 * `id` - The unique id assigned to the user by the GitLab server.
 
