@@ -10,6 +10,18 @@
         <a href="/docs/providers/gitlab/index.html">Gitlab Provider</a>
         </li>
 
+        <li<%= sidebar_current("docs-gitlab-data-source") %>>
+            <a href="#">Data Sources</a>
+            <ul class="nav nav-visible">
+                <li<%= sidebar_current("docs-gitlab-data-source-project") %>>
+                    <a href="/docs/providers/gitlab/r/datasource_project.html">gitlab_project</a>
+                </li>
+                <li<%= sidebar_current("docks-gitlab-data-source-user") %>>
+                    <a href="/docs/providers/gitlab/r/datasource_user.html">gitlab_user</a>
+                </li>
+            </ul>
+        </li>
+
         <li<%= sidebar_current("docs-gitlab-resource") %>>
         <a href="#">Resources</a>
         <ul class="nav nav-visible">
@@ -27,6 +39,9 @@
           </li>
           <li<%= sidebar_current("docs-gitlab-resource-project-x") %>>
             <a href="/docs/providers/gitlab/r/project.html">gitlab_project</a>
+          </li>
+          <li<%= sidebar_current("docs-gitlab-resource-project-membership") %>>
+              <a href="/docs/providers/gitlab/r/project-membership.html">gitlab_project_membership</a>
           </li>
           <li<%= sidebar_current("docs-gitlab-resource-user") %>>
             <a href="/docs/providers/gitlab/r/user.html">gitlab_user</a>
