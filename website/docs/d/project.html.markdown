@@ -1,20 +1,20 @@
 ---
 layout: "gitlab"
-page_title: "GitLab: gitlab_datasource_project"
+page_title: "GitLab: gitlab_project"
 sidebar_current: "docs-gitlab-data-source-project"
 description: |-
   View information about a project
 ---
 
-# gitlab\_datasource_project
+# gitlab\_project
 
-datasource_project provides details about a specific project in the gitlab provider. The results include the name of the project, path, description, default branch, etc.
+Provides details about a specific project in the gitlab provider. The results include the name of the project, path, description, default branch, etc.
 
 ## Example Usage
 
 ```hcl
-data "gitlab_project" "test" {
-	name = "Test Project"
+data "gitlab_project" "example" {
+	id = 30
 }
 ```
 
@@ -22,7 +22,7 @@ data "gitlab_project" "test" {
 
 The following arguments are supported:
 
-* `name` - (Required) The name of the project.
+* `id` - (Required) The integer that uniquely identifies the project within the gitlab install.
 
 ## Attributes Reference
 
