@@ -39,7 +39,7 @@ func testAccDataSourceGitlabProject(src, n string) resource.TestCheckFunc {
 			return fmt.Errorf("Expected to get a project ID from Gitlab")
 		}
 
-		testAttributes := []string{"id", "name", "visibility"}
+		testAttributes := []string{"id", "Name", "Path", "Visibility", "Description"}
 
 		for _, attribute := range testAttributes {
 			if searchResource[attribute] != projectResource[attribute] {
@@ -60,7 +60,7 @@ resource "gitlab_project" "test"{
 }
 
 data "gitlab_project" "foo" {
-	name = "${gitlab_project.test.name}"
+	id = "${gitlab_project.test.id}"
 }
 	`, projectname, projectname)
 }

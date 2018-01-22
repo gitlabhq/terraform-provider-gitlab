@@ -3,7 +3,6 @@ package gitlab
 import (
 	"fmt"
 	"log"
-	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -14,43 +13,26 @@ func dataSourceGitlabProject() *schema.Resource {
 		Read: dataSourceGitlabProjectRead,
 
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
+			"id": {
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 		},
 	}
 }
 
-// Performs the lookup
 func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	log.Printf("[INFO] Reading Gitlab project")
 
-	searchName := strings.ToLower(d.Get("name").(string))
+	v, _ := d.GetOk("id")
 
-	o := &gitlab.ListProjectsOptions{
-		Search: &searchName,
-	}
-
-	projects, _, err := client.Projects.ListProjects(o)
+	found, _, err := client.Projects.GetProject(v)
 	if err != nil {
 		return err
 	}
 
-	var found *gitlab.Project
-
-	for _, project := range projects {
-		if strings.ToLower(project.Name) == searchName {
-			found = project
-			break
-		}
-	}
-
-	if found == nil {
-		return fmt.Errorf("Unable to locate any project with the name: %s", searchName)
-	}
 	d.SetId(fmt.Sprintf("%d", found.ID))
 	d.Set("name", found.Name)
 	d.Set("path", found.Path)
