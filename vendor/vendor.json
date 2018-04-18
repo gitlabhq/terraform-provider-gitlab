@@ -585,10 +585,10 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "rBRMciteJAFVf9xWMXbMbXbJrzM=",
+			"checksumSHA1": "NZk5D25Na3CA5FX1N0EgHfe/sSg=",
 			"path": "github.com/xanzy/go-gitlab",
-			"revision": "d11d546f58c67430417f975b453f44f280474a4d",
-			"revisionTime": "2017-09-24T15:03:35Z"
+			"revision": "c00cef4b483bb262426d9b37bd252436dbccac55",
+			"revisionTime": "2018-04-06T12:10:38Z"
 		},
 		{
 			"checksumSHA1": "vE43s37+4CJ2CDU6TlOUOYE0K9c=",
@@ -689,5 +689,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "github.com/terraform-providers/terraform-provider-gitlab"
+	"rootPath": "github.com/claranet/terraform-provider-gitlab"
 }
