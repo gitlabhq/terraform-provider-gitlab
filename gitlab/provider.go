@@ -48,6 +48,9 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_deploy_key":   resourceGitlabDeployKey(),
 			"gitlab_user":         resourceGitlabUser(),
 		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"gitlab_users": dataSourceGitlabUsers(),
+		},
 
 		ConfigureFunc: providerConfigure,
 	}
