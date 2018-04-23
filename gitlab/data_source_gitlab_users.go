@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -16,62 +15,53 @@ func dataSourceGitlabUsers() *schema.Resource {
 		Read: dataSourceGitlabUsersRead,
 
 		Schema: map[string]*schema.Schema{
-			"options": {
-				Type:     schema.TypeList,
+			"order_by": {
+				Type:     schema.TypeString,
 				Optional: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"order_by": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  "id",
-							ValidateFunc: validation.StringInSlice([]string{"id", "name",
-								"username", "created_at"}, true),
-						},
-						"sort": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							Default:      "desc",
-							ValidateFunc: validation.StringInSlice([]string{"desc", "asc"}, true),
-						},
-						"search": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"active": {
-							Type:     schema.TypeBool,
-							Optional: true,
-						},
-						"blocked": {
-							Type:     schema.TypeBool,
-							Optional: true,
-						},
-						"extern_uid": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"provider": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"created_before": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-						"created_after": {
-							Type:     schema.TypeString,
-							Optional: true,
-						},
-					},
-				},
+				Default:  "id",
+				ValidateFunc: validation.StringInSlice([]string{"id", "name",
+					"username", "created_at"}, true),
+			},
+			"sort": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "desc",
+				ValidateFunc: validation.StringInSlice([]string{"desc", "asc"}, true),
+			},
+			"search": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"active": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"blocked": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"identities_extern_uid": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"identities_provider": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"created_before": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"created_after": {
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 			"users": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-						"user_id": {
+						"id": {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
@@ -137,13 +127,11 @@ func dataSourceGitlabUsers() *schema.Resource {
 func dataSourceGitlabUsersRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	listUsersOptions, id, err := expandGitlabUsersOptions(d.Get("options").([]interface{}))
+	listUsersOptions, id, err := expandGitlabUsersOptions(d)
 	if err != nil {
 		return err
 	}
-	log.Printf("\n\n\nListOptions\n%v\n\n\n", listUsersOptions)
 	users, _, err := client.Users.ListUsers(listUsersOptions)
-	log.Printf("\n\n\nListUsers\n%v\n\n\n", users)
 
 	if err != nil {
 		return err
@@ -160,7 +148,7 @@ func flattenGitlabUsers(users []*gitlab.User) []interface{} {
 
 	for _, user := range users {
 		values := map[string]interface{}{
-			"user_id":            user.ID,
+			"id":                 user.ID,
 			"username":           user.Username,
 			"email":              user.Email,
 			"name":               user.Name,
@@ -176,7 +164,7 @@ func flattenGitlabUsers(users []*gitlab.User) []interface{} {
 		}
 
 		if user.CreatedAt != nil {
-			values["created_at"] = user.CreatedAt
+			values["created_at"] = user.CreatedAt.String()
 		}
 
 		usersList = append(usersList, values)
@@ -185,61 +173,65 @@ func flattenGitlabUsers(users []*gitlab.User) []interface{} {
 	return usersList
 }
 
-func expandGitlabUsersOptions(d []interface{}) (*gitlab.ListUsersOptions, int, error) {
-	if len(d) == 0 {
-		return nil, 0, nil
-	}
-
-	data := d[0].(map[string]interface{})
+func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions, int, error) {
 	listUsersOptions := &gitlab.ListUsersOptions{}
-	options := ""
+	optionsHash := ""
 
-	if orderBy := data["order_by"].(string); orderBy != "" {
+	if data, ok := d.GetOk("order_by"); ok {
+		orderBy := data.(string)
 		listUsersOptions.OrderBy = &orderBy
-		options += orderBy
+		optionsHash += orderBy
 	}
-	if sort := data["sort"].(string); sort != "" {
+	if data, ok := d.GetOk("sort"); ok {
+		sort := data.(string)
 		listUsersOptions.Sort = &sort
-		options += sort
+		optionsHash += sort
 	}
-	if search := data["search"].(string); search != "" {
+	if data, ok := d.GetOk("search"); ok {
+		search := data.(string)
 		listUsersOptions.Search = &search
-		options += search
+		optionsHash += search
 	}
-	if active := data["active"].(bool); active != false {
+	if data, ok := d.GetOk("active"); ok {
+		active := data.(bool)
 		listUsersOptions.Active = &active
-		options += strconv.FormatBool(active)
+		optionsHash += strconv.FormatBool(active)
 	}
-	if blocked := data["blocked"].(bool); blocked != false {
+	if data, ok := d.GetOk("blocked"); ok {
+		blocked := data.(bool)
 		listUsersOptions.Blocked = &blocked
-		options += strconv.FormatBool(blocked)
+		optionsHash += strconv.FormatBool(blocked)
 	}
-	if externalUID := data["extern_uid"].(string); externalUID != "" {
+	if data, ok := d.GetOk("identities_extern_uid"); ok {
+		externalUID := data.(string)
 		listUsersOptions.ExternalUID = &externalUID
-		options += externalUID
+		optionsHash += externalUID
 	}
-	if provider := data["provider"].(string); provider != "" {
+	if data, ok := d.GetOk("identities_provider"); ok {
+		provider := data.(string)
 		// listUsersOptions.Provider = &provider
-		options += provider
+		optionsHash += provider
 	}
-	if createdBefore := data["created_before"].(string); createdBefore != "" {
+	if data, ok := d.GetOk("created_before"); ok {
+		createdBefore := data.(string)
 		date, err := time.Parse("2006-01-02", createdBefore)
 		if err != nil {
 			return nil, 0, fmt.Errorf("created_before must be in yyyy-mm-dd format")
 		}
 		listUsersOptions.CreatedBefore = &date
-		options += createdBefore
+		optionsHash += createdBefore
 	}
-	if createdAfter := data["created_after"].(string); createdAfter != "" {
+	if data, ok := d.GetOk("created_after"); ok {
+		createdAfter := data.(string)
 		// date, err := time.Parse("2006-01-02", createdAfter)
 		// if err != nil {
 		// 	return nil, 0, fmt.Errorf("created_after must be in yyyy-mm-dd format")
 		// }
 		// listUsersOptions.CreatedAfter = &date
-		options += createdAfter
+		optionsHash += createdAfter
 	}
 
-	id := schema.HashString(options)
+	id := schema.HashString(optionsHash)
 
 	return listUsersOptions, id, nil
 }
