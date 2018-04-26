@@ -66,6 +66,72 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					}),
 				),
 			},
+			//Update the project to share the project with a group
+			{
+				Config: testAccGitlabProjectSharedWithGroup(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-%d", rInt),
+						Path:                 fmt.Sprintf("foo.%d", rInt),
+						Description:          "Terraform acceptance tests",
+						IssuesEnabled:        true,
+						MergeRequestsEnabled: true,
+						WikiEnabled:          true,
+						SnippetsEnabled:      true,
+						Visibility:           gitlab.PublicVisibility,
+						SharedWithGroups: []struct {
+							GroupID          int
+							GroupName        string
+							GroupAccessLevel int
+						}{{0, "", 30}},
+					}),
+				),
+			},
+			//Update the project to share the project with more groups
+			{
+				Config: testAccGitlabProjectSharedWithGroup2(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-%d", rInt),
+						Path:                 fmt.Sprintf("foo.%d", rInt),
+						Description:          "Terraform acceptance tests",
+						IssuesEnabled:        true,
+						MergeRequestsEnabled: true,
+						WikiEnabled:          true,
+						SnippetsEnabled:      true,
+						Visibility:           gitlab.PublicVisibility,
+						SharedWithGroups: []struct {
+							GroupID          int
+							GroupName        string
+							GroupAccessLevel int
+						}{{0, "", 10}, {0, "", 30}},
+					}),
+				),
+			},
+			//Update the project to unshare the project from 1 group
+			{
+				Config: testAccGitlabProjectSharedWithGroup(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-%d", rInt),
+						Path:                 fmt.Sprintf("foo.%d", rInt),
+						Description:          "Terraform acceptance tests",
+						IssuesEnabled:        true,
+						MergeRequestsEnabled: true,
+						WikiEnabled:          true,
+						SnippetsEnabled:      true,
+						Visibility:           gitlab.PublicVisibility,
+						SharedWithGroups: []struct {
+							GroupID          int
+							GroupName        string
+							GroupAccessLevel int
+						}{{0, "", 30}},
+					}),
+				),
+			},
 		},
 	})
 }
@@ -142,6 +208,11 @@ type testAccGitlabProjectExpectedAttributes struct {
 	WikiEnabled          bool
 	SnippetsEnabled      bool
 	Visibility           gitlab.VisibilityValue
+	SharedWithGroups     []struct {
+		GroupID          int
+		GroupName        string
+		GroupAccessLevel int
+	}
 }
 
 func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
@@ -178,6 +249,12 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 
 		if project.Visibility != want.Visibility {
 			return fmt.Errorf("got visibility %q; want %q", project.Visibility, want.Visibility)
+		}
+
+		for i, group := range project.SharedWithGroups {
+			if group.GroupAccessLevel != want.SharedWithGroups[i].GroupAccessLevel {
+				return fmt.Errorf("got shared with groups access: %d; want %d", group.GroupAccessLevel, want.SharedWithGroups[i].GroupAccessLevel)
+			}
 		}
 
 		return nil
@@ -257,4 +334,65 @@ resource "gitlab_project" "foo" {
   snippets_enabled = false
 }
 	`, rInt, rInt)
+}
+
+func testAccGitlabProjectSharedWithGroup(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  visibility_level = "public"
+
+  shared_with_groups = [
+    {
+		group_id           = "${gitlab_group.foo.id}"
+        group_access_level = "developer"
+    }
+  ]
+}
+
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests!"
+  visibility_level = "public"
+}
+	`, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectSharedWithGroup2(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  visibility_level = "public"
+
+  shared_with_groups = [
+    {
+		group_id           = "${gitlab_group.foo.id}"
+        group_access_level = "guest"
+	},
+	{
+		group_id           = "${gitlab_group.foo2.id}"
+        group_access_level = "developer"
+    }
+  ]
+}
+
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests!"
+  visibility_level = "public"
+}
+
+resource "gitlab_group" "foo2" {
+  name = "foo2-name-%d"
+  path = "foo2-path-%d"
+  description = "Terraform acceptance tests!"
+  visibility_level = "public"
+}
+	`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
