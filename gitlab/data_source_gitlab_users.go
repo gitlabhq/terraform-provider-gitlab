@@ -182,36 +182,43 @@ func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions,
 		listUsersOptions.OrderBy = &orderBy
 		optionsHash += orderBy
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("sort"); ok {
 		sort := data.(string)
 		listUsersOptions.Sort = &sort
 		optionsHash += sort
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("search"); ok {
 		search := data.(string)
 		listUsersOptions.Search = &search
 		optionsHash += search
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("active"); ok {
 		active := data.(bool)
 		listUsersOptions.Active = &active
 		optionsHash += strconv.FormatBool(active)
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("blocked"); ok {
 		blocked := data.(bool)
 		listUsersOptions.Blocked = &blocked
 		optionsHash += strconv.FormatBool(blocked)
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("identities_extern_uid"); ok {
 		externalUID := data.(string)
 		listUsersOptions.ExternalUID = &externalUID
 		optionsHash += externalUID
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("identities_provider"); ok {
 		provider := data.(string)
 		// listUsersOptions.Provider = &provider
 		optionsHash += provider
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("created_before"); ok {
 		createdBefore := data.(string)
 		date, err := time.Parse("2006-01-02", createdBefore)
@@ -221,6 +228,7 @@ func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions,
 		listUsersOptions.CreatedBefore = &date
 		optionsHash += createdBefore
 	}
+	optionsHash += ","
 	if data, ok := d.GetOk("created_after"); ok {
 		createdAfter := data.(string)
 		// date, err := time.Parse("2006-01-02", createdAfter)
