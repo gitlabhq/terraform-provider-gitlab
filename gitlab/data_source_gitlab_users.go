@@ -215,7 +215,7 @@ func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions,
 	optionsHash += ","
 	if data, ok := d.GetOk("identities_provider"); ok {
 		provider := data.(string)
-		// listUsersOptions.Provider = &provider
+		listUsersOptions.Provider = &provider
 		optionsHash += provider
 	}
 	optionsHash += ","
@@ -231,11 +231,11 @@ func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions,
 	optionsHash += ","
 	if data, ok := d.GetOk("created_after"); ok {
 		createdAfter := data.(string)
-		// date, err := time.Parse("2006-01-02", createdAfter)
-		// if err != nil {
-		// 	return nil, 0, fmt.Errorf("created_after must be in yyyy-mm-dd format")
-		// }
-		// listUsersOptions.CreatedAfter = &date
+		date, err := time.Parse("2006-01-02", createdAfter)
+		if err != nil {
+			return nil, 0, fmt.Errorf("created_after must be in yyyy-mm-dd format")
+		}
+		listUsersOptions.CreatedAfter = &date
 		optionsHash += createdAfter
 	}
 
