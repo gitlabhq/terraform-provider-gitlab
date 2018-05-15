@@ -34,6 +34,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:            false,
 						CanCreateGroup:   false,
 						SkipConfirmation: true,
+						External:         false,
 					}),
 				),
 			},
@@ -51,6 +52,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:            true,
 						CanCreateGroup:   true,
 						SkipConfirmation: false,
+						External:         true,
 					}),
 				),
 			},
@@ -68,6 +70,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:            false,
 						CanCreateGroup:   false,
 						SkipConfirmation: false,
+						External:         false,
 					}),
 				),
 			},
@@ -108,6 +111,7 @@ type testAccGitlabUserExpectedAttributes struct {
 	Admin            bool
 	CanCreateGroup   bool
 	SkipConfirmation bool
+	External         bool
 }
 
 func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUserExpectedAttributes) resource.TestCheckFunc {
@@ -158,6 +162,7 @@ resource "gitlab_user" "foo" {
   is_admin         = false
   projects_limit   = 0
   can_create_group = false
+  is_external      = false
 }
   `, rInt, rInt, rInt, rInt)
 }
@@ -172,6 +177,7 @@ resource "gitlab_user" "foo" {
   is_admin         = true
   projects_limit   = 10
   can_create_group = true
+  is_external      = true
 }
   `, rInt, rInt, rInt, rInt)
 }
