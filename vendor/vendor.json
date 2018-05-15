@@ -252,8 +252,10 @@
 			"revision": "2a60fc2ba6c19de80291203597d752e9ba58e4c0"
 		},
 		{
+			"checksumSHA1": "5P2IcaZQ23sanVCogCk4S0zJGXU=",
 			"path": "github.com/gorilla/websocket",
-			"revision": ""
+			"revision": "21ab95fa12b9bdd8fecf5fa3586aad941cc98785",
+			"revisionTime": "2018-04-20T17:16:12Z"
 		},
 		{
 			"checksumSHA1": "cdOCt0Yb+hdErz8NAQqayxPmRsY=",
@@ -577,8 +579,10 @@
 			"revisionTime": "2016-10-03T17:45:16Z"
 		},
 		{
+			"checksumSHA1": "ljd3FhYRJ91cLZz3wsH9BQQ2JbA=",
 			"path": "github.com/pkg/errors",
-			"revision": ""
+			"revision": "816c9085562cd7ee03e7f8188a1cfd942858cded",
+			"revisionTime": "2018-03-11T21:45:15Z"
 		},
 		{
 			"checksumSHA1": "u5s2PZ7fzCOqQX7bVPf9IJ+qNLQ=",
@@ -587,8 +591,10 @@
 			"revisionTime": "2017-04-07T04:09:43Z"
 		},
 		{
+			"checksumSHA1": "HaWkK5qs6scz0y5pm+R13bEDBOI=",
 			"path": "github.com/rancher/go-rancher/client",
-			"revision": ""
+			"revision": "5d4e55e3f5de872bd5136d538139fffad238ad3a",
+			"revisionTime": "2017-12-19T19:17:06Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
@@ -597,8 +603,10 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
+			"checksumSHA1": "I8U9F0yoUfIQhtuMu1giDzyeLXY=",
 			"path": "github.com/terraform-providers/terraform-provider-gitlab/gitlab",
-			"revision": ""
+			"revision": "af02e06a52d8e986ee2c9bbce7c50549e32cb794",
+			"revisionTime": "2018-05-02T17:28:57Z"
 		},
 		{
 			"checksumSHA1": "vaWKo1D5oR4MBMAoU4BfoHmGYgI=",
@@ -685,12 +693,16 @@
 			"revisionTime": "2017-02-08T20:51:15Z"
 		},
 		{
+			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
 			"path": "golang.org/x/net/context",
-			"revision": ""
+			"revision": "2491c5de3490fced2f6cff376127c667efeed857",
+			"revisionTime": "2018-05-11T17:36:03Z"
 		},
 		{
+			"checksumSHA1": "WHc3uByvGaMcnSoI21fhzYgbOgg=",
 			"path": "golang.org/x/net/context/ctxhttp",
-			"revision": ""
+			"revision": "2491c5de3490fced2f6cff376127c667efeed857",
+			"revisionTime": "2018-05-11T17:36:03Z"
 		},
 		{
 			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",
