@@ -731,5 +731,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "terraform-provider-gitlab"
+	"rootPath": "github.com/terraform-providers/terraform-provider-gitlab"
 }
