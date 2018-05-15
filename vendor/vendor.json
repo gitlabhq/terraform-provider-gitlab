@@ -579,10 +579,18 @@
 			"revisionTime": "2017-04-07T04:09:43Z"
 		},
 		{
+			"path": "github.com/rancher/go-rancher/client",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
 			"path": "github.com/satori/go.uuid",
 			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
 			"revisionTime": "2016-09-27T10:08:44Z"
+		},
+		{
+			"path": "github.com/terraform-providers/terraform-provider-gitlab/gitlab",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "vaWKo1D5oR4MBMAoU4BfoHmGYgI=",
@@ -667,6 +675,14 @@
 			"path": "golang.org/x/crypto/ssh",
 			"revision": "453249f01cfeb54c3d549ddb75ff152ca243f9d8",
 			"revisionTime": "2017-02-08T20:51:15Z"
+		},
+		{
+			"path": "golang.org/x/net/context",
+			"revision": ""
+		},
+		{
+			"path": "golang.org/x/net/context/ctxhttp",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "vqc3a+oTUGX8PmD0TS+qQ7gmN8I=",
