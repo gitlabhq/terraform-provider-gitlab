@@ -11,8 +11,8 @@
 		{
 			"checksumSHA1": "+2yCNqbcf7VcavAptooQReTGiHY=",
 			"path": "github.com/apparentlymart/go-rundeck-api",
-			"revision": "f6af74d34d1ef69a511c59173876fc1174c11f0d",
-			"revisionTime": "2016-08-26T14:30:32Z"
+			"revision": "2c962acae81080a937c350a5bea054c239f27a81",
+			"revisionTime": "2017-07-05T17:22:45Z"
 		},
 		{
 			"checksumSHA1": "fFU9OeM0pKWGL3D+Fa3PmHSjjLg=",
@@ -250,6 +250,10 @@
 			"checksumSHA1": "Evpv9y6iPdy+8FeAVDmKrqV1sqo=",
 			"path": "github.com/google/go-querystring/query",
 			"revision": "2a60fc2ba6c19de80291203597d752e9ba58e4c0"
+		},
+		{
+			"path": "github.com/gorilla/websocket",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "cdOCt0Yb+hdErz8NAQqayxPmRsY=",
@@ -571,6 +575,10 @@
 			"path": "github.com/mitchellh/reflectwalk",
 			"revision": "92573fe8d000a145bfebc03a16bc22b34945867f",
 			"revisionTime": "2016-10-03T17:45:16Z"
+		},
+		{
+			"path": "github.com/pkg/errors",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "u5s2PZ7fzCOqQX7bVPf9IJ+qNLQ=",
