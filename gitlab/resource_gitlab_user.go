@@ -55,6 +55,11 @@ func resourceGitlabUser() *schema.Resource {
 				Optional: true,
 				Default:  0,
 			},
+			"is_external": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -77,6 +82,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		Admin:            gitlab.Bool(d.Get("is_admin").(bool)),
 		CanCreateGroup:   gitlab.Bool(d.Get("can_create_group").(bool)),
 		SkipConfirmation: gitlab.Bool(d.Get("skip_confirmation").(bool)),
+		External:         gitlab.Bool(d.Get("is_external").(bool)),
 	}
 
 	log.Printf("[DEBUG] create gitlab user %q", options.Username)
@@ -88,6 +94,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
 	d.Set("is_admin", user.IsAdmin)
+	d.Set("is_external", user.External)
 
 	return resourceGitlabUserRead(d, meta)
 }
@@ -136,6 +143,10 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("projects_limit") {
 		options.ProjectsLimit = gitlab.Int(d.Get("projects_limit").(int))
+	}
+
+	if d.HasChange("is_external") {
+		options.Admin = gitlab.Bool(d.Get("is_external").(bool))
 	}
 
 	log.Printf("[DEBUG] update gitlab user %s", d.Id())

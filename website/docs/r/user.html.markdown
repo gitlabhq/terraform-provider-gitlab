@@ -22,6 +22,7 @@ resource "gitlab_user" "example" {
   is_admin         = true
   projects_limit   = 4
   can_create_group = false
+  is_external      = true
 }
 ```
 
@@ -45,6 +46,8 @@ for the user.
 * `can_create_group` - (Optional) Boolean, defaults to false. Whether to allow the user to create groups.
 
 * `skip_confirmation` - (Optional) Boolean, defaults to true. Whether to skip confirmation.
+
+* `is_external` - (Optional) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
 
 ## Attributes Reference
 
