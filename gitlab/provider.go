@@ -40,13 +40,20 @@ func Provider() terraform.ResourceProvider {
 				Description: descriptions["insecure"],
 			},
 		},
+
+		DataSourcesMap: map[string]*schema.Resource{
+			"gitlab_project": dataSourceGitlabProject(),
+			"gitlab_user":    dataSourceGitlabUser(),
+		},
+
 		ResourcesMap: map[string]*schema.Resource{
-			"gitlab_group":        resourceGitlabGroup(),
-			"gitlab_project":      resourceGitlabProject(),
-			"gitlab_label":        resourceGitlabLabel(),
-			"gitlab_project_hook": resourceGitlabProjectHook(),
-			"gitlab_deploy_key":   resourceGitlabDeployKey(),
-			"gitlab_user":         resourceGitlabUser(),
+			"gitlab_group":              resourceGitlabGroup(),
+			"gitlab_project":            resourceGitlabProject(),
+			"gitlab_label":              resourceGitlabLabel(),
+			"gitlab_project_hook":       resourceGitlabProjectHook(),
+			"gitlab_deploy_key":         resourceGitlabDeployKey(),
+			"gitlab_user":               resourceGitlabUser(),
+			"gitlab_project_membership": resourceGitlabProjectMembership(),
 		},
 
 		ConfigureFunc: providerConfigure,
