@@ -15,6 +15,9 @@ func resourceGitlabUser() *schema.Resource {
 		Read:   resourceGitlabUserRead,
 		Update: resourceGitlabUserUpdate,
 		Delete: resourceGitlabUserDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"username": {
