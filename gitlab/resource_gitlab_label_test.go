@@ -73,7 +73,7 @@ func testAccCheckGitlabLabelExists(n string, label *gitlab.Label) resource.TestC
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		labels, _, err := conn.Labels.ListLabels(repoName)
+		labels, _, err := conn.Labels.ListLabels(repoName, nil)
 		if err != nil {
 			return err
 		}
