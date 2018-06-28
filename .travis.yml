@@ -5,6 +5,9 @@ services:
 language: go
 go:
   - "1.11.x"
+env:
+  GITLAB_BASE_URL: http://127.0.0.1:8080/api/v4
+  GITLAB_TOKEN: ACCTEST
 
 install:
 # This script is used by the Travis build to install a cookie for
@@ -13,9 +16,11 @@ install:
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
 - go get github.com/kardianos/govendor
+- bash scripts/start-gitlab.sh
 
 script:
 - make test
+- make testacc
 - make vendor-status
 - make vet
 - make website-test
