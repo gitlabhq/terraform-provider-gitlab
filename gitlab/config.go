@@ -39,7 +39,10 @@ func (c *Config) Client() (interface{}, error) {
 		tlsConfig.InsecureSkipVerify = true
 	}
 
-	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	transport := &http.Transport{
+		Proxy:           http.ProxyFromEnvironment,
+		TLSClientConfig: tlsConfig,
+	}
 
 	httpClient := &http.Client{Transport: transport}
 
