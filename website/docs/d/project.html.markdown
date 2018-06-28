@@ -31,7 +31,7 @@ The following attributes are exported:
 * `path` - The path of the repository.
 
 * `namespace_id` - The namespace (group or user) of the project. Defaults to your user.
-  See [`gitlab_group`](group.html) for an example.
+  See [`gitlab_group`](../r/group.html) for an example.
 
 * `description` - A description of the project.
 
