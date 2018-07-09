@@ -24,17 +24,15 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Config: testAccGitlabProjectVariableConfig(rString),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
-					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:   fmt.Sprintf("key-%s", rString),
-						Value: fmt.Sprintf("value-%s", rString),
-					}),
+					resource.TestCheckResourceAttr("gitlab_project_variable.foo", "Key", fmt.Sprintf("key-%s", rString)),
+					resource.TestCheckResourceAttr("gitlab_project_variable.foo", "Value", fmt.Sprintf("value-%s", rString)),
 				),
 			},
 			// Update the project variable to toggle all the values to their inverse
 			{
 				Config: testAccGitlabProjectVariableUpdateConfig(rString),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectVariableExists("gitlab_project_hook.foo", &projectVariable),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
 						Key:       fmt.Sprintf("key-%s", rString),
 						Value:     fmt.Sprintf("value-inverse-%s", rString),
@@ -46,7 +44,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectVariableConfig(rString),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectVariableExists("gitlab_project_hook.foo", &projectVariable),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
 						Key:       fmt.Sprintf("key-%s", rString),
 						Value:     fmt.Sprintf("value-%s", rString),

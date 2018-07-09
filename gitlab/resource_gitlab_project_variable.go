@@ -20,8 +20,9 @@ func resourceGitlabProjectVariable() *schema.Resource {
 				Required: true,
 			},
 			"key": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: StringIsGitlabVariableName(),
 			},
 			"value": {
 				Type:      schema.TypeString,
