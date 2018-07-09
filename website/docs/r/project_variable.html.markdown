@@ -35,7 +35,3 @@ The following arguments are supported:
 * `value` - (Required, string) The value of the variable.
 
 * `protected` - (Optional, boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-
-## Attributes Reference
-
-This resource does not currently export any attribute.
