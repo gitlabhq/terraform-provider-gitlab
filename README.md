@@ -48,15 +48,16 @@ $ $GOPATH/bin/terraform-provider-gitlab
 ...
 ```
 
-In order to test the provider, you can simply run `make test`.
+### Running tests
+The Terraform Provider only has acceptance tests, these can run against a gitlab instance where you have a token with administrator permissions (likely not gitlab.com). 
+There is excellent documentation on [how to run gitlab from docker at gitlab.com](https://docs.gitlab.com/omnibus/docker/)
 
-```sh
-$ make test
-```
+In order to run the full suite of acceptance tests, export the environment variables: 
 
-In order to run the full suite of Acceptance tests, run `make testacc`.
+- `GITLAB_TOKEN` //token for account with admin priviliges
+- `GITLAB_BASE_URL` //URL with api part e.g. `http://localhost:8929/api/v4/`
 
-*Note:* Acceptance tests create real resources, and often cost money to run.
+and run `make testacc`.
 
 ```sh
 $ make testacc
