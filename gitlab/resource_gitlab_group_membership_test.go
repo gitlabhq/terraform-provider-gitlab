@@ -141,7 +141,7 @@ username = "listest%d"
 password = "test%dtt"
 email = "listest%d@ssss.com"
 }
-`, rInt, rInt, rInt, rInt, rInt)
+`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabGroupMembershipUpdateConfig(rInt int) string {
@@ -162,5 +162,5 @@ username = "listest%d"
 password = "test%dtt"
 email = "listest%d@ssss.com"
 }
-`, rInt, rInt, rInt, rInt, rInt)
+`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
