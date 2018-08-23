@@ -13,6 +13,9 @@ func resourceGitlabProjectVariable() *schema.Resource {
 		Read:   resourceGitlabProjectVariableRead,
 		Update: resourceGitlabProjectVariableUpdate,
 		Delete: resourceGitlabProjectVariableDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -49,18 +52,24 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] create gitlab project variable %s/%s", project, key)
 
-	_, _, err := client.BuildVariables.CreateBuildVariable(project, options)
+	v, _, err := client.BuildVariables.CreateBuildVariable(project, options)
 	if err != nil {
 		return err
 	}
+
+	d.SetId(buildTwoPartID(&project, &v.Key))
 
 	return resourceGitlabProjectVariableRead(d, meta)
 }
 
 func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	key := d.Get("key").(string)
+
+	project, key, err := parseTwoPartID(d.Id())
+	if err != nil {
+		return err
+	}
+
 	log.Printf("[DEBUG] read gitlab project variable %s/%s", project, key)
 
 	v, _, err := client.BuildVariables.GetBuildVariable(project, key)
@@ -68,8 +77,12 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
+	d.Set("key", v.Key)
 	d.Set("value", v.Value)
+	d.Set("project", project)
 	d.Set("protected", v.Protected)
+	d.SetId(buildTwoPartID(&project, &v.Key))
+
 	return nil
 }
 
@@ -84,10 +97,12 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] update gitlab project variable %s/%s", project, key)
 
-	_, _, err := client.BuildVariables.UpdateBuildVariable(project, key, options)
+	v, _, err := client.BuildVariables.UpdateBuildVariable(project, key, options)
 	if err != nil {
 		return err
 	}
+
+	d.SetId(buildTwoPartID(&project, &v.Key))
 
 	return resourceGitlabProjectVariableRead(d, meta)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/xanzy/go-gitlab"
 	"regexp"
+	"strings"
 )
 
 // copied from ../github/util.go
@@ -58,4 +59,19 @@ func StringIsGitlabVariableName() schema.SchemaValidateFunc {
 		}
 		return
 	}
+}
+
+// return the pieces of id `a:b` as a, b
+func parseTwoPartID(id string) (string, string, error) {
+	parts := strings.SplitN(id, ":", 2)
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("Unexpected ID format (%q). Expected project:key", id)
+	}
+
+	return parts[0], parts[1], nil
+}
+
+// format the strings into an id `a:b`
+func buildTwoPartID(a, b *string) string {
+	return fmt.Sprintf("%s:%s", *a, *b)
 }
