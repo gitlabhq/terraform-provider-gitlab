@@ -36,7 +36,8 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://gitlab.com/api/v4/"
+	defaultBaseURL = "https://gitlab.com/"
+	apiVersionPath = "api/v4/"
 	userAgent      = "go-gitlab"
 )
 
@@ -185,19 +186,6 @@ var notificationLevelTypes = map[string]NotificationLevelValue{
 	"custom":        CustomNotificationLevel,
 }
 
-// OrderByValue represent in which order to sort the item
-type OrderByValue string
-
-// These constants represent all valid order by values.
-const (
-	OrderByCreatedAt OrderByValue = "created_at"
-	OrderByID        OrderByValue = "id"
-	OrderByIID       OrderByValue = "iid"
-	OrderByRef       OrderByValue = "ref"
-	OrderByStatus    OrderByValue = "status"
-	OrderByUserID    OrderByValue = "user_id"
-)
-
 // VisibilityValue represents a visibility level within GitLab.
 //
 // GitLab API docs: https://docs.gitlab.com/ce/api/
@@ -210,6 +198,20 @@ const (
 	PrivateVisibility  VisibilityValue = "private"
 	InternalVisibility VisibilityValue = "internal"
 	PublicVisibility   VisibilityValue = "public"
+)
+
+// MergeMethodValue represents a project merge type within GitLab.
+//
+// GitLab API docs: https://docs.gitlab.com/ce/api/projects.html#project-merge-method
+type MergeMethodValue string
+
+// List of available merge type
+//
+// GitLab API docs: https://docs.gitlab.com/ce/api/projects.html#project-merge-method
+const (
+	NoFastForwardMerge MergeMethodValue = "merge"
+	FastForwardMerge   MergeMethodValue = "ff"
+	RebaseMerge        MergeMethodValue = "rebase_merge"
 )
 
 // EventTypeValue represents actions type for contribution events
@@ -283,11 +285,14 @@ type Client struct {
 	Features              *FeaturesService
 	GitIgnoreTemplates    *GitIgnoreTemplatesService
 	Groups                *GroupsService
+	GroupIssueBoards      *GroupIssueBoardsService
 	GroupMembers          *GroupMembersService
 	GroupMilestones       *GroupMilestonesService
+	GroupVariables        *GroupVariablesService
 	Issues                *IssuesService
 	IssueLinks            *IssueLinksService
 	Jobs                  *JobsService
+	Keys                  *KeysService
 	Boards                *IssueBoardsService
 	Labels                *LabelsService
 	MergeRequests         *MergeRequestsService
@@ -303,6 +308,7 @@ type Client struct {
 	Projects              *ProjectsService
 	ProjectMembers        *ProjectMembersService
 	ProjectSnippets       *ProjectSnippetsService
+	ProjectVariables      *ProjectVariablesService
 	ProtectedBranches     *ProtectedBranchesService
 	Repositories          *RepositoriesService
 	RepositoryFiles       *RepositoryFilesService
@@ -350,7 +356,7 @@ func NewBasicAuthClient(httpClient *http.Client, endpoint, username, password st
 	client.authType = basicAuth
 	client.username = username
 	client.password = password
-	client.SetBaseURL(endpoint + "/api/v4")
+	client.SetBaseURL(endpoint)
 
 	err := client.requestOAuthToken(context.TODO())
 	if err != nil {
@@ -413,11 +419,14 @@ func newClient(httpClient *http.Client) *Client {
 	c.Features = &FeaturesService{client: c}
 	c.GitIgnoreTemplates = &GitIgnoreTemplatesService{client: c}
 	c.Groups = &GroupsService{client: c}
+	c.GroupIssueBoards = &GroupIssueBoardsService{client: c}
 	c.GroupMembers = &GroupMembersService{client: c}
 	c.GroupMilestones = &GroupMilestonesService{client: c}
+	c.GroupVariables = &GroupVariablesService{client: c}
 	c.Issues = &IssuesService{client: c, timeStats: timeStats}
 	c.IssueLinks = &IssueLinksService{client: c}
 	c.Jobs = &JobsService{client: c}
+	c.Keys = &KeysService{client: c}
 	c.Boards = &IssueBoardsService{client: c}
 	c.Labels = &LabelsService{client: c}
 	c.MergeRequests = &MergeRequestsService{client: c, timeStats: timeStats}
@@ -433,6 +442,7 @@ func newClient(httpClient *http.Client) *Client {
 	c.Projects = &ProjectsService{client: c}
 	c.ProjectMembers = &ProjectMembersService{client: c}
 	c.ProjectSnippets = &ProjectSnippetsService{client: c}
+	c.ProjectVariables = &ProjectVariablesService{client: c}
 	c.ProtectedBranches = &ProtectedBranchesService{client: c}
 	c.Repositories = &RepositoriesService{client: c}
 	c.RepositoryFiles = &RepositoryFilesService{client: c}
@@ -468,9 +478,19 @@ func (c *Client) SetBaseURL(urlStr string) error {
 		urlStr += "/"
 	}
 
-	var err error
-	c.baseURL, err = url.Parse(urlStr)
-	return err
+	baseURL, err := url.Parse(urlStr)
+	if err != nil {
+		return err
+	}
+
+	if !strings.HasSuffix(baseURL.Path, apiVersionPath) {
+		baseURL.Path += apiVersionPath
+	}
+
+	// Update the base URL of the client.
+	c.baseURL = baseURL
+
+	return nil
 }
 
 // NewRequest creates an API request. A relative URL path can be provided in
@@ -655,6 +675,7 @@ func parseID(id interface{}) (string, error) {
 // GitLab API docs:
 // https://docs.gitlab.com/ce/api/README.html#data-validation-and-error-reporting
 type ErrorResponse struct {
+	Body     []byte
 	Response *http.Response
 	Message  string
 }
@@ -675,12 +696,14 @@ func CheckResponse(r *http.Response) error {
 	errorResponse := &ErrorResponse{Response: r}
 	data, err := ioutil.ReadAll(r.Body)
 	if err == nil && data != nil {
+		errorResponse.Body = data
+
 		var raw interface{}
 		if err := json.Unmarshal(data, &raw); err != nil {
 			errorResponse.Message = "failed to parse unknown error format"
+		} else {
+			errorResponse.Message = parseError(raw)
 		}
-
-		errorResponse.Message = parseError(raw)
 	}
 
 	return errorResponse
@@ -804,18 +827,18 @@ func NotificationLevel(v NotificationLevelValue) *NotificationLevelValue {
 	return p
 }
 
-// OrderBy is a helper routine that allocates a new OrderByValue
-// to store v and returns a pointer to it.
-func OrderBy(v OrderByValue) *OrderByValue {
-	p := new(OrderByValue)
-	*p = v
-	return p
-}
-
 // Visibility is a helper routine that allocates a new VisibilityValue
 // to store v and returns a pointer to it.
 func Visibility(v VisibilityValue) *VisibilityValue {
 	p := new(VisibilityValue)
+	*p = v
+	return p
+}
+
+// MergeMethod is a helper routine that allocates a new MergeMethod
+// to sotre v and returns a pointer to it.
+func MergeMethod(v MergeMethodValue) *MergeMethodValue {
+	p := new(MergeMethodValue)
 	*p = v
 	return p
 }
