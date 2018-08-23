@@ -11,7 +11,7 @@ import (
 )
 
 func TestAccGitlabProjectVariable_basic(t *testing.T) {
-	var projectVariable gitlab.BuildVariable
+	var projectVariable gitlab.ProjectVariable
 	rString := acctest.RandString(5)
 
 	resource.Test(t, resource.TestCase{
@@ -58,7 +58,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabProjectVariableExists(n string, projectVariable *gitlab.BuildVariable) resource.TestCheckFunc {
+func testAccCheckGitlabProjectVariableExists(n string, projectVariable *gitlab.ProjectVariable) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -75,7 +75,7 @@ func testAccCheckGitlabProjectVariableExists(n string, projectVariable *gitlab.B
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotVariable, _, err := conn.BuildVariables.GetBuildVariable(repoName, key)
+		gotVariable, _, err := conn.ProjectVariables.GetVariable(repoName, key)
 		if err != nil {
 			return err
 		}
@@ -90,7 +90,7 @@ type testAccGitlabProjectVariableExpectedAttributes struct {
 	Protected bool
 }
 
-func testAccCheckGitlabProjectVariableAttributes(variable *gitlab.BuildVariable, want *testAccGitlabProjectVariableExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabProjectVariableAttributes(variable *gitlab.ProjectVariable, want *testAccGitlabProjectVariableExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if variable.Key != want.Key {
 			return fmt.Errorf("got key %s; want %s", variable.Key, want.Key)

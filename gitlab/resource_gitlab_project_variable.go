@@ -43,16 +43,21 @@ func resourceGitlabProjectVariable() *schema.Resource {
 
 func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
+
 	project := d.Get("project").(string)
 	key := d.Get("key").(string)
-	options := &gitlab.CreateBuildVariableOptions{
-		Key:       gitlab.String(key),
-		Value:     gitlab.String(d.Get("value").(string)),
-		Protected: gitlab.Bool(d.Get("protected").(bool)),
+	value := d.Get("value").(string)
+	protected := d.Get("protected").(bool)
+
+	options := gitlab.CreateVariableOptions{
+		Key:              &key,
+		Value:            &value,
+		Protected:        &protected,
+		EnvironmentScope: nil,
 	}
 	log.Printf("[DEBUG] create gitlab project variable %s/%s", project, key)
 
-	v, _, err := client.BuildVariables.CreateBuildVariable(project, options)
+	v, _, err := client.ProjectVariables.CreateVariable(project, &options)
 	if err != nil {
 		return err
 	}
@@ -72,7 +77,7 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] read gitlab project variable %s/%s", project, key)
 
-	v, _, err := client.BuildVariables.GetBuildVariable(project, key)
+	v, _, err := client.ProjectVariables.GetVariable(project, key)
 	if err != nil {
 		return err
 	}
@@ -88,16 +93,21 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 
 func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
+
 	project := d.Get("project").(string)
 	key := d.Get("key").(string)
-	options := &gitlab.UpdateBuildVariableOptions{
-		Key:       gitlab.String(d.Get("key").(string)),
-		Value:     gitlab.String(d.Get("value").(string)),
-		Protected: gitlab.Bool(d.Get("protected").(bool)),
+	value := d.Get("value").(string)
+	protected := d.Get("protected").(bool)
+
+	options := &gitlab.UpdateVariableOptions{
+		Key:              &key,
+		Value:            &value,
+		Protected:        &protected,
+		EnvironmentScope: nil,
 	}
 	log.Printf("[DEBUG] update gitlab project variable %s/%s", project, key)
 
-	v, _, err := client.BuildVariables.UpdateBuildVariable(project, key, options)
+	v, _, err := client.ProjectVariables.UpdateVariable(project, key, options)
 	if err != nil {
 		return err
 	}
@@ -113,6 +123,6 @@ func resourceGitlabProjectVariableDelete(d *schema.ResourceData, meta interface{
 	key := d.Get("key").(string)
 	log.Printf("[DEBUG] Delete gitlab project variable %s/%s", project, key)
 
-	_, err := client.BuildVariables.RemoveBuildVariable(project, key)
+	_, err := client.ProjectVariables.RemoveVariable(project, key)
 	return err
 }
