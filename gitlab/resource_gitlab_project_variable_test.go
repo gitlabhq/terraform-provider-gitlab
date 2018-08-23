@@ -25,7 +25,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:   fmt.Sprintf("key-%s", rString),
+						Key:   fmt.Sprintf("key_%s", rString),
 						Value: fmt.Sprintf("value-%s", rString),
 					}),
 				),
@@ -36,7 +36,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key-%s", rString),
+						Key:       fmt.Sprintf("key_%s", rString),
 						Value:     fmt.Sprintf("value-inverse-%s", rString),
 						Protected: true,
 					}),
@@ -48,7 +48,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key-%s", rString),
+						Key:       fmt.Sprintf("key_%s", rString),
 						Value:     fmt.Sprintf("value-%s", rString),
 						Protected: false,
 					}),
@@ -143,7 +143,7 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_project_variable" "foo" {
   project = "${gitlab_project.foo.id}"
-  key = "key-%s"
+  key = "key_%s"
   value = "value-%s"
 }
 	`, rString, rString, rString)
@@ -162,8 +162,8 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_project_variable" "foo" {
   project = "${gitlab_project.foo.id}"
-  key = "key-%s"
-  value = "value-%s"
+  key = "key_%s"
+  value = "value-inverse-%s"
   protected = true
 }
 	`, rString, rString, rString)
