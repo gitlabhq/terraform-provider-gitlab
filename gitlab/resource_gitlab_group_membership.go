@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -34,12 +35,10 @@ func resourceGitlabGroupMembership() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			// "expires_at": {
-			// 	Type:     schema.TypeString, // Format YYYY-MM-DD
-			// 	ForceNew: true,
-			// 	Required: false,
-			// 	Optional: true,
-			// },
+			"expires_at": {
+				Type:     schema.TypeString, // Format YYYY-MM-DD
+				Optional: true,
+			},
 		},
 	}
 }
@@ -47,69 +46,85 @@ func resourceGitlabGroupMembership() *schema.Resource {
 func resourceGitlabGroupMembershipCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	group_id := d.Get("group_id").(string)
-	access_level := strings.ToLower(d.Get("access_level").(string))
-	access_level_id, ok := accessLevelID[access_level]
-	if !ok {
-		return fmt.Errorf("Invalid access level '%s'", access_level)
-	}
-	user_id := d.Get("user_id").(int)
-	options := &gitlab.AddGroupMemberOptions{
-		UserID:      &user_id,
-		AccessLevel: &access_level_id,
-	}
-	log.Printf("[DEBUG] create gitlab group membership for %d in %s", options.UserID, group_id)
+	userId := d.Get("user_id").(int)
+	groupId := d.Get("group_id").(string)
+	expiresAt := d.Get("expires_at").(string)
+	accessLevel := strings.ToLower(d.Get("access_level").(string))
+	accessLevelId, ok := accessLevelID[accessLevel]
 
-	membership, _, err := client.GroupMembers.AddGroupMember(group_id, options)
+	if !ok {
+		return fmt.Errorf("Invalid access level '%s'", accessLevel)
+	}
+	options := &gitlab.AddGroupMemberOptions{
+		UserID:      &userId,
+		AccessLevel: &accessLevelId,
+		ExpiresAt:   &expiresAt,
+	}
+	log.Printf("[DEBUG] create gitlab group groupMember for %d in %s", options.UserID, groupId)
+
+	groupMember, _, err := client.GroupMembers.AddGroupMember(groupId, options)
 	if err != nil {
 		return err
 	}
-	d.SetId(fmt.Sprintf("%d", membership.ID))
-
+	userIdString := strconv.Itoa(groupMember.ID)
+	d.SetId(buildTwoPartID(&groupId, &userIdString))
 	return resourceGitlabGroupMembershipRead(d, meta)
 }
 
 func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] read gitlab group membership %s", d.Id())
+	id := d.Id()
+	log.Printf("[DEBUG] read gitlab group groupMember %s", id)
 
-	group_id := d.Get("group_id").(string)
-	user_id := d.Get("user_id").(int)
+	groupId, userId, e := groupIdAndUserIdFromId(id)
+	if e != nil {
+		return e
+	}
 
-	membership, resp, err := client.GroupMembers.GetGroupMember(group_id, user_id)
+	groupMember, resp, err := client.GroupMembers.GetGroupMember(groupId, userId)
 	if err != nil {
 		if resp.StatusCode == 404 {
-			log.Printf("[WARN] removing group membership %s for %s from state because it no longer exists in gitlab", d.Id(), group_id)
+			log.Printf("[WARN] removing group groupMember %v for %s from state because it no longer exists in gitlab", userId, groupId)
 			d.SetId("")
 			return nil
 		}
 		return err
 	}
 
-	resourceGitlabGroupMembershipSetToState(d, membership)
+	resourceGitlabGroupMembershipSetToState(d, groupMember, &groupId)
 	return nil
 }
 
-func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
-	if !d.HasChange("access_level") {
-		return nil
+func groupIdAndUserIdFromId(id string) (string, int, error) {
+	groupId, userIdString, err := parseTwoPartID(id)
+	userId, e := strconv.Atoi(userIdString)
+	if err != nil {
+		e = err
 	}
+	if e != nil {
+		log.Printf("[WARN] cannot get group member id from input: %v", id)
+	}
+	return groupId, userId, e
+}
 
+func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	group_id := d.Get("group_id").(string)
-	user_id := d.Get("user_id").(int)
-	access_level := strings.ToLower(d.Get("access_level").(string))
-	access_level_id, ok := accessLevelID[access_level]
+	userId := d.Get("user_id").(int)
+	groupId := d.Get("group_id").(string)
+	expiresAt := d.Get("expires_at").(string)
+	accessLevel := strings.ToLower(d.Get("access_level").(string))
+	accessLevelId, ok := accessLevelID[accessLevel]
 	if !ok {
-		return fmt.Errorf("Invalid access level '%s'", access_level)
+		return fmt.Errorf("Invalid access level '%s'", accessLevel)
 	}
 	options := gitlab.EditGroupMemberOptions{
-		AccessLevel: &access_level_id,
+		AccessLevel: &accessLevelId,
+		ExpiresAt:   &expiresAt,
 	}
-	log.Printf("[DEBUG] update gitlab group membership %s for %s", d.Id(), group_id)
+	log.Printf("[DEBUG] update gitlab group membership %v for %s", userId, groupId)
 
-	_, _, err := client.GroupMembers.EditGroupMember(group_id, user_id, &options)
+	_, _, err := client.GroupMembers.EditGroupMember(groupId, userId, &options)
 	if err != nil {
 		return err
 	}
@@ -119,19 +134,27 @@ func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{
 
 func resourceGitlabGroupMembershipDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	group_id := d.Get("group_id").(string)
-	user_id := d.Get("user_id").(int)
-	log.Printf("[DEBUG] Delete gitlab group membership %s for %s", d.Id(), group_id)
 
-	_, err := client.GroupMembers.RemoveGroupMember(group_id, user_id)
+	id := d.Id()
+	groupId, userId, e := groupIdAndUserIdFromId(id)
+	if e != nil {
+		return e
+	}
+
+	log.Printf("[DEBUG] Delete gitlab group membership %v for %s", userId, groupId)
+
+	_, err := client.GroupMembers.RemoveGroupMember(groupId, userId)
 	return err
 }
 
-func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, membership *gitlab.GroupMember) {
-	d.SetId(fmt.Sprintf("%d", membership.ID))
-	d.Set("username", membership.Username)
-	d.Set("email", membership.Email)
-	d.Set("Name", membership.Name)
-	d.Set("State", membership.State)
-	d.Set("AccessLevel", membership.AccessLevel)
+func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, group_id *string) {
+	d.Set("username", groupMember.Username)
+	d.Set("email", groupMember.Email)
+	d.Set("Name", groupMember.Name)
+	d.Set("State", groupMember.State)
+	d.Set("AccessLevel", groupMember.AccessLevel)
+	d.Set("ExpiresAt", groupMember.ExpiresAt)
+
+	userId := strconv.Itoa(groupMember.ID)
+	d.SetId(buildTwoPartID(group_id, &userId))
 }

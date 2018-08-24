@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccGitlabGroupMembership_basic(t *testing.T) {
-	var membership gitlab.GroupMember
+	var groupMember gitlab.GroupMember
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{PreCheck: func() { testAccPreCheck(t) },
@@ -23,24 +23,25 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			// Assign member to the group as a developer
 			{
 				Config: testAccGitlabGroupMembershipConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &membership), testAccCheckGitlabGroupMembershipAttributes(&membership, &testAccGitlabGroupMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
+					accessLevel: fmt.Sprintf("developer"),
 				})),
 			},
 
-			// Update the group member to change the access level (use testAccGitlabGroupMembershipUpdateConfig for Config)
+			//Update the group member to change the access level (use testAccGitlabGroupMembershipUpdateConfig for Config)
 			{
 				Config: testAccGitlabGroupMembershipUpdateConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &membership), testAccCheckGitlabGroupMembershipAttributes(&membership, &testAccGitlabGroupMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("guest"),
+				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
+					accessLevel: fmt.Sprintf("guest"),
+					expiresAt:   fmt.Sprintf("2099-01-01"),
 				})),
 			},
 
 			// Update the group member to change the access level back
 			{
 				Config: testAccGitlabGroupMembershipConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &membership), testAccCheckGitlabGroupMembershipAttributes(&membership, &testAccGitlabGroupMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
+					accessLevel: fmt.Sprintf("developer"),
 				})),
 			},
 		},
@@ -55,18 +56,18 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 			return fmt.Errorf("Not found: %s", n)
 		}
 
-		groupID := rs.Primary.Attributes["group_id"]
-		if groupID == "" {
+		groupId := rs.Primary.Attributes["group_id"]
+		if groupId == "" {
 			return fmt.Errorf("No group ID is set")
 		}
 
-		userID := rs.Primary.Attributes["user_id"]
-		id, _ := strconv.Atoi(userID)
-		if userID == "" {
-			return fmt.Errorf("No user id is set")
+		userIdString := rs.Primary.Attributes["user_id"]
+		userId, _ := strconv.Atoi(userIdString)
+		if userIdString == "" {
+			return fmt.Errorf("No user userId is set")
 		}
 
-		gotGroupMembership, _, err := conn.GroupMembers.GetGroupMember(groupID, id)
+		gotGroupMembership, _, err := conn.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
 			return err
 		}
@@ -77,18 +78,19 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 }
 
 type testAccGitlabGroupMembershipExpectedAttributes struct {
-	access_level string
+	accessLevel string
+	expiresAt   string
 }
 
 func testAccCheckGitlabGroupMembershipAttributes(membership *gitlab.GroupMember, want *testAccGitlabGroupMembershipExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		access_level_id, ok := accessLevel[membership.AccessLevel]
+		accessLevelId, ok := accessLevel[membership.AccessLevel]
 		if !ok {
-			return fmt.Errorf("Invalid access level '%s'", access_level_id)
+			return fmt.Errorf("Invalid access level '%s'", accessLevelId)
 		}
-		if access_level_id != want.access_level {
-			return fmt.Errorf("got access level %s; want %s", access_level_id, want.access_level)
+		if accessLevelId != want.accessLevel {
+			return fmt.Errorf("got access level %s; want %s", accessLevelId, want.accessLevel)
 		}
 		return nil
 	}
@@ -102,14 +104,14 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 			continue
 		}
 
-		groupID := rs.Primary.Attributes["group_id"]
-		userID := rs.Primary.Attributes["user_id"]
+		groupId := rs.Primary.Attributes["group_id"]
+		userIdString := rs.Primary.Attributes["user_id"]
 
-		// GetGroupMember needs int type for userID
-		userIDI, err := strconv.Atoi(userID)
-		gotMembership, resp, err := conn.GroupMembers.GetGroupMember(groupID, userIDI)
+		// GetGroupMember needs int type for userIdString
+		userId, err := strconv.Atoi(userIdString)
+		groupMember, resp, err := conn.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
-			if gotMembership != nil && fmt.Sprintf("%d", gotMembership.AccessLevel) == rs.Primary.Attributes["access_level"] {
+			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["accessLevel"] {
 				return fmt.Errorf("Group still has member.")
 			}
 			return nil
@@ -124,43 +126,44 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 }
 
 func testAccGitlabGroupMembershipConfig(rInt int) string {
-	return fmt.Sprintf(`resource "gitlab_group_membership" "foo" {
-group_id = "${gitlab_group.foo.id}"
-user_id = "${gitlab_user.test.id}"
-access_level = "developer"
-}
-
+	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
-name = "foo%d"
-path = "foo%d"
+  name = "foo%d"
+  path = "foo%d"
 }
 
 resource "gitlab_user" "test" {
-name = "foo%d"
-username = "listest%d"
-password = "test%dtt"
-email = "listest%d@ssss.com"
+  name 		= "foo%d"
+  username  = "listest%d"
+  password  = "test%dtt"
+  email 	= "listest%d@ssss.com"
 }
-`, rInt, rInt, rInt, rInt, rInt, rInt)
+
+resource "gitlab_group_membership" "foo" {
+  group_id 		= "${gitlab_group.foo.id}"
+  user_id 		= "${gitlab_user.test.id}"
+  access_level 	= "developer"
+}`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabGroupMembershipUpdateConfig(rInt int) string {
-	return fmt.Sprintf(`resource "gitlab_group_membership" "foo" {
-group_id = "${gitlab_group.foo.id}"
-user_id = "${gitlab_user.test.id}"
-access_level = "guest"
-}
-
+	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
-name = "foo%d"
-path = "foo%d"
+  name = "foo%d"
+  path = "foo%d"
 }
 
 resource "gitlab_user" "test" {
-name = "foo%d"
-username = "listest%d"
-password = "test%dtt"
-email = "listest%d@ssss.com"
+  name 		= "foo%d"
+  username 	= "listest%d"
+  password 	= "test%dtt"
+  email 	= "listest%d@ssss.com"
 }
-`, rInt, rInt, rInt, rInt, rInt, rInt)
+
+resource "gitlab_group_membership" "foo" {
+  group_id 		= "${gitlab_group.foo.id}"
+  user_id 		= "${gitlab_user.test.id}"
+  expires_at    = "2099-01-01"
+  access_level 	= "guest"
+}`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
