@@ -1,16 +1,19 @@
 package gitlab
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupMembership() *schema.Resource {
+	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
+	for k := range accessLevelID {
+		acceptedAccessLevels = append(acceptedAccessLevels, k)
+	}
 	return &schema.Resource{
 		Create: resourceGitlabGroupMembershipCreate,
 		Read:   resourceGitlabGroupMembershipRead,
@@ -32,8 +35,9 @@ func resourceGitlabGroupMembership() *schema.Resource {
 				Required: true,
 			},
 			"access_level": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				ValidateFunc: validateValueFunc(acceptedAccessLevels),
+				Required:     true,
 			},
 			"expires_at": {
 				Type:     schema.TypeString, // Format YYYY-MM-DD
@@ -49,12 +53,8 @@ func resourceGitlabGroupMembershipCreate(d *schema.ResourceData, meta interface{
 	userId := d.Get("user_id").(int)
 	groupId := d.Get("group_id").(string)
 	expiresAt := d.Get("expires_at").(string)
-	accessLevel := strings.ToLower(d.Get("access_level").(string))
-	accessLevelId, ok := accessLevelID[accessLevel]
+	accessLevelId := accessLevelID[d.Get("access_level").(string)]
 
-	if !ok {
-		return fmt.Errorf("Invalid access level '%s'", accessLevel)
-	}
 	options := &gitlab.AddGroupMemberOptions{
 		UserID:      &userId,
 		AccessLevel: &accessLevelId,
@@ -113,11 +113,8 @@ func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{
 	userId := d.Get("user_id").(int)
 	groupId := d.Get("group_id").(string)
 	expiresAt := d.Get("expires_at").(string)
-	accessLevel := strings.ToLower(d.Get("access_level").(string))
-	accessLevelId, ok := accessLevelID[accessLevel]
-	if !ok {
-		return fmt.Errorf("Invalid access level '%s'", accessLevel)
-	}
+	accessLevelId := accessLevelID[strings.ToLower(d.Get("access_level").(string))]
+
 	options := gitlab.EditGroupMemberOptions{
 		AccessLevel: &accessLevelId,
 		ExpiresAt:   &expiresAt,
