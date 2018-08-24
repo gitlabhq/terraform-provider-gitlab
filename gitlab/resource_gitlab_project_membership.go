@@ -44,14 +44,6 @@ func resourceGitlabProjectMembership() *schema.Resource {
 	}
 }
 
-var accessLevelID = map[string]gitlab.AccessLevelValue{
-	"guest":     gitlab.GuestPermissions,
-	"reporter":  gitlab.ReporterPermissions,
-	"developer": gitlab.DeveloperPermissions,
-	"master":    gitlab.MasterPermissions,
-	"owner":     gitlab.OwnerPermission,
-}
-
 func resourceGitlabProjectMembershipCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 

@@ -7,6 +7,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // copied from ../github/util.go
@@ -23,6 +24,18 @@ func validateValueFunc(values []string) schema.SchemaValidateFunc {
 
 		if !valid {
 			errors = append(errors, fmt.Errorf("%s is an invalid value for argument %s acceptable values are: %v", value, k, values))
+		}
+		return
+	}
+}
+
+func validateDateFunc() schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (we []string, errors []error) {
+		value := v.(string)
+		//add zero hours and let time figure out correctness
+		_, e := time.Parse(time.RFC3339, value+"T00:00:00Z")
+		if e != nil {
+			errors = append(errors, fmt.Errorf("%s is not valid for format YYYY-MM-DD", value))
 		}
 		return
 	}
@@ -74,4 +87,12 @@ func parseTwoPartID(id string) (string, string, error) {
 // format the strings into an id `a:b`
 func buildTwoPartID(a, b *string) string {
 	return fmt.Sprintf("%s:%s", *a, *b)
+}
+
+var accessLevelID = map[string]gitlab.AccessLevelValue{
+	"guest":     gitlab.GuestPermissions,
+	"reporter":  gitlab.ReporterPermissions,
+	"developer": gitlab.DeveloperPermissions,
+	"master":    gitlab.MasterPermissions,
+	"owner":     gitlab.OwnerPermission,
 }
