@@ -1,4 +1,21 @@
 ## 1.0.1 (Unreleased)
+
+FEATURES:
+
+* **New Resource:** `gitlab_project_membership`
+* **New Resource:** `gitlab_group_membership` ([#8](https://github.com/terraform-providers/terraform-provider-gitlab/issues/8))
+* **New Resource:** `gitlab_project_variable` ([#47](https://github.com/terraform-providers/terraform-provider-gitlab/issues/47))
+* **New Resource:** `gitlab_group_variable` ([#47](https://github.com/terraform-providers/terraform-provider-gitlab/issues/47))
+
+BACKWARDS INCOMPATIBILITIES:
+
+`gitlab_project_membership` is not compatible with a previous *unrealeased* version due to an id change resource will need to be reimported manually
+e.g
+```bash
+terraform state rm gitlab_project_membership.foo
+terraform import gitlab_project_membership.foo 12345:1337
+```
+
 ## 1.0.0 (October 06, 2017)
 
 BACKWARDS INCOMPATIBILITIES:

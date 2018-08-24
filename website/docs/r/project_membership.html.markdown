@@ -14,8 +14,8 @@ This resource allows you to add a current user to an existing project with a set
 
 ```hcl
 resource "gitlab_project_membership" "test" {
-project_id = "Test Project"
-user_id = "Test User"
+project_id = "12345"
+user_id = 1337
 access_level = "guest"
 }
 ```
@@ -30,9 +30,9 @@ The following arguments are supported:
 
 * `access_level` - (Required) One of five levels of access to the project.
 
-## Attributes Reference
+## Import
 
-The resource exports the following attributes:
+GitLab group membership can be imported using an id made up of `groupid:username`, e.g.
 
-* `id` - The unique id assigned to the membership by the GitLab server.
-
+```
+$ terraform import gitlab_group_membership.test 12345:1337

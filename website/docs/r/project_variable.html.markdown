@@ -10,14 +10,14 @@ description: |-
 
 This resource allows you to create and manage CI/CD variables for your GitLab projects.
 For further information on variables, consult the [gitlab
-documentation](https://docs.gitlab.com/ce/ci/variables/README.html).
+documentation](https://docs.gitlab.com/ce/ci/variables/README.html#variables).
 
 
 ## Example Usage
 
 ```hcl
 resource "gitlab_project_variable" "example" {
-   project   = "example/project_with_variables"
+   project   = "12345"
    key       = "project_variable_key"
    value     = "project_variable_value"
    protected = false
@@ -35,3 +35,11 @@ The following arguments are supported:
 * `value` - (Required, string) The value of the variable.
 
 * `protected` - (Optional, boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+
+## Import
+
+GitLab project variables can be imported using an id made up of `projectid:variablename`, e.g.
+
+```
+$ terraform import gitlab_group_membership.test 12345:project_variable_key
+```
