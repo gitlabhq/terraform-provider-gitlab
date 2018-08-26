@@ -77,8 +77,13 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] read gitlab project variable %s/%s", project, key)
 
-	v, _, err := client.ProjectVariables.GetVariable(project, key)
+	v, resp, err := client.ProjectVariables.GetVariable(project, key)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			log.Printf("[WARN] Project variable %v for project %s not found in gitlab", key, project)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
@@ -86,8 +91,6 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 	d.Set("value", v.Value)
 	d.Set("project", project)
 	d.Set("protected", v.Protected)
-	d.SetId(buildTwoPartID(&project, &v.Key))
-
 	return nil
 }
 
@@ -107,12 +110,15 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] update gitlab project variable %s/%s", project, key)
 
-	v, _, err := client.ProjectVariables.UpdateVariable(project, key, options)
+	_, resp, err := client.ProjectVariables.UpdateVariable(project, key, options)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			log.Printf("[WARN] Project variable %v for project %s not found in gitlab, removing from state", key, project)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
-
-	d.SetId(buildTwoPartID(&project, &v.Key))
 
 	return resourceGitlabProjectVariableRead(d, meta)
 }
