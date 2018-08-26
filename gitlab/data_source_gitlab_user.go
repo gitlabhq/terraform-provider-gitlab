@@ -15,7 +15,11 @@ func dataSourceGitlabUser() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"email": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+			},
+			"username": {
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 		},
 	}
@@ -27,8 +31,15 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] Reading Gitlab user")
 
 	searchEmail := strings.ToLower(d.Get("email").(string))
+	userName := strings.ToLower(d.Get("username").(string))
+	var q *string
+	if searchEmail != "" {
+		q = &searchEmail
+	} else {
+		q = &userName
+	}
 	query := &gitlab.ListUsersOptions{
-		Search: &searchEmail,
+		Search: q,
 	}
 	users, _, err := client.Users.ListUsers(query)
 	if err != nil {
@@ -37,18 +48,28 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	var found *gitlab.User
 
-	for _, user := range users {
-		if strings.ToLower(user.Email) == searchEmail {
-			found = user
-			break
+	if searchEmail != "" {
+		for _, user := range users {
+			if strings.ToLower(user.Email) == searchEmail {
+				found = user
+				break
+			}
+		}
+	} else {
+		for _, user := range users {
+			if strings.ToLower(user.Username) == userName {
+				found = user
+				break
+			}
 		}
 	}
+
 	if found == nil {
 		return fmt.Errorf("The email '%s' does not match any user email", searchEmail)
 	}
 	d.SetId(fmt.Sprintf("%d", found.ID))
 	d.Set("name", found.Name)
-	d.Set("username", found.Username)
+	d.Set("userName", found.Username)
 	d.Set("email", found.Email)
 	return nil
 }

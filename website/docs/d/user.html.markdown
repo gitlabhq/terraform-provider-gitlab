@@ -8,7 +8,7 @@ description: |-
 
 # gitlab\_user
 
-Provides details about a specific user in the gitlab provider. The results include username, id, name, etc.
+Provides details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.
 
 ## Example Usage
 
@@ -22,7 +22,11 @@ data "gitlab_user" "example" {
 
 The following arguments are supported:
 
-* `email` - (Required) The e-mail address of the user.
+* `email` - (Optional) The e-mail address of the user. (Requires administrator privileges)
+
+* `username` - (Optional) The username of the user.
+
+If both are given only e-mail is used.
 
 ## Attributes Reference
 
