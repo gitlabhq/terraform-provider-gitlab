@@ -150,14 +150,13 @@ func resourceGitlabGroupMembershipDelete(d *schema.ResourceData, meta interface{
 	return err
 }
 
-func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, group_id *string) {
-	d.Set("username", groupMember.Username)
-	d.Set("email", groupMember.Email)
-	d.Set("Name", groupMember.Name)
-	d.Set("State", groupMember.State)
-	d.Set("AccessLevel", groupMember.AccessLevel)
-	d.Set("ExpiresAt", groupMember.ExpiresAt)
+func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, groupId *string) {
+
+	d.Set("group_id", groupId)
+	d.Set("user_id", groupMember.ID)
+	d.Set("access_level", accessLevel[groupMember.AccessLevel])
+	d.Set("expires_at", groupMember.ExpiresAt)
 
 	userId := strconv.Itoa(groupMember.ID)
-	d.SetId(buildTwoPartID(group_id, &userId))
+	d.SetId(buildTwoPartID(groupId, &userId))
 }

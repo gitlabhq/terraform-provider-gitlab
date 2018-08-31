@@ -80,14 +80,6 @@ type testAccGitlabProjectMembershipExpectedAttributes struct {
 	access_level string
 }
 
-var accessLevel = map[gitlab.AccessLevelValue]string{
-	gitlab.GuestPermissions:     "guest",
-	gitlab.ReporterPermissions:  "reporter",
-	gitlab.DeveloperPermissions: "developer",
-	gitlab.MasterPermissions:    "master",
-	gitlab.OwnerPermission:      "owner",
-}
-
 func testAccCheckGitlabProjectMembershipAttributes(membership *gitlab.ProjectMember, want *testAccGitlabProjectMembershipExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 

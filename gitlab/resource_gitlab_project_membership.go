@@ -58,11 +58,11 @@ func resourceGitlabProjectMembershipCreate(d *schema.ResourceData, meta interfac
 	}
 	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.UserID, projectId)
 
-	projectMember, _, err := client.ProjectMembers.AddProjectMember(projectId, options)
+	_, _, err := client.ProjectMembers.AddProjectMember(projectId, options)
 	if err != nil {
 		return err
 	}
-	userIdString := strconv.Itoa(projectMember.ID)
+	userIdString := strconv.Itoa(userId)
 	d.SetId(buildTwoPartID(&projectId, &userIdString))
 	return resourceGitlabProjectMembershipRead(d, meta)
 }
@@ -142,13 +142,12 @@ func resourceGitlabProjectMembershipDelete(d *schema.ResourceData, meta interfac
 	return err
 }
 
-func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, project_id *string) {
-	d.Set("username", projectMember.Username)
-	d.Set("email", projectMember.Email)
-	d.Set("Name", projectMember.Name)
-	d.Set("State", projectMember.State)
-	d.Set("AccessLevel", projectMember.AccessLevel)
+func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) {
+
+	d.Set("project_id", projectId)
+	d.Set("user_id", projectMember.ID)
+	d.Set("access_level", accessLevel[projectMember.AccessLevel])
 
 	userId := strconv.Itoa(projectMember.ID)
-	d.SetId(buildTwoPartID(project_id, &userId))
+	d.SetId(buildTwoPartID(projectId, &userId))
 }

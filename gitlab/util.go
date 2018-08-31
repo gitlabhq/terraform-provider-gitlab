@@ -96,3 +96,11 @@ var accessLevelID = map[string]gitlab.AccessLevelValue{
 	"master":    gitlab.MasterPermissions,
 	"owner":     gitlab.OwnerPermission,
 }
+
+var accessLevel = map[gitlab.AccessLevelValue]string{
+	gitlab.GuestPermissions:     "guest",
+	gitlab.ReporterPermissions:  "reporter",
+	gitlab.DeveloperPermissions: "developer",
+	gitlab.MasterPermissions:    "master",
+	gitlab.OwnerPermission:      "owner",
+}

@@ -57,12 +57,12 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] create gitlab project variable %s/%s", project, key)
 
-	v, _, err := client.ProjectVariables.CreateVariable(project, &options)
+	_, _, err := client.ProjectVariables.CreateVariable(project, &options)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(buildTwoPartID(&project, &v.Key))
+	d.SetId(buildTwoPartID(&project, &key))
 
 	return resourceGitlabProjectVariableRead(d, meta)
 }

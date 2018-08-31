@@ -57,12 +57,12 @@ func resourceGitlabGroupVariableCreate(d *schema.ResourceData, meta interface{})
 	}
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", group, key)
 
-	groupVariable, _, err := client.GroupVariables.CreateVariable(group, &options)
+	_, _, err := client.GroupVariables.CreateVariable(group, &options)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(buildTwoPartID(&group, &groupVariable.Key))
+	d.SetId(buildTwoPartID(&group, &key))
 
 	return resourceGitlabGroupVariableRead(d, meta)
 }
