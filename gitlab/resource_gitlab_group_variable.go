@@ -20,10 +20,12 @@ func resourceGitlabGroupVariable() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"group": {
 				Type:     schema.TypeString,
+				ForceNew: true,
 				Required: true,
 			},
 			"key": {
 				Type:         schema.TypeString,
+				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: StringIsGitlabVariableName(),
 			},
