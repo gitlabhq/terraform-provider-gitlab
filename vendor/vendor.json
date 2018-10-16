@@ -1,6 +1,6 @@
 {
 	"comment": "",
-	"ignore": "appengine test github.com/hashicorp/nomad/ github.com/hashicorp/terraform/backend",
+	"ignore": "test",
 	"package": [
 		{
 			"checksumSHA1": "FIL83loX9V9APvGQIjJpbxq53F0=",
@@ -585,10 +585,10 @@
 			"revisionTime": "2016-09-27T10:08:44Z"
 		},
 		{
-			"checksumSHA1": "vaWKo1D5oR4MBMAoU4BfoHmGYgI=",
+			"checksumSHA1": "0pPNzpalb1D+T6Ld1T//BiP6CAA=",
 			"path": "github.com/xanzy/go-gitlab",
-			"revision": "cd73cda9998de176d10794c3df14395620febc5a",
-			"revisionTime": "2018-05-14T21:07:48Z"
+			"revision": "537e392d65c9027fe0bb78d4601dcceaa0e814f5",
+			"revisionTime": "2018-08-23T06:36:17Z"
 		},
 		{
 			"checksumSHA1": "vE43s37+4CJ2CDU6TlOUOYE0K9c=",

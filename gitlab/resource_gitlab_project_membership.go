@@ -1,15 +1,21 @@
 package gitlab
 
 import (
-	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectMembership() *schema.Resource {
+	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
+	for k := range accessLevelID {
+		if k != "owner" {
+			acceptedAccessLevels = append(acceptedAccessLevels, k)
+		}
+	}
 	return &schema.Resource{
 		Create: resourceGitlabProjectMembershipCreate,
 		Read:   resourceGitlabProjectMembershipRead,
@@ -31,115 +37,117 @@ func resourceGitlabProjectMembership() *schema.Resource {
 				Required: true,
 			},
 			"access_level": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:         schema.TypeString,
+				ValidateFunc: validateValueFunc(acceptedAccessLevels),
+				Required:     true,
 			},
-			// "expires_at": {
-			// 	Type:     schema.TypeString, // Format YYYY-MM-DD
-			// 	ForceNew: true,
-			// 	Required: false,
-			// 	Optional: true,
-			// },
 		},
 	}
-}
-
-var accessLevelID = map[string]gitlab.AccessLevelValue{
-	"guest":     gitlab.GuestPermissions,
-	"reporter":  gitlab.ReporterPermissions,
-	"developer": gitlab.DeveloperPermissions,
-	"master":    gitlab.MasterPermissions,
-	"owner":     gitlab.OwnerPermission,
 }
 
 func resourceGitlabProjectMembershipCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	project_id := d.Get("project_id").(string)
-	access_level := strings.ToLower(d.Get("access_level").(string))
-	access_level_id, ok := accessLevelID[access_level]
-	if !ok {
-		return fmt.Errorf("Invalid access level '%s'", access_level)
-	}
-	user_id := d.Get("user_id").(int)
-	options := &gitlab.AddProjectMemberOptions{
-		UserID:      &user_id,
-		AccessLevel: &access_level_id,
-	}
-	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.UserID, project_id)
+	userId := d.Get("user_id").(int)
+	projectId := d.Get("project_id").(string)
+	accessLevelId := accessLevelID[d.Get("access_level").(string)]
 
-	membership, _, err := client.ProjectMembers.AddProjectMember(project_id, options)
+	options := &gitlab.AddProjectMemberOptions{
+		UserID:      &userId,
+		AccessLevel: &accessLevelId,
+	}
+	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.UserID, projectId)
+
+	_, _, err := client.ProjectMembers.AddProjectMember(projectId, options)
 	if err != nil {
 		return err
 	}
-	d.SetId(fmt.Sprintf("%d", membership.ID))
-
+	userIdString := strconv.Itoa(userId)
+	d.SetId(buildTwoPartID(&projectId, &userIdString))
 	return resourceGitlabProjectMembershipRead(d, meta)
 }
 
 func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] read gitlab project membership %s", d.Id())
+	id := d.Id()
+	log.Printf("[DEBUG] read gitlab project projectMember %s", id)
 
-	project_id := d.Get("project_id").(string)
-	user_id := d.Get("user_id").(int)
+	projectId, userId, e := projectIdAndUserIdFromId(id)
+	if e != nil {
+		return e
+	}
 
-	membership, resp, err := client.ProjectMembers.GetProjectMember(project_id, user_id)
+	projectMember, resp, err := client.ProjectMembers.GetProjectMember(projectId, userId)
 	if err != nil {
 		if resp.StatusCode == 404 {
-			log.Printf("[WARN] removing project membership %s for %s from state because it no longer exists in gitlab", d.Id(), project_id)
+			log.Printf("[WARN] Project member %v not found in project %s", userId, projectId)
 			d.SetId("")
 			return nil
 		}
 		return err
 	}
 
-	resourceGitlabProjectMembershipSetToState(d, membership)
+	resourceGitlabProjectMembershipSetToState(d, projectMember, &projectId)
 	return nil
 }
 
-func resourceGitlabProjectMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
-	if !d.HasChange("access_level") {
-		return nil
+func projectIdAndUserIdFromId(id string) (string, int, error) {
+	projectId, userIdString, err := parseTwoPartID(id)
+	userId, e := strconv.Atoi(userIdString)
+	if err != nil {
+		e = err
 	}
+	if e != nil {
+		log.Printf("[WARN] cannot get project member id from input: %v", id)
+	}
+	return projectId, userId, e
+}
 
+func resourceGitlabProjectMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	project_id := d.Get("project_id").(string)
-	user_id := d.Get("user_id").(int)
-	access_level := strings.ToLower(d.Get("access_level").(string))
-	access_level_id, ok := accessLevelID[access_level]
-	if !ok {
-		return fmt.Errorf("Invalid access level '%s'", access_level)
-	}
-	options := gitlab.EditProjectMemberOptions{
-		AccessLevel: &access_level_id,
-	}
-	log.Printf("[DEBUG] update gitlab project membership %s for %s", d.Id(), project_id)
+	userId := d.Get("user_id").(int)
+	projectId := d.Get("project_id").(string)
+	accessLevelId := accessLevelID[strings.ToLower(d.Get("access_level").(string))]
 
-	_, _, err := client.ProjectMembers.EditProjectMember(project_id, user_id, &options)
+	options := gitlab.EditProjectMemberOptions{
+		AccessLevel: &accessLevelId,
+	}
+	log.Printf("[DEBUG] update gitlab project membership %v for %s", userId, projectId)
+
+	_, resp, err := client.ProjectMembers.EditProjectMember(projectId, userId, &options)
 	if err != nil {
+		if resp.StatusCode == 404 {
+			log.Printf("[WARN] Project member %v not found in project %s, removing from state", userId, projectId)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
-
 	return resourceGitlabProjectMembershipRead(d, meta)
 }
 
 func resourceGitlabProjectMembershipDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project_id := d.Get("project_id").(string)
-	user_id := d.Get("user_id").(int)
-	log.Printf("[DEBUG] Delete gitlab project membership %s for %s", d.Id(), project_id)
 
-	_, err := client.ProjectMembers.DeleteProjectMember(project_id, user_id)
+	id := d.Id()
+	projectId, userId, e := projectIdAndUserIdFromId(id)
+	if e != nil {
+		return e
+	}
+
+	log.Printf("[DEBUG] Delete gitlab project membership %v for %s", userId, projectId)
+
+	_, err := client.ProjectMembers.DeleteProjectMember(projectId, userId)
 	return err
 }
 
-func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, membership *gitlab.ProjectMember) {
-	d.SetId(fmt.Sprintf("%d", membership.ID))
-	d.Set("username", membership.Username)
-	d.Set("email", membership.Email)
-	d.Set("Name", membership.Name)
-	d.Set("State", membership.State)
-	d.Set("AccessLevel", membership.AccessLevel)
+func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) {
+
+	d.Set("project_id", projectId)
+	d.Set("user_id", projectMember.ID)
+	d.Set("access_level", accessLevel[projectMember.AccessLevel])
+
+	userId := strconv.Itoa(projectMember.ID)
+	d.SetId(buildTwoPartID(projectId, &userId))
 }

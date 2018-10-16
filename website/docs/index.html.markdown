@@ -33,6 +33,13 @@ resource "gitlab_project_hook" "sample_project_hook" {
     url = "https://example.com/project_hook"
 }
 
+# Add a variable to the project
+resource "gitlab_project_variable" "sample_project_variable" {
+    project = "${gitlab_project.sample_project.id}"
+    key = "project_variable_key"
+    value = "project_variable_value"
+}
+
 # Add a deploy key to the project
 resource "gitlab_deploy_key" "sample_deploy_key" {
     project = "${gitlab_project.sample_project.id}"

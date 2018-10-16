@@ -80,14 +80,6 @@ type testAccGitlabProjectMembershipExpectedAttributes struct {
 	access_level string
 }
 
-var accessLevel = map[gitlab.AccessLevelValue]string{
-	gitlab.GuestPermissions:     "guest",
-	gitlab.ReporterPermissions:  "reporter",
-	gitlab.DeveloperPermissions: "developer",
-	gitlab.MasterPermissions:    "master",
-	gitlab.OwnerPermission:      "owner",
-}
-
 func testAccCheckGitlabProjectMembershipAttributes(membership *gitlab.ProjectMember, want *testAccGitlabProjectMembershipExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
@@ -132,45 +124,47 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 }
 
 func testAccGitlabProjectMembershipConfig(rInt int) string {
-	return fmt.Sprintf(`resource "gitlab_project_membership" "foo" {
-project_id = "${gitlab_project.foo.id}"
-user_id = "${gitlab_user.test.id}"
-access_level = "developer"
+	return fmt.Sprintf(`
+resource "gitlab_project_membership" "foo" {
+  project_id = "${gitlab_project.foo.id}"
+  user_id = "${gitlab_user.test.id}"
+  access_level = "developer"
 }
 
 resource "gitlab_project" "foo" {
-name = "foo%d"
-description = "Terraform acceptance tests"
-visibility_level ="public"
+  name = "foo%d"
+  description = "Terraform acceptance tests"
+  visibility_level ="public"
 }
 
 resource "gitlab_user" "test" {
-name = "foo%d"
-username = "listest%d"
-password = "test%dtt"
-email = "listest%d@ssss.com"
+  name = "foo%d"
+  username = "listest%d"
+  password = "test%dtt"
+  email = "listest%d@ssss.com"
 }
 `, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectMembershipUpdateConfig(rInt int) string {
-	return fmt.Sprintf(`resource "gitlab_project_membership" "foo" {
-project_id = "${gitlab_project.foo.id}"
-user_id = "${gitlab_user.test.id}"
-access_level = "guest"
+	return fmt.Sprintf(`
+resource "gitlab_project_membership" "foo" {
+  project_id = "${gitlab_project.foo.id}"
+  user_id = "${gitlab_user.test.id}"
+  access_level = "guest"
 }
 
 resource "gitlab_project" "foo" {
-name = "foo%d"
-description = "Terraform acceptance tests"
-visibility_level ="public"
+  name = "foo%d"
+  description = "Terraform acceptance tests"
+ visibility_level ="public"
 }
 
 resource "gitlab_user" "test" {
-name = "foo%d"
-username = "listest%d"
-password = "test%dtt"
-email = "listest%d@ssss.com"
+  name = "foo%d"
+  username = "listest%d"
+  password = "test%dtt"
+  email = "listest%d@ssss.com"
 }
 `, rInt, rInt, rInt, rInt, rInt)
 }
