@@ -1,0 +1,118 @@
+package gitlab
+
+import (
+	"log"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	gitlab "github.com/xanzy/go-gitlab"
+)
+
+func resourceGitlabProjectBranchProtection() *schema.Resource {
+	acceptedAccessLevels := []string{
+		"master",
+		"developer",
+	}
+	return &schema.Resource{
+		Create: resourceGitlabProjectBranchProtectionCreate,
+		Read:   resourceGitlabProjectBranchProtectionRead,
+		Delete: resourceGitlabProjectBranchProtectionDelete,
+		Schema: map[string]*schema.Schema{
+			"project": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"branch": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Required: true,
+			},
+			"merge_access_level": {
+				Type:         schema.TypeString,
+				ValidateFunc: validateValueFunc(acceptedAccessLevels),
+				Required:     true,
+				ForceNew:     true,
+			},
+			"push_access_level": {
+				Type:         schema.TypeString,
+				ValidateFunc: validateValueFunc(acceptedAccessLevels),
+				Required:     true,
+				ForceNew:     true,
+			},
+		},
+	}
+}
+
+func resourceGitlabProjectBranchProtectionCreate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gitlab.Client)
+	project := d.Get("project").(string)
+	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
+	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+
+	options := &gitlab.ProtectRepositoryBranchesOptions{
+		Name:             gitlab.String(d.Get("branch").(string)),
+		MergeAccessLevel: &mergeAccessLevel,
+		PushAccessLevel:  &pushAccessLevel,
+	}
+
+	log.Printf("[DEBUG] create gitlab project branch protection on %q", options.Name)
+
+	bp, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, options)
+	if err != nil {
+		return err
+	}
+
+	d.SetId(buildTwoPartID(&project, &bp.Name))
+
+	return resourceGitlabProjectBranchProtectionRead(d, meta)
+}
+
+func resourceGitlabProjectBranchProtectionRead(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gitlab.Client)
+	project, branch, err := projectAndBranchFromID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	log.Printf("[DEBUG] read gitlab branch protection for project %s, branch %s", project, branch)
+
+	pb, response, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
+	if err != nil {
+		if response.StatusCode == 404 {
+			log.Printf("[WARN] removing project branch protection %s from state because it no longer exists in gitlab", branch)
+			d.SetId("")
+			return nil
+		}
+
+		return err
+	}
+
+	d.Set("project", project)
+	d.Set("branch", pb.Name)
+	d.Set("merge_access_level", pb.MergeAccessLevels[0].AccessLevel)
+	d.Set("push_access_level", pb.PushAccessLevels[0].AccessLevel)
+
+	d.SetId(buildTwoPartID(&project, &pb.Name))
+
+	return nil
+}
+
+func resourceGitlabProjectBranchProtectionDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gitlab.Client)
+	project := d.Get("project").(string)
+	branch := d.Get("branch").(string)
+
+	log.Printf("[DEBUG] Delete gitlab protected branch %s for project %s", branch, project)
+
+	_, err := client.ProtectedBranches.UnprotectRepositoryBranches(project, branch)
+	return err
+}
+
+func projectAndBranchFromID(id string) (string, string, error) {
+	project, branch, err := parseTwoPartID(id)
+
+	if err != nil {
+		log.Printf("[WARN] cannot get group member id from input: %v", id)
+	}
+	return project, branch, err
+}
