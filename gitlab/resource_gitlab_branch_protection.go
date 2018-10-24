@@ -46,20 +46,30 @@ func resourceGitlabBranchProtection() *schema.Resource {
 func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
+	branch := gitlab.String(d.Get("branch").(string))
 	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
 
 	options := &gitlab.ProtectRepositoryBranchesOptions{
-		Name:             gitlab.String(d.Get("branch").(string)),
+		Name:             branch,
 		MergeAccessLevel: &mergeAccessLevel,
 		PushAccessLevel:  &pushAccessLevel,
 	}
 
-	log.Printf("[DEBUG] create gitlab branch protection on %s for project %s", options.Name, project)
+	log.Printf("[DEBUG] create gitlab branch protection on %v for project %s", options.Name, project)
 
 	bp, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, options)
 	if err != nil {
-		return err
+		// Remove existing branch protection
+		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project, *branch)
+		if err != nil {
+			return err
+		}
+		// Reprotect branch with updated values
+		bp, _, err = client.ProtectedBranches.ProtectRepositoryBranches(project, options)
+		if err != nil {
+			return err
+		}
 	}
 
 	d.SetId(buildTwoPartID(&project, &bp.Name))
