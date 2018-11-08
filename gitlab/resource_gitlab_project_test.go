@@ -339,23 +339,23 @@ resource "gitlab_project" "foo" {
 func testAccGitlabProjectSharedWithGroup(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  path = "foo.%d"
-  description = "Terraform acceptance tests"
+  name             = "foo-%d"
+  path             = "foo.%d"
+  description      = "Terraform acceptance tests"
   visibility_level = "public"
 
   shared_with_groups = [
     {
-		group_id           = "${gitlab_group.foo.id}"
-        group_access_level = "developer"
-    }
+      group_id           = "${gitlab_group.foo.id}"
+      group_access_level = "developer"
+    },
   ]
 }
 
 resource "gitlab_group" "foo" {
-  name = "foo-name-%d"
-  path = "foo-path-%d"
-  description = "Terraform acceptance tests!"
+  name             = "foo-name-%d"
+  path             = "foo-path-%d"
+  description      = "Terraform acceptance tests!"
   visibility_level = "public"
 }
 	`, rInt, rInt, rInt, rInt)
@@ -364,34 +364,34 @@ resource "gitlab_group" "foo" {
 func testAccGitlabProjectSharedWithGroup2(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  path = "foo.%d"
-  description = "Terraform acceptance tests"
+  name             = "foo-%d"
+  path             = "foo.%d"
+  description      = "Terraform acceptance tests"
   visibility_level = "public"
 
   shared_with_groups = [
     {
-		group_id           = "${gitlab_group.foo.id}"
-        group_access_level = "guest"
-	},
-	{
-		group_id           = "${gitlab_group.foo2.id}"
-        group_access_level = "developer"
-    }
+      group_id           = "${gitlab_group.foo.id}"
+      group_access_level = "guest"
+    },
+    {
+      group_id           = "${gitlab_group.foo2.id}"
+      group_access_level = "developer"
+    },
   ]
 }
 
 resource "gitlab_group" "foo" {
-  name = "foo-name-%d"
-  path = "foo-path-%d"
-  description = "Terraform acceptance tests!"
+  name             = "foo-name-%d"
+  path             = "foo-path-%d"
+  description      = "Terraform acceptance tests!"
   visibility_level = "public"
 }
 
 resource "gitlab_group" "foo2" {
-  name = "foo2-name-%d"
-  path = "foo2-path-%d"
-  description = "Terraform acceptance tests!"
+  name             = "foo2-name-%d"
+  path             = "foo2-path-%d"
+  description      = "Terraform acceptance tests!"
   visibility_level = "public"
 }
 	`, rInt, rInt, rInt, rInt, rInt, rInt)

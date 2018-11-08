@@ -173,7 +173,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		options := expandSharedWithGroupsOptions(v.([]interface{}))
 
 		for _, option := range options {
-			log.Printf("[DEBUG] project shared with group %v", option)
 			_, err := client.Projects.ShareProjectWithGroup(project.ID, option)
 			if err != nil {
 				return err
@@ -401,7 +400,6 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 
 	// Unshare groups to delete and update
 	for _, group := range groupsToUnshare {
-		log.Printf("[DEBUG] update shared_with_group: unshare %d", *group.GroupID)
 		_, err := client.Projects.DeleteSharedProjectFromGroup(d.Id(), *group.GroupID)
 		if err != nil {
 			return err
@@ -410,7 +408,6 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 
 	// Share groups to add and update
 	for _, group := range groupsToShare {
-		log.Printf("[DEBUG] update shared_with_group: share %d", *group.GroupID)
 		_, err := client.Projects.ShareProjectWithGroup(d.Id(), group)
 		if err != nil {
 			return err
