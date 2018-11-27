@@ -98,6 +98,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("name", project.Name)
 	d.Set("path", project.Path)
 	d.Set("description", project.Description)
+	d.Set("default_branch", project.DefaultBranch)
 	d.Set("issues_enabled", project.IssuesEnabled)
 	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
 	d.Set("wiki_enabled", project.WikiEnabled)
@@ -179,6 +180,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("description") {
 		options.Description = gitlab.String(d.Get("description").(string))
+	}
+
+	if d.HasChange("default_branch") {
+		options.DefaultBranch = gitlab.String(d.Get("default_branch").(string))
 	}
 
 	if d.HasChange("visibility_level") {
