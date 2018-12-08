@@ -69,7 +69,7 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	d.SetId(fmt.Sprintf("%d", found.ID))
 	d.Set("name", found.Name)
-	d.Set("userName", found.Username)
+	d.Set("username", found.Username)
 	d.Set("email", found.Email)
 	return nil
 }
