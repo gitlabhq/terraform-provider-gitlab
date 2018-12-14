@@ -50,6 +50,14 @@ The following arguments are supported:
   Valid values are `private`, `internal`, `public`.
   Repositories are created as private by default.
 
+* `merge_method` - (Optional) Set to `ff` to create fast-forward merges
+  Valid values are `merge`, `rebase_merge`, `ff`
+  Repositories are created with `merge` by default
+
+* `only_allow_merge_if_pipeline_succeeds` - (Optional) Set to true if you want allow merges only if a pipeline succeeds.
+
+* `only_allow_merge_if_all_discussions_are_resolved` - (Optional) Set to true if you want allow merges only if all discussions are resolved.
+
 * `shared_with_groups` - (Optional) Enable sharing the project with a list of groups (maps).
   * `group_id` - (Required) Group id of the group you want to share the project with.
   * `group_access_level` - (Optional) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
