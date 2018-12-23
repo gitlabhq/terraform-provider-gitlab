@@ -64,6 +64,8 @@ The following additional attributes are exported:
 
 * `web_url` - URL that can be used to find the project in a browser.
 
+* `runners_token` - Registration token to use during runner setup.
+
 ## Importing projects
 
 You can import a project state using `terraform import <resource> <id>`.  The
