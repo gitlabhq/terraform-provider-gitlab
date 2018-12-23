@@ -89,6 +89,10 @@ func resourceGitlabProject() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"runners_token": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -109,6 +113,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
 	d.Set("web_url", project.WebURL)
+	d.Set("runners_token", project.RunnersToken)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
