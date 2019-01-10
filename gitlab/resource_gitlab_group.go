@@ -82,7 +82,7 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		options.ParentID = gitlab.Int(v.(int))
 	}
 
-	log.Printf("[DEBUG] create gitlab group %q", options.Name)
+	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
 
 	group, _, err := client.Groups.CreateGroup(options)
 	if err != nil {
