@@ -88,7 +88,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		External:         gitlab.Bool(d.Get("is_external").(bool)),
 	}
 
-	log.Printf("[DEBUG] create gitlab user %q", options.Username)
+	log.Printf("[DEBUG] create gitlab user %q", *options.Username)
 
 	user, _, err := client.Users.CreateUser(options)
 	if err != nil {

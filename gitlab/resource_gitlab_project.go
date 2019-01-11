@@ -134,7 +134,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		options.Description = gitlab.String(v.(string))
 	}
 
-	log.Printf("[DEBUG] create gitlab project %q", options.Name)
+	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
 
 	project, _, err := client.Projects.CreateProject(options)
 	if err != nil {

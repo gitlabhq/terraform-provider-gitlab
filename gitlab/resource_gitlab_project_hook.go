@@ -99,7 +99,7 @@ func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) e
 		options.Token = gitlab.String(v.(string))
 	}
 
-	log.Printf("[DEBUG] create gitlab project hook %q", options.URL)
+	log.Printf("[DEBUG] create gitlab project hook %q", *options.URL)
 
 	hook, _, err := client.Projects.AddProjectHook(project, options)
 	if err != nil {
