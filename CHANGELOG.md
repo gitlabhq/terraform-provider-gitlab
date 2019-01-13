@@ -9,7 +9,7 @@ FEATURES:
 
 BACKWARDS INCOMPATIBILITIES:
 
-`gitlab_project_membership` is not compatible with a previous *unrealeased* version due to an id change resource will need to be reimported manually
+`gitlab_project_membership` is not compatible with a previous *unreleased* version due to an id change resource will need to be reimported manually
 e.g
 ```bash
 terraform state rm gitlab_project_membership.foo
