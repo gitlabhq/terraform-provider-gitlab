@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabProject_basic(t *testing.T) {
@@ -110,9 +110,9 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					}),
 				),
 			},
-			//Update the project to unshare the project from 1 group
+			//Update the project to unshare the project
 			{
-				Config: testAccGitlabProjectSharedWithGroup(rInt),
+				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
@@ -128,7 +128,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							GroupID          int
 							GroupName        string
 							GroupAccessLevel int
-						}{{0, "", 30}},
+						}{},
 					}),
 				),
 			},
