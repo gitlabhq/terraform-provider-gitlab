@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectVariable() *schema.Resource {
@@ -105,7 +105,6 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 	protected := d.Get("protected").(bool)
 
 	options := &gitlab.UpdateVariableOptions{
-		Key:              &key,
 		Value:            &value,
 		Protected:        &protected,
 		EnvironmentScope: nil,
