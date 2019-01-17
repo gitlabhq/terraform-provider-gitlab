@@ -111,6 +111,13 @@ type MergeRequest struct {
 		SHA    string `json:"sha"`
 		Status string `json:"status"`
 	} `json:"pipeline"`
+	DiffRefs struct {
+		BaseSha  string `json:"base_sha"`
+		HeadSha  string `json:"head_sha"`
+		StartSha string `json:"start_sha"`
+	} `json:"diff_refs"`
+	DivergedCommitsCount int  `json:"diverged_commits_count"`
+	RebaseInProgress     bool `json:"rebase_in_progress"`
 }
 
 func (m MergeRequest) String() string {
@@ -153,10 +160,15 @@ type ListMergeRequestsOptions struct {
 	Labels          Labels     `url:"labels,omitempty" json:"labels,omitempty"`
 	CreatedAfter    *time.Time `url:"created_after,omitempty" json:"created_after,omitempty"`
 	CreatedBefore   *time.Time `url:"created_before,omitempty" json:"created_before,omitempty"`
+	UpdatedAfter    *time.Time `url:"updated_after,omitempty" json:"updated_after,omitempty"`
+	UpdatedBefore   *time.Time `url:"updated_before,omitempty" json:"updated_before,omitempty"`
 	Scope           *string    `url:"scope,omitempty" json:"scope,omitempty"`
 	AuthorID        *int       `url:"author_id,omitempty" json:"author_id,omitempty"`
 	AssigneeID      *int       `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
 	MyReactionEmoji *string    `url:"my_reaction_emoji,omitempty" json:"my_reaction_emoji,omitempty"`
+	SourceBranch    *string    `url:"source_branch,omitempty" json:"source_branch,omitempty"`
+	TargetBranch    *string    `url:"target_branch,omitempty" json:"target_branch,omitempty"`
+	Search          *string    `url:"search,omitempty" json:"search,omitempty"`
 }
 
 // ListMergeRequests gets all merge requests. The state parameter can be used
@@ -168,6 +180,57 @@ type ListMergeRequestsOptions struct {
 // https://docs.gitlab.com/ce/api/merge_requests.html#list-merge-requests
 func (s *MergeRequestsService) ListMergeRequests(opt *ListMergeRequestsOptions, options ...OptionFunc) ([]*MergeRequest, *Response, error) {
 	req, err := s.client.NewRequest("GET", "merge_requests", opt, options)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var m []*MergeRequest
+	resp, err := s.client.Do(req, &m)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return m, resp, err
+}
+
+// ListGroupMergeRequestsOptions represents the available ListGroupMergeRequests()
+// options.
+//
+// GitLab API docs:
+// https://docs.gitlab.com/ce/api/merge_requests.html#list-group-merge-requests
+type ListGroupMergeRequestsOptions struct {
+	ListOptions
+	State           *string    `url:"state,omitempty" json:"state,omitempty"`
+	OrderBy         *string    `url:"order_by,omitempty" json:"order_by,omitempty"`
+	Sort            *string    `url:"sort,omitempty" json:"sort,omitempty"`
+	Milestone       *string    `url:"milestone,omitempty" json:"milestone,omitempty"`
+	View            *string    `url:"view,omitempty" json:"view,omitempty"`
+	Labels          Labels     `url:"labels,omitempty" json:"labels,omitempty"`
+	CreatedAfter    *time.Time `url:"created_after,omitempty" json:"created_after,omitempty"`
+	CreatedBefore   *time.Time `url:"created_before,omitempty" json:"created_before,omitempty"`
+	UpdatedAfter    *time.Time `url:"updated_after,omitempty" json:"updated_after,omitempty"`
+	UpdatedBefore   *time.Time `url:"updated_before,omitempty" json:"updated_before,omitempty"`
+	Scope           *string    `url:"scope,omitempty" json:"scope,omitempty"`
+	AuthorID        *int       `url:"author_id,omitempty" json:"author_id,omitempty"`
+	AssigneeID      *int       `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
+	MyReactionEmoji *string    `url:"my_reaction_emoji,omitempty" json:"my_reaction_emoji,omitempty"`
+	SourceBranch    *string    `url:"source_branch,omitempty" json:"source_branch,omitempty"`
+	TargetBranch    *string    `url:"target_branch,omitempty" json:"target_branch,omitempty"`
+	Search          *string    `url:"search,omitempty" json:"search,omitempty"`
+}
+
+// ListGroupMergeRequests gets all merge requests for this group.
+//
+// GitLab API docs:
+// https://docs.gitlab.com/ce/api/merge_requests.html#list-group-merge-requests
+func (s *MergeRequestsService) ListGroupMergeRequests(gid interface{}, opt *ListGroupMergeRequestsOptions, options ...OptionFunc) ([]*MergeRequest, *Response, error) {
+	group, err := parseID(gid)
+	if err != nil {
+		return nil, nil, err
+	}
+	u := fmt.Sprintf("groups/%s/merge_requests", url.QueryEscape(group))
+
+	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -197,19 +260,21 @@ type ListProjectMergeRequestsOptions struct {
 	Labels          Labels     `url:"labels,omitempty" json:"labels,omitempty"`
 	CreatedAfter    *time.Time `url:"created_after,omitempty" json:"created_after,omitempty"`
 	CreatedBefore   *time.Time `url:"created_before,omitempty" json:"created_before,omitempty"`
+	UpdatedAfter    *time.Time `url:"updated_after,omitempty" json:"updated_after,omitempty"`
+	UpdatedBefore   *time.Time `url:"updated_before,omitempty" json:"updated_before,omitempty"`
 	Scope           *string    `url:"scope,omitempty" json:"scope,omitempty"`
 	AuthorID        *int       `url:"author_id,omitempty" json:"author_id,omitempty"`
 	AssigneeID      *int       `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
 	MyReactionEmoji *string    `url:"my_reaction_emoji,omitempty" json:"my_reaction_emoji,omitempty"`
+	SourceBranch    *string    `url:"source_branch,omitempty" json:"source_branch,omitempty"`
+	TargetBranch    *string    `url:"target_branch,omitempty" json:"target_branch,omitempty"`
+	Search          *string    `url:"search,omitempty" json:"search,omitempty"`
 }
 
-// ListProjectMergeRequests gets all merge requests for this project. The state
-// parameter can be used to get only merge requests with a given state (opened,
-// closed, or merged) or all of them (all). The pagination parameters page and
-// per_page can be used to restrict the list of merge requests.
+// ListProjectMergeRequests gets all merge requests for this project.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/api/merge_requests.html#list-merge-requests
+// https://docs.gitlab.com/ce/api/merge_requests.html#list-project-merge-requests
 func (s *MergeRequestsService) ListProjectMergeRequests(pid interface{}, opt *ListProjectMergeRequestsOptions, options ...OptionFunc) ([]*MergeRequest, *Response, error) {
 	project, err := parseID(pid)
 	if err != nil {
@@ -231,18 +296,29 @@ func (s *MergeRequestsService) ListProjectMergeRequests(pid interface{}, opt *Li
 	return m, resp, err
 }
 
+// GetMergeRequestsOptions represents the available GetMergeRequests()
+// options.
+//
+// GitLab API docs:
+// https://docs.gitlab.com/ce/api/merge_requests.html#get-single-mr
+type GetMergeRequestsOptions struct {
+	RenderHTML                  *bool `url:"render_html,omitempty" json:"render_html,omitempty"`
+	IncludeDivergedCommitsCount *bool `url:"include_diverged_commits_count,omitempty" json:"include_diverged_commits_count,omitempty"`
+	IncludeRebaseInProgress     *bool `url:"include_rebase_in_progress,omitempty" json:"include_rebase_in_progress,omitempty"`
+}
+
 // GetMergeRequest shows information about a single merge request.
 //
 // GitLab API docs:
 // https://docs.gitlab.com/ce/api/merge_requests.html#get-single-mr
-func (s *MergeRequestsService) GetMergeRequest(pid interface{}, mergeRequest int, options ...OptionFunc) (*MergeRequest, *Response, error) {
+func (s *MergeRequestsService) GetMergeRequest(pid interface{}, mergeRequest int, opt *GetMergeRequestsOptions, options ...OptionFunc) (*MergeRequest, *Response, error) {
 	project, err := parseID(pid)
 	if err != nil {
 		return nil, nil, err
 	}
 	u := fmt.Sprintf("projects/%s/merge_requests/%d", url.QueryEscape(project), mergeRequest)
 
-	req, err := s.client.NewRequest("GET", u, nil, options)
+	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -447,13 +523,17 @@ func (s *MergeRequestsService) CreateMergeRequest(pid interface{}, opt *CreateMe
 // GitLab API docs:
 // https://docs.gitlab.com/ce/api/merge_requests.html#update-mr
 type UpdateMergeRequestOptions struct {
-	Title        *string `url:"title,omitempty" json:"title,omitempty"`
-	Description  *string `url:"description,omitempty" json:"description,omitempty"`
-	TargetBranch *string `url:"target_branch,omitempty" json:"target_branch,omitempty"`
-	AssigneeID   *int    `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
-	Labels       Labels  `url:"labels,comma,omitempty" json:"labels,omitempty"`
-	MilestoneID  *int    `url:"milestone_id,omitempty" json:"milestone_id,omitempty"`
-	StateEvent   *string `url:"state_event,omitempty" json:"state_event,omitempty"`
+	Title              *string `url:"title,omitempty" json:"title,omitempty"`
+	Description        *string `url:"description,omitempty" json:"description,omitempty"`
+	TargetBranch       *string `url:"target_branch,omitempty" json:"target_branch,omitempty"`
+	AssigneeID         *int    `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
+	Labels             Labels  `url:"labels,comma,omitempty" json:"labels,omitempty"`
+	MilestoneID        *int    `url:"milestone_id,omitempty" json:"milestone_id,omitempty"`
+	StateEvent         *string `url:"state_event,omitempty" json:"state_event,omitempty"`
+	RemoveSourceBranch *bool   `url:"remove_source_branch,omitempty" json:"remove_source_branch,omitempty"`
+	Squash             *bool   `url:"squash,omitempty" json:"squash,omitempty"`
+	DiscussionLocked   *bool   `url:"discussion_locked,omitempty" json:"discussion_locked,omitempty"`
+	AllowCollaboration *bool   `url:"allow_collaboration,omitempty" json:"allow_collaboration,omitempty"`
 }
 
 // UpdateMergeRequest updates an existing project milestone.
@@ -509,7 +589,7 @@ type AcceptMergeRequestOptions struct {
 	MergeCommitMessage        *string `url:"merge_commit_message,omitempty" json:"merge_commit_message,omitempty"`
 	ShouldRemoveSourceBranch  *bool   `url:"should_remove_source_branch,omitempty" json:"should_remove_source_branch,omitempty"`
 	MergeWhenPipelineSucceeds *bool   `url:"merge_when_pipeline_succeeds,omitempty" json:"merge_when_pipeline_succeeds,omitempty"`
-	Sha                       *string `url:"sha,omitempty" json:"sha,omitempty"`
+	SHA                       *string `url:"sha,omitempty" json:"sha,omitempty"`
 }
 
 // AcceptMergeRequest merges changes submitted with MR using this API. If merge
@@ -569,6 +649,27 @@ func (s *MergeRequestsService) CancelMergeWhenPipelineSucceeds(pid interface{}, 
 	return m, resp, err
 }
 
+// RebaseMergeRequest automatically rebases the source_branch of the merge
+// request against its target_branch. If you don’t have permissions to push
+// to the merge request’s source branch, you’ll get a 403 Forbidden response.
+//
+// GitLab API docs:
+// https://docs.gitlab.com/ce/api/merge_requests.html#rebase-a-merge-request
+func (s *MergeRequestsService) RebaseMergeRequest(pid interface{}, mergeRequest int, options ...OptionFunc) (*Response, error) {
+	project, err := parseID(pid)
+	if err != nil {
+		return nil, err
+	}
+	u := fmt.Sprintf("projects/%s/merge_requests/%d/rebase", url.QueryEscape(project), mergeRequest)
+
+	req, err := s.client.NewRequest("PUT", u, nil, options)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(req, nil)
+}
+
 // GetMergeRequestDiffVersionsOptions represents the available
 // GetMergeRequestDiffVersions() options.
 //
@@ -626,8 +727,8 @@ func (s *MergeRequestsService) GetSingleMergeRequestDiffVersion(pid interface{},
 	return v, resp, err
 }
 
-// SubscribeToMergeRequest subscribes the authenticated user to the given merge request
-// to receive notifications. If the user is already subscribed to the
+// SubscribeToMergeRequest subscribes the authenticated user to the given merge
+// request to receive notifications. If the user is already subscribed to the
 // merge request, the status code 304 is returned.
 //
 // GitLab API docs:
@@ -653,9 +754,10 @@ func (s *MergeRequestsService) SubscribeToMergeRequest(pid interface{}, mergeReq
 	return m, resp, err
 }
 
-// UnsubscribeFromMergeRequest unsubscribes the authenticated user from the given merge request
-// to not receive notifications from that merge request. If the user is
-// not subscribed to the merge request, status code 304 is returned.
+// UnsubscribeFromMergeRequest unsubscribes the authenticated user from the
+// given merge request to not receive notifications from that merge request.
+// If the user is not subscribed to the merge request, status code 304 is
+// returned.
 //
 // GitLab API docs:
 // https://docs.gitlab.com/ce/api/merge_requests.html#unsubscribe-from-a-merge-request
