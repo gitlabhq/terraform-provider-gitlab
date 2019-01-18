@@ -20,7 +20,7 @@ func dataSourceGitlabUsers() *schema.Resource {
 				Optional: true,
 				Default:  "id",
 				ValidateFunc: validation.StringInSlice([]string{"id", "name",
-					"username", "created_at"}, true),
+					"username", "created_at", "updated_at"}, true),
 			},
 			"sort": {
 				Type:         schema.TypeString,
