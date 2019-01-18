@@ -1,0 +1,66 @@
+---
+layout: "gitlab"
+page_title: "GitLab: gitlab_users"
+sidebar_current: "docs-gitlab-data-source-users"
+description: |-
+  Looks up gitlab users
+---
+
+# gitlab\_users
+
+Provides details about a list of users in the gitlab provider. The results include id, username, email, name and more about the requested users. Users can also be sorted and filtered using several options.
+
+## Example Usage
+
+```hcl
+data "gitlab_users" "example" {
+  sort = "desc"
+  order_by = "name"
+  created_before = "2019-01-01"
+}
+```
+
+## Argument Reference
+
+The following arguments are supported:
+
+* `search` - (Optional) Search users by username, name or email.
+
+* `active` - (Optional) Filter users that are active.
+
+* `blocked` - (Optional) Filter users that are blocked.
+
+* `order_by` - (Optional) Order the users' list by `id`, `name`, `username`, `created_at` or `updated_at`. (Requires administrator privileges)
+
+* `sort` - (Optional) Sort users' list in asc or desc order. (Requires administrator privileges)
+
+* `identities_extern_uid` - (Optional) Lookup users by external UID. (Requires administrator privileges)
+
+* `identities_provider` - (Optional) Lookup users by external provider. (Requires administrator privileges)
+
+* `created_before` - (Optional) Search for users created before a specific date. (Requires administrator privileges)
+
+* `created_after` - (Optional)  Search for users created after a specific date. (Requires administrator privileges)
+
+
+## Attributes Reference
+
+The following attributes are exported:
+
+* `users` - The list of users.
+  * `id` - The unique id assigned to the user by the gitlab server.
+  * `username` - The username of the user.
+  * `email` - The e-mail address of the user.
+  * `name` - The name of the user.
+  * `is_admin` - Whether the user is an admin.
+  * `can_create_group` - Whether the user can create groups.
+  * `can_create_project` - Whether the user can create projects.
+  * `projects_limit` - Number of projects the user can create.
+  * `created_at` - Date the user was created at.
+  * `state` - Whether the user is active or blocked.
+  * `external` - Whether the user is external.
+  * `extern_uid` - The external UID of the user.
+  * `organization` - The organization of the user.
+  * `two_factor_enabled` - Whether user's two factor auth is enabled.
+
+
