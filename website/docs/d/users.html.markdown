@@ -10,6 +10,8 @@ description: |-
 
 Provides details about a list of users in the gitlab provider. The results include id, username, email, name and more about the requested users. Users can also be sorted and filtered using several options.
 
+**NOTE**: Some of the available options require administrator privileges. Please visit [Gitlab API documentation][users_for_admins] for more information.
+
 ## Example Usage
 
 ```hcl
@@ -34,9 +36,9 @@ The following arguments are supported:
 
 * `sort` - (Optional) Sort users' list in asc or desc order. (Requires administrator privileges)
 
-* `identities_extern_uid` - (Optional) Lookup users by external UID. (Requires administrator privileges)
+* `extern_uid` - (Optional) Lookup users by external UID. (Requires administrator privileges)
 
-* `identities_provider` - (Optional) Lookup users by external provider. (Requires administrator privileges)
+* `extern_provider` - (Optional) Lookup users by external provider. (Requires administrator privileges)
 
 * `created_before` - (Optional) Search for users created before a specific date. (Requires administrator privileges)
 
@@ -64,3 +66,4 @@ The following attributes are exported:
   * `two_factor_enabled` - Whether user's two factor auth is enabled.
 
 
+[users_for_admins]: https://docs.gitlab.com/ce/api/users.html#for-admins
