@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -40,11 +41,11 @@ func dataSourceGitlabUsers() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
-			"identities_extern_uid": {
+			"extern_uid": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"identities_provider": {
+			"extern_provider": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
@@ -175,50 +176,50 @@ func flattenGitlabUsers(users []*gitlab.User) []interface{} {
 
 func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions, int, error) {
 	listUsersOptions := &gitlab.ListUsersOptions{}
-	optionsHash := ""
+	var optionsHash strings.Builder
 
 	if data, ok := d.GetOk("order_by"); ok {
 		orderBy := data.(string)
 		listUsersOptions.OrderBy = &orderBy
-		optionsHash += orderBy
+		optionsHash.WriteString(orderBy)
 	}
-	optionsHash += ","
+	optionsHash.WriteString(",")
 	if data, ok := d.GetOk("sort"); ok {
 		sort := data.(string)
 		listUsersOptions.Sort = &sort
-		optionsHash += sort
+		optionsHash.WriteString(sort)
 	}
-	optionsHash += ","
+	optionsHash.WriteString(",")
 	if data, ok := d.GetOk("search"); ok {
 		search := data.(string)
 		listUsersOptions.Search = &search
-		optionsHash += search
+		optionsHash.WriteString(search)
 	}
-	optionsHash += ","
+	optionsHash.WriteString(",")
 	if data, ok := d.GetOk("active"); ok {
 		active := data.(bool)
 		listUsersOptions.Active = &active
-		optionsHash += strconv.FormatBool(active)
+		optionsHash.WriteString(strconv.FormatBool(active))
 	}
-	optionsHash += ","
+	optionsHash.WriteString(",")
 	if data, ok := d.GetOk("blocked"); ok {
 		blocked := data.(bool)
 		listUsersOptions.Blocked = &blocked
-		optionsHash += strconv.FormatBool(blocked)
+		optionsHash.WriteString(strconv.FormatBool(blocked))
 	}
-	optionsHash += ","
-	if data, ok := d.GetOk("identities_extern_uid"); ok {
+	optionsHash.WriteString(",")
+	if data, ok := d.GetOk("extern_uid"); ok {
 		externalUID := data.(string)
 		listUsersOptions.ExternalUID = &externalUID
-		optionsHash += externalUID
+		optionsHash.WriteString(externalUID)
 	}
-	optionsHash += ","
-	if data, ok := d.GetOk("identities_provider"); ok {
+	optionsHash.WriteString(",")
+	if data, ok := d.GetOk("extern_provider"); ok {
 		provider := data.(string)
 		listUsersOptions.Provider = &provider
-		optionsHash += provider
+		optionsHash.WriteString(provider)
 	}
-	optionsHash += ","
+	optionsHash.WriteString(",")
 	if data, ok := d.GetOk("created_before"); ok {
 		createdBefore := data.(string)
 		date, err := time.Parse("2006-01-02", createdBefore)
@@ -226,9 +227,9 @@ func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions,
 			return nil, 0, fmt.Errorf("created_before must be in yyyy-mm-dd format")
 		}
 		listUsersOptions.CreatedBefore = &date
-		optionsHash += createdBefore
+		optionsHash.WriteString(createdBefore)
 	}
-	optionsHash += ","
+	optionsHash.WriteString(",")
 	if data, ok := d.GetOk("created_after"); ok {
 		createdAfter := data.(string)
 		date, err := time.Parse("2006-01-02", createdAfter)
@@ -236,10 +237,10 @@ func expandGitlabUsersOptions(d *schema.ResourceData) (*gitlab.ListUsersOptions,
 			return nil, 0, fmt.Errorf("created_after must be in yyyy-mm-dd format")
 		}
 		listUsersOptions.CreatedAfter = &date
-		optionsHash += createdAfter
+		optionsHash.WriteString(createdAfter)
 	}
 
-	id := schema.HashString(optionsHash)
+	id := schema.HashString(optionsHash.String())
 
 	return listUsersOptions, id, nil
 }
