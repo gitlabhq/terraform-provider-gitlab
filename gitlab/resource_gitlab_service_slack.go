@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceSlack() *schema.Resource {
@@ -50,7 +50,7 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"issue_events": {
+			"issues_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -59,7 +59,7 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"confidential_issue_events": {
+			"confidential_issues_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -68,7 +68,7 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"merge_request_events": {
+			"merge_requests_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
@@ -126,6 +126,10 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"job_events": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -140,15 +144,15 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	d.SetId(fmt.Sprintf("%d", service.ID))
 	d.Set("webhook", service.Properties.WebHook)
 	d.Set("username", service.Properties.Username)
-	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines)
-	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch)
+	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON)
+	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)
 	d.Set("push_events", service.PushEvents)
 	d.Set("push_channel", service.Properties.PushChannel)
-	d.Set("issue_events", service.IssuesEvents)
+	d.Set("issues_events", service.IssuesEvents)
 	d.Set("issue_channel", service.Properties.IssueChannel)
-	d.Set("confidential_issue_events", service.ConfidentialIssuesEvents)
+	d.Set("confidential_issues_events", service.ConfidentialIssuesEvents)
 	d.Set("confidential_issue_channel", service.Properties.ConfidentialIssueChannel)
-	d.Set("merge_request_events", service.MergeRequestsEvents)
+	d.Set("merge_requests_events", service.MergeRequestsEvents)
 	d.Set("merge_request_channel", service.Properties.MergeRequestChannel)
 	d.Set("tag_push_events", service.TagPushEvents)
 	d.Set("tag_push_channel", service.Properties.TagPushChannel)
@@ -161,6 +165,7 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	d.Set("pipeline_channel", service.Properties.PipelineChannel)
 	d.Set("wiki_page_events", service.WikiPageEvents)
 	d.Set("wiki_page_channel", service.Properties.WikiPageChannel)
+	d.Set("job_events", service.JobEvents)
 }
 
 func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) error {
@@ -170,60 +175,62 @@ func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) 
 	log.Printf("[DEBUG] create gitlab slack service for project %s", project)
 
 	opts := &gitlab.SetSlackServiceOptions{
-		WebHook:  gitlab.String(d.Get("webhook").(string)),
-		Username: gitlab.String(d.Get("username").(string)),
+		WebHook: gitlab.String(d.Get("webhook").(string)),
 	}
 
-	if v, ok := d.GetOkExists("notify_only_broken_pipelines"); ok {
+	if v := d.Get("username"); v != nil {
+		opts.Username = gitlab.String(v.(string))
+	}
+	if v := d.Get("notify_only_broken_pipelines"); v != nil {
 		opts.NotifyOnlyBrokenPipelines = gitlab.Bool(v.(bool))
 	}
-	if v, ok := d.GetOkExists("notify_only_default_branch"); ok {
+	if v := d.Get("notify_only_default_branch"); v != nil {
 		opts.NotifyOnlyDefaultBranch = gitlab.Bool(v.(bool))
 	}
 
-	if v, ok := d.GetOkExists("push_events"); ok {
+	if v := d.Get("push_events"); v != nil {
 		opts.PushEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("push_channel"); ok {
 		opts.PushChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("issue_events"); ok {
+	if v := d.Get("issues_events"); v != nil {
 		opts.IssuesEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("issue_channel"); ok {
 		opts.IssueChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("confidential_issue_events"); ok {
+	if v := d.Get("confidential_issues_events"); v != nil {
 		opts.ConfidentialIssuesEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("confidential_issue_channel"); ok {
 		opts.ConfidentialIssueChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("merge_request_events"); ok {
+	if v := d.Get("merge_requests_events"); v != nil {
 		opts.MergeRequestsEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("merge_request_channel"); ok {
 		opts.MergeRequestChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("tag_push_events"); ok {
+	if v := d.Get("tag_push_events"); v != nil {
 		opts.TagPushEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("tag_push_channel"); ok {
 		opts.TagPushChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("note_events"); ok {
+	if v := d.Get("note_events"); v != nil {
 		opts.NoteEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("note_channel"); ok {
 		opts.NoteChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("confidential_note_events"); ok {
+	if v := d.Get("confidential_note_events"); v != nil {
 		opts.ConfidentialNoteEvents = gitlab.Bool(v.(bool))
 	}
 	// See comment to "confidential_note_channel" in resourceGitlabServiceSlack()
@@ -231,14 +238,14 @@ func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) 
 	//	opts.ConfidentialNoteChannel = gitlab.String(v.(string))
 	//}
 
-	if v, ok := d.GetOkExists("pipeline_events"); ok {
+	if v := d.Get("pipeline_events"); v != nil {
 		opts.PipelineEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("pipeline_channel"); ok {
 		opts.PipelineChannel = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOkExists("wiki_page_events"); ok {
+	if v := d.Get("wiki_page_events"); v != nil {
 		opts.WikiPageEvents = gitlab.Bool(v.(bool))
 	}
 	if v, ok := d.GetOk("wiki_page_channel"); ok {
@@ -293,22 +300,22 @@ func resourceGitlabServiceSlackUpdate(d *schema.ResourceData, meta interface{}) 
 		opts.PushChannel = gitlab.String(d.Get("push_channel").(string))
 	}
 
-	if d.HasChange("issue_events") {
-		opts.IssuesEvents = gitlab.Bool(d.Get("issue_events").(bool))
+	if d.HasChange("issues_events") {
+		opts.IssuesEvents = gitlab.Bool(d.Get("issues_events").(bool))
 	}
 	if d.HasChange("issue_channel") {
 		opts.IssueChannel = gitlab.String(d.Get("issue_channel").(string))
 	}
 
-	if d.HasChange("confidential_issue_events") {
-		opts.ConfidentialIssuesEvents = gitlab.Bool(d.Get("confidential_issue_events").(bool))
+	if d.HasChange("confidential_issues_events") {
+		opts.ConfidentialIssuesEvents = gitlab.Bool(d.Get("confidential_issues_events").(bool))
 	}
 	if d.HasChange("confidential_issue_channel") {
 		opts.ConfidentialIssueChannel = gitlab.String(d.Get("confidential_issue_channel").(string))
 	}
 
-	if d.HasChange("merge_request_events") {
-		opts.MergeRequestsEvents = gitlab.Bool(d.Get("merge_request_events").(bool))
+	if d.HasChange("merge_requests_events") {
+		opts.MergeRequestsEvents = gitlab.Bool(d.Get("merge_requests_events").(bool))
 	}
 	if d.HasChange("merge_request_channel") {
 		opts.MergeRequestChannel = gitlab.String(d.Get("merge_request_channel").(string))
