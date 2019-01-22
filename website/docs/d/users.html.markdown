@@ -62,8 +62,20 @@ The following attributes are exported:
   * `state` - Whether the user is active or blocked.
   * `external` - Whether the user is external.
   * `extern_uid` - The external UID of the user.
+  * `provider` - The UID provider of the user.
   * `organization` - The organization of the user.
   * `two_factor_enabled` - Whether user's two factor auth is enabled.
+  * `avatar_url` - The avatar URL of the user.
+  * `bio` - The bio of the user.
+  * `location` - The location of the user.
+  * `skype` - Skype username of the user.
+  * `linkedin` - Linkedin profile of the user.
+  * `twitter` - Twitter username of the user.
+  * `website_url` - User's website URL.
+  * `theme_id` - User's theme ID.
+  * `color_scheme_id` - User's color scheme ID.
+  * `last_sign_in_at` - Last user's sign-in date.
+  * `current_sign_in_at` - Current user's sign-in date.
 
 
 [users_for_admins]: https://docs.gitlab.com/ce/api/users.html#for-admins

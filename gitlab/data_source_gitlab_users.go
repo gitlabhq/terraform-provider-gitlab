@@ -118,6 +118,54 @@ func dataSourceGitlabUsers() *schema.Resource {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
+						"provider": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"avatar_url": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"bio": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"location": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"skype": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"linkedin": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"twitter": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"website_url": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"theme_id": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"color_scheme_id": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"last_sign_in_at": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"current_sign_in_at": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 					},
 				},
 			},
@@ -160,12 +208,28 @@ func flattenGitlabUsers(users []*gitlab.User) []interface{} {
 			"state":              user.State,
 			"external":           user.External,
 			"extern_uid":         user.ExternUID,
-			"organization":       user.Organization,
+			"provider":           user.Provider,
 			"two_factor_enabled": user.TwoFactorEnabled,
+			"avatar_url":         user.AvatarURL,
+			"bio":                user.Bio,
+			"location":           user.Location,
+			"skype":              user.Skype,
+			"linkedin":           user.Linkedin,
+			"twitter":            user.Twitter,
+			"website_url":        user.WebsiteURL,
+			"organization":       user.Organization,
+			"theme_id":           user.ThemeID,
+			"color_scheme_id":    user.ColorSchemeID,
 		}
 
 		if user.CreatedAt != nil {
 			values["created_at"] = user.CreatedAt.String()
+		}
+		if user.LastSignInAt != nil {
+			values["last_sign_in_at"] = user.LastSignInAt.String()
+		}
+		if user.CurrentSignInAt != nil {
+			values["current_sign_in_at"] = user.CurrentSignInAt.String()
 		}
 
 		usersList = append(usersList, values)
