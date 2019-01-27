@@ -1,11 +1,11 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/pkg/errors"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -58,7 +58,7 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 	pipelineTriggerID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return errors.Wrapf(err, "%s cannot be converted to int", d.Id())
+		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
 	log.Printf("[DEBUG] read gitlab PipelineTrigger %s/%d", project, pipelineTriggerID)
@@ -100,7 +100,7 @@ func resourceGitlabPipelineTriggerUpdate(d *schema.ResourceData, meta interface{
 	pipelineTriggerID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return errors.Wrapf(err, "%s cannot be converted to int", d.Id())
+		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
 	if d.HasChange("description") {
@@ -125,7 +125,7 @@ func resourceGitlabPipelineTriggerDelete(d *schema.ResourceData, meta interface{
 	pipelineTriggerID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return errors.Wrapf(err, "%s cannot be converted to int", d.Id())
+		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
 	_, err = client.PipelineTriggers.DeletePipelineTrigger(project, pipelineTriggerID)
