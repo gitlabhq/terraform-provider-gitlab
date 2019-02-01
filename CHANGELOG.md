@@ -1,4 +1,7 @@
 ## 1.1.1 (Unreleased)
+
+* **New Datasource:** gitlab_users ([#79](https://github.com/terraform-providers/terraform-provider-gitlab/issues/79))
+
 ## 1.1.0 (January 14, 2019)
 
 FEATURES:
