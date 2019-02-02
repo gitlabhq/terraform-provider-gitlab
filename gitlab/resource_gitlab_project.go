@@ -106,7 +106,7 @@ func resourceGitlabProject() *schema.Resource {
 							Type:     schema.TypeString,
 							Required: true,
 							ValidateFunc: validation.StringInSlice([]string{
-								"guest", "reporter", "developer", "master"}, false),
+								"no one", "guest", "reporter", "developer", "maintainer"}, false),
 						},
 						"group_name": {
 							Type:     schema.TypeString,
