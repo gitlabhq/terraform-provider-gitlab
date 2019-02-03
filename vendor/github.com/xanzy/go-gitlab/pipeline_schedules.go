@@ -30,15 +30,6 @@ type PipelineSchedulesService struct {
 	client *Client
 }
 
-// PipelineVariable represents a pipeline schedule variable.
-//
-// GitLab API docs:
-// https://docs.gitlab.com/ce/api/pipeline_schedules.html#pipeline-schedule-variable
-type PipelineVariable struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
 // PipelineSchedule represents a pipeline schedule.
 //
 // GitLab API docs:
@@ -56,7 +47,7 @@ type PipelineSchedule struct {
 	Owner        *User      `json:"owner"`
 	LastPipeline struct {
 		ID     int    `json:"id"`
-		Sha    string `json:"sha"`
+		SHA    string `json:"sha"`
 		Ref    string `json:"ref"`
 		Status string `json:"status"`
 	} `json:"last_pipeline"`
