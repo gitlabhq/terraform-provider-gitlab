@@ -94,7 +94,7 @@ func resourceGitlabProject() *schema.Resource {
 				Computed: true,
 			},
 			"shared_with_groups": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -170,7 +170,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if v, ok := d.GetOk("shared_with_groups"); ok {
-		options := expandSharedWithGroupsOptions(v.([]interface{}))
+		options := expandSharedWithGroupsOptions(v)
 
 		for _, option := range options {
 			_, err := client.Projects.ShareProjectWithGroup(project.ID, option)
@@ -298,10 +298,10 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func expandSharedWithGroupsOptions(d []interface{}) []*gitlab.ShareWithGroupOptions {
+func expandSharedWithGroupsOptions(v interface{}) []*gitlab.ShareWithGroupOptions {
 	shareWithGroupOptionsList := []*gitlab.ShareWithGroupOptions{}
 
-	for _, config := range d {
+	for _, config := range v.(*schema.Set).List() {
 		data := config.(map[string]interface{})
 
 		groupAccess := accessLevelNameToValue[data["group_access_level"].(string)]
@@ -368,8 +368,7 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 	var groupsToShare []*gitlab.ShareWithGroupOptions
 
 	// Get target groups from the TF config and current groups from Gitlab server
-	targetGroups := expandSharedWithGroupsOptions(
-		d.Get("shared_with_groups").([]interface{}))
+	targetGroups := expandSharedWithGroupsOptions(d.Get("shared_with_groups"))
 	project, _, err := client.Projects.GetProject(d.Id())
 	if err != nil {
 		return err

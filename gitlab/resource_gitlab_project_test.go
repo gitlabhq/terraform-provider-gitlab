@@ -106,7 +106,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							GroupID          int
 							GroupName        string
 							GroupAccessLevel int
-						}{{0, "", 10}, {0, "", 30}},
+						}{{0, "", 30}, {0, "", 10}},
 					}),
 				),
 			},
