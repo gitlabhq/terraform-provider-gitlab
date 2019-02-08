@@ -7,6 +7,7 @@ FEATURES:
 ENHANCEMENTS:
 
 * Supports "No one" and "maintainer" permissions ([#83](https://github.com/terraform-providers/terraform-provider-gitlab/issues/83))
+* shared_with_groups is now order-independant ([#86](https://github.com/terraform-providers/terraform-provider-gitlab/issues/86))
 
 ## 1.1.0 (January 14, 2019)
 
