@@ -84,7 +84,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							GroupID          int
 							GroupName        string
 							GroupAccessLevel int
-						}{{0, "", 30}},
+						}{{0, fmt.Sprintf("foo-name-%d", rInt), 30}},
 					}),
 				),
 			},
@@ -106,7 +106,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							GroupID          int
 							GroupName        string
 							GroupAccessLevel int
-						}{{0, "", 10}, {0, "", 30}},
+						}{{0, fmt.Sprintf("foo-name-%d", rInt), 10}, {0, fmt.Sprintf("foo2-name-%d", rInt), 30}},
 					}),
 				),
 			},
@@ -251,10 +251,17 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 			return fmt.Errorf("got visibility %q; want %q", project.Visibility, want.Visibility)
 		}
 
-		for i, group := range project.SharedWithGroups {
-			if group.GroupAccessLevel != want.SharedWithGroups[i].GroupAccessLevel {
-				return fmt.Errorf("got shared with groups access: %d; want %d", group.GroupAccessLevel, want.SharedWithGroups[i].GroupAccessLevel)
+		groupsToCheck := want.SharedWithGroups
+		for _, group := range project.SharedWithGroups {
+			for i, groupToCheck := range groupsToCheck {
+				if group.GroupName == groupToCheck.GroupName && group.GroupAccessLevel == groupToCheck.GroupAccessLevel {
+					groupsToCheck = append(groupsToCheck[:i], groupsToCheck[i+1:]...)
+					break
+				}
 			}
+		}
+		if len(groupsToCheck) != 0 {
+			return fmt.Errorf("got shared with groups: %v; want %v", project.SharedWithGroups, want.SharedWithGroups)
 		}
 
 		return nil
