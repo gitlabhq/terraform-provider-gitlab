@@ -11,19 +11,24 @@ import (
 )
 
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
-	"guest":     gitlab.GuestPermissions,
-	"reporter":  gitlab.ReporterPermissions,
-	"developer": gitlab.DeveloperPermissions,
-	"master":    gitlab.MasterPermissions,
-	"owner":     gitlab.OwnerPermission,
+	"no one":     gitlab.NoPermissions,
+	"guest":      gitlab.GuestPermissions,
+	"reporter":   gitlab.ReporterPermissions,
+	"developer":  gitlab.DeveloperPermissions,
+	"maintainer": gitlab.MaintainerPermissions,
+	"owner":      gitlab.OwnerPermission,
+
+	// Deprecated
+	"master": gitlab.MaintainerPermissions,
 }
 
 var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
-	gitlab.GuestPermissions:     "guest",
-	gitlab.ReporterPermissions:  "reporter",
-	gitlab.DeveloperPermissions: "developer",
-	gitlab.MasterPermissions:    "master",
-	gitlab.OwnerPermission:      "owner",
+	gitlab.NoPermissions:         "no one",
+	gitlab.GuestPermissions:      "guest",
+	gitlab.ReporterPermissions:   "reporter",
+	gitlab.DeveloperPermissions:  "developer",
+	gitlab.MaintainerPermissions: "maintainer",
+	gitlab.OwnerPermissions:      "owner",
 }
 
 // copied from ../github/util.go
@@ -106,17 +111,22 @@ func buildTwoPartID(a, b *string) string {
 }
 
 var accessLevelID = map[string]gitlab.AccessLevelValue{
-	"guest":     gitlab.GuestPermissions,
-	"reporter":  gitlab.ReporterPermissions,
-	"developer": gitlab.DeveloperPermissions,
-	"master":    gitlab.MasterPermissions,
-	"owner":     gitlab.OwnerPermission,
+	"no one":     gitlab.NoPermissions,
+	"guest":      gitlab.GuestPermissions,
+	"reporter":   gitlab.ReporterPermissions,
+	"developer":  gitlab.DeveloperPermissions,
+	"maintainer": gitlab.MaintainerPermissions,
+	"owner":      gitlab.OwnerPermission,
+
+	// Deprecated
+	"master": gitlab.MaintainerPermissions,
 }
 
 var accessLevel = map[gitlab.AccessLevelValue]string{
-	gitlab.GuestPermissions:     "guest",
-	gitlab.ReporterPermissions:  "reporter",
-	gitlab.DeveloperPermissions: "developer",
-	gitlab.MasterPermissions:    "master",
-	gitlab.OwnerPermission:      "owner",
+	gitlab.NoPermissions:         "no one",
+	gitlab.GuestPermissions:      "guest",
+	gitlab.ReporterPermissions:   "reporter",
+	gitlab.DeveloperPermissions:  "developer",
+	gitlab.MaintainerPermissions: "maintainer",
+	gitlab.OwnerPermission:       "owner",
 }
