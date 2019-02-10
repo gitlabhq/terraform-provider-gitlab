@@ -3,6 +3,7 @@
 FEATURES:
 
 * **New Datasource:** `gitlab_users` ([#79](https://github.com/terraform-providers/terraform-provider-gitlab/issues/79))
+* **New Resources**: `gitlab_pipeline_trigger` ([#82](https://github.com/terraform-providers/terraform-provider-gitlab/issues/82))
 
 ENHANCEMENTS:
 
