@@ -3,11 +3,12 @@ package gitlab
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-gitlab"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/xanzy/go-gitlab"
 )
 
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
@@ -67,6 +68,20 @@ func stringToVisibilityLevel(s string) *gitlab.VisibilityValue {
 		"private":  gitlab.PrivateVisibility,
 		"internal": gitlab.InternalVisibility,
 		"public":   gitlab.PublicVisibility,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
+func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
+	lookup := map[string]gitlab.MergeMethodValue{
+		"merge":        gitlab.NoFastForwardMerge,
+		"ff":           gitlab.FastForwardMerge,
+		"rebase_merge": gitlab.RebaseMerge,
 	}
 
 	value, ok := lookup[s]

@@ -76,7 +76,22 @@ func resourceGitlabProject() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 				Default:      "private",
 			},
-
+			"merge_method": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"merge", "rebase_merge", "ff"}, true),
+				Default:      "merge",
+			},
+			"only_allow_merge_if_pipeline_succeeds": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"only_allow_merge_if_all_discussions_are_resolved": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"ssh_url_to_repo": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -130,8 +145,10 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
 	d.Set("visibility_level", string(project.Visibility))
+	d.Set("merge_method", string(project.MergeMethod))
+	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
+	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
 	d.Set("namespace_id", project.Namespace.ID)
-
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
 	d.Set("web_url", project.WebURL)
@@ -142,12 +159,15 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.CreateProjectOptions{
-		Name:                 gitlab.String(d.Get("name").(string)),
-		IssuesEnabled:        gitlab.Bool(d.Get("issues_enabled").(bool)),
-		MergeRequestsEnabled: gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
-		WikiEnabled:          gitlab.Bool(d.Get("wiki_enabled").(bool)),
-		SnippetsEnabled:      gitlab.Bool(d.Get("snippets_enabled").(bool)),
-		Visibility:           stringToVisibilityLevel(d.Get("visibility_level").(string)),
+		Name:                             gitlab.String(d.Get("name").(string)),
+		IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
+		MergeRequestsEnabled:             gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
+		WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
+		SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
+		Visibility:                       stringToVisibilityLevel(d.Get("visibility_level").(string)),
+		MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
+		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
+		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -227,6 +247,18 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("visibility_level") {
 		options.Visibility = stringToVisibilityLevel(d.Get("visibility_level").(string))
+	}
+
+	if d.HasChange("merge_method") {
+		options.MergeMethod = stringToMergeMethod(d.Get("merge_method").(string))
+	}
+
+	if d.HasChange("only_allow_merge_if_pipeline_succeeds") {
+		options.OnlyAllowMergeIfPipelineSucceeds = gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool))
+	}
+
+	if d.HasChange("only_allow_merge_if_all_discussions_are_resolved") {
+		options.OnlyAllowMergeIfAllDiscussionsAreResolved = gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool))
 	}
 
 	if d.HasChange("issues_enabled") {
