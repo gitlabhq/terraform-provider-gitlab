@@ -42,6 +42,8 @@ The following arguments are supported:
 
 * `merge_requests_enabled` - (Optional) Enable merge requests for the project.
 
+* `approvals_before_merge` - (Optional) Number of merge request approvals required for merging. Default is 0.
+
 * `wiki_enabled` - (Optional) Enable wiki for the project.
 
 * `snippets_enabled` - (Optional) Enable snippets for the project.

@@ -60,6 +60,11 @@ func resourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"approvals_before_merge": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
 			"wiki_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -142,6 +147,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("default_branch", project.DefaultBranch)
 	d.Set("issues_enabled", project.IssuesEnabled)
 	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
+	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
 	d.Set("visibility_level", string(project.Visibility))
@@ -162,6 +168,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		Name:                             gitlab.String(d.Get("name").(string)),
 		IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
 		MergeRequestsEnabled:             gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
+		ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
 		WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
 		SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
 		Visibility:                       stringToVisibilityLevel(d.Get("visibility_level").(string)),
@@ -267,6 +274,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("merge_requests_enabled") {
 		options.MergeRequestsEnabled = gitlab.Bool(d.Get("merge_requests_enabled").(bool))
+	}
+
+	if d.HasChange("approvals_before_merge") {
+		options.ApprovalsBeforeMerge = gitlab.Int(d.Get("approvals_before_merge").(int))
 	}
 
 	if d.HasChange("wiki_enabled") {
