@@ -9,7 +9,8 @@ ENHANCEMENTS:
 
 * Supports "No one" and "maintainer" permissions ([#83](https://github.com/terraform-providers/terraform-provider-gitlab/issues/83))
 * `gitlab_project.shared_with_groups` is now order-independent ([#86](https://github.com/terraform-providers/terraform-provider-gitlab/issues/86))
-* add `merge_method`, `only_allow_merge_if_*` parameters to `gitlab_project` ([#72](https://github.com/terraform-providers/terraform-provider-gitlab/issues/72))
+* add `merge_method`, `only_allow_merge_if_*`, `approvals_before_merge` parameters to `gitlab_project` ([#72](https://github.com/terraform-providers/terraform-provider-gitlab/issues/72), [#88](https://github.com/terraform-providers/terraform-provider-gitlab/issues/88))
+
 
 ## 1.1.0 (January 14, 2019)
 
