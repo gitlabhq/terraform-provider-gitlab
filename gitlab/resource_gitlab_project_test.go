@@ -30,6 +30,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Description:                      "Terraform acceptance tests",
 						IssuesEnabled:                    true,
 						MergeRequestsEnabled:             true,
+						ApprovalsBeforeMerge:             0,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
 						Visibility:                       gitlab.PublicVisibility,
@@ -48,6 +49,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Name:                             fmt.Sprintf("foo-%d", rInt),
 						Path:                             fmt.Sprintf("foo.%d", rInt),
 						Description:                      "Terraform acceptance tests!",
+						ApprovalsBeforeMerge:             0,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -66,6 +68,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Description:                      "Terraform acceptance tests",
 						IssuesEnabled:                    true,
 						MergeRequestsEnabled:             true,
+						ApprovalsBeforeMerge:             0,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
 						Visibility:                       gitlab.PublicVisibility,
@@ -223,6 +226,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 	DefaultBranch                             string
 	IssuesEnabled                             bool
 	MergeRequestsEnabled                      bool
+	ApprovalsBeforeMerge                      int
 	WikiEnabled                               bool
 	SnippetsEnabled                           bool
 	Visibility                                gitlab.VisibilityValue
@@ -258,6 +262,10 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 
 		if project.MergeRequestsEnabled != want.MergeRequestsEnabled {
 			return fmt.Errorf("got merge_requests_enabled %t; want %t", project.MergeRequestsEnabled, want.MergeRequestsEnabled)
+		}
+
+		if project.ApprovalsBeforeMerge != want.ApprovalsBeforeMerge {
+			return fmt.Errorf("got approvals_before_merge %d; want %d", project.ApprovalsBeforeMerge, want.ApprovalsBeforeMerge)
 		}
 
 		if project.WikiEnabled != want.WikiEnabled {
@@ -376,6 +384,7 @@ resource "gitlab_project" "foo" {
 
   issues_enabled = false
   merge_requests_enabled = false
+  approvals_before_merge = 0
   wiki_enabled = false
   snippets_enabled = false
 }
