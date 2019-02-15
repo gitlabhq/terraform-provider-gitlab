@@ -3,7 +3,9 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -167,5 +169,35 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Delete gitlab group %s", d.Id())
 
 	_, err := client.Groups.DeleteGroup(d.Id())
+	if err != nil {
+		return fmt.Errorf("error deleting group %s: %s", d.Id(), err)
+	}
+
+	// Wait for the group to be deleted.
+	// Deleting a group in gitlab is async.
+	stateConf := &resource.StateChangeConf{
+		Pending: []string{"Deleting"},
+		Target:  []string{"Deleted"},
+		Refresh: func() (interface{}, string, error) {
+			out, response, err := client.Groups.GetGroup(d.Id())
+			if err != nil {
+				if response.StatusCode == 404 {
+					return out, "Deleted", nil
+				}
+				log.Printf("[ERROR] Received error: %#v", err)
+				return out, "Error", err
+			}
+			return out, "Deleting", nil
+		},
+
+		Timeout:    10 * time.Minute,
+		MinTimeout: 3 * time.Second,
+		Delay:      5 * time.Second,
+	}
+
+	_, err = stateConf.WaitForState()
+	if err != nil {
+		return fmt.Errorf("error waiting for group (%s) to become deleted: %s", d.Id(), err)
+	}
 	return err
 }
