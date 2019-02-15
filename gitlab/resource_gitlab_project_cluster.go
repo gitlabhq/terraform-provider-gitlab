@@ -2,11 +2,12 @@ package gitlab
 
 import (
 	"fmt"
+	"log"
+	"strconv"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/xanzy/go-gitlab"
-	"log"
-	"strconv"
 )
 
 func resourceGitlabProjectCluster() *schema.Resource {
