@@ -34,6 +34,7 @@ func resourceGitlabProjectCluster() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
+				ForceNew: true,
 			},
 			"created_at": {
 				Type:     schema.TypeString,
