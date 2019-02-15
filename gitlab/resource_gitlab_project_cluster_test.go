@@ -66,6 +66,27 @@ func TestAccGitlabProjectCluster_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectCluster_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectClusterDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectClusterConfig(rInt),
+			},
+			{
+				ResourceName:            "gitlab_project_cluster.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"enabled", "kubernetes_token"},
+			},
+		},
+	})
+}
+
 type testAccGitlabProjectClusterExpectedAttributes struct {
 	Name                        string
 	EnvironmentScope            string
