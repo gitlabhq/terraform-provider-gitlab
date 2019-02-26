@@ -1,6 +1,10 @@
 ## 1.2.1 (Unreleased)
 
-BUGFIXES: documentation fix ([#92](https://github.com/terraform-providers/terraform-provider-gitlab/issues/92))
+BUGFIXES:
+* documentation fix ([#92](https://github.com/terraform-providers/terraform-provider-gitlab/issues/92))
+
+ENHANCEMENTS:
+* Support for request/response logging when >`DEBUG` severity is set ([#93](https://github.com/terraform-providers/terraform-provider-gitlab/issues/93))
 
 ## 1.2.0 (February 19, 2019)
 
