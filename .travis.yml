@@ -6,9 +6,7 @@ language: go
 go:
   - "1.11.x"
 env:
-  - GOFLAGS=-mod=vendor GO111MODULE=on
-  GITLAB_BASE_URL: http://127.0.0.1:8080/api/v4
-  GITLAB_TOKEN: ACCTEST
+  - GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
 
 install:
 # This script is used by the Travis build to install a cookie for
