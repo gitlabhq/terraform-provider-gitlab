@@ -135,12 +135,6 @@ func resourceGitlabServiceSlack() *schema.Resource {
 }
 
 func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitlab.SlackService) {
-	if !service.Active {
-		log.Println("[DEBUG] slack service is not active")
-		d.SetId("")
-		return
-	}
-
 	d.SetId(fmt.Sprintf("%d", service.ID))
 	d.Set("webhook", service.Properties.WebHook)
 	d.Set("username", service.Properties.Username)
@@ -293,4 +287,10 @@ func resourceGitlabServiceSlackDelete(d *schema.ResourceData, meta interface{}) 
 
 	_, err := client.Services.DeleteSlackService(project)
 	return err
+}
+
+func resourceGitlabServiceSlackImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	d.Set("project", d.Id())
+
+	return []*schema.ResourceData{d}, nil
 }
