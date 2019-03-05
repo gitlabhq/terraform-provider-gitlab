@@ -172,79 +172,26 @@ func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) 
 		WebHook: gitlab.String(d.Get("webhook").(string)),
 	}
 
-	if v := d.Get("username"); v != nil {
-		opts.Username = gitlab.String(v.(string))
-	}
-	if v := d.Get("notify_only_broken_pipelines"); v != nil {
-		opts.NotifyOnlyBrokenPipelines = gitlab.Bool(v.(bool))
-	}
-	if v := d.Get("notify_only_default_branch"); v != nil {
-		opts.NotifyOnlyDefaultBranch = gitlab.Bool(v.(bool))
-	}
-
-	if v := d.Get("push_events"); v != nil {
-		opts.PushEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("push_channel"); ok {
-		opts.PushChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("issues_events"); v != nil {
-		opts.IssuesEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("issue_channel"); ok {
-		opts.IssueChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("confidential_issues_events"); v != nil {
-		opts.ConfidentialIssuesEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("confidential_issue_channel"); ok {
-		opts.ConfidentialIssueChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("merge_requests_events"); v != nil {
-		opts.MergeRequestsEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("merge_request_channel"); ok {
-		opts.MergeRequestChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("tag_push_events"); v != nil {
-		opts.TagPushEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("tag_push_channel"); ok {
-		opts.TagPushChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("note_events"); v != nil {
-		opts.NoteEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("note_channel"); ok {
-		opts.NoteChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("confidential_note_events"); v != nil {
-		opts.ConfidentialNoteEvents = gitlab.Bool(v.(bool))
-	}
-	// See comment to "confidential_note_channel" in resourceGitlabServiceSlack()
-	//if v, ok := d.GetOk("confidential_note_channel"); ok {
-	//	opts.ConfidentialNoteChannel = gitlab.String(v.(string))
-	//}
-
-	if v := d.Get("pipeline_events"); v != nil {
-		opts.PipelineEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("pipeline_channel"); ok {
-		opts.PipelineChannel = gitlab.String(v.(string))
-	}
-
-	if v := d.Get("wiki_page_events"); v != nil {
-		opts.WikiPageEvents = gitlab.Bool(v.(bool))
-	}
-	if v, ok := d.GetOk("wiki_page_channel"); ok {
-		opts.WikiPageChannel = gitlab.String(v.(string))
-	}
+	opts.Username = gitlab.String(d.Get("username").(string))
+	opts.NotifyOnlyBrokenPipelines = gitlab.Bool(d.Get("notify_only_broken_pipelines").(bool))
+	opts.NotifyOnlyDefaultBranch = gitlab.Bool(d.Get("notify_only_default_branch").(bool))
+	opts.PushEvents = gitlab.Bool(d.Get("push_events").(bool))
+	opts.PushChannel = gitlab.String(d.Get("push_channel").(string))
+	opts.IssuesEvents = gitlab.Bool(d.Get("issues_events").(bool))
+	opts.IssueChannel = gitlab.String(d.Get("issue_channel").(string))
+	opts.ConfidentialIssuesEvents = gitlab.Bool(d.Get("confidential_issues_events").(bool))
+	opts.ConfidentialIssueChannel = gitlab.String(d.Get("confidential_issue_channel").(string))
+	opts.MergeRequestsEvents = gitlab.Bool(d.Get("merge_requests_events").(bool))
+	opts.MergeRequestChannel = gitlab.String(d.Get("merge_request_channel").(string))
+	opts.TagPushEvents = gitlab.Bool(d.Get("tag_push_events").(bool))
+	opts.TagPushChannel = gitlab.String(d.Get("tag_push_channel").(string))
+	opts.NoteEvents = gitlab.Bool(d.Get("note_events").(bool))
+	opts.NoteChannel = gitlab.String(d.Get("note_channel").(string))
+	opts.ConfidentialNoteEvents = gitlab.Bool(d.Get("confidential_note_events").(bool))
+	opts.PipelineEvents = gitlab.Bool(d.Get("pipeline_events").(bool))
+	opts.PipelineChannel = gitlab.String(d.Get("pipeline_channel").(string))
+	opts.WikiPageEvents = gitlab.Bool(d.Get("wiki_page_events").(bool))
+	opts.WikiPageChannel = gitlab.String(d.Get("wiki_page_channel").(string))
 
 	_, err := client.Services.SetSlackService(project, opts)
 	if err != nil {

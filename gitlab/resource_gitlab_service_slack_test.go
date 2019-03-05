@@ -50,7 +50,7 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "notify_only_broken_pipelines", "false"),
 				),
 			},
-			// Update the slack service to get back to initial settings
+			// Update the slack service to get back to previous settings
 			{
 				Config: testAccGitlabServiceSlackConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -59,6 +59,15 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "push_events", "true"),
 					resource.TestCheckResourceAttr(slackResourceName, "push_channel", "test"),
 					resource.TestCheckResourceAttr(slackResourceName, "notify_only_broken_pipelines", "true"),
+				),
+			},
+			// Update the slack service to get back to minimal settings
+			{
+				Config: testAccGitlabServiceSlackMinimalConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabServiceExists(slackResourceName, &slackService),
+					resource.TestCheckResourceAttr(slackResourceName, "webhook", "https://test.com"),
+					resource.TestCheckResourceAttr(slackResourceName, "push_channel", ""),
 				),
 			},
 		},
