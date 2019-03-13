@@ -153,6 +153,25 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Disable shared runners in project
+			{
+				Config: testAccGitlabProjectDisableSharedRunners(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-%d", rInt),
+						Path:                 fmt.Sprintf("foo.%d", rInt),
+						Description:          "Terraform acceptance tests",
+						IssuesEnabled:        true,
+						MergeRequestsEnabled: true,
+						WikiEnabled:          true,
+						SnippetsEnabled:      true,
+						Visibility:           gitlab.PublicVisibility,
+						MergeMethod:          gitlab.FastForwardMerge,
+						SharedRunnersEnabled: false,
+					}),
+				),
+			},
 		},
 	})
 }
@@ -232,6 +251,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 	Visibility                                gitlab.VisibilityValue
 	MergeMethod                               gitlab.MergeMethodValue
 	OnlyAllowMergeIfPipelineSucceeds          bool
+	SharedRunnersEnabled                      bool
 	OnlyAllowMergeIfAllDiscussionsAreResolved bool
 	SharedWithGroups                          []struct {
 		GroupID          int
@@ -456,4 +476,18 @@ resource "gitlab_group" "foo2" {
   visibility_level = "public"
 }
 	`, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectDisableSharedRunners(rInt int) string {
+	return fmt.Sprintf(`
+		resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  visibility_level = "public"
+  merge_method = "ff"
+
+  shared_runners_enabled = false
+}
+	`, rInt, rInt)
 }

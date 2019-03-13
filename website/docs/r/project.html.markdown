@@ -60,6 +60,8 @@ The following arguments are supported:
 
 * `only_allow_merge_if_all_discussions_are_resolved` - (Optional) Set to true if you want allow merges only if all discussions are resolved.
 
+* `shared_runners_enabled` - (Optional) Set to false to disable shared runners usage in the project ci pipelines.
+
 * `shared_with_groups` - (Optional) Enable sharing the project with a list of groups (maps).
   * `group_id` - (Required) Group id of the group you want to share the project with.
   * `group_access_level` - (Optional) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
