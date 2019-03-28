@@ -35,4 +35,4 @@ The following arguments are supported:
 GitLab group membership can be imported using an id made up of `groupid:username`, e.g.
 
 ```
-$ terraform import gitlab_group_membership.test 12345:1337
+$ terraform import gitlab_project_membership.test 12345:1337
