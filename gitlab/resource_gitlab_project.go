@@ -216,7 +216,7 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
-	project, response, err := client.Projects.GetProject(d.Id())
+	project, response, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		if response.StatusCode == 404 {
 			log.Printf("[WARN] removing project %s from state because it no longer exists in gitlab", d.Id())
@@ -318,7 +318,7 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 		Pending: []string{"Deleting"},
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Projects.GetProject(d.Id())
+			out, response, err := client.Projects.GetProject(d.Id(), nil)
 			if err != nil {
 				if response.StatusCode == 404 {
 					return out, "Deleted", nil
@@ -412,7 +412,7 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 
 	// Get target groups from the TF config and current groups from Gitlab server
 	targetGroups := expandSharedWithGroupsOptions(d.Get("shared_with_groups"))
-	project, _, err := client.Projects.GetProject(d.Id())
+	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		return err
 	}
