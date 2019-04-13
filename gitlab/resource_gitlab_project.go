@@ -75,6 +75,11 @@ func resourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"container_registry_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
 			"visibility_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -157,6 +162,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
+	d.Set("container_registry_enabled", project.ContainerRegistryEnabled)
 	d.Set("visibility_level", string(project.Visibility))
 	d.Set("merge_method", string(project.MergeMethod))
 	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
@@ -179,6 +185,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
 		WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
 		SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
+		ContainerRegistryEnabled:         gitlab.Bool(d.Get("container_registry_enabled").(bool)),
 		Visibility:                       stringToVisibilityLevel(d.Get("visibility_level").(string)),
 		MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
@@ -302,6 +309,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("tags") {
 		options.TagList = stringSetToStringSlice(d.Get("tags").(*schema.Set))
+	}
+
+	if d.HasChange("container_registry_enabled") {
+		options.ContainerRegistryEnabled = gitlab.Bool(d.Get("container_registry_enabled").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {

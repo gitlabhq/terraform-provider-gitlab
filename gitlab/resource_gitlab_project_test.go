@@ -34,6 +34,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						ApprovalsBeforeMerge:             0,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
+						ContainerRegistryEnabled:         true,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -52,6 +53,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Description:                      "Terraform acceptance tests!",
 						TagList:                          []string{"tag1", "tag2"},
 						ApprovalsBeforeMerge:             0,
+						ContainerRegistryEnabled:         false,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -73,6 +75,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						ApprovalsBeforeMerge:             0,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
+						ContainerRegistryEnabled:         true,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -93,6 +96,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeRequestsEnabled:             true,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
+						ContainerRegistryEnabled:         true,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: false,
@@ -118,6 +122,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeRequestsEnabled:             true,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
+						ContainerRegistryEnabled:         true,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: false,
@@ -143,6 +148,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeRequestsEnabled:             true,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
+						ContainerRegistryEnabled:         true,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -231,6 +237,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 	ApprovalsBeforeMerge                      int
 	WikiEnabled                               bool
 	SnippetsEnabled                           bool
+	ContainerRegistryEnabled                  bool
 	Visibility                                gitlab.VisibilityValue
 	MergeMethod                               gitlab.MergeMethodValue
 	OnlyAllowMergeIfPipelineSucceeds          bool
@@ -277,6 +284,10 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 
 		if project.SnippetsEnabled != want.SnippetsEnabled {
 			return fmt.Errorf("got snippets_enabled %t; want %t", project.SnippetsEnabled, want.SnippetsEnabled)
+		}
+
+		if project.ContainerRegistryEnabled != want.ContainerRegistryEnabled {
+			return fmt.Errorf("got container_registry_enabled %t; want %t", project.ContainerRegistryEnabled, want.ContainerRegistryEnabled)
 		}
 
 		if project.Visibility != want.Visibility {
@@ -399,6 +410,7 @@ resource "gitlab_project" "foo" {
   approvals_before_merge = 0
   wiki_enabled = false
   snippets_enabled = false
+  container_registry_enabled = false
 }
 	`, rInt, rInt)
 }
