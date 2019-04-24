@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/hashicorp/terraform/helper/logging"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -39,10 +40,11 @@ func (c *Config) Client() (interface{}, error) {
 		tlsConfig.InsecureSkipVerify = true
 	}
 
-	transport := &http.Transport{
+	t := &http.Transport{
 		Proxy:           http.ProxyFromEnvironment,
 		TLSClientConfig: tlsConfig,
 	}
+	transport := logging.NewTransport("GitLab", t)
 
 	httpClient := &http.Client{Transport: transport}
 

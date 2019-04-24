@@ -44,6 +44,7 @@ func Provider() terraform.ResourceProvider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"gitlab_project": dataSourceGitlabProject(),
 			"gitlab_user":    dataSourceGitlabUser(),
+			"gitlab_users":   dataSourceGitlabUsers(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -51,6 +52,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_group":              resourceGitlabGroup(),
 			"gitlab_project":            resourceGitlabProject(),
 			"gitlab_label":              resourceGitlabLabel(),
+			"gitlab_pipeline_trigger":   resourceGitlabPipelineTrigger(),
 			"gitlab_project_hook":       resourceGitlabProjectHook(),
 			"gitlab_deploy_key":         resourceGitlabDeployKey(),
 			"gitlab_user":               resourceGitlabUser(),
@@ -58,6 +60,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_group_membership":   resourceGitlabGroupMembership(),
 			"gitlab_project_variable":   resourceGitlabProjectVariable(),
 			"gitlab_group_variable":     resourceGitlabGroupVariable(),
+			"gitlab_project_cluster":    resourceGitlabProjectCluster(),
 		},
 
 		ConfigureFunc: providerConfigure,

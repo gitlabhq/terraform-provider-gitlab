@@ -34,7 +34,7 @@ The following arguments are supported:
 
 * `name` - (Required) The name of this group.
 
-* `path` - (Required) The url of the hook to invoke.
+* `path` - (Required) The path of the group.
 
 * `description` - (Optional) The description of the group.
 

@@ -17,6 +17,76 @@ func dataSourceGitlabProject() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"name": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"path": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"default_branch": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"issues_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"merge_requests_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"wiki_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"snippets_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"visibility_level": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"namespace_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
+			"ssh_url_to_repo": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"http_url_to_repo": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"web_url": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"runners_token": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -47,5 +117,6 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("ssh_url_to_repo", found.SSHURLToRepo)
 	d.Set("http_url_to_repo", found.HTTPURLToRepo)
 	d.Set("web_url", found.WebURL)
+	d.Set("runners_token", found.RunnersToken)
 	return nil
 }

@@ -42,6 +42,8 @@ The following arguments are supported:
 
 * `merge_requests_enabled` - (Optional) Enable merge requests for the project.
 
+* `approvals_before_merge` - (Optional) Number of merge request approvals required for merging. Default is 0.
+
 * `wiki_enabled` - (Optional) Enable wiki for the project.
 
 * `snippets_enabled` - (Optional) Enable snippets for the project.
@@ -49,6 +51,19 @@ The following arguments are supported:
 * `visibility_level` - (Optional) Set to `public` to create a public project.
   Valid values are `private`, `internal`, `public`.
   Repositories are created as private by default.
+
+* `merge_method` - (Optional) Set to `ff` to create fast-forward merges
+  Valid values are `merge`, `rebase_merge`, `ff`
+  Repositories are created with `merge` by default
+
+* `only_allow_merge_if_pipeline_succeeds` - (Optional) Set to true if you want allow merges only if a pipeline succeeds.
+
+* `only_allow_merge_if_all_discussions_are_resolved` - (Optional) Set to true if you want allow merges only if all discussions are resolved.
+
+* `shared_with_groups` - (Optional) Enable sharing the project with a list of groups (maps).
+  * `group_id` - (Required) Group id of the group you want to share the project with.
+  * `group_access_level` - (Optional) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
+  Valid values are `guest`, `reporter`, `developer`, `master`.
 
 ## Attributes Reference
 
@@ -64,6 +79,11 @@ The following additional attributes are exported:
 
 * `web_url` - URL that can be used to find the project in a browser.
 
+* `runners_token` - Registration token to use during runner setup.
+
+* `shared_with_groups` - List of the groups the project is shared with.
+  * `group_name` - Group's name.
+
 ## Importing projects
 
 You can import a project state using `terraform import <resource> <id>`.  The
@@ -73,3 +93,4 @@ its `:id` value, so for example:
     terraform import gitlab_project.example richardc/example
 
 [get_single_project]: https://docs.gitlab.com/ee/api/projects.html#get-single-project
+[group_members_permissions]: https://docs.gitlab.com/ce/user/permissions.html#group-members-permissions

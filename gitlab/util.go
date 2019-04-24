@@ -3,12 +3,34 @@ package gitlab
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-gitlab"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/xanzy/go-gitlab"
 )
+
+var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
+	"no one":     gitlab.NoPermissions,
+	"guest":      gitlab.GuestPermissions,
+	"reporter":   gitlab.ReporterPermissions,
+	"developer":  gitlab.DeveloperPermissions,
+	"maintainer": gitlab.MaintainerPermissions,
+	"owner":      gitlab.OwnerPermission,
+
+	// Deprecated
+	"master": gitlab.MaintainerPermissions,
+}
+
+var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
+	gitlab.NoPermissions:         "no one",
+	gitlab.GuestPermissions:      "guest",
+	gitlab.ReporterPermissions:   "reporter",
+	gitlab.DeveloperPermissions:  "developer",
+	gitlab.MaintainerPermissions: "maintainer",
+	gitlab.OwnerPermissions:      "owner",
+}
 
 // copied from ../github/util.go
 func validateValueFunc(values []string) schema.SchemaValidateFunc {
@@ -55,6 +77,20 @@ func stringToVisibilityLevel(s string) *gitlab.VisibilityValue {
 	return &value
 }
 
+func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
+	lookup := map[string]gitlab.MergeMethodValue{
+		"merge":        gitlab.NoFastForwardMerge,
+		"ff":           gitlab.FastForwardMerge,
+		"rebase_merge": gitlab.RebaseMerge,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
 func StringIsGitlabVariableName() schema.SchemaValidateFunc {
 	return func(v interface{}, k string) (s []string, es []error) {
 		value, ok := v.(string)
@@ -90,17 +126,22 @@ func buildTwoPartID(a, b *string) string {
 }
 
 var accessLevelID = map[string]gitlab.AccessLevelValue{
-	"guest":     gitlab.GuestPermissions,
-	"reporter":  gitlab.ReporterPermissions,
-	"developer": gitlab.DeveloperPermissions,
-	"master":    gitlab.MasterPermissions,
-	"owner":     gitlab.OwnerPermission,
+	"no one":     gitlab.NoPermissions,
+	"guest":      gitlab.GuestPermissions,
+	"reporter":   gitlab.ReporterPermissions,
+	"developer":  gitlab.DeveloperPermissions,
+	"maintainer": gitlab.MaintainerPermissions,
+	"owner":      gitlab.OwnerPermission,
+
+	// Deprecated
+	"master": gitlab.MaintainerPermissions,
 }
 
 var accessLevel = map[gitlab.AccessLevelValue]string{
-	gitlab.GuestPermissions:     "guest",
-	gitlab.ReporterPermissions:  "reporter",
-	gitlab.DeveloperPermissions: "developer",
-	gitlab.MasterPermissions:    "master",
-	gitlab.OwnerPermission:      "owner",
+	gitlab.NoPermissions:         "no one",
+	gitlab.GuestPermissions:      "guest",
+	gitlab.ReporterPermissions:   "reporter",
+	gitlab.DeveloperPermissions:  "developer",
+	gitlab.MaintainerPermissions: "maintainer",
+	gitlab.OwnerPermission:       "owner",
 }

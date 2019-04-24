@@ -1,4 +1,24 @@
-## 1.1.0 (Unreleased)
+## 1.2.1 (Unreleased)
+
+ENHANCEMENTS:
+* Support for request/response logging when >`DEBUG` severity is set ([#93](https://github.com/terraform-providers/terraform-provider-gitlab/issues/93))
+
+## 1.2.0 (February 19, 2019)
+
+FEATURES:
+
+* **New Datasource:** `gitlab_users` ([#79](https://github.com/terraform-providers/terraform-provider-gitlab/issues/79))
+* **New Resource:** `gitlab_pipeline_trigger` ([#82](https://github.com/terraform-providers/terraform-provider-gitlab/issues/82))
+* **New Resource:** `gitlab_project_cluster` ([#87](https://github.com/terraform-providers/terraform-provider-gitlab/issues/87))
+
+ENHANCEMENTS:
+
+* Supports "No one" and "maintainer" permissions ([#83](https://github.com/terraform-providers/terraform-provider-gitlab/issues/83))
+* `gitlab_project.shared_with_groups` is now order-independent ([#86](https://github.com/terraform-providers/terraform-provider-gitlab/issues/86))
+* add `merge_method`, `only_allow_merge_if_*`, `approvals_before_merge` parameters to `gitlab_project` ([#72](https://github.com/terraform-providers/terraform-provider-gitlab/issues/72), [#88](https://github.com/terraform-providers/terraform-provider-gitlab/issues/88))
+
+
+## 1.1.0 (January 14, 2019)
 
 FEATURES:
 
@@ -9,7 +29,7 @@ FEATURES:
 
 BACKWARDS INCOMPATIBILITIES:
 
-`gitlab_project_membership` is not compatible with a previous *unrealeased* version due to an id change resource will need to be reimported manually
+`gitlab_project_membership` is not compatible with a previous *unreleased* version due to an id change resource will need to be reimported manually
 e.g
 ```bash
 terraform state rm gitlab_project_membership.foo

@@ -20,61 +20,62 @@ incompatible changes that were needed to fully support the V4 Gitlab API.
 This API client package covers most of the existing Gitlab API calls and is updated regularly
 to add new and/or missing endpoints. Currently the following services are supported:
 
+- [ ] Discussions (threaded comments)
+- [ ] Epic Issues
+- [ ] Epics
+- [ ] Geo Nodes
+- [ ] Project import/export
 - [x] Award Emojis
 - [x] Branches
 - [x] Broadcast Messages
-- [x] Project-level Variables
-- [x] Group-level Variables
 - [x] Commits
-- [ ] Custom Attributes
-- [x] Deployments
+- [x] Custom Attributes
 - [x] Deploy Keys
+- [x] Deployments
 - [x] Environments
-- [ ] Epics
-- [ ] Epic Issues
 - [x] Events
 - [x] Feature flags
-- [ ] Geo Nodes
+- [x] GitLab CI Config templates
 - [x] Gitignores templates
-- [ ] GitLab CI Config templates
-- [x] Groups
-- [ ] Group Access Requests
+- [x] Group Access Requests
+- [x] Group Issue Boards
 - [x] Group Members
-- [x] Issues
+- [x] Group Milestones
+- [x] Group-level Variables
+- [x] Groups
 - [x] Issue Boards
-- [x] Group Issue Boards 
+- [x] Issues
 - [x] Jobs
 - [x] Keys
 - [x] Labels
-- [ ] License
-- [x] Merge Requests
+- [x] License
 - [x] Merge Request Approvals
-- [x] Project Milestones
-- [ ] Group Milestones
+- [x] Merge Requests
 - [x] Namespaces
 - [x] Notes (comments)
-- [ ] Discussions (threaded comments)
 - [x] Notification settings
-- [ ] Open source license templates
+- [x] Open source license templates
 - [x] Pages Domains
-- [x] Pipelines
-- [x] Pipeline Triggers
 - [x] Pipeline Schedules
-- [x] Projects (including setting Webhooks)
-- [ ] Project Access Requests
-- [ ] Project badges
-- [ ] Project import/export
+- [x] Pipeline Triggers
+- [x] Pipelines
+- [x] Project Access Requests
+- [x] Project Clusters
 - [x] Project Members
+- [x] Project Milestones
 - [x] Project Snippets
+- [x] Project badges
+- [x] Project-level Variables
+- [x] Projects (including setting Webhooks)
 - [x] Protected Branches
+- [x] Protected Tags
 - [x] Repositories
 - [x] Repository Files
 - [x] Runners
-- [ ] Search
+- [x] Search
 - [x] Services
 - [x] Settings
 - [x] Sidekiq metrics
-- [x] Session
 - [x] System Hooks
 - [x] Tags
 - [x] Todos
@@ -150,7 +151,6 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
 ```
 
 For complete usage of go-gitlab, see the full [package docs](https://godoc.org/github.com/xanzy/go-gitlab).
