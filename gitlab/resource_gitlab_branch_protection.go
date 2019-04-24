@@ -8,9 +8,10 @@ import (
 )
 
 func resourceGitlabBranchProtection() *schema.Resource {
-	acceptedAccessLevels := []string{
-		"master",
-		"developer",
+	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
+
+	for k := range accessLevelID {
+		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
 		Create: resourceGitlabBranchProtectionCreate,
