@@ -41,5 +41,5 @@ The following arguments are supported:
 GitLab project variables can be imported using an id made up of `projectid:variablename`, e.g.
 
 ```
-$ terraform import gitlab_group_membership.test 12345:project_variable_key
+$ terraform import gitlab_project_variable.example 12345:project_variable_key
 ```

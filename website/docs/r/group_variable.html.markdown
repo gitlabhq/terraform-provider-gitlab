@@ -41,5 +41,5 @@ The following arguments are supported:
 GitLab group variables can be imported using an id made up of `groupid:variablename`, e.g.
 
 ```
-$ terraform import gitlab_group_membership.test 12345:group_variable_key
+$ terraform import gitlab_group_variable.example 12345:group_variable_key
 ```
