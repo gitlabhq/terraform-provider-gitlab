@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployKey_basic(t *testing.T) {
@@ -67,7 +67,29 @@ func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with newline as suffix
 			{
-				Config: testAccGitlabDeployKeyConfig(rInt, "\\n"),
+				Config: testAccGitlabDeployKeyConfig(rInt, ""),
+			},
+		},
+	})
+}
+
+func TestAccGitlabDeployKey_import(t *testing.T) {
+	rInt := acctest.RandInt()
+	resourceName := "gitlab_deploy_key.foo"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabDeployKeyDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabDeployKeyConfig(rInt, ""),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateIdFunc: getDeployKeyImportID(resourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -145,6 +167,26 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
+}
+
+func getDeployKeyImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
+		}
+
+		deployKeyID := rs.Primary.ID
+		if deployKeyID == "" {
+			return "", fmt.Errorf("No deploy key ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("No project ID is set")
+		}
+
+		return fmt.Sprintf("%s:%s", projectID, deployKeyID), nil
+	}
 }
 
 func testAccGitlabDeployKeyConfig(rInt int, suffix string) string {

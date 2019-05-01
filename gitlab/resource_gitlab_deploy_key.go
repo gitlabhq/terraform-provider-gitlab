@@ -15,6 +15,9 @@ func resourceGitlabDeployKey() *schema.Resource {
 		Create: resourceGitlabDeployKeyCreate,
 		Read:   resourceGitlabDeployKeyRead,
 		Delete: resourceGitlabDeployKeyDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabDeployKeyStateImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -108,4 +111,18 @@ func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) err
 		return nil
 	}
 	return err
+}
+
+func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 2 {
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
+	}
+	project, id := s[0], s[1]
+
+	d.SetId(id)
+	d.Set("project", project)
+
+	return []*schema.ResourceData{d}, nil
 }
