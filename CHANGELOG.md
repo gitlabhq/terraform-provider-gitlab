@@ -2,6 +2,7 @@
 
 FEATURES:
 * **New Resource:** `gitlab_service_slack` ([#96](https://github.com/terraform-providers/terraform-provider-gitlab/issues/96))
+* **New Resource:** `gitlab_branch_protection` ([#68](https://github.com/terraform-providers/terraform-provider-gitlab/issues/68))
 
 ENHANCEMENTS:
 * Support for request/response logging when >`DEBUG` severity is set ([#93](https://github.com/terraform-providers/terraform-provider-gitlab/issues/93))
