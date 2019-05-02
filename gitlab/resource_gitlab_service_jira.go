@@ -3,10 +3,8 @@ package gitlab
 import (
 	"fmt"
 	"log"
-	"regexp"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -45,7 +43,7 @@ func resourceGitlabServiceJira() *schema.Resource {
 			"url": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validation.StringMatch(regexp.MustCompile(`https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)`), "value must be a url"),
+				ValidateFunc: validateURLFunc(),
 			},
 			"project_key": {
 				Type:     schema.TypeString,

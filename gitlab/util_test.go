@@ -3,7 +3,7 @@ package gitlab
 import (
 	"testing"
 
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestGitlab_validation(t *testing.T) {
@@ -60,6 +60,44 @@ func TestGitlab_visbilityHelpers(t *testing.T) {
 		sv := string(tc.Level)
 		if sv == "" || sv != tc.String {
 			t.Fatalf("got %v expected %v", sv, tc.String)
+		}
+	}
+}
+
+func TestValidateURLFunc(t *testing.T) {
+	cases := []struct {
+		Value    string
+		ErrCount int
+	}{
+		{
+			Value:    "invalid_url",
+			ErrCount: 1,
+		},
+		{
+			Value:    "invalid_url.com",
+			ErrCount: 1,
+		},
+		{
+			Value:    "/relative/path",
+			ErrCount: 1,
+		},
+		{
+			Value:    "https://valid_url.com",
+			ErrCount: 0,
+		},
+		{
+			Value:    "http://www.valid_url.com",
+			ErrCount: 0,
+		},
+	}
+
+	validationFunc := validateURLFunc()
+
+	for _, tc := range cases {
+		_, errors := validationFunc(tc.Value, "test_arg")
+
+		if len(errors) != tc.ErrCount {
+			t.Fatalf("Expected 1 validation error")
 		}
 	}
 }

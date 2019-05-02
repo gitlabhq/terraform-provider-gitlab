@@ -2,13 +2,13 @@ package gitlab
 
 import (
 	"fmt"
-
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
@@ -59,6 +59,20 @@ func validateDateFunc() schema.SchemaValidateFunc {
 		if e != nil {
 			errors = append(errors, fmt.Errorf("%s is not valid for format YYYY-MM-DD", value))
 		}
+		return
+	}
+}
+
+func validateURLFunc() schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (s []string, errors []error) {
+		value := v.(string)
+		url, err := url.Parse(value)
+
+		if err != nil || url.Host == "" || url.Scheme == "" {
+			errors = append(errors, fmt.Errorf("%s is not a valid URL", value))
+			return
+		}
+
 		return
 	}
 }
