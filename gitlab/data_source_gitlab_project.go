@@ -98,7 +98,7 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 
 	v, _ := d.GetOk("id")
 
-	found, _, err := client.Projects.GetProject(v)
+	found, _, err := client.Projects.GetProject(v, nil)
 	if err != nil {
 		return err
 	}

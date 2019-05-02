@@ -82,6 +82,11 @@ type Project struct {
 	RequestAccessEnabled                      bool              `json:"request_access_enabled"`
 	MergeMethod                               MergeMethodValue  `json:"merge_method"`
 	ForkedFromProject                         *ForkParent       `json:"forked_from_project"`
+	Mirror                                    bool              `json:"mirror"`
+	MirrorUserID                              int               `json:"mirror_user_id"`
+	MirrorTriggerBuilds                       bool              `json:"mirror_trigger_builds"`
+	OnlyMirrorProtectedBranches               bool              `json:"only_mirror_protected_branches"`
+	MirrorOverwritesDivergedBranches          bool              `json:"mirror_overwrites_diverged_branches"`
 	SharedWithGroups                          []struct {
 		GroupID          int    `json:"group_id"`
 		GroupName        string `json:"group_name"`
@@ -315,19 +320,28 @@ func (s *ProjectsService) GetProjectLanguages(pid interface{}, options ...Option
 	return p, resp, err
 }
 
+// GetProjectOptions represents the available GetProject() options.
+//
+// GitLab API docs: https://docs.gitlab.com/ee/api/projects.html#get-single-project
+type GetProjectOptions struct {
+	Statistics           *bool `url:"statistics,omitempty" json:"statistics,omitempty"`
+	License              *bool `url:"license,omitempty" json:"license,omitempty"`
+	WithCustomAttributes *bool `url:"with_custom_attributes,omitempty" json:"with_custom_attributes,omitempty"`
+}
+
 // GetProject gets a specific project, identified by project ID or
 // NAMESPACE/PROJECT_NAME, which is owned by the authenticated user.
 //
 // GitLab API docs:
 // https://docs.gitlab.com/ce/api/projects.html#get-single-project
-func (s *ProjectsService) GetProject(pid interface{}, options ...OptionFunc) (*Project, *Response, error) {
+func (s *ProjectsService) GetProject(pid interface{}, opt *GetProjectOptions, options ...OptionFunc) (*Project, *Response, error) {
 	project, err := parseID(pid)
 	if err != nil {
 		return nil, nil, err
 	}
 	u := fmt.Sprintf("projects/%s", url.QueryEscape(project))
 
-	req, err := s.client.NewRequest("GET", u, nil, options)
+	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -430,7 +444,7 @@ type CreateProjectOptions struct {
 	TagList                                   *[]string         `url:"tag_list,omitempty" json:"tag_list,omitempty"`
 	PrintingMergeRequestLinkEnabled           *bool             `url:"printing_merge_request_link_enabled,omitempty" json:"printing_merge_request_link_enabled,omitempty"`
 	CIConfigPath                              *string           `url:"ci_config_path,omitempty" json:"ci_config_path,omitempty"`
-	ApprovalsBeforeMerge                      *int              `url:"approvals_before_merge" json:"approvals_before_merge"`
+	ApprovalsBeforeMerge                      *int              `url:"approvals_before_merge,omitempty" json:"approvals_before_merge,omitempty"`
 }
 
 // CreateProject creates a new project owned by the authenticated user.

@@ -36,6 +36,8 @@ The following arguments are supported:
 
 * `description` - (Optional) A description of the project.
 
+* `tags` - (Optional) Tags (topics) of the project.
+
 * `default_branch` - (Optional) The default branch for the project.
 
 * `issues_enabled` - (Optional) Enable issue tracking for the project.

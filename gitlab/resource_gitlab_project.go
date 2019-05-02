@@ -113,6 +113,13 @@ func resourceGitlabProject() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"tags": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: false,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
 			"shared_with_groups": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -160,6 +167,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("web_url", project.WebURL)
 	d.Set("runners_token", project.RunnersToken)
 	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
+	d.Set("tags", project.TagList)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -189,6 +197,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		options.Description = gitlab.String(v.(string))
 	}
 
+	if v, ok := d.GetOk("tags"); ok {
+		options.TagList = stringSetToStringSlice(v.(*schema.Set))
+	}
+
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
 
 	project, _, err := client.Projects.CreateProject(options)
@@ -216,7 +228,7 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
-	project, response, err := client.Projects.GetProject(d.Id())
+	project, response, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		if response.StatusCode == 404 {
 			log.Printf("[WARN] removing project %s from state because it no longer exists in gitlab", d.Id())
@@ -288,6 +300,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		options.SnippetsEnabled = gitlab.Bool(d.Get("snippets_enabled").(bool))
 	}
 
+	if d.HasChange("tags") {
+		options.TagList = stringSetToStringSlice(d.Get("tags").(*schema.Set))
+	}
+
 	if *options != (gitlab.EditProjectOptions{}) {
 		log.Printf("[DEBUG] update gitlab project %s", d.Id())
 		_, _, err := client.Projects.EditProject(d.Id(), options)
@@ -318,7 +334,7 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 		Pending: []string{"Deleting"},
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Projects.GetProject(d.Id())
+			out, response, err := client.Projects.GetProject(d.Id(), nil)
 			if err != nil {
 				if response.StatusCode == 404 {
 					return out, "Deleted", nil
@@ -412,7 +428,7 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 
 	// Get target groups from the TF config and current groups from Gitlab server
 	targetGroups := expandSharedWithGroupsOptions(d.Get("shared_with_groups"))
-	project, _, err := client.Projects.GetProject(d.Id())
+	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		return err
 	}

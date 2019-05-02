@@ -1,4 +1,5 @@
 #!/bin/bash -e
+if [[ $MAKE_TARGET != "testacc" ]]; then echo "not starting gitlab!"; exit 0; fi
 echo "Starting gitlab container..."
 docker run -d -e GITLAB_ROOT_PASSWORD=adminadmin --rm -p 127.0.0.1:8080:80 --name gitlab gitlab/gitlab-ce
 echo -n "Waiting for gitlab to be ready "
@@ -12,4 +13,4 @@ do
 done
 echo
 echo "Creating access token"
-echo 'PersonalAccessToken.create(user_id: 1, scopes: [:api, :read_user], name: :terraform, token: :ACCTEST).save!' | docker exec -i gitlab gitlab-rails console
+docker exec -i gitlab gitlab-rails console < scripts/generate-access-token.rb
