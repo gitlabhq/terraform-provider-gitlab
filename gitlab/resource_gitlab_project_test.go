@@ -210,7 +210,7 @@ func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotProject, _, err := conn.Projects.GetProject(repoName)
+		gotProject, _, err := conn.Projects.GetProject(repoName, nil)
 		if err != nil {
 			return err
 		}
@@ -317,7 +317,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID)
+		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				return fmt.Errorf("Repository still exists")
