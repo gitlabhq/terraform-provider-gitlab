@@ -113,6 +113,13 @@ func resourceGitlabProject() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"tags": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: false,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
 			"shared_with_groups": {
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -160,6 +167,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("web_url", project.WebURL)
 	d.Set("runners_token", project.RunnersToken)
 	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
+	d.Set("tags", project.TagList)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -187,6 +195,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("tags"); ok {
+		options.TagList = stringSetToStringSlice(v.(*schema.Set))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -286,6 +298,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("snippets_enabled") {
 		options.SnippetsEnabled = gitlab.Bool(d.Get("snippets_enabled").(bool))
+	}
+
+	if d.HasChange("tags") {
+		options.TagList = stringSetToStringSlice(d.Get("tags").(*schema.Set))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {

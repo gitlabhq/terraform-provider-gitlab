@@ -28,6 +28,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Name:                             fmt.Sprintf("foo-%d", rInt),
 						Path:                             fmt.Sprintf("foo.%d", rInt),
 						Description:                      "Terraform acceptance tests",
+						TagList:                          []string{"tag1"},
 						IssuesEnabled:                    true,
 						MergeRequestsEnabled:             true,
 						ApprovalsBeforeMerge:             0,
@@ -49,6 +50,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Name:                             fmt.Sprintf("foo-%d", rInt),
 						Path:                             fmt.Sprintf("foo.%d", rInt),
 						Description:                      "Terraform acceptance tests!",
+						TagList:                          []string{"tag1", "tag2"},
 						ApprovalsBeforeMerge:             0,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
@@ -233,6 +235,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 	MergeMethod                               gitlab.MergeMethodValue
 	OnlyAllowMergeIfPipelineSucceeds          bool
 	OnlyAllowMergeIfAllDiscussionsAreResolved bool
+	TagList                                   []string
 	SharedWithGroups                          []struct {
 		GroupID          int
 		GroupName        string
@@ -358,6 +361,10 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
 
+  tags = [
+	"tag1",
+  ]
+
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
@@ -374,6 +381,11 @@ resource "gitlab_project" "foo" {
   name = "foo-%d"
   path = "foo.%d"
   description = "Terraform acceptance tests!"
+
+  tags = [
+	"tag1",
+	"tag2",
+  ]
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
