@@ -406,20 +406,18 @@ resource "gitlab_project" "foo" {
 func testAccGitlabProjectSharedWithGroup(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
-  name             = "foo-%d"
-  path             = "foo.%d"
-  description      = "Terraform acceptance tests"
-  visibility_level = "public"
-  merge_method = "ff"
-  only_allow_merge_if_pipeline_succeeds = false
+  name                                             = "foo-%d"
+  path                                             = "foo.%d"
+  description                                      = "Terraform acceptance tests"
+  visibility_level                                 = "public"
+  merge_method                                     = "ff"
+  only_allow_merge_if_pipeline_succeeds            = false
   only_allow_merge_if_all_discussions_are_resolved = false
 
-  shared_with_groups = [
-    {
-      group_id           = "${gitlab_group.foo.id}"
-      group_access_level = "developer"
-    },
-  ]
+  shared_with_groups {
+     group_id           = "${gitlab_group.foo.id}"
+     group_access_level = "developer"
+  }
 }
 
 resource "gitlab_group" "foo" {
@@ -442,16 +440,14 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_pipeline_succeeds = false
   only_allow_merge_if_all_discussions_are_resolved = false
 
-  shared_with_groups = [
-    {
+  shared_with_groups {
       group_id           = "${gitlab_group.foo.id}"
       group_access_level = "guest"
-    },
-    {
+  }
+  shared_with_groups {
       group_id           = "${gitlab_group.foo2.id}"
       group_access_level = "developer"
-    },
-  ]
+  }
 }
 
 resource "gitlab_group" "foo" {
