@@ -1,4 +1,4 @@
-## 1.3.0 (Unreleased)
+## 1.3.0 (May 03, 2019)
 
 FEATURES:
 * **New Resource:** `gitlab_service_slack` ([#96](https://github.com/terraform-providers/terraform-provider-gitlab/issues/96))
