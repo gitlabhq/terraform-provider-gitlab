@@ -1,4 +1,8 @@
-## 1.4.0 (Unreleased)
+## 2.0.0 (Unreleased)
+
+BACKWARDS INCOMPATIBILITIES:
+* all: This is the first release to use the 0.12 SDK required for Terraform 0.12 support. Some provider behaviour may have changed as a result of changes made by the new SDK version.
+
 ## 1.3.0 (May 03, 2019)
 
 FEATURES:
