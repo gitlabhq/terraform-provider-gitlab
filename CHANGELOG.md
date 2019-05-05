@@ -3,6 +3,9 @@
 BACKWARDS INCOMPATIBILITIES:
 * all: This is the first release to use the 0.12 SDK required for Terraform 0.12 support. Some provider behaviour may have changed as a result of changes made by the new SDK version.
 
+ENHANCEMENTS:
+* Add `container_registry_enabled` argument to `gitlab_project` ([#115](https://github.com/terraform-providers/terraform-provider-gitlab/issues/115))
+
 ## 1.3.0 (May 03, 2019)
 
 FEATURES:
