@@ -63,6 +63,11 @@ func resourceGitlabUser() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"reset_password": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -86,6 +91,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		CanCreateGroup:   gitlab.Bool(d.Get("can_create_group").(bool)),
 		SkipConfirmation: gitlab.Bool(d.Get("skip_confirmation").(bool)),
 		External:         gitlab.Bool(d.Get("is_external").(bool)),
+		ResetPassword:    gitlab.Bool(d.Get("reset_password").(bool)),
 	}
 
 	log.Printf("[DEBUG] create gitlab user %q", *options.Username)
