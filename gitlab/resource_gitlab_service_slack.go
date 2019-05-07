@@ -207,13 +207,8 @@ func resourceGitlabServiceSlackRead(d *schema.ResourceData, meta interface{}) er
 
 	log.Printf("[DEBUG] read gitlab slack service for project %s", project)
 
-	service, response, err := client.Services.GetSlackService(project)
+	service, _, err := client.Services.GetSlackService(project)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing Slack service from state because it no longer exists in Gitlab")
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 

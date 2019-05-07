@@ -79,13 +79,8 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 
 	log.Printf("[DEBUG] read gitlab group variable %s/%s", group, key)
 
-	v, resp, err := client.GroupVariables.GetVariable(group, key)
+	v, _, err := client.GroupVariables.GetVariable(group, key)
 	if err != nil {
-		if resp.StatusCode == 404 {
-			log.Printf("[WARN] Group variable %v for group %s not found in gitlab", key, group)
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 
@@ -111,13 +106,8 @@ func resourceGitlabGroupVariableUpdate(d *schema.ResourceData, meta interface{})
 	}
 	log.Printf("[DEBUG] update gitlab group variable %s/%s", group, key)
 
-	_, resp, err := client.GroupVariables.UpdateVariable(group, key, options)
+	_, _, err := client.GroupVariables.UpdateVariable(group, key, options)
 	if err != nil {
-		if resp.StatusCode == 404 {
-			log.Printf("[WARN] Group variable %v for group %s not found in gitlab, removing from state", key, group)
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 	return resourceGitlabGroupVariableRead(d, meta)

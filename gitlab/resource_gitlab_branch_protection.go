@@ -87,14 +87,8 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] read gitlab branch protection for project %s, branch %s", project, branch)
 
-	pb, response, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
+	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing project branch protection %s from state because it no longer exists in gitlab", branch)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 

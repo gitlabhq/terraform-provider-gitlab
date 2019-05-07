@@ -80,14 +80,8 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 
 	log.Printf("[DEBUG] read gitlab tag protection for project %s, tag %s", project, tag)
 
-	pt, response, err := client.ProtectedTags.GetProtectedTag(project, url.PathEscape(tag))
+	pt, _, err := client.ProtectedTags.GetProtectedTag(project, url.PathEscape(tag))
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing project tag protection %s from state because it no longer exists in gitlab", tag)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 
