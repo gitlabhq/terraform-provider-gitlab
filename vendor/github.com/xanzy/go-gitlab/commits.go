@@ -18,7 +18,6 @@ package gitlab
 
 import (
 	"fmt"
-	"net/url"
 	"time"
 )
 
@@ -48,6 +47,8 @@ type Commit struct {
 	ParentIDs      []string         `json:"parent_ids"`
 	Stats          *CommitStats     `json:"stats"`
 	Status         *BuildStateValue `json:"status"`
+	LastPipeline   *PipelineInfo    `json:"last_pipeline"`
+	ProjectID      int              `json:"project_id"`
 }
 
 // CommitStats represents the number of added and deleted files in a commit.
@@ -84,7 +85,7 @@ func (s *CommitsService) ListCommits(pid interface{}, opt *ListCommitsOptions, o
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits", url.QueryEscape(project))
+	u := fmt.Sprintf("projects/%s/repository/commits", pathEscape(project))
 
 	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
@@ -149,7 +150,7 @@ func (s *CommitsService) GetCommitRefs(pid interface{}, sha string, opt *GetComm
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/refs", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/refs", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
@@ -174,7 +175,7 @@ func (s *CommitsService) GetCommit(pid interface{}, sha string, options ...Optio
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/repository/commits/%s", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("GET", u, nil, options)
 	if err != nil {
@@ -210,7 +211,7 @@ func (s *CommitsService) CreateCommit(pid interface{}, opt *CreateCommitOptions,
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits", url.QueryEscape(project))
+	u := fmt.Sprintf("projects/%s/repository/commits", pathEscape(project))
 
 	req, err := s.client.NewRequest("POST", u, opt, options)
 	if err != nil {
@@ -259,7 +260,7 @@ func (s *CommitsService) GetCommitDiff(pid interface{}, sha string, opt *GetComm
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/diff", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/diff", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
@@ -316,7 +317,7 @@ func (s *CommitsService) GetCommitComments(pid interface{}, sha string, opt *Get
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/comments", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/comments", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
@@ -355,7 +356,7 @@ func (s *CommitsService) PostCommitComment(pid interface{}, sha string, opt *Pos
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/comments", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/comments", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("POST", u, opt, options)
 	if err != nil {
@@ -407,7 +408,7 @@ func (s *CommitsService) GetCommitStatuses(pid interface{}, sha string, opt *Get
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/statuses", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/statuses", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("GET", u, opt, options)
 	if err != nil {
@@ -443,7 +444,7 @@ func (s *CommitsService) SetCommitStatus(pid interface{}, sha string, opt *SetCo
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/statuses/%s", url.QueryEscape(project), sha)
+	u := fmt.Sprintf("projects/%s/statuses/%s", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("POST", u, opt, options)
 	if err != nil {
@@ -468,8 +469,7 @@ func (s *CommitsService) GetMergeRequestsByCommit(pid interface{}, sha string, o
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/merge_requests",
-		url.QueryEscape(project), url.QueryEscape(sha))
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/merge_requests", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("GET", u, nil, options)
 	if err != nil {
@@ -500,8 +500,7 @@ func (s *CommitsService) CherryPickCommit(pid interface{}, sha string, opt *Cher
 	if err != nil {
 		return nil, nil, err
 	}
-	u := fmt.Sprintf("projects/%s/repository/commits/%s/cherry_pick",
-		url.QueryEscape(project), url.QueryEscape(sha))
+	u := fmt.Sprintf("projects/%s/repository/commits/%s/cherry_pick", pathEscape(project), sha)
 
 	req, err := s.client.NewRequest("POST", u, opt, options)
 	if err != nil {
