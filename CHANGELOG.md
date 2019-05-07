@@ -3,6 +3,11 @@
 BACKWARDS INCOMPATIBILITIES:
 * all: This is the first release to use the 0.12 SDK required for Terraform 0.12 support. Some provider behaviour may have changed as a result of changes made by the new SDK version.
 
+
+FEATURES:
+* **New Resource:** `gitlab_tag_protection` ([#125](https://github.com/terraform-providers/terraform-provider-gitlab/pull/125))
+
+
 ENHANCEMENTS:
 * Add `container_registry_enabled` argument to `gitlab_project` ([#115](https://github.com/terraform-providers/terraform-provider-gitlab/issues/115))
 
