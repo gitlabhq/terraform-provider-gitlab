@@ -26,6 +26,7 @@ func TestAccGitlabProjectCluster_basic(t *testing.T) {
 					testAccCheckGitlabProjectClusterExists("gitlab_project_cluster.foo", &cluster),
 					testAccCheckGitlabProjectClusterAttributes(&cluster, &testAccGitlabProjectClusterExpectedAttributes{
 						Name:                        fmt.Sprintf("foo-cluster-%d", rInt),
+						Domain:                      "example.com",
 						EnvironmentScope:            "*",
 						KubernetesApiURL:            "https://123.123.123",
 						KubernetesCACert:            projectClusterFakeCert,
@@ -40,6 +41,7 @@ func TestAccGitlabProjectCluster_basic(t *testing.T) {
 					testAccCheckGitlabProjectClusterExists("gitlab_project_cluster.foo", &cluster),
 					testAccCheckGitlabProjectClusterAttributes(&cluster, &testAccGitlabProjectClusterExpectedAttributes{
 						Name:                        fmt.Sprintf("foo-cluster-%d", rInt),
+						Domain:                      "example-new.com",
 						EnvironmentScope:            "*",
 						KubernetesApiURL:            "https://124.124.124",
 						KubernetesCACert:            projectClusterFakeCert,
@@ -55,6 +57,7 @@ func TestAccGitlabProjectCluster_basic(t *testing.T) {
 					testAccCheckGitlabProjectClusterExists("gitlab_project_cluster.foo", &cluster),
 					testAccCheckGitlabProjectClusterAttributes(&cluster, &testAccGitlabProjectClusterExpectedAttributes{
 						Name:                        fmt.Sprintf("foo-cluster-%d", rInt),
+						Domain:                      "example-new.com",
 						EnvironmentScope:            "*",
 						KubernetesApiURL:            "https://124.124.124",
 						KubernetesCACert:            projectClusterFakeCert,
@@ -90,6 +93,7 @@ func TestAccGitlabProjectCluster_import(t *testing.T) {
 
 type testAccGitlabProjectClusterExpectedAttributes struct {
 	Name                        string
+	Domain                      string
 	EnvironmentScope            string
 	KubernetesApiURL            string
 	KubernetesCACert            string
@@ -155,6 +159,10 @@ func testAccCheckGitlabProjectClusterAttributes(cluster *gitlab.ProjectCluster, 
 			return fmt.Errorf("got name %q; want %q", cluster.Name, want.Name)
 		}
 
+		if cluster.Domain != want.Domain {
+			return fmt.Errorf("got domain %q; want %q", cluster.Domain, want.Domain)
+		}
+
 		if cluster.EnvironmentScope != want.EnvironmentScope {
 			return fmt.Errorf("got environment scope %q; want %q", cluster.EnvironmentScope, want.EnvironmentScope)
 		}
@@ -199,6 +207,7 @@ resource "gitlab_project" "foo" {
 resource gitlab_project_cluster "foo" {
   project                       = "${gitlab_project.foo.id}"
   name                          = "foo-cluster-%d"
+  domain                        = "example.com"
   kubernetes_api_url            = "https://123.123.123"
   kubernetes_token              = "some-token"
   kubernetes_ca_cert            = "${trimspace(var.cert)}"
@@ -227,6 +236,7 @@ resource "gitlab_project" "foo" {
 resource gitlab_project_cluster "foo" {
   project                       = "${gitlab_project.foo.id}"
   name                          = "foo-cluster-%d"
+  domain                        = "example-new.com"
   kubernetes_api_url            = "https://124.124.124"
   kubernetes_token              = "some-token"
   kubernetes_ca_cert            = "${trimspace(var.cert)}"
