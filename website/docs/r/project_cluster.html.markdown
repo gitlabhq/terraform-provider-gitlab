@@ -23,6 +23,7 @@ resource "gitlab_project" "foo" {
 resource gitlab_project_cluster "bar" {
   project                       = "${gitlab_project.foo.id}"
   name                          = "bar-cluster"
+  domain                        = "example.com"
   enabled                       = true
   kubernetes_api_url            = "https://124.124.124"
   kubernetes_token              = "some-token"
@@ -40,6 +41,8 @@ The following arguments are supported:
 * `project` - (Required, string) The id of the project to add the cluster to.
 
 * `name` - (Required, string) The name of cluster.
+
+* `domain` - (Optional, string) The base domain of the cluster.
 
 * `enabled` - (Optional, boolean) Determines if cluster is active or not. Defaults to `true`.
 
