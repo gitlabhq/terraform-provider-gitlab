@@ -24,7 +24,7 @@ func dataSourceGitlabGroup() *schema.Resource {
 				Computed: true,
 				Optional: true,
 				ConflictsWith: []string{
-					"name",
+					"group_id",
 				},
 			},
 			"name": {
