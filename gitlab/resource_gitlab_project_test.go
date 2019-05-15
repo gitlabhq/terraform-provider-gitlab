@@ -167,6 +167,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
 		ContainerRegistryEnabled:         true,
+		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
