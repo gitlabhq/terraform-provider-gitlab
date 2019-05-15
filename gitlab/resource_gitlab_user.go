@@ -66,7 +66,6 @@ func resourceGitlabUser() *schema.Resource {
 			"reset_password": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
 			},
 		},
 	}
