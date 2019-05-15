@@ -27,6 +27,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
 		ContainerRegistryEnabled:         true,
+		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
@@ -59,6 +60,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						TagList:                          []string{"tag1", "tag2"},
 						ApprovalsBeforeMerge:             0,
 						ContainerRegistryEnabled:         false,
+						SharedRunnersEnabled:             false,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -90,6 +92,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							WikiEnabled:                      true,
 							SnippetsEnabled:                  true,
 							ContainerRegistryEnabled:         true,
+							SharedRunnersEnabled:             false,
 							Visibility:                       gitlab.PublicVisibility,
 							MergeMethod:                      gitlab.FastForwardMerge,
 							OnlyAllowMergeIfPipelineSucceeds: false,
@@ -143,25 +146,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
 					testAccCheckAggregateGitlabProject(&defaults, &received),
-				),
-			},
-			// Disable shared runners in project
-			{
-				Config: testAccGitlabProjectDisableSharedRunners(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
-						Name:                 fmt.Sprintf("foo-%d", rInt),
-						Path:                 fmt.Sprintf("foo.%d", rInt),
-						Description:          "Terraform acceptance tests",
-						IssuesEnabled:        true,
-						MergeRequestsEnabled: true,
-						WikiEnabled:          true,
-						SnippetsEnabled:      true,
-						Visibility:           gitlab.PublicVisibility,
-						MergeMethod:          gitlab.FastForwardMerge,
-						SharedRunnersEnabled: false,
-					}),
 				),
 			},
 		},
@@ -425,7 +409,8 @@ resource "gitlab_project" "foo" {
   approvals_before_merge = 0
   wiki_enabled = false
   snippets_enabled = false
-  container_registry_enabled = false
+	container_registry_enabled = false
+	shared_runners_enabled = false
 }
 	`, rInt, rInt)
 }
@@ -491,18 +476,4 @@ resource "gitlab_group" "foo2" {
   visibility_level = "public"
 }
 	`, rInt, rInt, rInt, rInt, rInt, rInt)
-}
-
-func testAccGitlabProjectDisableSharedRunners(rInt int) string {
-	return fmt.Sprintf(`
-		resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  path = "foo.%d"
-  description = "Terraform acceptance tests"
-  visibility_level = "public"
-  merge_method = "ff"
-
-  shared_runners_enabled = false
-}
-	`, rInt, rInt)
 }
