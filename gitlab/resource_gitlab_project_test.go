@@ -410,8 +410,8 @@ resource "gitlab_project" "foo" {
   approvals_before_merge = 0
   wiki_enabled = false
   snippets_enabled = false
-	container_registry_enabled = false
-	shared_runners_enabled = false
+  container_registry_enabled = false
+  shared_runners_enabled = false
 }
 	`, rInt, rInt)
 }
