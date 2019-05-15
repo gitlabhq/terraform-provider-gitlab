@@ -1,7 +1,31 @@
-## 1.2.1 (Unreleased)
+## 2.0.0 (Unreleased)
+
+BACKWARDS INCOMPATIBILITIES:
+* all: This is the first release to use the 0.12 SDK required for Terraform 0.12 support. Some provider behaviour may have changed as a result of changes made by the new SDK version.
+
+
+FEATURES:
+* **New Resource:** `gitlab_tag_protection` ([#125](https://github.com/terraform-providers/terraform-provider-gitlab/pull/125))
+
+
+ENHANCEMENTS:
+* Add `container_registry_enabled` argument to `gitlab_project` ([#115](https://github.com/terraform-providers/terraform-provider-gitlab/issues/115))
+
+## 1.3.0 (May 03, 2019)
+
+FEATURES:
+* **New Resource:** `gitlab_service_slack` ([#96](https://github.com/terraform-providers/terraform-provider-gitlab/issues/96))
+* **New Resource:** `gitlab_branch_protection` ([#68](https://github.com/terraform-providers/terraform-provider-gitlab/issues/68))
 
 ENHANCEMENTS:
 * Support for request/response logging when >`DEBUG` severity is set ([#93](https://github.com/terraform-providers/terraform-provider-gitlab/issues/93))
+* Datasource `gitlab_user` supports user_id, email lookup and return lots of new attributes ([#102](https://github.com/terraform-providers/terraform-provider-gitlab/issues/102))
+* Resource `gitlab_deploy_key` can now be imported ([#197](https://github.com/terraform-providers/terraform-provider-gitlab/issues/97))
+* Add `tags` attribute for `gitlab_project` ([#106](https://github.com/terraform-providers/terraform-provider-gitlab/pull/106))
+
+
+BUGFIXES:
+* Documentation fixes ([#108](https://github.com/terraform-providers/terraform-provider-gitlab/issues/108), [#113](https://github.com/terraform-providers/terraform-provider-gitlab/issues/113))
 
 ## 1.2.0 (February 19, 2019)
 

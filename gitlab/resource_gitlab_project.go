@@ -11,6 +11,139 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+var resourceGitLabProjectSchema = map[string]*schema.Schema{
+	"name": {
+		Type:     schema.TypeString,
+		Required: true,
+	},
+	"path": {
+		Type:     schema.TypeString,
+		Optional: true,
+		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+			if new == "" {
+				return true
+			}
+			return old == new
+		},
+	},
+	"namespace_id": {
+		Type:     schema.TypeInt,
+		Optional: true,
+		ForceNew: true,
+		Computed: true,
+	},
+	"description": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"default_branch": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"issues_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"merge_requests_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"approvals_before_merge": {
+		Type:     schema.TypeInt,
+		Optional: true,
+		Default:  0,
+	},
+	"wiki_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"snippets_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"container_registry_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"visibility_level": {
+		Type:         schema.TypeString,
+		Optional:     true,
+		ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
+		Default:      "private",
+	},
+	"merge_method": {
+		Type:         schema.TypeString,
+		Optional:     true,
+		ValidateFunc: validation.StringInSlice([]string{"merge", "rebase_merge", "ff"}, true),
+		Default:      "merge",
+	},
+	"only_allow_merge_if_pipeline_succeeds": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"only_allow_merge_if_all_discussions_are_resolved": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"ssh_url_to_repo": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
+	"http_url_to_repo": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
+	"web_url": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
+	"runners_token": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
+	"shared_runners_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
+	"tags": {
+		Type:     schema.TypeSet,
+		Optional: true,
+		ForceNew: false,
+		Elem:     &schema.Schema{Type: schema.TypeString},
+		Set:      schema.HashString,
+	},
+	"shared_with_groups": {
+		Type:     schema.TypeSet,
+		Optional: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"group_id": {
+					Type:     schema.TypeInt,
+					Required: true,
+				},
+				"group_access_level": {
+					Type:     schema.TypeString,
+					Required: true,
+					ValidateFunc: validation.StringInSlice([]string{
+						"no one", "guest", "reporter", "developer", "maintainer"}, false),
+				},
+				"group_name": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+			},
+		},
+	},
+}
+
 func resourceGitlabProject() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabProjectCreate,
@@ -20,127 +153,7 @@ func resourceGitlabProject() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
-
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"path": {
-				Type:     schema.TypeString,
-				Optional: true,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					if new == "" {
-						return true
-					}
-					return old == new
-				},
-			},
-			"namespace_id": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
-			},
-			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"default_branch": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-			"issues_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-			},
-			"merge_requests_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-			},
-			"approvals_before_merge": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  0,
-			},
-			"wiki_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-			},
-			"snippets_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-			},
-			"visibility_level": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
-				Default:      "private",
-			},
-			"merge_method": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.StringInSlice([]string{"merge", "rebase_merge", "ff"}, true),
-				Default:      "merge",
-			},
-			"only_allow_merge_if_pipeline_succeeds": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"only_allow_merge_if_all_discussions_are_resolved": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-			},
-			"ssh_url_to_repo": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"http_url_to_repo": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"web_url": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"runners_token": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
-			"shared_runners_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-			},
-			"shared_with_groups": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"group_id": {
-							Type:     schema.TypeInt,
-							Required: true,
-						},
-						"group_access_level": {
-							Type:     schema.TypeString,
-							Required: true,
-							ValidateFunc: validation.StringInSlice([]string{
-								"no one", "guest", "reporter", "developer", "maintainer"}, false),
-						},
-						"group_name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-					},
-				},
-			},
-		},
+		Schema: resourceGitLabProjectSchema,
 	}
 }
 
@@ -155,6 +168,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
+	d.Set("container_registry_enabled", project.ContainerRegistryEnabled)
 	d.Set("visibility_level", string(project.Visibility))
 	d.Set("merge_method", string(project.MergeMethod))
 	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
@@ -166,6 +180,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("runners_token", project.RunnersToken)
 	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
 	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
+	d.Set("tags", project.TagList)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -177,6 +192,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
 		WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
 		SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
+		ContainerRegistryEnabled:         gitlab.Bool(d.Get("container_registry_enabled").(bool)),
 		Visibility:                       stringToVisibilityLevel(d.Get("visibility_level").(string)),
 		MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
@@ -196,6 +212,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		options.Description = gitlab.String(v.(string))
 	}
 
+	if v, ok := d.GetOk("tags"); ok {
+		options.TagList = stringSetToStringSlice(v.(*schema.Set))
+	}
+
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
 
 	project, _, err := client.Projects.CreateProject(options)
@@ -204,11 +224,8 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if v, ok := d.GetOk("shared_with_groups"); ok {
-		options := expandSharedWithGroupsOptions(v)
-
-		for _, option := range options {
-			_, err := client.Projects.ShareProjectWithGroup(project.ID, option)
-			if err != nil {
+		for _, option := range expandSharedWithGroupsOptions(v) {
+			if _, err := client.Projects.ShareProjectWithGroup(project.ID, option); err != nil {
 				return err
 			}
 		}
@@ -223,7 +240,7 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
-	project, response, err := client.Projects.GetProject(d.Id())
+	project, response, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		if response.StatusCode == 404 {
 			log.Printf("[WARN] removing project %s from state because it no longer exists in gitlab", d.Id())
@@ -299,6 +316,14 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		options.SharedRunnersEnabled = gitlab.Bool(d.Get("shared_runners_enabled").(bool))
 	}
 
+	if d.HasChange("tags") {
+		options.TagList = stringSetToStringSlice(d.Get("tags").(*schema.Set))
+	}
+
+	if d.HasChange("container_registry_enabled") {
+		options.ContainerRegistryEnabled = gitlab.Bool(d.Get("container_registry_enabled").(bool))
+	}
+
 	if *options != (gitlab.EditProjectOptions{}) {
 		log.Printf("[DEBUG] update gitlab project %s", d.Id())
 		_, _, err := client.Projects.EditProject(d.Id(), options)
@@ -329,7 +354,7 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 		Pending: []string{"Deleting"},
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Projects.GetProject(d.Id())
+			out, response, err := client.Projects.GetProject(d.Id(), nil)
 			if err != nil {
 				if response.StatusCode == 404 {
 					return out, "Deleted", nil
@@ -423,7 +448,7 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 
 	// Get target groups from the TF config and current groups from Gitlab server
 	targetGroups := expandSharedWithGroupsOptions(d.Get("shared_with_groups"))
-	project, _, err := client.Projects.GetProject(d.Id())
+	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		return err
 	}

@@ -48,6 +48,8 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
+			"gitlab_branch_protection":  resourceGitlabBranchProtection(),
+			"gitlab_tag_protection":     resourceGitlabTagProtection(),
 			"gitlab_group":              resourceGitlabGroup(),
 			"gitlab_project":            resourceGitlabProject(),
 			"gitlab_label":              resourceGitlabLabel(),
@@ -60,6 +62,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_variable":   resourceGitlabProjectVariable(),
 			"gitlab_group_variable":     resourceGitlabGroupVariable(),
 			"gitlab_project_cluster":    resourceGitlabProjectCluster(),
+			"gitlab_service_slack":      resourceGitlabServiceSlack(),
 		},
 
 		ConfigureFunc: providerConfigure,

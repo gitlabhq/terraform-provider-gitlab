@@ -30,6 +30,10 @@ func resourceGitlabProjectCluster() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"domain": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -112,6 +116,10 @@ func resourceGitlabProjectClusterCreate(d *schema.ResourceData, meta interface{}
 		PlatformKubernetes: &pk,
 	}
 
+	if v, ok := d.GetOk("domain"); ok {
+		options.Domain = gitlab.String(v.(string))
+	}
+
 	if v, ok := d.GetOk("environment_scope"); ok {
 		options.EnvironmentScope = gitlab.String(v.(string))
 	}
@@ -153,6 +161,7 @@ func resourceGitlabProjectClusterRead(d *schema.ResourceData, meta interface{}) 
 
 	d.Set("project", project)
 	d.Set("name", cluster.Name)
+	d.Set("domain", cluster.Domain)
 	d.Set("created_at", cluster.CreatedAt.String())
 	d.Set("provider_type", cluster.ProviderType)
 	d.Set("platform_type", cluster.PlatformType)
@@ -179,6 +188,10 @@ func resourceGitlabProjectClusterUpdate(d *schema.ResourceData, meta interface{}
 
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
+	}
+
+	if d.HasChange("domain") {
+		options.Domain = gitlab.String(d.Get("domain").(string))
 	}
 
 	if d.HasChange("environment_scope") {

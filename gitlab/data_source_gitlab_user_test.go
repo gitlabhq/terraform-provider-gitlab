@@ -9,15 +9,30 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
-func TestAccDataGitlabUser_basic(t *testing.T) {
-	userEmail := fmt.Sprintf("tf-%s", acctest.RandString(5))
+func TestAccDataSourceGitlabUser_basic(t *testing.T) {
+	rString := fmt.Sprintf("%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
+			// Get user using its email
 			{
-				Config: testAccDataGitlabUserConfig(userEmail),
+				Config: testAccDataGitlabUserConfigEmail(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccDataSourceGitlabUser("gitlab_user.foo", "data.gitlab_user.foo"),
+				),
+			},
+			// Get user using its ID
+			{
+				Config: testAccDataGitlabUserConfigUserID(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccDataSourceGitlabUser("gitlab_user.foo2", "data.gitlab_user.foo2"),
+				),
+			},
+			// Get user using its username
+			{
+				Config: testAccDataGitlabUserConfigUsername(rString),
 				Check: resource.ComposeTestCheckFunc(
 					testAccDataSourceGitlabUser("gitlab_user.foo", "data.gitlab_user.foo"),
 				),
@@ -35,32 +50,90 @@ func testAccDataSourceGitlabUser(src, n string) resource.TestCheckFunc {
 		search := s.RootModule().Resources[n]
 		searchResource := search.Primary.Attributes
 
-		if searchResource["email"] == "" {
-			return fmt.Errorf("Expected to get user email from Gitlab")
+		testAttributes := []string{
+			"username",
+			"email",
+			"name",
+			"is_admin",
+			"can_create_group",
+			"projects_limit",
 		}
-
-		testAttributes := []string{"email"}
 
 		for _, attribute := range testAttributes {
 			if searchResource[attribute] != userResource[attribute] {
-				return fmt.Errorf("Expected the user %s to be: %s, but got: %s", attribute, userResource[attribute], searchResource[attribute])
+				return fmt.Errorf("Expected user's parameter `%s` to be: %s, but got: `%s`", attribute, userResource[attribute], searchResource[attribute])
 			}
 		}
+
 		return nil
 	}
 }
 
-func testAccDataGitlabUserConfig(userEmail string) string {
+func testAccDataGitlabUserConfigEmail(rString string) string {
 	return fmt.Sprintf(`
 resource "gitlab_user" "foo" {
-  name             = "foo %s"
-  username         = "listest%s"
-  password         = "test%stt"
-  email            = "listest%s@ssss.com"
+  name     = "foo%s"
+  username = "listest%s"
+  password = "test%stt"
+  email    = "listest%s@ssss.com"
+  is_admin = false
+}
+
+resource "gitlab_user" "foo2" {
+  name     = "foo2%s"
+  username = "listest2%s"
+  password = "test2%stt"
+  email    = "listest2%s@ssss.com"
 }
 
 data "gitlab_user" "foo" {
-	email = "${gitlab_user.foo.email}"
+  email = "${gitlab_user.foo.email}"
 }
-	`, userEmail, userEmail, userEmail, userEmail)
+`, rString, rString, rString, rString, rString, rString, rString, rString)
+}
+
+func testAccDataGitlabUserConfigUserID(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name     = "foo%s"
+  username = "listest%s"
+  password = "test%stt"
+  email    = "listest%s@ssss.com"
+  is_admin = false
+}
+
+resource "gitlab_user" "foo2" {
+  name     = "foo2%s"
+  username = "listest2%s"
+  password = "test2%stt"
+  email    = "listest2%s@ssss.com"
+}
+
+data "gitlab_user" "foo2" {
+  user_id = "${gitlab_user.foo2.id}"
+}
+`, rString, rString, rString, rString, rString, rString, rString, rString)
+}
+
+func testAccDataGitlabUserConfigUsername(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name     = "foo%s"
+  username = "listest%s"
+  password = "test%stt"
+  email    = "listest%s@ssss.com"
+  is_admin = false
+}
+
+resource "gitlab_user" "foo2" {
+  name     = "foo2%s"
+  username = "listest2%s"
+  password = "test2%stt"
+  email    = "listest2%s@ssss.com"
+}
+
+data "gitlab_user" "foo" {
+  username = "${gitlab_user.foo.username}"
+}
+`, rString, rString, rString, rString, rString, rString, rString, rString)
 }

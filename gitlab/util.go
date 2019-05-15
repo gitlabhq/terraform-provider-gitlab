@@ -145,3 +145,14 @@ var accessLevel = map[gitlab.AccessLevelValue]string{
 	gitlab.MaintainerPermissions: "maintainer",
 	gitlab.OwnerPermission:       "owner",
 }
+
+func stringSetToStringSlice(stringSet *schema.Set) *[]string {
+	ret := []string{}
+	if stringSet == nil {
+		return &ret
+	}
+	for _, envVal := range stringSet.List() {
+		ret = append(ret, envVal.(string))
+	}
+	return &ret
+}

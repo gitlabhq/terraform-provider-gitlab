@@ -36,6 +36,8 @@ The following arguments are supported:
 
 * `description` - (Optional) A description of the project.
 
+* `tags` - (Optional) Tags (topics) of the project.
+
 * `default_branch` - (Optional) The default branch for the project.
 
 * `issues_enabled` - (Optional) Enable issue tracking for the project.
@@ -47,6 +49,8 @@ The following arguments are supported:
 * `wiki_enabled` - (Optional) Enable wiki for the project.
 
 * `snippets_enabled` - (Optional) Enable snippets for the project.
+
+* `container_registry_enabled` - (Optional) Enable container registry for the project.
 
 * `visibility_level` - (Optional) Set to `public` to create a public project.
   Valid values are `private`, `internal`, `public`.

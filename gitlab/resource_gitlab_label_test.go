@@ -119,7 +119,7 @@ func testAccCheckGitlabLabelDestroy(s *terraform.State) error {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID)
+		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				return fmt.Errorf("Repository still exists")

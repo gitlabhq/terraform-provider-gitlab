@@ -23,7 +23,7 @@ import (
 // PushEvent represents a push event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#push-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#push-events
 type PushEvent struct {
 	ObjectKind  string `json:"object_kind"`
 	Before      string `json:"before"`
@@ -71,7 +71,7 @@ type PushEvent struct {
 // TagEvent represents a tag event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#tag-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#tag-events
 type TagEvent struct {
 	ObjectKind  string `json:"object_kind"`
 	Before      string `json:"before"`
@@ -118,7 +118,7 @@ type TagEvent struct {
 // IssueEvent represents a issue event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#issues-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#issues-events
 type IssueEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -161,12 +161,61 @@ type IssueEvent struct {
 		Username  string `json:"username"`
 		AvatarURL string `json:"avatar_url"`
 	} `json:"assignee"`
+	Labels []Label `json:"labels"`
+	Changes struct {
+		Labels struct {
+			Previous []Label `json:"previous"`
+			Current  []Label `json:"current"`
+		} `json:"labels"`
+		UpdatedByID []int `json:"updated_by_id"`
+	} `json:"changes"`
+}
+
+// JobEvent represents a job event.
+//
+// GitLab API docs:
+// TODO: link to docs instead of src once they are published.
+// https://gitlab.com/gitlab-org/gitlab-ce/blob/master/lib/gitlab/data_builder/build.rb
+type JobEvent struct {
+	ObjectKind        string  `json:"object_kind"`
+	Ref               string  `json:"ref"`
+	Tag               bool    `json:"tag"`
+	BeforeSHA         string  `json:"before_sha"`
+	SHA               string  `json:"sha"`
+	BuildID           int     `json:"build_id"`
+	BuildName         string  `json:"build_name"`
+	BuildStage        string  `json:"build_stage"`
+	BuildStatus       string  `json:"build_status"`
+	BuildStartedAt    string  `json:"build_started_at"`
+	BuildFinishedAt   string  `json:"build_finished_at"`
+	BuildDuration     float64 `json:"build_duration"`
+	BuildAllowFailure bool    `json:"build_allow_failure"`
+	ProjectID         int     `json:"project_id"`
+	ProjectName       string  `json:"project_name"`
+	User              struct {
+		ID    int    `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	} `json:"user"`
+	Commit struct {
+		ID          int    `json:"id"`
+		SHA         string `json:"sha"`
+		Message     string `json:"message"`
+		AuthorName  string `json:"author_name"`
+		AuthorEmail string `json:"author_email"`
+		AuthorURL   string `json:"author_url"`
+		Status      string `json:"status"`
+		Duration    int    `json:"duration"`
+		StartedAt   string `json:"started_at"`
+		FinishedAt  string `json:"finished_at"`
+	} `json:"commit"`
+	Repository *Repository `json:"repository"`
 }
 
 // CommitCommentEvent represents a comment on a commit event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#comment-on-commit
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#comment-on-commit
 type CommitCommentEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -227,7 +276,7 @@ type CommitCommentEvent struct {
 // MergeCommentEvent represents a comment on a merge event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#comment-on-merge-request
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#comment-on-merge-request
 type MergeCommentEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -320,7 +369,7 @@ type MergeCommentEvent struct {
 // IssueCommentEvent represents a comment on an issue event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#comment-on-issue
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#comment-on-issue
 type IssueCommentEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -364,7 +413,7 @@ type IssueCommentEvent struct {
 // SnippetCommentEvent represents a comment on a snippet event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#comment-on-code-snippet
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#comment-on-code-snippet
 type SnippetCommentEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -408,7 +457,7 @@ type SnippetCommentEvent struct {
 // MergeEvent represents a merge event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#merge-request-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#merge-request-events
 type MergeEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -491,6 +540,7 @@ type MergeEvent struct {
 		Username  string `json:"username"`
 		AvatarURL string `json:"avatar_url"`
 	} `json:"assignee"`
+	Labels []Label `json:"labels"`
 	Changes struct {
 		AssigneeID struct {
 			Previous int `json:"previous"`
@@ -504,17 +554,14 @@ type MergeEvent struct {
 			Previous []Label `json:"previous"`
 			Current  []Label `json:"current"`
 		} `json:"labels"`
-		UpdatedByID struct {
-			Previous int `json:"previous"`
-			Current  int `json:"current"`
-		} `json:"updated_by_id"`
+		UpdatedByID []int `json:"updated_by_id"`
 	} `json:"changes"`
 }
 
 // WikiPageEvent represents a wiki page event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#wiki-page-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#wiki-page-events
 type WikiPageEvent struct {
 	ObjectKind string `json:"object_kind"`
 	User       *User  `json:"user"`
@@ -555,7 +602,7 @@ type WikiPageEvent struct {
 // PipelineEvent represents a pipeline event.
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#pipeline-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#pipeline-events
 type PipelineEvent struct {
 	ObjectKind       string `json:"object_kind"`
 	ObjectAttributes struct {
@@ -633,7 +680,7 @@ type PipelineEvent struct {
 //BuildEvent represents a build event
 //
 // GitLab API docs:
-// https://docs.gitlab.com/ce/web_hooks/web_hooks.html#build-events
+// https://docs.gitlab.com/ce/user/project/integrations/webhooks.html#build-events
 type BuildEvent struct {
 	ObjectKind        string  `json:"object_kind"`
 	Ref               string  `json:"ref"`
