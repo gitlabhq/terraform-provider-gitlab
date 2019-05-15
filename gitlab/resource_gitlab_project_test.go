@@ -325,6 +325,10 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 			return fmt.Errorf("got only_allow_merge_if_all_discussions_are_resolved %t; want %t", project.OnlyAllowMergeIfAllDiscussionsAreResolved, want.OnlyAllowMergeIfAllDiscussionsAreResolved)
 		}
 
+		if project.SharedRunnersEnabled != want.SharedRunnersEnabled {
+			return fmt.Errorf("got shared_runners_enabled %t; want %t", project.SharedRunnersEnabled, want.SharedRunnersEnabled)
+		}
+
 		return nil
 	}
 }
