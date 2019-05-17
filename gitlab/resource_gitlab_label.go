@@ -66,14 +66,8 @@ func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
 	labelName := d.Id()
 	log.Printf("[DEBUG] read gitlab label %s/%s", project, labelName)
 
-	labels, response, err := client.Labels.ListLabels(project, nil)
+	labels, _, err := client.Labels.ListLabels(project, nil)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing label %s from state because it no longer exists in gitlab", labelName)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 	found := false

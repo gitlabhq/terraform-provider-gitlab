@@ -148,14 +148,8 @@ func resourceGitlabProjectClusterRead(d *schema.ResourceData, meta interface{}) 
 
 	log.Printf("[DEBUG] read gitlab project cluster %q/%d", project, clusterId)
 
-	cluster, response, err := client.ProjectCluster.GetCluster(project, clusterId)
+	cluster, _, err := client.ProjectCluster.GetCluster(project, clusterId)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing project cluster %s/%d from state because it no longer exists in gitlab", project, clusterId)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 

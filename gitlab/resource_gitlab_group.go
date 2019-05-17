@@ -100,14 +100,8 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab group %s", d.Id())
 
-	group, response, err := client.Groups.GetGroup(d.Id())
+	group, _, err := client.Groups.GetGroup(d.Id())
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing group %s from state because it no longer exists in gitlab", d.Id())
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 

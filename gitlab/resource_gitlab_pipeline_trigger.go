@@ -63,14 +63,8 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] read gitlab PipelineTrigger %s/%d", project, pipelineTriggerID)
 
-	pipelineTriggers, response, err := client.PipelineTriggers.ListPipelineTriggers(project, nil)
+	pipelineTriggers, _, err := client.PipelineTriggers.ListPipelineTriggers(project, nil)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing PipelineTrigger %d from state because it no longer exists in gitlab", pipelineTriggerID)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 	found := false

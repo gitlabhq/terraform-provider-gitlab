@@ -120,14 +120,8 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 	}
 	log.Printf("[DEBUG] read gitlab project hook %s/%d", project, hookId)
 
-	hook, response, err := client.Projects.GetProjectHook(project, hookId)
+	hook, _, err := client.Projects.GetProjectHook(project, hookId)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing project hook %d from state because it no longer exists in gitlab", hookId)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 

@@ -78,14 +78,8 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 	}
 	log.Printf("[DEBUG] read gitlab deploy key %s/%d", project, deployKeyID)
 
-	deployKey, response, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
+	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing deploy key %d from state because it no longer exists in gitlab", deployKeyID)
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 

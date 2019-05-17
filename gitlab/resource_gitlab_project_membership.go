@@ -77,13 +77,8 @@ func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{
 		return e
 	}
 
-	projectMember, resp, err := client.ProjectMembers.GetProjectMember(projectId, userId)
+	projectMember, _, err := client.ProjectMembers.GetProjectMember(projectId, userId)
 	if err != nil {
-		if resp.StatusCode == 404 {
-			log.Printf("[WARN] Project member %v not found in project %s", userId, projectId)
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 
@@ -115,13 +110,8 @@ func resourceGitlabProjectMembershipUpdate(d *schema.ResourceData, meta interfac
 	}
 	log.Printf("[DEBUG] update gitlab project membership %v for %s", userId, projectId)
 
-	_, resp, err := client.ProjectMembers.EditProjectMember(projectId, userId, &options)
+	_, _, err := client.ProjectMembers.EditProjectMember(projectId, userId, &options)
 	if err != nil {
-		if resp.StatusCode == 404 {
-			log.Printf("[WARN] Project member %v not found in project %s, removing from state", userId, projectId)
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 	return resourceGitlabProjectMembershipRead(d, meta)

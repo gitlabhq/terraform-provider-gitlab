@@ -82,13 +82,8 @@ func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{})
 		return e
 	}
 
-	groupMember, resp, err := client.GroupMembers.GetGroupMember(groupId, userId)
+	groupMember, _, err := client.GroupMembers.GetGroupMember(groupId, userId)
 	if err != nil {
-		if resp.StatusCode == 404 {
-			log.Printf("[WARN] Group member %v not found in group %s", userId, groupId)
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 
@@ -122,13 +117,8 @@ func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] update gitlab group membership %v for %s", userId, groupId)
 
-	_, resp, err := client.GroupMembers.EditGroupMember(groupId, userId, &options)
+	_, _, err := client.GroupMembers.EditGroupMember(groupId, userId, &options)
 	if err != nil {
-		if resp.StatusCode == 404 {
-			log.Printf("[WARN] Group member %v not found in group %s, removing from state", userId, groupId)
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 

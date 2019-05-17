@@ -240,14 +240,8 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
-	project, response, err := client.Projects.GetProject(d.Id(), nil)
+	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing project %s from state because it no longer exists in gitlab", d.Id())
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 

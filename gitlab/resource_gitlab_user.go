@@ -108,14 +108,8 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	id, _ := strconv.Atoi(d.Id())
 
-	user, response, err := client.Users.GetUser(id)
+	user, _, err := client.Users.GetUser(id)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing user %s from state because it no longer exists in gitlab", d.Id())
-			d.SetId("")
-			return nil
-		}
-
 		return err
 	}
 
