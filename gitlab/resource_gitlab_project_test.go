@@ -27,6 +27,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
 		ContainerRegistryEnabled:         true,
+		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
@@ -59,6 +60,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						TagList:                          []string{"tag1", "tag2"},
 						ApprovalsBeforeMerge:             0,
 						ContainerRegistryEnabled:         false,
+						SharedRunnersEnabled:             false,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
@@ -90,6 +92,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							WikiEnabled:                      true,
 							SnippetsEnabled:                  true,
 							ContainerRegistryEnabled:         true,
+							SharedRunnersEnabled:             false,
 							Visibility:                       gitlab.PublicVisibility,
 							MergeMethod:                      gitlab.FastForwardMerge,
 							OnlyAllowMergeIfPipelineSucceeds: false,
@@ -164,6 +167,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
 		ContainerRegistryEnabled:         true,
+		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
@@ -407,6 +411,7 @@ resource "gitlab_project" "foo" {
   wiki_enabled = false
   snippets_enabled = false
   container_registry_enabled = false
+  shared_runners_enabled = false
 }
 	`, rInt, rInt)
 }

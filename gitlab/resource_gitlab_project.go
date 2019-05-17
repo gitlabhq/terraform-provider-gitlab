@@ -108,6 +108,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeString,
 		Computed: true,
 	},
+	"shared_runners_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
 	"tags": {
 		Type:     schema.TypeSet,
 		Optional: true,
@@ -173,6 +178,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
 	d.Set("web_url", project.WebURL)
 	d.Set("runners_token", project.RunnersToken)
+	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
 	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
 	d.Set("tags", project.TagList)
 }
@@ -191,6 +197,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
+		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -303,6 +310,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("snippets_enabled") {
 		options.SnippetsEnabled = gitlab.Bool(d.Get("snippets_enabled").(bool))
+	}
+
+	if d.HasChange("shared_runners_enabled") {
+		options.SharedRunnersEnabled = gitlab.Bool(d.Get("shared_runners_enabled").(bool))
 	}
 
 	if d.HasChange("tags") {
