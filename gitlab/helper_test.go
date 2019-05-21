@@ -11,9 +11,9 @@ import (
 func testAccCompareGitLabAttribute(attr string, expected, received *schema.ResourceData) error {
 	e := expected.Get(attr)
 	r := received.Get(attr)
-	switch et := e.(type) {
-	case schema.Set:
-		if !et.Equal(r) {
+	switch e.(type) {
+	case *schema.Set:
+		if !e.(*schema.Set).Equal(r) {
 			return fmt.Errorf(`attribute set %s expected "%+v" received "%+v"`, attr, e, r)
 		}
 	default:

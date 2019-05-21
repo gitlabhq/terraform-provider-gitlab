@@ -111,7 +111,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"shared_runners_enabled": {
 		Type:     schema.TypeBool,
 		Optional: true,
-		Default:  true,
+		Computed: true,
 	},
 	"tags": {
 		Type:     schema.TypeSet,
