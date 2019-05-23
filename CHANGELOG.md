@@ -1,10 +1,14 @@
 ## 2.1.0 (Unreleased)
+
+FEATURES:
+* **New Datasource**: `gitlab_group` ([#129](https://github.com/terraform-providers/terraform-provider-gitlab/issues/129))
+
 ## 2.0.0 (May 23, 2019)
 
 This is the first release to support Terraform 0.12.
 
 BACKWARDS INCOMPATIBILITIES:
-* *all*: Previous versions of this provider silently removed state from state when
+* **all**: Previous versions of this provider silently removed state from state when
   Gitlab returned an error 404. Now we error on this and you must reconciliate
   the state (e.g. `terraform state rm`). We have done this because we can not
   make the difference between permission denied and resources removed outside of
