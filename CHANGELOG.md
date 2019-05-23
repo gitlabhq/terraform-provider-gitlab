@@ -1,5 +1,7 @@
 ## 2.0.0 (Unreleased)
 
+This is the first release to support Terraform 0.12.
+
 BACKWARDS INCOMPATIBILITIES:
 * all: Previous versions of this provider silently removed state from state when
   Gitlab returned an error 404. Now we error on this and you must reconciliate
@@ -7,9 +9,6 @@ BACKWARDS INCOMPATIBILITIES:
   make the difference between permission denied and resources removed outside of
   terraform (gitlab returns 404 in both cases)
   ([#130](https://github.com/terraform-providers/terraform-provider-gitlab/pull/130))
-* all: This is the first release to use the 0.12 SDK required for Terraform 0.12
-  support. Some provider behaviour may have changed as a result of changes made
-  by the new SDK version.
 
 
 FEATURES:
