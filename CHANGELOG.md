@@ -1,7 +1,15 @@
 ## 2.0.0 (Unreleased)
 
 BACKWARDS INCOMPATIBILITIES:
-* all: This is the first release to use the 0.12 SDK required for Terraform 0.12 support. Some provider behaviour may have changed as a result of changes made by the new SDK version.
+* all: Previous versions of this provider silently removed state from state when
+  Gitlab returned an error 404. Now we error on this and you must reconciliate
+  the state (e.g. `terraform state rm`). We have done this because we can not
+  make the difference between permission denied and resources removed outside of
+  terraform (gitlab returns 404 in both cases)
+  ([#130](https://github.com/terraform-providers/terraform-provider-gitlab/pull/130))
+* all: This is the first release to use the 0.12 SDK required for Terraform 0.12
+  support. Some provider behaviour may have changed as a result of changes made
+  by the new SDK version.
 
 
 FEATURES:
@@ -10,6 +18,7 @@ FEATURES:
 
 ENHANCEMENTS:
 * Add `container_registry_enabled` argument to `gitlab_project` ([#115](https://github.com/terraform-providers/terraform-provider-gitlab/issues/115))
+* Add `shared_runners_enabled` argument to `gitlab_project` ([#134](https://github.com/terraform-providers/terraform-provider-gitlab/issues/134) [#104](https://github.com/terraform-providers/terraform-provider-gitlab/issues/104))
 
 ## 1.3.0 (May 03, 2019)
 
