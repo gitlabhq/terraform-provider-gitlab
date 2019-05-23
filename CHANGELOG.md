@@ -1,4 +1,4 @@
-## 2.0.0 (Unreleased)
+## 2.0.0 (May 23, 2019)
 
 This is the first release to support Terraform 0.12.
 
