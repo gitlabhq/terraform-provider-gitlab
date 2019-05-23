@@ -3,7 +3,7 @@
 This is the first release to support Terraform 0.12.
 
 BACKWARDS INCOMPATIBILITIES:
-* all: Previous versions of this provider silently removed state from state when
+* *all*: Previous versions of this provider silently removed state from state when
   Gitlab returned an error 404. Now we error on this and you must reconciliate
   the state (e.g. `terraform state rm`). We have done this because we can not
   make the difference between permission denied and resources removed outside of
