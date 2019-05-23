@@ -56,6 +56,12 @@ The resource exports the following attributes:
 
 * `id` - The unique id assigned to the group by the GitLab server.  Serves as a
   namespace id where one is needed.
+  
+* `full_path` - The full path of the group.
+
+* `full_name` - The full name of the group.
+
+* `web_url` - Web URL of the group.
 
 ## Importing groups
 

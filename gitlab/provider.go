@@ -42,6 +42,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
+			"gitlab_group":   dataSourceGitlabGroup(),
 			"gitlab_project": dataSourceGitlabProject(),
 			"gitlab_user":    dataSourceGitlabUser(),
 			"gitlab_users":   dataSourceGitlabUsers(),
