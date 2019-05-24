@@ -40,6 +40,12 @@ func resourceGitlabProjectCluster() *schema.Resource {
 				Default:  true,
 				ForceNew: true,
 			},
+			"managed": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+				ForceNew: true,
+			},
 			"created_at": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -113,6 +119,7 @@ func resourceGitlabProjectClusterCreate(d *schema.ResourceData, meta interface{}
 	options := &gitlab.AddClusterOptions{
 		Name:               gitlab.String(d.Get("name").(string)),
 		Enabled:            gitlab.Bool(d.Get("enabled").(bool)),
+		Managed:            gitlab.Bool(d.Get("managed").(bool)),
 		PlatformKubernetes: &pk,
 	}
 
