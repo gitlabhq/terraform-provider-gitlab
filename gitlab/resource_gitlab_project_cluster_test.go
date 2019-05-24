@@ -85,7 +85,7 @@ func TestAccGitlabProjectCluster_import(t *testing.T) {
 				ResourceName:            "gitlab_project_cluster.foo",
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"enabled", "kubernetes_token"},
+				ImportStateVerifyIgnore: []string{"enabled", "kubernetes_token", "managed"},
 			},
 		},
 	})
