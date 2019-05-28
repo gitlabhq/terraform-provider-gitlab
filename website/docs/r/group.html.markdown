@@ -24,7 +24,7 @@ resource "gitlab_group" "example" {
 resource "gitlab_project" "example" {
   name         = "example"
   description  = "An example project"
-  namespace_id = "${gitlab_group.example.id}"
+  parent_id = "${gitlab_group.example.id}"
 }
 ```
 
