@@ -1,4 +1,4 @@
-## 2.1.0 (Unreleased)
+## 2.1.0 (May 29, 2019)
 
 FEATURES:
 * **New Datasource**: `gitlab_group` ([#129](https://github.com/terraform-providers/terraform-provider-gitlab/issues/129))
