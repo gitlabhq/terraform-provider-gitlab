@@ -142,6 +142,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			},
 		},
 	},
+	"on_delete_archive": {
+		Type:        schema.TypeBool,
+		Description: "Whether the project should be archived instead of being physically deleted.",
+		Optional:    true,
+		Default:     false,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -335,7 +341,25 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
+
 	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
+
+	if v, ok := d.GetOk("on_delete_archive"); ok {
+		if v.(bool) {
+			log.Printf("[INFO] Project (%s) will be archived instead of being deleted", d.Id())
+			out, _, err := client.Projects.ArchiveProject(d.Id())
+			if err != nil {
+				log.Printf("[ERROR] Error archiving project (%s), received %#v", d.Id(), err)
+				return err
+			}
+			if !out.Archived {
+				log.Printf("[ERROR] Project (%s) is still not archived", d.Id())
+				return fmt.Errorf("error archiving project (%s): its status on the server is still unarchived", d.Id())
+			}
+			log.Printf("[DEBUG] Project (%s) archived", d.Id())
+			return nil
+		}
+	}
 
 	_, err := client.Projects.DeleteProject(d.Id())
 	if err != nil {
