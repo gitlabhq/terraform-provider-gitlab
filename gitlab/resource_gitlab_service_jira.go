@@ -60,7 +60,7 @@ func resourceGitlabServiceJira() *schema.Resource {
 				Sensitive: true,
 			},
 			"jira_issue_transition_id": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 			},
 		},
@@ -105,17 +105,17 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	if v := jiraService.Properties.URL; v != nil {
-		d.Set("url", *v)
+	if v := jiraService.Properties.URL; v != "" {
+		d.Set("url", v)
 	}
-	if v := jiraService.Properties.Username; v != nil {
-		d.Set("username", *v)
+	if v := jiraService.Properties.Username; v != "" {
+		d.Set("username", v)
 	}
-	if v := jiraService.Properties.ProjectKey; v != nil {
-		d.Set("project_key", *v)
+	if v := jiraService.Properties.ProjectKey; v != "" {
+		d.Set("project_key", v)
 	}
-	if v := jiraService.Properties.JiraIssueTransitionID; v != nil {
-		d.Set("jira_issue_transition_id", *v)
+	if v := jiraService.Properties.JiraIssueTransitionID; v != "" {
+		d.Set("jira_issue_transition_id", v)
 	}
 
 	d.Set("title", jiraService.Title)
@@ -124,14 +124,11 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("active", jiraService.Active)
 	d.Set("push_events", jiraService.PushEvents)
 	d.Set("issues_events", jiraService.IssuesEvents)
-	d.Set("confidential_issues_events", jiraService.ConfidentialIssuesEvents)
 	d.Set("merge_requests_events", jiraService.MergeRequestsEvents)
 	d.Set("tag_push_events", jiraService.TagPushEvents)
 	d.Set("note_events", jiraService.NoteEvents)
 	d.Set("pipeline_events", jiraService.PipelineEvents)
 	d.Set("job_events", jiraService.JobEvents)
-	d.Set("wikiPage_events", jiraService.WikiPageEvents)
-	d.Set("confidentialNote_events", jiraService.ConfidentialNoteEvents)
 
 	return nil
 }
@@ -163,7 +160,7 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 
 	// Set optional properties
 	if val := d.Get("jira_issue_transition_id"); val != nil {
-		setJiraServiceOptions.JiraIssueTransitionID = gitlab.Int(val.(int))
+		setJiraServiceOptions.JiraIssueTransitionID = gitlab.String(val.(string))
 	}
 
 	return &setJiraServiceOptions, nil

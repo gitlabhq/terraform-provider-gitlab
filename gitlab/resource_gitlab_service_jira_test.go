@@ -38,6 +38,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(jiraResourceName, "url", "https://testurl.com"),
 					resource.TestCheckResourceAttr(jiraResourceName, "username", "user2"),
 					resource.TestCheckResourceAttr(jiraResourceName, "password", "mypass_update"),
+					resource.TestCheckResourceAttr(jiraResourceName, "jira_issue_transition_id", "3"),
 				),
 			},
 			// Update the jira service to get back to previous settings
@@ -174,6 +175,7 @@ resource "gitlab_service_jira" "jira" {
   url      = "https://testurl.com"
   username = "user2"
   password = "mypass_update"
+  jira_issue_transition_id = "3"
 }
 `, rInt)
 }
