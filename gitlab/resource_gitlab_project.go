@@ -148,6 +148,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 		Default:     false,
 	},
+	"archived": {
+		Type:        schema.TypeBool,
+		Description: "Whether the project is archived.",
+		Optional:    true,
+		Default:     false,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -187,6 +193,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
 	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
 	d.Set("tags", project.TagList)
+	d.Set("archived", project.Archived)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -205,6 +212,8 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 	}
+
+	log.Printf("[TRACE] Entering resourceGitlabProjectCreate")
 
 	if v, ok := d.GetOk("path"); ok {
 		options.Path = gitlab.String(v.(string))
@@ -239,6 +248,16 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	d.SetId(fmt.Sprintf("%d", project.ID))
 
+	v := d.Get("archived")
+	if v.(bool) {
+		// strange as it may seem, this project is created in archived state...
+		err := archiveProject(d, meta)
+		if err != nil {
+			log.Printf("[WARN] New project (%s) could not be created in archived state: error %#v", d.Id(), err)
+			// TODO: handle error instead of swallowing it?
+		}
+	}
+
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -257,6 +276,8 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
+
+	log.Printf("[TRACE] Entering resourceGitlabProjectUpdate")
 
 	options := &gitlab.EditProjectOptions{}
 
@@ -336,30 +357,36 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		updateSharedWithGroups(d, meta)
 	}
 
+	if d.HasChange("archived") {
+		v := d.Get("archived")
+		if v.(bool) {
+			err := archiveProject(d, meta)
+			if err != nil {
+				log.Printf("[WARN] Project (%s) could not be archived: error %#v", d.Id(), err)
+				return err
+			}
+		} else {
+			err := unarchiveProject(d, meta)
+			if err != nil {
+				log.Printf("[WARN] Project (%s) could not be unarchived: error %#v", d.Id(), err)
+				return err
+			}
+		}
+	}
+
 	return resourceGitlabProjectRead(d, meta)
 }
 
 func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
-
-	if v, ok := d.GetOk("on_delete_archive"); ok {
-		if v.(bool) {
-			log.Printf("[INFO] Project (%s) will be archived instead of being deleted", d.Id())
-			out, _, err := client.Projects.ArchiveProject(d.Id())
-			if err != nil {
-				log.Printf("[ERROR] Error archiving project (%s), received %#v", d.Id(), err)
-				return err
-			}
-			if !out.Archived {
-				log.Printf("[ERROR] Project (%s) is still not archived", d.Id())
-				return fmt.Errorf("error archiving project (%s): its status on the server is still unarchived", d.Id())
-			}
-			log.Printf("[DEBUG] Project (%s) archived", d.Id())
-			return nil
-		}
+	v := d.Get("on_delete_archive")
+	if v.(bool) {
+		log.Printf("[DEBUG] Archive project %s (instead of deleting)", d.Id())
+		return archiveProject(d, meta)
 	}
+
+	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
 
 	_, err := client.Projects.DeleteProject(d.Id())
 	if err != nil {
@@ -510,5 +537,43 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
+	return nil
+}
+
+// archiveProject calls the Gitlab server to archive a project; if the
+// project is already archived, the call will do nothing (the API is
+// idempotent).
+func archiveProject(d *schema.ResourceData, meta interface{}) error {
+	log.Printf("[TRACE] Project (%s) will be archived", d.Id())
+	client := meta.(*gitlab.Client)
+	out, _, err := client.Projects.ArchiveProject(d.Id())
+	if err != nil {
+		log.Printf("[ERROR] Error archiving project (%s), received %#v", d.Id(), err)
+		return err
+	}
+	if !out.Archived {
+		log.Printf("[ERROR] Project (%s) is still not archived", d.Id())
+		return fmt.Errorf("error archiving project (%s): its status on the server is still unarchived", d.Id())
+	}
+	log.Printf("[TRACE] Project (%s) archived", d.Id())
+	return nil
+}
+
+// unarchiveProject calls the Gitlab server to unarchive a project; if the
+// project is already not archived, the call will do nothing (the API is
+// idempotent).
+func unarchiveProject(d *schema.ResourceData, meta interface{}) error {
+	log.Printf("[INFO] Project (%s) will be unarchived", d.Id())
+	client := meta.(*gitlab.Client)
+	out, _, err := client.Projects.UnarchiveProject(d.Id())
+	if err != nil {
+		log.Printf("[ERROR] Error unarchiving project (%s), received %#v", d.Id(), err)
+		return err
+	}
+	if out.Archived {
+		log.Printf("[ERROR] Project (%s) is still archived", d.Id())
+		return fmt.Errorf("error unarchiving project (%s): its status on the server is still archived", d.Id())
+	}
+	log.Printf("[TRACE] Project (%s) unarchived", d.Id())
 	return nil
 }
