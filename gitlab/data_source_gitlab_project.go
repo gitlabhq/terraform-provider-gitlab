@@ -87,6 +87,11 @@ func dataSourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"archived": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -118,5 +123,6 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("http_url_to_repo", found.HTTPURLToRepo)
 	d.Set("web_url", found.WebURL)
 	d.Set("runners_token", found.RunnersToken)
+	d.Set("archived", found.Archived)
 	return nil
 }

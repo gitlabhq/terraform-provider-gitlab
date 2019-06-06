@@ -58,3 +58,5 @@ The following attributes are exported:
 * `web_url` - URL that can be used to find the project in a browser.
 
 * `runners_token` - Registration token to use during runner setup.
+
+* `archived` - Whether the project is in read-only mode (archived).

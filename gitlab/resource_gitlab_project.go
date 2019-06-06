@@ -271,68 +271,89 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	options := &gitlab.EditProjectOptions{}
 
+	// need to manage partial state since project archiving requires
+	// a separate API call which could fail
+	d.Partial(true)
+	updatedProperties := []string{}
+
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
+		updatedProperties = append(updatedProperties, "name")
 	}
 
 	if d.HasChange("path") && (d.Get("path").(string) != "") {
 		options.Path = gitlab.String(d.Get("path").(string))
+		updatedProperties = append(updatedProperties, "path")
 	}
 
 	if d.HasChange("description") {
 		options.Description = gitlab.String(d.Get("description").(string))
+		updatedProperties = append(updatedProperties, "description")
 	}
 
 	if d.HasChange("default_branch") {
 		options.DefaultBranch = gitlab.String(d.Get("default_branch").(string))
+		updatedProperties = append(updatedProperties, "default_branch")
 	}
 
 	if d.HasChange("visibility_level") {
 		options.Visibility = stringToVisibilityLevel(d.Get("visibility_level").(string))
+		updatedProperties = append(updatedProperties, "visibility_level")
 	}
 
 	if d.HasChange("merge_method") {
 		options.MergeMethod = stringToMergeMethod(d.Get("merge_method").(string))
+		updatedProperties = append(updatedProperties, "merge_method")
 	}
 
 	if d.HasChange("only_allow_merge_if_pipeline_succeeds") {
 		options.OnlyAllowMergeIfPipelineSucceeds = gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool))
+		updatedProperties = append(updatedProperties, "only_allow_merge_if_pipeline_succeeds")
 	}
 
 	if d.HasChange("only_allow_merge_if_all_discussions_are_resolved") {
 		options.OnlyAllowMergeIfAllDiscussionsAreResolved = gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool))
+		updatedProperties = append(updatedProperties, "only_allow_merge_if_all_discussions_are_resolved")
 	}
 
 	if d.HasChange("issues_enabled") {
 		options.IssuesEnabled = gitlab.Bool(d.Get("issues_enabled").(bool))
+		updatedProperties = append(updatedProperties, "issues_enabled")
 	}
 
 	if d.HasChange("merge_requests_enabled") {
 		options.MergeRequestsEnabled = gitlab.Bool(d.Get("merge_requests_enabled").(bool))
+		updatedProperties = append(updatedProperties, "merge_requests_enabled")
 	}
 
 	if d.HasChange("approvals_before_merge") {
 		options.ApprovalsBeforeMerge = gitlab.Int(d.Get("approvals_before_merge").(int))
+		updatedProperties = append(updatedProperties, "approvals_before_merge")
 	}
 
 	if d.HasChange("wiki_enabled") {
 		options.WikiEnabled = gitlab.Bool(d.Get("wiki_enabled").(bool))
+		updatedProperties = append(updatedProperties, "wiki_enabled")
 	}
 
 	if d.HasChange("snippets_enabled") {
 		options.SnippetsEnabled = gitlab.Bool(d.Get("snippets_enabled").(bool))
+		updatedProperties = append(updatedProperties, "snippets_enabled")
 	}
 
 	if d.HasChange("shared_runners_enabled") {
 		options.SharedRunnersEnabled = gitlab.Bool(d.Get("shared_runners_enabled").(bool))
+		updatedProperties = append(updatedProperties, "shared_runners_enabled")
 	}
 
 	if d.HasChange("tags") {
 		options.TagList = stringSetToStringSlice(d.Get("tags").(*schema.Set))
+		updatedProperties = append(updatedProperties, "tags")
 	}
 
 	if d.HasChange("container_registry_enabled") {
 		options.ContainerRegistryEnabled = gitlab.Bool(d.Get("container_registry_enabled").(bool))
+		updatedProperties = append(updatedProperties, "container_registry_enabled")
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
@@ -341,8 +362,13 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		if err != nil {
 			return err
 		}
+		for _, updatedProperty := range updatedProperties {
+			log.Printf("[DEBUG] partial gitlab project %s update of property %q", d.Id(), updatedProperty)
+			d.SetPartial(updatedProperty)
+		}
 	}
 
+	// TODO: handle partial state update
 	if d.HasChange("shared_with_groups") {
 		updateSharedWithGroups(d, meta)
 	}
@@ -362,8 +388,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 				return err
 			}
 		}
+		d.SetPartial("archived")
 	}
 
+	d.Partial(false)
 	return resourceGitlabProjectRead(d, meta)
 }
 

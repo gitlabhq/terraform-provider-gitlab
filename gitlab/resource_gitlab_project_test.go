@@ -32,6 +32,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
+		Archived: false, // needless, but let's make this explicit
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -39,7 +40,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
-			// Step0 Create a project with all the features on
+			// Step0 Create a project with all the features on (note: "archived" is "false")
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -47,7 +48,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckAggregateGitlabProject(&defaults, &received),
 				),
 			},
-			// Step1 Update the project to turn the features off
+			// Step1 Update the project to turn the features off (note: "archived" is "true")
 			{
 				Config: testAccGitlabProjectUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -65,10 +66,11 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
+						Archived: true,
 					}, &received),
 				),
 			},
-			// Step2 Update the project to turn the features on again
+			// Step2 Update the project to turn the features on again (note: "archived" is "false")
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -411,7 +413,8 @@ resource "gitlab_project" "foo" {
   wiki_enabled = false
   snippets_enabled = false
   container_registry_enabled = false
-  shared_runners_enabled = false
+	shared_runners_enabled = false
+	archived = true
 }
 	`, rInt, rInt)
 }

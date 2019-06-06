@@ -71,6 +71,8 @@ The following arguments are supported:
   * `group_access_level` - (Optional) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
   Valid values are `guest`, `reporter`, `developer`, `master`.
 
+* `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+
 ## Attributes Reference
 
 The following additional attributes are exported:
