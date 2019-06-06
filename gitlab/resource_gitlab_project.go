@@ -368,9 +368,13 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
-	// TODO: handle partial state update
 	if d.HasChange("shared_with_groups") {
-		updateSharedWithGroups(d, meta)
+		err := updateSharedWithGroups(d, meta)
+		// TODO: check if handling partial state update in this simplistic
+		// way is ok when an error in the "shared groups" API calls occurs
+		if err != nil {
+			d.SetPartial("shared_with_groups")
+		}
 	}
 
 	if d.HasChange("archived") {
