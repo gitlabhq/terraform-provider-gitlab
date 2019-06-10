@@ -95,13 +95,8 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] Read Gitlab Jira service %s", d.Id())
 
-	jiraService, response, err := client.Services.GetJiraService(project)
+	jiraService, _, err := client.Services.GetJiraService(project)
 	if err != nil {
-		if response.StatusCode == 404 {
-			log.Printf("[WARN] removing Jira service from state because it no longer exists in Gitlab")
-			d.SetId("")
-			return nil
-		}
 		return err
 	}
 
