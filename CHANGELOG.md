@@ -1,8 +1,18 @@
 ## 2.2.0 (Unreleased)
+
+FEATURES:
+* **New Resource:** `gitlab_service_jira` ([#101](https://github.com/terraform-providers/terraform-provider-gitlab/pull/101))
+* **New Resource:** `gitlab_pipeline_schedule` ([#116](https://github.com/terraform-providers/terraform-provider-gitlab/pull/116))
+
+ENHANCEMENTS:
+* Add `archived` argument to `gitlab_project` ([#148](https://github.com/terraform-providers/terraform-provider-gitlab/issues/148))
+* Add `managed` argument to `gitlab_project_cluster` ([#137](https://github.com/terraform-providers/terraform-provider-gitlab/issues/137))
+
 ## 2.1.0 (May 29, 2019)
 
 FEATURES:
 * **New Datasource**: `gitlab_group` ([#129](https://github.com/terraform-providers/terraform-provider-gitlab/issues/129))
+
 
 ## 2.0.0 (May 23, 2019)
 
