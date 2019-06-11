@@ -192,6 +192,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
+
 	options := &gitlab.CreateProjectOptions{
 		Name:                             gitlab.String(d.Get("name").(string)),
 		IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
@@ -207,20 +208,43 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 	}
 
+	// need to manage partial state since project creation may require
+	// more than a single API call, and they may all fail independently;
+	// the default set of attributes is prepopulated with those used above
+	d.Partial(true)
+	setProperties := []string{
+		"name",
+		"issues_enabled",
+		"merge_requests_enabled",
+		"approvals_before_merge",
+		"wiki_enabled",
+		"snippets_enabled",
+		"container_registry_enabled",
+		"visibility_level",
+		"merge_method",
+		"only_allow_merge_if_pipeline_succeeds",
+		"only_allow_merge_if_all_discussions_are_resolved",
+		"shared_runners_enabled",
+	}
+
 	if v, ok := d.GetOk("path"); ok {
 		options.Path = gitlab.String(v.(string))
+		setProperties = append(setProperties, "path")
 	}
 
 	if v, ok := d.GetOk("namespace_id"); ok {
 		options.NamespaceID = gitlab.Int(v.(int))
+		setProperties = append(setProperties, "namespace_id")
 	}
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
+		setProperties = append(setProperties, "description")
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
 		options.TagList = stringSetToStringSlice(v.(*schema.Set))
+		setProperties = append(setProperties, "tags")
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -230,15 +254,23 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
+	for _, setProperty := range setProperties {
+		log.Printf("[DEBUG] partial gitlab project %s creation of property %q", d.Id(), setProperty)
+		d.SetPartial(setProperty)
+	}
+
+	// from this point onwards no matter how we return, resource creation
+	// is committed to state since we set its ID
+	d.SetId(fmt.Sprintf("%d", project.ID))
+
 	if v, ok := d.GetOk("shared_with_groups"); ok {
 		for _, option := range expandSharedWithGroupsOptions(v) {
 			if _, err := client.Projects.ShareProjectWithGroup(project.ID, option); err != nil {
 				return err
 			}
 		}
+		d.SetPartial("shared_with_groups")
 	}
-
-	d.SetId(fmt.Sprintf("%d", project.ID))
 
 	v := d.Get("archived")
 	if v.(bool) {
@@ -246,10 +278,14 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		err := archiveProject(d, meta)
 		if err != nil {
 			log.Printf("[WARN] New project (%s) could not be created in archived state: error %#v", d.Id(), err)
-			// TODO: handle error instead of swallowing it?
+			return err
 		}
+		d.SetPartial(("archived"))
 	}
 
+	// everything went OK, we can revert to ordinary state management
+	// and let the Gitlab server fill in the resource state via a read
+	d.Partial(false)
 	return resourceGitlabProjectRead(d, meta)
 }
 

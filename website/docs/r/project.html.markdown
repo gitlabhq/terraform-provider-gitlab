@@ -68,7 +68,7 @@ The following arguments are supported:
 
 * `shared_with_groups` - (Optional) Enable sharing the project with a list of groups (maps).
   * `group_id` - (Required) Group id of the group you want to share the project with.
-  * `group_access_level` - (Optional) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
+  * `group_access_level` - (Required) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
   Valid values are `guest`, `reporter`, `developer`, `master`.
 
 * `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
