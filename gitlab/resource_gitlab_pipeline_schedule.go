@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -81,7 +82,7 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d", project, pipelineScheduleID)
 
-	pipelineSchedules, response, err := client.PipelineSchedules.ListPipelineSchedules(project, nil)
+	pipelineSchedules, _, err := client.PipelineSchedules.ListPipelineSchedules(project, nil)
 	if err != nil {
 		return err
 	}
@@ -98,8 +99,7 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		}
 	}
 	if !found {
-		log.Printf("[WARN] removing PipelineSchedule %d from state because it no longer exists in gitlab", pipelineScheduleID)
-		d.SetId("")
+		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID))
 	}
 
 	return nil
