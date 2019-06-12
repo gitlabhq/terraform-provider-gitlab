@@ -1,4 +1,4 @@
-## 2.2.0 (Unreleased)
+## 2.2.0 (June 12, 2019)
 
 FEATURES:
 * **New Resource:** `gitlab_service_jira` ([#101](https://github.com/terraform-providers/terraform-provider-gitlab/pull/101))
