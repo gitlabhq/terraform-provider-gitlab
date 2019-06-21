@@ -11,28 +11,30 @@ func resourceGitlabBranchCreation() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabBranchCreate,
 		Read:   resourceGitlabBranchRead,
+		Delete: resourceGitlabBranchDelete,
+
 		Schema: map[string]*schema.Schema{
+			"name": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
 			"project": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"branch": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
 			"ref": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
+				Computed: true,
 			},
 		},
 	}
 }
 
 func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error {
-
 	client := meta.(*gitlab.Client)
 
 	options := &gitlab.CreateBranchOptions{
@@ -42,7 +44,9 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 
 	project := d.Get("project").(string)
 
-	_, _, err := client.Branches.CreateBranch(project, options)
+	branch, _, err := client.Branches.CreateBranch(project, options)
+
+	log.Printf("[DEBUG] created gitlab branch for project %s, branch %s", project, branch)
 
 	if err != nil {
 		return err
@@ -53,24 +57,30 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project, branch, err := projectAndBranchFromID(d.Id())
+
+	project := d.Get("project").(string)
+	branch := d.Get("name").(string)
+
+	pb, _, err := client.Branches.GetBranch(project, branch)
+
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[DEBUG] read gitlab branch protection for project %s, branch %s", project, branch)
-
-	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
-	if err != nil {
-		return err
-	}
-
-	d.Set("project", project)
-	d.Set("branch", pb.Name)
-	d.Set("merge_access_level", pb.MergeAccessLevels[0].AccessLevel)
-	d.Set("push_access_level", pb.PushAccessLevels[0].AccessLevel)
+	log.Printf("[DEBUG] read gitlab branch for project %s, branch %s", project, branch)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
 	return nil
+}
+
+func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gitlab.Client)
+	project := d.Get("project").(string)
+	branch := d.Get("name").(string)
+
+	log.Printf("[DEBUG] Delete gitlab branch %s for project %s", branch, project)
+
+	_, err := client.Branches.DeleteBranch(project, branch)
+	return err
 }
