@@ -50,6 +50,7 @@ func Provider() terraform.ResourceProvider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"gitlab_branch_protection":  resourceGitlabBranchProtection(),
+			"gitlab_branch":             resourceGitlabBranchCreation(),
 			"gitlab_tag_protection":     resourceGitlabTagProtection(),
 			"gitlab_group":              resourceGitlabGroup(),
 			"gitlab_project":            resourceGitlabProject(),
