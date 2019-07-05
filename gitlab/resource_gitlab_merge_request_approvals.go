@@ -73,13 +73,13 @@ func resourceGitlabMergeRequestApprovalsCreate(d *schema.ResourceData, meta inte
 		return err
 	}
 
-	d.SetId(strings.ReplaceAll(project, "/", ":"))
+	d.SetId(strings.Replace(project, "/", ":", 1))
 	return resourceGitlabMergeRequestApprovalsRead(d, meta)
 }
 
 func resourceGitlabMergeRequestApprovalsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := strings.ReplaceAll(d.Id(), ":", "/")
+	project := strings.Replace(d.Id(), ":", "/", 1)
 
 	log.Printf("[DEBUG] read gitlab approvals configuration for project %s", project)
 
@@ -99,7 +99,7 @@ func resourceGitlabMergeRequestApprovalsRead(d *schema.ResourceData, meta interf
 
 func resourceGitlabMergeRequestApprovalsDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := strings.ReplaceAll(d.Id(), ":", "/")
+	project := strings.Replace(d.Id(), ":", "/", 1)
 
 	log.Printf("[DEBUG] Delete gitlab approvals configuration for project %s", project)
 
