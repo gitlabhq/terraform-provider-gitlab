@@ -352,6 +352,24 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	})
 }
 
+func TestAccImportURL(t *testing.T) {
+	var received gitlab.Project
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testImportURLOptions(),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.import_url", &received),
+					testAccCheckImportURL("gitlab/resource_gitlab_project.go", &received),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		var err error
@@ -666,4 +684,50 @@ resource "gitlab_project" "foo" {
   initialize_with_readme = true
 }
 	`, rInt, rInt)
+}
+
+func testImportURLOptions() string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "import_url" {
+  name = "import"
+  path = "import"
+  description = "Terraform Import URL Acceptance test"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+  merge_method = "ff"
+  only_allow_merge_if_pipeline_succeeds = true
+  only_allow_merge_if_all_discussions_are_resolved = true
+
+  issues_enabled = false
+  merge_requests_enabled = false
+  approvals_before_merge = 0
+  wiki_enabled = false
+  snippets_enabled = false
+  container_registry_enabled = false
+  shared_runners_enabled = false
+  archived = false
+  import_url = "https://github.com/terraform-providers/terraform-provider-gitlab.git"
+  default_branch = "master"
+}
+	`)
+}
+
+func testAccCheckImportURL(fp string, project *gitlab.Project) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := testAccProvider.Meta().(*gitlab.Client)
+		ref := &gitlab.GetFileOptions{
+			Ref: gitlab.String("master"),
+		}
+		f, _, err := conn.RepositoryFiles.GetFile(project.ID, fp, ref, nil)
+		if err != nil {
+			return fmt.Errorf("Cannot find file %s, error %s\n", fp, err)
+		}
+		if f == nil {
+			return fmt.Errorf("Did not find file\n")
+		}
+
+		return nil
+	}
 }

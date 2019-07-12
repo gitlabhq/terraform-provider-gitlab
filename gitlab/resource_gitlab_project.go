@@ -113,6 +113,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 		Default:      "private",
 	},
+	"import_url": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
 	"merge_method": {
 		Type:         schema.TypeString,
 		Optional:     true,
@@ -309,6 +313,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		setProperties = append(setProperties, "initialize_with_readme")
 	}
 
+	if v, ok := d.GetOk("import_url"); ok {
+		options.ImportURL = gitlab.String(v.(string))
+	}
+
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
 
 	project, _, err := client.Projects.CreateProject(options)
@@ -352,6 +360,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
+	var project *gitlab.Project
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
@@ -363,6 +372,13 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] gitlab project %s is marked for deletion", d.Id())
 		d.SetId("")
 		return nil
+	}
+
+	for project.ImportStatus == "started" {
+		project, _, err = client.Projects.GetProject(d.Id(), nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	resourceGitlabProjectSetToState(d, project)
