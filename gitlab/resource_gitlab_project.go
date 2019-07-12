@@ -76,6 +76,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 		Default:      "private",
 	},
+	"import_url": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
 	"merge_method": {
 		Type:         schema.TypeString,
 		Optional:     true,
@@ -245,6 +249,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	if v, ok := d.GetOk("tags"); ok {
 		options.TagList = stringSetToStringSlice(v.(*schema.Set))
 		setProperties = append(setProperties, "tags")
+	}
+
+	if v, ok := d.GetOk("import_url"); ok {
+		options.ImportURL = gitlab.String(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
