@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"log"
-	"net/url"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -55,7 +54,7 @@ func resourceGitlabTagProtectionCreate(d *schema.ResourceData, meta interface{})
 	tp, _, err := client.ProtectedTags.ProtectRepositoryTags(project, options)
 	if err != nil {
 		// Remove existing tag protection
-		_, err = client.ProtectedTags.UnprotectRepositoryTags(project, url.PathEscape(*tag))
+		_, err = client.ProtectedTags.UnprotectRepositoryTags(project, *tag)
 		if err != nil {
 			return err
 		}
@@ -80,7 +79,7 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 
 	log.Printf("[DEBUG] read gitlab tag protection for project %s, tag %s", project, tag)
 
-	pt, _, err := client.ProtectedTags.GetProtectedTag(project, url.PathEscape(tag))
+	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag)
 	if err != nil {
 		return err
 	}
@@ -101,7 +100,7 @@ func resourceGitlabTagProtectionDelete(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] Delete gitlab protected tag %s for project %s", tag, project)
 
-	_, err := client.ProtectedTags.UnprotectRepositoryTags(project, url.PathEscape(tag))
+	_, err := client.ProtectedTags.UnprotectRepositoryTags(project, tag)
 	return err
 }
 
