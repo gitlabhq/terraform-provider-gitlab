@@ -23,7 +23,7 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectPushRulesConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rule.foo", &pushRules),
+					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
 				),
 			},
 		},
