@@ -22,7 +22,7 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and Tag Protection with default options
 			{
-				Config: testAccGitlabTagProtectionConfig(rInt),
+				Config: testAccGitlabTagProtectionConfig(rInt, ""),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
@@ -33,7 +33,7 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 			},
 			// Update the Tag Protection
 			{
-				Config: testAccGitlabTagProtectionUpdateConfig(rInt),
+				Config: testAccGitlabTagProtectionUpdateConfig(rInt, ""),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
@@ -44,11 +44,60 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 			},
 			// Update the Tag Protection to get back to initial settings
 			{
-				Config: testAccGitlabTagProtectionConfig(rInt),
+				Config: testAccGitlabTagProtectionConfig(rInt, ""),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d", rInt),
+						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabTagProtection_wildcard(t *testing.T) {
+
+	var pt gitlab.ProtectedTag
+	rInt := acctest.RandInt()
+
+	wildcard := "-*"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabTagProtectionDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and Tag Protection with default options
+			{
+				Config: testAccGitlabTagProtectionConfig(rInt, wildcard),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
+					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
+						Name:              fmt.Sprintf("TagProtect-%d%s", rInt, wildcard),
+						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+			// Update the Tag Protection
+			{
+				Config: testAccGitlabTagProtectionUpdateConfig(rInt, wildcard),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
+					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
+						Name:              fmt.Sprintf("TagProtect-%d%s", rInt, wildcard),
+						CreateAccessLevel: accessLevel[gitlab.MasterPermissions],
+					}),
+				),
+			},
+			// Update the Tag Protection to get back to initial settings
+			{
+				Config: testAccGitlabTagProtectionConfig(rInt, wildcard),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
+					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
+						Name:              fmt.Sprintf("TagProtect-%d%s", rInt, wildcard),
 						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
 					}),
 				),
@@ -127,7 +176,7 @@ func testAccCheckGitlabTagProtectionDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabTagProtectionConfig(rInt int) string {
+func testAccGitlabTagProtectionConfig(rInt int, postfix string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
@@ -140,13 +189,13 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_tag_protection" "TagProtect" {
   project = "${gitlab_project.foo.id}"
-  tag = "TagProtect-%d"
+  tag = "TagProtect-%d%s"
   create_access_level = "developer"
 }
-	`, rInt, rInt)
+	`, rInt, rInt, postfix)
 }
 
-func testAccGitlabTagProtectionUpdateConfig(rInt int) string {
+func testAccGitlabTagProtectionUpdateConfig(rInt int, postfix string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
@@ -159,8 +208,8 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_tag_protection" "TagProtect" {
 	project = "${gitlab_project.foo.id}"
-	tag = "TagProtect-%d"
+	tag = "TagProtect-%d%s"
 	create_access_level = "maintainer"
 }
-	`, rInt, rInt)
+	`, rInt, rInt, postfix)
 }
