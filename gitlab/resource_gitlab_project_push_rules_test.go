@@ -1,7 +1,9 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform/helper/resource"
@@ -10,6 +12,26 @@ import (
 
 	"github.com/hashicorp/terraform/helper/acctest"
 )
+
+func isRunningInEE() (bool, error) {
+	if conn, ok := testAccProvider.Meta().(*gitlab.Client); ok {
+		version, _, err := conn.Version.GetVersion()
+		if err != nil {
+			return false, err
+		}
+		if strings.Contains(version.String(), "-ee") {
+			return true, nil
+		}
+	} else {
+		return false, errors.New("Provider not initialized, unable to get GitLab connection")
+	}
+	return false, nil
+}
+
+func isRunningInCE() (bool, error) {
+	isEE, err := isRunningInEE()
+	return !isEE, err
+}
 
 func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 	var pushRules gitlab.ProjectPushRules
@@ -22,7 +44,8 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create project and push rules with basic options
 			{
-				Config: testAccGitlabProjectPushRulesConfig(rInt),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectPushRulesConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
 					testAccCheckGitlabProjectPushRulesAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
@@ -39,7 +62,8 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 			},
 			// Update the project push rules
 			{
-				Config: testAccGitlabProjectPushRulesUpdate(rInt),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectPushRulesUpdate(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
 					testAccCheckGitlabProjectPushRulesAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
@@ -56,7 +80,8 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 			},
 			// Update the project push rules to original config
 			{
-				Config: testAccGitlabProjectPushRulesConfig(rInt),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectPushRulesConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
 					testAccCheckGitlabProjectPushRulesAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
