@@ -298,12 +298,19 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
+	var project *gitlab.Project
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
 	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
 		return err
+	}
+	for project.ImportStatus == "started" {
+		project, _, err = client.Projects.GetProject(d.Id(), nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	resourceGitlabProjectSetToState(d, project)

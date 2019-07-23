@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
@@ -506,7 +505,7 @@ func testImportURLOptions() string {
 resource "gitlab_project" "import_url" {
   name = "import"
   path = "import"
-  description = " Terraform Import URL Acceptance test"
+  description = "Terraform Import URL Acceptance test"
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
@@ -524,14 +523,13 @@ resource "gitlab_project" "import_url" {
   shared_runners_enabled = false
   archived = false
   import_url = "https://github.com/terraform-providers/terraform-provider-gitlab.git"
-	default_branch = "master"
+  default_branch = "master"
 }
 	`)
 }
 
 func testAccCheckImportURL(fp string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		time.Sleep(10 * time.Second)
 		conn := testAccProvider.Meta().(*gitlab.Client)
 		ref := &gitlab.GetFileOptions{
 			Ref: gitlab.String("master"),
