@@ -94,8 +94,8 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	d.Set("project", project)
 	d.Set("branch", pb.Name)
-	d.Set("merge_access_level", pb.MergeAccessLevels[0].AccessLevel)
-	d.Set("push_access_level", pb.PushAccessLevels[0].AccessLevel)
+	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
+	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
