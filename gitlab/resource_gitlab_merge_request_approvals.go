@@ -89,7 +89,7 @@ func resourceGitlabMergeRequestApprovalsRead(d *schema.ResourceData, meta interf
 	}
 
 	d.Set("project", project)
-	d.Set("approvalsBeforeMerge", approvals.ApprovalsBeforeMerge)
+	d.Set("approvals_before_merge", approvals.ApprovalsBeforeMerge)
 	d.Set("reset_approvals_on_push", approvals.ResetApprovalsOnPush)
 	d.Set("disable_overriding_approvers_per_merge_request", approvals.DisableOverridingApproversPerMergeRequest)
 	d.Set("merge_requests_author_approval", approvals.MergeRequestsAuthorApproval)
