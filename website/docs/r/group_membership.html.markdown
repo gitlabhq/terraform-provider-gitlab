@@ -14,10 +14,10 @@ This resource allows you to add a user to an existing group.
 
 ```hcl
 resource "gitlab_group_membership" "test" {
-group_id = "12345"
-user_id = 1337
-access_level = "guest"
-expires_at = "2020-12-31"
+  group_id     = "12345"
+  user_id      = 1337
+  access_level = "guest"
+  expires_at   = "2020-12-31"
 }
 ```
 
@@ -29,7 +29,7 @@ The following arguments are supported:
 
 * `user_id` - (Required) The id of the user.
 
-* `access_level` - (Required)  Acceptable values are: guest, reporter, developer, master.
+* `access_level` - (Required)  Acceptable values are: guest, reporter, developer, master, owner.
 
 * `expires_at` - (Optional) Expiration date for the group membership. Format: `YYYY-MM-DD`
 
