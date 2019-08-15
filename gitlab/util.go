@@ -91,6 +91,19 @@ func stringToVisibilityLevel(s string) *gitlab.VisibilityValue {
 	return &value
 }
 
+func stringToVariableType(s string) *gitlab.VariableTypeValue {
+	lookup := map[string]gitlab.VariableTypeValue{
+		"env_var": gitlab.EnvVariableType,
+		"file":    gitlab.FileVariableType,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
 func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
 	lookup := map[string]gitlab.MergeMethodValue{
 		"merge":        gitlab.NoFastForwardMerge,
@@ -119,6 +132,21 @@ func StringIsGitlabVariableName() schema.SchemaValidateFunc {
 		match, _ := regexp.MatchString("[a-zA-Z0-9_]+", value)
 		if !match {
 			es = append(es, fmt.Errorf("%s is an invalid value for argument %s. Only A-Z, a-z, 0-9, and _ are allowed", value, k))
+		}
+		return
+	}
+}
+
+func StringIsGitlabVariableType() schema.SchemaValidateFunc {
+	return func(v interface{}, k string) (s []string, es []error) {
+		value, ok := v.(string)
+		if !ok {
+			es = append(es, fmt.Errorf("expected type of %s to be string", k))
+			return
+		}
+		variableType := stringToVariableType(value)
+		if variableType == nil {
+			es = append(es, fmt.Errorf("expected variable_type to be \"env_var\" or \"file\""))
 		}
 		return
 	}

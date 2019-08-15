@@ -34,6 +34,8 @@ The following arguments are supported:
 
 * `value` - (Required, string) The value of the variable.
 
+* `variable_type` - (Optional, string)  The type of a variable. Available types are: env_var (default) and file.
+
 * `protected` - (Optional, boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
 
 ## Import

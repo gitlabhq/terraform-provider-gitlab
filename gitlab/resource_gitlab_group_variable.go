@@ -34,6 +34,12 @@ func resourceGitlabGroupVariable() *schema.Resource {
 				Required:  true,
 				Sensitive: true,
 			},
+			"variable_type": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "env_var",
+				ValidateFunc: StringIsGitlabVariableType(),
+			},
 			"protected": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -49,13 +55,14 @@ func resourceGitlabGroupVariableCreate(d *schema.ResourceData, meta interface{})
 	group := d.Get("group").(string)
 	key := d.Get("key").(string)
 	value := d.Get("value").(string)
+	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
 
-	options := gitlab.CreateVariableOptions{
-		Key:              &key,
-		Value:            &value,
-		Protected:        &protected,
-		EnvironmentScope: nil,
+	options := gitlab.CreateGroupVariableOptions{
+		Key:          &key,
+		Value:        &value,
+		VariableType: variableType,
+		Protected:    &protected,
 	}
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", group, key)
 
@@ -86,6 +93,7 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 
 	d.Set("key", v.Key)
 	d.Set("value", v.Value)
+	d.Set("variable_type", v.VariableType)
 	d.Set("group", group)
 	d.Set("protected", v.Protected)
 	return nil
@@ -97,12 +105,13 @@ func resourceGitlabGroupVariableUpdate(d *schema.ResourceData, meta interface{})
 	group := d.Get("group").(string)
 	key := d.Get("key").(string)
 	value := d.Get("value").(string)
+	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
 
-	options := &gitlab.UpdateVariableOptions{
-		Value:            &value,
-		Protected:        &protected,
-		EnvironmentScope: nil,
+	options := &gitlab.UpdateGroupVariableOptions{
+		Value:        &value,
+		Protected:    &protected,
+		VariableType: variableType,
 	}
 	log.Printf("[DEBUG] update gitlab group variable %s/%s", group, key)
 
