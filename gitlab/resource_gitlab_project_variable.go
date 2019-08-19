@@ -51,7 +51,7 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 	value := d.Get("value").(string)
 	protected := d.Get("protected").(bool)
 
-	options := gitlab.CreateVariableOptions{
+	options := gitlab.CreateProjectVariableOptions{
 		Key:              &key,
 		Value:            &value,
 		Protected:        &protected,
@@ -99,7 +99,7 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 	value := d.Get("value").(string)
 	protected := d.Get("protected").(bool)
 
-	options := &gitlab.UpdateVariableOptions{
+	options := &gitlab.UpdateProjectVariableOptions{
 		Value:            &value,
 		Protected:        &protected,
 		EnvironmentScope: nil,

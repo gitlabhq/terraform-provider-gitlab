@@ -51,11 +51,10 @@ func resourceGitlabGroupVariableCreate(d *schema.ResourceData, meta interface{})
 	value := d.Get("value").(string)
 	protected := d.Get("protected").(bool)
 
-	options := gitlab.CreateVariableOptions{
-		Key:              &key,
-		Value:            &value,
-		Protected:        &protected,
-		EnvironmentScope: nil,
+	options := gitlab.CreateGroupVariableOptions{
+		Key:       &key,
+		Value:     &value,
+		Protected: &protected,
 	}
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", group, key)
 
@@ -99,10 +98,9 @@ func resourceGitlabGroupVariableUpdate(d *schema.ResourceData, meta interface{})
 	value := d.Get("value").(string)
 	protected := d.Get("protected").(bool)
 
-	options := &gitlab.UpdateVariableOptions{
-		Value:            &value,
-		Protected:        &protected,
-		EnvironmentScope: nil,
+	options := &gitlab.UpdateGroupVariableOptions{
+		Value:     &value,
+		Protected: &protected,
 	}
 	log.Printf("[DEBUG] update gitlab group variable %s/%s", group, key)
 
