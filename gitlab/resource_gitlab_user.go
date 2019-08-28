@@ -99,8 +99,7 @@ func resourceGitlabUser() *schema.Resource {
 			"user_provider": {
 				Type:     schema.TypeString,
 				Optional: true,
-				//				Default:  "provider.gitlab",
-				Default: "",
+				Default:  "provider.gitlab",
 			},
 			"avatar_url": {
 				Type:     schema.TypeString,
@@ -231,6 +230,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(fmt.Sprintf("%d", user.ID))
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
+	d.Set("user_provider", user.Provider)
 
 	return resourceGitlabUserRead(d, meta)
 }
