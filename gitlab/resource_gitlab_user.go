@@ -58,7 +58,7 @@ func resourceGitlabUser() *schema.Resource {
 			"is_external": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
+				//Default:  false,
 			},
 			"can_create_group": {
 				Type:     schema.TypeBool,
