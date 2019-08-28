@@ -63,7 +63,7 @@ func resourceGitlabUser() *schema.Resource {
 			"can_create_group": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  false,
+				Default:  true,
 			},
 			"can_create_project": {
 				Type:     schema.TypeBool,
