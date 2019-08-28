@@ -58,7 +58,7 @@ func resourceGitlabUser() *schema.Resource {
 			"is_external": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  true,
+				Default:  false,
 			},
 			"can_create_group": {
 				Type:     schema.TypeBool,
@@ -71,8 +71,8 @@ func resourceGitlabUser() *schema.Resource {
 			},
 			"projects_limit": {
 				Type:     schema.TypeInt,
-				Computed: true,
 				Optional: true,
+				Default:  0,
 			},
 			"created_at": {
 				Type:     schema.TypeString,
@@ -272,7 +272,7 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("is_external") {
-		options.Admin = gitlab.Bool(d.Get("is_external").(bool))
+		options.External = gitlab.Bool(d.Get("is_external").(bool))
 	}
 
 	if d.HasChange("can_create_group") {
