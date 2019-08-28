@@ -98,8 +98,8 @@ func resourceGitlabUser() *schema.Resource {
 			},
 			"user_provider": {
 				Type:     schema.TypeString,
-				Computed: true,
 				Optional: true,
+				Default:  "provider.gitlab",
 			},
 			"avatar_url": {
 				Type:     schema.TypeString,
