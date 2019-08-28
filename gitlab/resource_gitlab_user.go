@@ -85,7 +85,6 @@ func resourceGitlabUser() *schema.Resource {
 			"extern_uid": {
 				Type:     schema.TypeString,
 				Computed: true,
-				Optional: true,
 			},
 			"organization": {
 				Type:     schema.TypeString,
@@ -98,8 +97,7 @@ func resourceGitlabUser() *schema.Resource {
 			},
 			"user_provider": {
 				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "provider.gitlab",
+				Computed: true,
 			},
 			"avatar_url": {
 				Type:     schema.TypeString,
@@ -207,9 +205,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		External:         gitlab.Bool(d.Get("is_external").(bool)),
 		CanCreateGroup:   gitlab.Bool(d.Get("can_create_group").(bool)),
 		ProjectsLimit:    gitlab.Int(d.Get("projects_limit").(int)),
-		ExternUID:        gitlab.String(d.Get("extern_uid").(string)),
 		Organization:     gitlab.String(d.Get("organization").(string)),
-		Provider:         gitlab.String(d.Get("user_provider").(string)),
 		Bio:              gitlab.String(d.Get("bio").(string)),
 		Location:         gitlab.String(d.Get("location").(string)),
 		Skype:            gitlab.String(d.Get("skype").(string)),
@@ -230,7 +226,6 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(fmt.Sprintf("%d", user.ID))
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
-	d.Set("user_provider", "")
 
 	return resourceGitlabUserRead(d, meta)
 }
@@ -288,16 +283,8 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.ProjectsLimit = gitlab.Int(d.Get("projects_limit").(int))
 	}
 
-	if d.HasChange("extern_uid") {
-		options.ExternUID = gitlab.String(d.Get("extern_uid").(string))
-	}
-
 	if d.HasChange("organization") {
 		options.Organization = gitlab.String(d.Get("organization").(string))
-	}
-
-	if d.HasChange("user_provider") {
-		options.Provider = gitlab.String(d.Get("user_provider").(string))
 	}
 
 	if d.HasChange("bio") {
