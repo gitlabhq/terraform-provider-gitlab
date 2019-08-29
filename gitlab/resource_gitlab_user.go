@@ -226,6 +226,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(fmt.Sprintf("%d", user.ID))
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
+	d.Set("can_create_group", user.CanCreateGroup)
 
 	return resourceGitlabUserRead(d, meta)
 }
