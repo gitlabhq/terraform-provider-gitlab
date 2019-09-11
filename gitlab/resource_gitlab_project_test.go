@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccGitlabProject_basic(t *testing.T) {
-	var received, defaults gitlab.Project
+	var received, defaults, defaultsMasterBranch gitlab.Project
 	rInt := acctest.RandInt()
 
 	defaults = gitlab.Project{
@@ -34,6 +34,9 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 		Archived: false, // needless, but let's make this explicit
 	}
+
+	defaultsMasterBranch = defaults
+	defaultsMasterBranch.DefaultBranch = "master"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -148,6 +151,16 @@ func TestAccGitlabProject_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
 					testAccCheckAggregateGitlabProject(&defaults, &received),
+				),
+			},
+			// Step6 Update the project creating the default branch
+			{
+				// Get the ID from the project data at the previous step
+				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "master"),
+				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
+					testAccCheckAggregateGitlabProject(&defaultsMasterBranch, &received),
 				),
 			},
 		},
@@ -367,12 +380,20 @@ resource "gitlab_project" "foo" {
 	`, rInt, rInt, rInt)
 }
 
-func testAccGitlabProjectConfig(rInt int) string {
+func testAccGitlabProjectConfigDefaultBranch(rInt int, defaultBranch string) string {
+	defaultBranchStatement := ""
+
+	if len(defaultBranch) > 0 {
+		defaultBranchStatement = fmt.Sprintf("default_branch = \"%s\"", defaultBranch)
+	}
+
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
   path = "foo.%d"
   description = "Terraform acceptance tests"
+
+  %s
 
   tags = [
 	"tag1",
@@ -385,7 +406,29 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
 }
-	`, rInt, rInt)
+	`, rInt, rInt, defaultBranchStatement)
+}
+
+func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, defaultBranch string) func() (bool, error) {
+	return func() (bool, error) {
+		conn := testAccProvider.Meta().(*gitlab.Client)
+
+		commitMessage := "Initial Commit"
+
+		options := &gitlab.CreateCommitOptions{
+			Branch:        &defaultBranch,
+			CommitMessage: &commitMessage,
+			Actions:       []*gitlab.CommitAction{},
+		}
+
+		_, _, err := conn.Commits.CreateCommit(project.ID, options)
+
+		return false, err
+	}
+}
+
+func testAccGitlabProjectConfig(rInt int) string {
+	return testAccGitlabProjectConfigDefaultBranch(rInt, "")
 }
 
 func testAccGitlabProjectUpdateConfig(rInt int) string {

@@ -39,6 +39,19 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"default_branch": {
 		Type:     schema.TypeString,
 		Optional: true,
+		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+			// If the old default branch is empty, it means that the project does not
+			// have a default branch. This can only happen if the project does not have
+			// branches, i.e. it is an empty project. In that case it is useless to
+			// try setting a specific default branch (because no branch exists).
+			// This code will defer the setting of a default branch to a time when the
+			// project is no longer empty.
+			if old == "" {
+				return true
+			}
+
+			return old == new
+		},
 	},
 	"issues_enabled": {
 		Type:     schema.TypeBool,
