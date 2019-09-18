@@ -16,9 +16,6 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 	var deployKey gitlab.DeployKey
 	rInt := acctest.RandInt()
 
-	// Publicly accessible key "main" in gitlab.com
-	// XXX Is this available to everyone ? what if acceptance test is run against a private gitlab repo ?
-	keyId := "677433"
 	keyTitle := "main"
 	key := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDblguSWgpqiXIjHPSas4+N3Dten7MTLJMlGQXxGpaqN9nGPdNmuRB2YXyjT/nrryoY/qrtuVkPnis5WVo8N/s3hAnJbeJPUS2WKEGjpBlL34AQ+ANnlmGY8L6zr82Hp2Ommb7XGGtlq5D3yLCgTfcXLjC51tgcdwHsdH1U+RisgLwaTSrP/HF4G7IAr5ATsyYjtCwQRQ8ijdf5A34+XN6h8J6TLXKab5eZDuH38s9LxJuS7MRxx/P2UTOsqfjtrZWoQgE5adEGvnDxKyruex9PzNbCNVahzsma7tdikDbzxlHLIZ1aht6rKuai3iyLgcZfGIYtkq4xvg/bnNXxSsGf worker@kg.getwifi.com"
 
@@ -29,13 +26,12 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with default options
 			{
-				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyId),
+				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyTitle, key),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
 					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
 						Title: keyTitle,
 						Key:   key,
-						KeyId: keyId,
 					}),
 				),
 			},
@@ -72,7 +68,6 @@ func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.DeployK
 type testAccGitlabDeployKeyEnableExpectedAttributes struct {
 	Title   string
 	Key     string
-	KeyId   string
 	CanPush bool
 }
 
@@ -84,11 +79,6 @@ func testAccCheckGitlabDeployKeyEnableAttributes(deployKey *gitlab.DeployKey, wa
 
 		if deployKey.Key != want.Key {
 			return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
-		}
-
-		wantId, _ := strconv.Atoi(want.KeyId)
-		if deployKey.ID != wantId {
-			return fmt.Errorf("got key_id %q; want %q", deployKey.ID, want.KeyId)
 		}
 
 		if deployKey.CanPush != nil && *deployKey.CanPush != want.CanPush {
@@ -125,20 +115,35 @@ func testAccCheckGitlabDeployKeyEnableDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabDeployKeyEnableConfig(rInt int, keyId string) string {
+func testAccGitlabDeployKeyEnableConfig(rInt int, keyTitle string, key string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
+resource "gitlab_project" "parent" {
+  name = "parent-%d"
+  description = "Terraform acceptance tests - Parent project"
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
 }
 
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests - Test Project"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_deploy_key" "parent" {
+  project = "${gitlab_project.parent.id}"
+	title = "%s"
+	key = "%s"
+}
+
 resource "gitlab_deploy_key_enable" "foo" {
   project = "${gitlab_project.foo.id}"
-  key_id = "%s"
+  key_id = "${gitlab_deploy_key.parent.id}"
 }
-  `, rInt, keyId)
+  `, rInt, rInt, keyTitle, key)
 }
