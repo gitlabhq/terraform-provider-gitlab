@@ -25,6 +25,7 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -37,6 +38,7 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				Config: testAccGitlabBranchProtectionUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.MasterPermissions],
@@ -49,6 +51,7 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -58,6 +61,23 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			},
 		},
 	})
+}
+
+func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gitlab.ProtectedBranch) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("Not Found: %s", n)
+		}
+
+		if rs.Primary.Attributes["merge_access_level"] != accessLevel[pb.MergeAccessLevels[0].AccessLevel] {
+			return fmt.Errorf("merge access level not persisted in state correctly")
+		}
+
+		if rs.Primary.Attributes["push_access_level"] != accessLevel[pb.PushAccessLevels[0].AccessLevel] {
+			return fmt.Errorf("push access level not persisted in state correctly")
+		}
+	}
 }
 
 func testAccCheckGitlabBranchProtectionExists(n string, pb *gitlab.ProtectedBranch) resource.TestCheckFunc {
