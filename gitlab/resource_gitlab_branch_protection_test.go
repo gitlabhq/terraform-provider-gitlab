@@ -77,6 +77,8 @@ func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gi
 		if rs.Primary.Attributes["push_access_level"] != accessLevel[pb.PushAccessLevels[0].AccessLevel] {
 			return fmt.Errorf("push access level not persisted in state correctly")
 		}
+
+		return nil
 	}
 }
 
