@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -10,12 +11,8 @@ import (
 )
 
 func resourceGitlabProjectShareGroup() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-	for k := range accessLevelID {
-		if k != "owner" {
-			acceptedAccessLevels = append(acceptedAccessLevels, k)
-		}
-	}
+	acceptedAccessLevels := []string{"guest", "reporter", "developer", "maintainer"}
+
 	return &schema.Resource{
 		Create: resourceGitlabProjectShareGroupCreate,
 		Read:   resourceGitlabProjectShareGroupRead,
@@ -72,9 +69,9 @@ func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{
 	id := d.Id()
 	log.Printf("[DEBUG] read gitlab project projectMember %s", id)
 
-	projectId, groupId, e := projectIdAndGroupIdFromId(id)
-	if e != nil {
-		return e
+	projectId, groupId, err := projectIdAndGroupIdFromId(id)
+	if err != nil {
+		return err
 	}
 
 	projectInformation, _, err := client.Projects.GetProject(projectId, nil)
@@ -93,14 +90,16 @@ func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{
 
 func projectIdAndGroupIdFromId(id string) (string, int, error) {
 	projectId, groupIdString, err := parseTwoPartID(id)
-	groupId, e := strconv.Atoi(groupIdString)
 	if err != nil {
-		e = err
+		return "", 0, fmt.Errorf("Error parsing ID: %s", id)
 	}
-	if e != nil {
-		log.Printf("[WARN] cannot get project member id from input: %v", id)
+
+	groupId, err := strconv.Atoi(groupIdString)
+	if err != nil {
+		return "", 0, fmt.Errorf("Can not determine group id: %v", id)
 	}
-	return projectId, groupId, e
+
+	return projectId, groupId, nil
 }
 
 func resourceGitlabProjectShareGroupUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -127,14 +126,14 @@ func resourceGitlabProjectShareGroupDelete(d *schema.ResourceData, meta interfac
 	client := meta.(*gitlab.Client)
 
 	id := d.Id()
-	projectId, groupId, e := projectIdAndGroupIdFromId(id)
-	if e != nil {
-		return e
+	projectId, groupId, err := projectIdAndGroupIdFromId(id)
+	if err != nil {
+		return err
 	}
 
 	log.Printf("[DEBUG] Delete gitlab project membership %v for %s", groupId, projectId)
 
-	_, err := client.Projects.DeleteSharedProjectFromGroup(projectId, groupId)
+	_, err = client.Projects.DeleteSharedProjectFromGroup(projectId, groupId)
 	return err
 }
 
