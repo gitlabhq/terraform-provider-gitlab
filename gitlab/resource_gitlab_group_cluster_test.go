@@ -60,7 +60,6 @@ func TestAccGitlabGroupCluster_basic(t *testing.T) {
 						EnvironmentScope:            "*",
 						KubernetesApiURL:            "https://124.124.124",
 						KubernetesCACert:            groupClusterFakeCert,
-						KubernetesNamespace:         "changed-namespace",
 						KubernetesAuthorizationType: "abac",
 					}),
 				),
@@ -76,7 +75,6 @@ func TestAccGitlabGroupCluster_basic(t *testing.T) {
 						EnvironmentScope:            "*",
 						KubernetesApiURL:            "https://124.124.124",
 						KubernetesCACert:            groupClusterFakeCert,
-						KubernetesNamespace:         "changed-namespace",
 						KubernetesAuthorizationType: "rbac",
 					}),
 				),
@@ -112,7 +110,6 @@ type testAccGitlabGroupClusterExpectedAttributes struct {
 	EnvironmentScope            string
 	KubernetesApiURL            string
 	KubernetesCACert            string
-	KubernetesNamespace         string
 	KubernetesAuthorizationType string
 }
 
@@ -190,10 +187,6 @@ func testAccCheckGitlabGroupClusterAttributes(cluster *gitlab.GroupCluster, want
 			return fmt.Errorf("got kubernetes ca cert %q; want %q", cluster.PlatformKubernetes.CaCert, want.KubernetesCACert)
 		}
 
-		if cluster.PlatformKubernetes.Namespace != want.KubernetesNamespace {
-			return fmt.Errorf("got kubernetes namespace %q; want %q", cluster.PlatformKubernetes.Namespace, want.KubernetesNamespace)
-		}
-
 		if cluster.PlatformKubernetes.AuthorizationType != want.KubernetesAuthorizationType {
 			return fmt.Errorf("got kubernetes authorization type %q; want %q", cluster.PlatformKubernetes.AuthorizationType, want.KubernetesAuthorizationType)
 		}
@@ -217,6 +210,7 @@ EOF
 
 resource "gitlab_group" "foo" {
   name = "foo-group-%d"
+  path = "foo-group-%d"
   description = "Terraform acceptance tests"
 
   # So that acceptance tests can be run in a gitlab organization
@@ -234,7 +228,7 @@ resource gitlab_group_cluster "foo" {
   kubernetes_ca_cert            = "${trimspace(var.cert)}"
   kubernetes_authorization_type = "abac"
 }
-`, groupClusterFakeCert, rInt, rInt, m)
+`, groupClusterFakeCert, rInt, rInt, rInt, m)
 }
 
 func testAccGitlabGroupClusterUpdateConfig(rInt int, authType string) string {
@@ -262,7 +256,6 @@ resource gitlab_group_cluster "foo" {
   kubernetes_api_url            = "https://124.124.124"
   kubernetes_token              = "some-token"
   kubernetes_ca_cert            = "${trimspace(var.cert)}"
-  kubernetes_namespace          = "changed-namespace"
   kubernetes_authorization_type = "%s"
 }
 `, groupClusterFakeCert, rInt, rInt, rInt, authType)

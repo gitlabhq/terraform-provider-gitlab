@@ -80,10 +80,6 @@ func resourceGitlabGroupCluster() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"kubernetes_namespace": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
 			"kubernetes_authorization_type": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -106,10 +102,6 @@ func resourceGitlabGroupClusterCreate(d *schema.ResourceData, meta interface{}) 
 
 	if v, ok := d.GetOk("kubernetes_ca_cert"); ok {
 		pk.CaCert = gitlab.String(v.(string))
-	}
-
-	if v, ok := d.GetOk("kubernetes_namespace"); ok {
-		pk.Namespace = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("kubernetes_authorization_type"); ok {
@@ -171,7 +163,6 @@ func resourceGitlabGroupClusterRead(d *schema.ResourceData, meta interface{}) er
 
 	d.Set("kubernetes_api_url", cluster.PlatformKubernetes.APIURL)
 	d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
-	d.Set("kubernetes_namespace", cluster.PlatformKubernetes.Namespace)
 	d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
 
 	return nil
@@ -211,10 +202,6 @@ func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) 
 
 	if d.HasChange("kubernetes_ca_cert") {
 		pk.CaCert = gitlab.String(d.Get("kubernetes_ca_cert").(string))
-	}
-
-	if d.HasChange("kubernetes_namespace") {
-		pk.Namespace = gitlab.String(d.Get("kubernetes_namespace").(string))
 	}
 
 	if *pk != (gitlab.EditPlatformKubernetesOptions{}) {
