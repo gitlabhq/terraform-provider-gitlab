@@ -247,6 +247,7 @@ EOF
 
 resource "gitlab_group" "foo" {
   name = "foo-group-%d"
+  path = "foo-group-%d"
   description = "Terraform acceptance tests"
 
   # So that acceptance tests can be run in a gitlab organization
@@ -255,7 +256,7 @@ resource "gitlab_group" "foo" {
 }
 
 resource gitlab_group_cluster "foo" {
-  group                       = "${gitlab_group.foo.id}"
+  group                         = "${gitlab_group.foo.id}"
   name                          = "foo-cluster-%d"
   domain                        = "example-new.com"
   kubernetes_api_url            = "https://124.124.124"
@@ -264,7 +265,7 @@ resource gitlab_group_cluster "foo" {
   kubernetes_namespace          = "changed-namespace"
   kubernetes_authorization_type = "%s"
 }
-`, groupClusterFakeCert, rInt, rInt, authType)
+`, groupClusterFakeCert, rInt, rInt, rInt, authType)
 }
 
 var groupClusterFakeCert = `-----BEGIN CERTIFICATE-----
