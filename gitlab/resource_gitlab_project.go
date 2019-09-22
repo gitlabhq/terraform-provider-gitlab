@@ -50,6 +50,16 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 				return true
 			}
 
+			// Once the initialize_with_readme attribute is set to true, Gitlab creates
+			// a master branch and sets it as default. If the Gitlab project resource
+			// doesn't have default_branch attribute specified, Terraform will
+			// force "master" => "" on the next run.
+			if v, ok := d.GetOk("initialize_with_readme"); ok {
+				if new == "" && v == true {
+					return true
+				}
+			}
+
 			return old == new
 		},
 	},
@@ -161,6 +171,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 		Default:     false,
 	},
+	"initialize_with_readme": {
+		Type:     schema.TypeBool,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -258,6 +272,11 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	if v, ok := d.GetOk("tags"); ok {
 		options.TagList = stringSetToStringSlice(v.(*schema.Set))
 		setProperties = append(setProperties, "tags")
+	}
+
+	if v, ok := d.GetOk("initialize_with_readme"); ok {
+		options.InitializeWithReadme = gitlab.Bool(v.(bool))
+		setProperties = append(setProperties, "initialize_with_readme")
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)

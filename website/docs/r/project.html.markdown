@@ -73,6 +73,8 @@ The following arguments are supported:
 
 * `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 
+* `initialize_with_readme` - (Optional) Create master branch with first commit containing a README.md file.
+
 ## Attributes Reference
 
 The following additional attributes are exported:
