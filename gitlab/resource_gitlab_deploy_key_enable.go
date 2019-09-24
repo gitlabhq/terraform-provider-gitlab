@@ -104,8 +104,8 @@ func resourceGitlabDeployKeyEnableDelete(d *schema.ResourceData, meta interface{
 
 	response, err := client.DeployKeys.DeleteDeployKey(project, deployKeyID)
 
-	// HTTP 204 is success with no body
-	if response.StatusCode == 204 {
+	// HTTP 2XX is success including 204 with no body
+	if response.StatusCode/100 == 2 {
 		return nil
 	}
 	return err
