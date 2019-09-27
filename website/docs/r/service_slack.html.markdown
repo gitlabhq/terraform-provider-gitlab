@@ -76,6 +76,10 @@ The following arguments are supported:
 
 * `wiki_page_channel` - (Optional) The name of the channel to receive wiki page events notifications.
 
+* `deployment_events` - (Optional) Enable notifications for deployment events.
+
+* `deployment_channel` - (Optional) The name of the channel to receive deployment events notifications.
+
 ## Importing Slack service
 
 You can import a service_slack state using `terraform import <resource> <project_id>`:
