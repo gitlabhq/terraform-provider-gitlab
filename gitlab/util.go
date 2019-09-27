@@ -51,30 +51,26 @@ func validateValueFunc(values []string) schema.SchemaValidateFunc {
 	}
 }
 
-func validateDateFunc() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (we []string, errors []error) {
-		value := v.(string)
-		//add zero hours and let time figure out correctness
-		_, e := time.Parse(time.RFC3339, value+"T00:00:00Z")
-		if e != nil {
-			errors = append(errors, fmt.Errorf("%s is not valid for format YYYY-MM-DD", value))
-		}
-		return
+var validateDateFunc = func(v interface{}, k string) (we []string, errors []error) {
+	value := v.(string)
+	//add zero hours and let time figure out correctness
+	_, e := time.Parse(time.RFC3339, value+"T00:00:00Z")
+	if e != nil {
+		errors = append(errors, fmt.Errorf("%s is not valid for format YYYY-MM-DD", value))
 	}
+	return
 }
 
-func validateURLFunc() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (s []string, errors []error) {
-		value := v.(string)
-		url, err := url.Parse(value)
+var validateURLFunc = func(v interface{}, k string) (s []string, errors []error) {
+	value := v.(string)
+	url, err := url.Parse(value)
 
-		if err != nil || url.Host == "" || url.Scheme == "" {
-			errors = append(errors, fmt.Errorf("%s is not a valid URL", value))
-			return
-		}
-
+	if err != nil || url.Host == "" || url.Scheme == "" {
+		errors = append(errors, fmt.Errorf("%s is not a valid URL", value))
 		return
 	}
+
+	return
 }
 
 func stringToVisibilityLevel(s string) *gitlab.VisibilityValue {
@@ -118,38 +114,34 @@ func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
 	return &value
 }
 
-func StringIsGitlabVariableName() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (s []string, es []error) {
-		value, ok := v.(string)
-		if !ok {
-			es = append(es, fmt.Errorf("expected type of %s to be string", k))
-			return
-		}
-		if len(value) < 1 || len(value) > 255 {
-			es = append(es, fmt.Errorf("expected length of %s to be in the range (%d - %d), got %s", k, 1, 255, v))
-		}
-
-		match, _ := regexp.MatchString("[a-zA-Z0-9_]+", value)
-		if !match {
-			es = append(es, fmt.Errorf("%s is an invalid value for argument %s. Only A-Z, a-z, 0-9, and _ are allowed", value, k))
-		}
+var StringIsGitlabVariableName = func(v interface{}, k string) (s []string, es []error) {
+	value, ok := v.(string)
+	if !ok {
+		es = append(es, fmt.Errorf("expected type of %s to be string", k))
 		return
 	}
+	if len(value) < 1 || len(value) > 255 {
+		es = append(es, fmt.Errorf("expected length of %s to be in the range (%d - %d), got %s", k, 1, 255, v))
+	}
+
+	match, _ := regexp.MatchString("[a-zA-Z0-9_]+", value)
+	if !match {
+		es = append(es, fmt.Errorf("%s is an invalid value for argument %s. Only A-Z, a-z, 0-9, and _ are allowed", value, k))
+	}
+	return
 }
 
-func StringIsGitlabVariableType() schema.SchemaValidateFunc {
-	return func(v interface{}, k string) (s []string, es []error) {
-		value, ok := v.(string)
-		if !ok {
-			es = append(es, fmt.Errorf("expected type of %s to be string", k))
-			return
-		}
-		variableType := stringToVariableType(value)
-		if variableType == nil {
-			es = append(es, fmt.Errorf("expected variable_type to be \"env_var\" or \"file\""))
-		}
+var StringIsGitlabVariableType = func(v interface{}, k string) (s []string, es []error) {
+	value, ok := v.(string)
+	if !ok {
+		es = append(es, fmt.Errorf("expected type of %s to be string", k))
 		return
 	}
+	variableType := stringToVariableType(value)
+	if variableType == nil {
+		es = append(es, fmt.Errorf("expected variable_type to be \"env_var\" or \"file\""))
+	}
+	return
 }
 
 // return the pieces of id `a:b` as a, b

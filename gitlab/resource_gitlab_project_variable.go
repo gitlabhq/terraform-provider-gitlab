@@ -27,7 +27,7 @@ func resourceGitlabProjectVariable() *schema.Resource {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
-				ValidateFunc: StringIsGitlabVariableName(),
+				ValidateFunc: StringIsGitlabVariableName,
 			},
 			"value": {
 				Type:      schema.TypeString,
@@ -38,7 +38,7 @@ func resourceGitlabProjectVariable() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "env_var",
-				ValidateFunc: StringIsGitlabVariableType(),
+				ValidateFunc: StringIsGitlabVariableType,
 			},
 			"protected": {
 				Type:     schema.TypeBool,
