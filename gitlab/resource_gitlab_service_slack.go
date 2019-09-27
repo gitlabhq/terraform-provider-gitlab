@@ -126,6 +126,15 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"deployment_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"deployment_channel": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"job_events": {
 				Type:     schema.TypeBool,
 				Computed: true,
@@ -159,6 +168,8 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	d.Set("pipeline_channel", service.Properties.PipelineChannel)
 	d.Set("wiki_page_events", service.WikiPageEvents)
 	d.Set("wiki_page_channel", service.Properties.WikiPageChannel)
+	d.Set("deployment_events", service.DeploymentEvents)
+	d.Set("deployment_channel", service.Properties.DeploymentChannel)
 	d.Set("job_events", service.JobEvents)
 }
 
@@ -192,6 +203,8 @@ func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) 
 	opts.PipelineChannel = gitlab.String(d.Get("pipeline_channel").(string))
 	opts.WikiPageEvents = gitlab.Bool(d.Get("wiki_page_events").(bool))
 	opts.WikiPageChannel = gitlab.String(d.Get("wiki_page_channel").(string))
+	opts.DeploymentEvents = gitlab.Bool(d.Get("deployment_events").(bool))
+	opts.DeploymentChannel = gitlab.String(d.Get("deployment_channel").(string))
 
 	_, err := client.Services.SetSlackService(project, opts)
 	if err != nil {
