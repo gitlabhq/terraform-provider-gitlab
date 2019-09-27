@@ -213,6 +213,8 @@ resource "gitlab_service_slack" "slack" {
   wiki_page_channel            = "test"
   notify_only_broken_pipelines = true
   notify_only_default_branch   = true
+  deployment_events            = true
+  deployment_channel           = "test"
 }
 `, rInt)
 }
@@ -251,6 +253,8 @@ resource "gitlab_service_slack" "slack" {
   wiki_page_channel            = "test wiki_page_channel"
   notify_only_broken_pipelines = false
   notify_only_default_branch   = false
+  deployment_events            = false
+  deployment_channel           = "test deployment_channel"
 }
 `, rInt)
 }
