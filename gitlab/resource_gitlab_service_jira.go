@@ -43,7 +43,7 @@ func resourceGitlabServiceJira() *schema.Resource {
 			"url": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validateURLFunc(),
+				ValidateFunc: validateURLFunc,
 			},
 			"project_key": {
 				Type:     schema.TypeString,
