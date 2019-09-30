@@ -41,7 +41,7 @@ func resourceGitlabGroupMembership() *schema.Resource {
 			},
 			"expires_at": {
 				Type:         schema.TypeString, // Format YYYY-MM-DD
-				ValidateFunc: validateDateFunc(),
+				ValidateFunc: validateDateFunc,
 				Optional:     true,
 			},
 		},

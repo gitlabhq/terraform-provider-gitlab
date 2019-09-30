@@ -27,15 +27,31 @@ func resourceGitlabProjectVariable() *schema.Resource {
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
-				ValidateFunc: StringIsGitlabVariableName(),
+				ValidateFunc: StringIsGitlabVariableName,
 			},
 			"value": {
 				Type:      schema.TypeString,
 				Required:  true,
 				Sensitive: true,
 			},
+			"variable_type": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "env_var",
+				ValidateFunc: StringIsGitlabVariableType,
+			},
 			"protected": {
 				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"masked": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"environment_scope": {
+				Type:     schema.TypeString,
 				Optional: true,
 				Default:  false,
 			},
@@ -49,13 +65,18 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 	project := d.Get("project").(string)
 	key := d.Get("key").(string)
 	value := d.Get("value").(string)
+	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
+	masked := d.Get("masked").(bool)
+	environmentScope := d.Get("environment_scope").(string)
 
-	options := gitlab.CreateVariableOptions{
+	options := gitlab.CreateProjectVariableOptions{
 		Key:              &key,
 		Value:            &value,
+		VariableType:     variableType,
 		Protected:        &protected,
-		EnvironmentScope: nil,
+		Masked:           &masked,
+		EnvironmentScope: &environmentScope,
 	}
 	log.Printf("[DEBUG] create gitlab project variable %s/%s", project, key)
 
@@ -86,8 +107,14 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 
 	d.Set("key", v.Key)
 	d.Set("value", v.Value)
+	d.Set("variable_type", v.VariableType)
 	d.Set("project", project)
 	d.Set("protected", v.Protected)
+	d.Set("masked", v.Masked)
+	//For now I'm ignoring environment_scope when reading back data. (this can cause configuration drift so it is bad).
+	//However I'm unable to stop terraform from gratuitously updating this to values that are unacceptable by Gitlab)
+	//I don't have an enterprise license to properly test this either.
+	//d.Set("environment_scope", v.EnvironmentScope)
 	return nil
 }
 
@@ -97,12 +124,17 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 	project := d.Get("project").(string)
 	key := d.Get("key").(string)
 	value := d.Get("value").(string)
+	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
+	masked := d.Get("masked").(bool)
+	environmentScope := d.Get("environment_scope").(string)
 
-	options := &gitlab.UpdateVariableOptions{
+	options := &gitlab.UpdateProjectVariableOptions{
 		Value:            &value,
+		VariableType:     variableType,
 		Protected:        &protected,
-		EnvironmentScope: nil,
+		Masked:           &masked,
+		EnvironmentScope: &environmentScope,
 	}
 	log.Printf("[DEBUG] update gitlab project variable %s/%s", project, key)
 

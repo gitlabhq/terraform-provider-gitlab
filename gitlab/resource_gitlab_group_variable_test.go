@@ -141,6 +141,7 @@ resource "gitlab_group_variable" "foo" {
   group = "${gitlab_group.foo.id}"
   key = "key_%s"
   value = "value-%s"
+  variable_type = "file"
 }
 	`, rString, rString, rString, rString)
 }
