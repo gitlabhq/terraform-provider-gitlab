@@ -145,6 +145,7 @@ resource "gitlab_project_variable" "foo" {
   project = "${gitlab_project.foo.id}"
   key = "key_%s"
   value = "value-%s"
+  variable_type = "env_var"
 }
 	`, rString, rString, rString)
 }
