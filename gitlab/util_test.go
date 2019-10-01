@@ -91,10 +91,8 @@ func TestValidateURLFunc(t *testing.T) {
 		},
 	}
 
-	validationFunc := validateURLFunc()
-
 	for _, tc := range cases {
-		_, errors := validationFunc(tc.Value, "test_arg")
+		_, errors := validateURLFunc(tc.Value, "test_arg")
 
 		if len(errors) != tc.ErrCount {
 			t.Fatalf("Expected 1 validation error")
