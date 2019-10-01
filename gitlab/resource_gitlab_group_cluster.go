@@ -95,7 +95,7 @@ func resourceGitlabGroupClusterCreate(d *schema.ResourceData, meta interface{}) 
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 
-	pk := gitlab.AddPlatformKubernetesOptions{
+	pk := gitlab.AddGroupPlatformKubernetesOptions{
 		APIURL: gitlab.String(d.Get("kubernetes_api_url").(string)),
 		Token:  gitlab.String(d.Get("kubernetes_token").(string)),
 	}
@@ -108,7 +108,7 @@ func resourceGitlabGroupClusterCreate(d *schema.ResourceData, meta interface{}) 
 		pk.AuthorizationType = gitlab.String(v.(string))
 	}
 
-	options := &gitlab.AddClusterOptions{
+	options := &gitlab.AddGroupClusterOptions{
 		Name:               gitlab.String(d.Get("name").(string)),
 		Enabled:            gitlab.Bool(d.Get("enabled").(bool)),
 		Managed:            gitlab.Bool(d.Get("managed").(bool)),
@@ -176,7 +176,7 @@ func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) 
 		return err
 	}
 
-	options := &gitlab.EditClusterOptions{}
+	options := &gitlab.EditGroupClusterOptions{}
 
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
@@ -190,7 +190,7 @@ func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) 
 		options.EnvironmentScope = gitlab.String(d.Get("environment_scope").(string))
 	}
 
-	pk := &gitlab.EditPlatformKubernetesOptions{}
+	pk := &gitlab.EditGroupPlatformKubernetesOptions{}
 
 	if d.HasChange("kubernetes_api_url") {
 		pk.APIURL = gitlab.String(d.Get("kubernetes_api_url").(string))
@@ -204,11 +204,11 @@ func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) 
 		pk.CaCert = gitlab.String(d.Get("kubernetes_ca_cert").(string))
 	}
 
-	if *pk != (gitlab.EditPlatformKubernetesOptions{}) {
+	if *pk != (gitlab.EditGroupPlatformKubernetesOptions{}) {
 		options.PlatformKubernetes = pk
 	}
 
-	if *options != (gitlab.EditClusterOptions{}) {
+	if *options != (gitlab.EditGroupClusterOptions{}) {
 		log.Printf("[DEBUG] update gitlab group cluster %q/%d", group, clusterId)
 		_, _, err := client.GroupCluster.EditCluster(group, clusterId, options)
 		if err != nil {
