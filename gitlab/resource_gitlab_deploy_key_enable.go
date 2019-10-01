@@ -76,12 +76,7 @@ func resourceGitlabDeployKeyEnableRead(d *schema.ResourceData, meta interface{})
 	log.Printf("[DEBUG] read gitlab deploy key %s/%d", project, deployKeyID)
 
 	deployKey, response, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
-
-	// HTTP 404 indicates that the key is not enabled on the project, maybe it was removed through the UI
-	if response.StatusCode == 404 {
-		d.SetId("")
-		return nil
-	} else if err != nil {
+	if err != nil {
 		return err
 	}
 
