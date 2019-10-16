@@ -3,7 +3,7 @@ test "$MAKE_TARGET" == "testacc" || { echo "not starting gitlab!"; exit 0; }
 echo "Starting gitlab container..."
 if [[ -n $GITLAB_LICENSE_FILE ]]
 then
-    extra="-e GITLAB_LICENSE_FILE=/license/$GITLAB_LICENSE_FILE"
+    extra="-v $PWD/license:/license -e GITLAB_LICENSE_FILE=/license/$GITLAB_LICENSE_FILE"
     img=gitlab/gitlab-ee
 else
     img=gitlab/gitlab-ce
