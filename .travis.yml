@@ -5,7 +5,10 @@ matrix:
   - name: unit tests
     env: MAKE_TARGET=test GOFLAGS=-mod=vendor GO111MODULE=on
     go: "1.11.x"
-  - name: acceptance tests
+  - name: acceptance tests EE
+    env: MAKE_TARGET=testacc GITLAB_LICENSE_FILE=JulienPivotto.gitlab-license GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
+    go: "1.11.x"
+  - name: acceptance tests CE
     env: MAKE_TARGET=testacc GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
     go: "1.11.x"
   - name: govet tests
@@ -27,6 +30,9 @@ matrix:
   - name: unit tests (go 1.12)
     env: MAKE_TARGET=test GOFLAGS=-mod=vendor GO111MODULE=on
     go: "1.12.x"
+  - name: acceptance tests EE
+    env: MAKE_TARGET=testacc GITLAB_LICENSE_FILE=JulienPivotto.gitlab-license GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
+    go: "1.11.x"
 
 install:
 # This script is used by the Travis build to install a cookie for
@@ -34,6 +40,7 @@ install:
 # packages that live there.
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
+- bash scripts/license.sh
 - bash scripts/start-gitlab.sh
 
 script:

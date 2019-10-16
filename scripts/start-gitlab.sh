@@ -1,10 +1,19 @@
 #!/bin/bash -e
 test "$MAKE_TARGET" == "testacc" || { echo "not starting gitlab!"; exit 0; }
+test -z "$GITLAB_LICENSE_FILE" || { echo "not starting gitlab CE!"; exit 0; }
 echo "Starting gitlab container..."
+if [[ -n $GITLAB_LICENSE_FILE ]]
+then
+    extra="-e GITLAB_LICENSE_FILE=/license/$GITLAB_LICENSE_FILE"
+    img=gitlab/gitlab-ee
+else
+    img=gitlab/gitlab-ce
+fi
 docker run -d --rm --name gitlab \
   -e GITLAB_ROOT_PASSWORD=adminadmin \
+  $extra \
   -p 127.0.0.1:8080:80 \
-  gitlab/gitlab-ce
+  $img
 
 echo -n "Waiting for gitlab to be ready "
 i=1
