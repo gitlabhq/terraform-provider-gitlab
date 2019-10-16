@@ -1,6 +1,5 @@
 #!/bin/bash -e
 test "$MAKE_TARGET" == "testacc" || { echo "not starting gitlab!"; exit 0; }
-test -z "$GITLAB_LICENSE_FILE" || { echo "not starting gitlab CE!"; exit 0; }
 echo "Starting gitlab container..."
 if [[ -n $GITLAB_LICENSE_FILE ]]
 then
