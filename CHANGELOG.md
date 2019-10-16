@@ -1,4 +1,20 @@
 ## 2.2.1 (Unreleased)
+
+FEATURES:
+* **New Resource:** `gitlab_project_share_group` ([#167](https://github.com/terraform-providers/terraform-provider-gitlab/pull/167))
+
+ENHANCEMENTS:
+* Add support for more variable options ([#169](https://github.com/terraform-providers/terraform-provider-gitlab/issues/169))
+* Documentation improvements ([#168](https://github.com/terraform-providers/terraform-provider-gitlab/issues/168), [#187](https://github.com/terraform-providers/terraform-provider-gitlab/issues/187), [#171](https://github.com/terraform-providers/terraform-provider-gitlab/issues/171))
+
+BUGFIXES:
+* Fix tag protection URL
+  ([#156](https://github.com/terraform-providers/terraform-provider-gitlab/issues/156))
+* Properly manage the default branch in a git repo
+  ([#158](https://github.com/terraform-providers/terraform-provider-gitlab/issues/158))
+* Resolve triggers pagination issue by calling `GetPipelineTrigger`
+  ([#173](https://github.com/terraform-providers/terraform-provider-gitlab/issues/173))
+
 ## 2.2.0 (June 12, 2019)
 
 FEATURES:
