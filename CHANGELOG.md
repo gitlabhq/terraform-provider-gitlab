@@ -1,9 +1,15 @@
-## 2.2.1 (Unreleased)
+## 2.3.0 (Unreleased)
+
+*We would like to thank Gitlab, which has provided us a EE license. This project
+is now tested against Gitlab CE and Gitlab EE.*
 
 FEATURES:
+* **New Resource:** `gitlab_project_push_rules` ([#163](https://github.com/terraform-providers/terraform-provider-gitlab/pull/163))
+* **New Resource:** `gitlab_deploy_key_enable` ([#176](https://github.com/terraform-providers/terraform-provider-gitlab/pull/176))
 * **New Resource:** `gitlab_project_share_group` ([#167](https://github.com/terraform-providers/terraform-provider-gitlab/pull/167))
 
 ENHANCEMENTS:
+* Add `initialize_with_readme` to `gitlab_project` ([#179](https://github.com/terraform-providers/terraform-provider-gitlab/issues/179))
 * Add support for more variable options ([#169](https://github.com/terraform-providers/terraform-provider-gitlab/issues/169))
 * Documentation improvements ([#168](https://github.com/terraform-providers/terraform-provider-gitlab/issues/168), [#187](https://github.com/terraform-providers/terraform-provider-gitlab/issues/187), [#171](https://github.com/terraform-providers/terraform-provider-gitlab/issues/171))
 
