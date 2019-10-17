@@ -11,6 +11,10 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+type testAccGitlabProjectExpectedAttributes struct {
+	DefaultBranch string
+}
+
 func TestAccGitlabProject_basic(t *testing.T) {
 	var received, defaults, defaultsMasterBranch gitlab.Project
 	rInt := acctest.RandInt()
@@ -161,6 +165,28 @@ func TestAccGitlabProject_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
 					testAccCheckAggregateGitlabProject(&defaultsMasterBranch, &received),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigInitializeWithReadme(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectInitializeWithReadme(&project, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "master",
+					}),
 				),
 			},
 		},
@@ -336,6 +362,16 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 		})
 	}
 	return resource.ComposeAggregateTestCheckFunc(checks...)
+}
+
+func testAccCheckGitlabProjectInitializeWithReadme(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if project.DefaultBranch != want.DefaultBranch {
+			return fmt.Errorf("got description %q; want %q", project.DefaultBranch, want.DefaultBranch)
+		}
+
+		return nil
+	}
 }
 
 func testAccCheckGitLabProjectGroups(expected, received *gitlab.Project) resource.TestCheckFunc {
@@ -523,4 +559,15 @@ resource "gitlab_group" "foo2" {
   visibility_level = "public"
 }
 	`, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigInitializeWithReadme(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  initialize_with_readme = true
+}
+	`, rInt, rInt)
 }
