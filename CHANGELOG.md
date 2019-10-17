@@ -1,4 +1,8 @@
 ## 2.3.1 (Unreleased)
+
+FEATURES:
+* **New Resource:** `gitlab_group_label` ([#186](https://github.com/terraform-providers/terraform-provider-gitlab/pull/186))
+
 ## 2.3.0 (October 17, 2019)
 
 *We would like to thank Gitlab, which has provided us a EE license. This project
