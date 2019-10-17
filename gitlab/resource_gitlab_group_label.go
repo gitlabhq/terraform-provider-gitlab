@@ -83,7 +83,7 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 		}
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("label %s no longer exists in group %s", labelName, group))
+		return errors.New(fmt.Sprintf("label %s does not exist or the user does not have permissions to see it", labelName))
 	}
 
 	return nil
