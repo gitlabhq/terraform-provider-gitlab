@@ -33,22 +33,22 @@ func isRunningInCE() (bool, error) {
 	return !isEE, err
 }
 
-func TestAccGitlabProjectPushRules_basic(t *testing.T) {
-	var pushRules gitlab.ProjectPushRules
+func TestAccGitlabProjectPushRule_basic(t *testing.T) {
+	var pushRules gitlab.ProjectPushRule
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectPushRulesDestroy,
+		CheckDestroy: testAccCheckGitlabProjectPushRuleDestroy,
 		Steps: []resource.TestStep{
 			// Create project and push rules with basic options
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectPushRulesConfig(rInt),
+				Config:   testAccGitlabProjectPushRuleConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
-					testAccCheckGitlabProjectPushRulesAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
+					testAccCheckGitlabProjectPushRuleExists("gitlab_project_push_rule.foo", &pushRules),
+					testAccCheckGitlabProjectPushRuleAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
 						CommitMessageRegex: "^(foo|bar).*",
 						BranchNameRegex:    "^(foo|bar).*",
 						AuthorEmailRegex:   "^(foo|bar).*",
@@ -63,10 +63,10 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 			// Update the project push rules
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectPushRulesUpdate(rInt),
+				Config:   testAccGitlabProjectPushRuleUpdate(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
-					testAccCheckGitlabProjectPushRulesAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
+					testAccCheckGitlabProjectPushRuleExists("gitlab_project_push_rule.foo", &pushRules),
+					testAccCheckGitlabProjectPushRuleAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
 						CommitMessageRegex: "^(fu|baz).*",
 						BranchNameRegex:    "^(fu|baz).*",
 						AuthorEmailRegex:   "^(fu|baz).*",
@@ -81,10 +81,10 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 			// Update the project push rules to original config
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectPushRulesConfig(rInt),
+				Config:   testAccGitlabProjectPushRuleConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectPushRulesExists("gitlab_project_push_rules.foo", &pushRules),
-					testAccCheckGitlabProjectPushRulesAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
+					testAccCheckGitlabProjectPushRuleExists("gitlab_project_push_rule.foo", &pushRules),
+					testAccCheckGitlabProjectPushRuleAttributes(&pushRules, &testAccGitlabProjectPushRulesExpectedAttributes{
 						CommitMessageRegex: "^(foo|bar).*",
 						BranchNameRegex:    "^(foo|bar).*",
 						AuthorEmailRegex:   "^(foo|bar).*",
@@ -100,7 +100,7 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabProjectPushRulesExists(n string, pushRules *gitlab.ProjectPushRules) resource.TestCheckFunc {
+func testAccCheckGitlabProjectPushRuleExists(n string, pushRules *gitlab.ProjectPushRules) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -112,7 +112,7 @@ func testAccCheckGitlabProjectPushRulesExists(n string, pushRules *gitlab.Projec
 			return fmt.Errorf("No project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
-		gotPushRules, _, err := conn.Projects.GetProjectPushRules(repoName)
+		gotPushRules, _, err := conn.Projects.GetProjectPushRule(repoName)
 		if err != nil {
 			return err
 		}
@@ -121,7 +121,7 @@ func testAccCheckGitlabProjectPushRulesExists(n string, pushRules *gitlab.Projec
 	}
 }
 
-type testAccGitlabProjectPushRulesExpectedAttributes struct {
+type testAccGitlabProjectPushRuleExpectedAttributes struct {
 	CommitMessageRegex string
 	BranchNameRegex    string
 	AuthorEmailRegex   string
@@ -132,7 +132,7 @@ type testAccGitlabProjectPushRulesExpectedAttributes struct {
 	MaxFileSize        int
 }
 
-func testAccCheckGitlabProjectPushRulesAttributes(pushRules *gitlab.ProjectPushRules, want *testAccGitlabProjectPushRulesExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabProjectPushRuleAttributes(pushRules *gitlab.ProjectPushRules, want *testAccGitlabProjectPushRulesExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if pushRules.CommitMessageRegex != want.CommitMessageRegex {
 			return fmt.Errorf("got commit_message_regex %s; want %s", pushRules.CommitMessageRegex, want.CommitMessageRegex)
@@ -162,7 +162,7 @@ func testAccCheckGitlabProjectPushRulesAttributes(pushRules *gitlab.ProjectPushR
 	}
 }
 
-func testAccCheckGitlabProjectPushRulesDestroy(s *terraform.State) error {
+func testAccCheckGitlabProjectPushRuleDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
@@ -184,7 +184,7 @@ func testAccCheckGitlabProjectPushRulesDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabProjectPushRulesConfig(rInt int) string {
+func testAccGitlabProjectPushRuleConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
@@ -192,7 +192,7 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_project_push_rules" "foo" {
+resource "gitlab_project_push_rule" "foo" {
   project = "${gitlab_project.foo.id}"
   commit_message_regex = "^(foo|bar).*"
   branch_name_regex = "^(foo|bar).*"
@@ -206,7 +206,7 @@ resource "gitlab_project_push_rules" "foo" {
 `, rInt)
 }
 
-func testAccGitlabProjectPushRulesUpdate(rInt int) string {
+func testAccGitlabProjectPushRuleUpdate(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
@@ -214,7 +214,7 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_project_push_rules" "foo" {
+resource "gitlab_project_push_rule" "foo" {
   project = "${gitlab_project.foo.id}"
   commit_message_regex = "^(fu|baz).*"
   branch_name_regex = "^(fu|baz).*"

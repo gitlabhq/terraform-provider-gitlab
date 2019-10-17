@@ -8,12 +8,12 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectPushRules() *schema.Resource {
+func resourceGitlabProjectPushRule() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectPushRulesCreate,
-		Read:   resourceGitlabProjectPushRulesRead,
-		Update: resourceGitlabProjectPushRulesUpdate,
-		Delete: resourceGitlabProjectPushRulesDelete,
+		Create: resourceGitlabProjectPushRuleCreate,
+		Read:   resourceGitlabProjectPushRuleRead,
+		Update: resourceGitlabProjectPushRuleUpdate,
+		Delete: resourceGitlabProjectPushRuleDelete,
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -60,7 +60,7 @@ func resourceGitlabProjectPushRules() *schema.Resource {
 		},
 	}
 }
-func resourceGitlabProjectPushRulesUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectPushRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.EditProjectPushRuleOptions{
@@ -78,10 +78,10 @@ func resourceGitlabProjectPushRulesUpdate(d *schema.ResourceData, meta interface
 	if err != nil {
 		return err
 	}
-	return resourceGitlabProjectPushRulesRead(d, meta)
+	return resourceGitlabProjectPushRuleRead(d, meta)
 }
 
-func resourceGitlabProjectPushRulesCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectPushRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.AddProjectPushRuleOptions{
@@ -101,14 +101,14 @@ func resourceGitlabProjectPushRulesCreate(d *schema.ResourceData, meta interface
 		return err
 	}
 	d.SetId(fmt.Sprintf("%d", pushRules.ID))
-	return resourceGitlabProjectPushRulesRead(d, meta)
+	return resourceGitlabProjectPushRuleRead(d, meta)
 }
 
-func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectPushRuleRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	log.Printf("[DEBUG] read gitlab project %s", project)
-	pushRules, _, err := client.Projects.GetProjectPushRules(project)
+	pushRules, _, err := client.Projects.GetProjectPushRule(project)
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceGitlabProjectPushRulesDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectPushRuleDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	log.Printf("[DEBUG] Delete gitlab project push rules %s", project)

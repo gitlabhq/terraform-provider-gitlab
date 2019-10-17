@@ -1,6 +1,6 @@
 ---
 layout: "gitlab"
-page_title: "GitLab: gitlab_project_push_rules"
+page_title: "GitLab: gitlab_project_push_rule"
 sidebar_current: "docs-gitlab-resource-project-push-rules"
 description: |-
   Creates and manages push rules for GitLab projects
@@ -15,7 +15,7 @@ documentation](https://docs.gitlab.com/ce/push_rules/push_rules.html#push-rules)
 ## Example Usage
 
 ```hcl
-resource "gitlab_project_push_rules" "example" {
+resource "gitlab_project_push_rule" "example" {
   commit_message_regex = "^(feat|feature|fix|chore|docs|BREAKING_CHANGE):.*"
   prevent_secrets = true
   branch_name_regex = "^PROJ-\d+-.*"
