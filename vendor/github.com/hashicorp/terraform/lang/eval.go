@@ -5,9 +5,9 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/hashicorp/hcl2/ext/dynblock"
-	"github.com/hashicorp/hcl2/hcl"
-	"github.com/hashicorp/hcl2/hcldec"
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/ext/dynblock"
+	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/terraform/addrs"
 	"github.com/hashicorp/terraform/configs/configschema"
 	"github.com/hashicorp/terraform/lang/blocktoattr"
@@ -203,6 +203,7 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 	pathAttrs := map[string]cty.Value{}
 	terraformAttrs := map[string]cty.Value{}
 	countAttrs := map[string]cty.Value{}
+	forEachAttrs := map[string]cty.Value{}
 	var self cty.Value
 
 	for _, ref := range refs {
@@ -334,6 +335,14 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 				self = val
 			}
 
+		case addrs.ForEachAttr:
+			val, valDiags := normalizeRefValue(s.Data.GetForEachAttr(subj, rng))
+			diags = diags.Append(valDiags)
+			forEachAttrs[subj.Name] = val
+			if isSelf {
+				self = val
+			}
+
 		default:
 			// Should never happen
 			panic(fmt.Errorf("Scope.buildEvalContext cannot handle address type %T", rawSubj))
@@ -350,6 +359,7 @@ func (s *Scope) evalContext(refs []*addrs.Reference, selfAddr addrs.Referenceabl
 	vals["path"] = cty.ObjectVal(pathAttrs)
 	vals["terraform"] = cty.ObjectVal(terraformAttrs)
 	vals["count"] = cty.ObjectVal(countAttrs)
+	vals["each"] = cty.ObjectVal(forEachAttrs)
 	if self != cty.NilVal {
 		vals["self"] = self
 	}

@@ -5,6 +5,11 @@ if [[ -n $GITLAB_LICENSE_FILE ]]
 then
     extra="-v $PWD/license:/license -e GITLAB_LICENSE_FILE=/license/$GITLAB_LICENSE_FILE"
     img=gitlab/gitlab-ee
+    if [[ ! -f license/$GITLAB_LICENSE_FILE ]]
+    then
+        echo No license
+        exit 1
+    fi
 else
     img=gitlab/gitlab-ce
 fi
