@@ -1,4 +1,4 @@
-## 2.3.0 (Unreleased)
+## 2.3.0 (October 17, 2019)
 
 *We would like to thank Gitlab, which has provided us a EE license. This project
 is now tested against Gitlab CE and Gitlab EE.*
