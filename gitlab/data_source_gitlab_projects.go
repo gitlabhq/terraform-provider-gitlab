@@ -50,7 +50,7 @@ func dataSourceGitlabProjects() *schema.Resource {
 func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	log.Printf("[INFO] Reading Gitlab projects")
+	log.Printf("[DEBUG] Reading Gitlab projects")
 
 	listProjectsOptions, id, err := expandGitlabProjectsOptions(d)
 	if err != nil {

@@ -54,7 +54,7 @@ func dataSourceGitlabGroupProjects() *schema.Resource {
 func dataSourceGitlabGroupProjectsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	log.Printf("[INFO] Reading Gitlab projects")
+	log.Printf("[DEBUG] Reading Gitlab projects in group")
 
 	listGroupProjectsOptions, id, err := expandGitlabGroupProjectsOptions(d)
 	if err != nil {
