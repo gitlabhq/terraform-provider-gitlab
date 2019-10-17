@@ -1,6 +1,8 @@
 package gitlab
 
 import (
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
@@ -81,8 +83,7 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 		}
 	}
 	if !found {
-		log.Printf("[WARN] removing label %s from state because it no longer exists in gitlab", labelName)
-		d.SetId("")
+		return errors.New(fmt.Sprintf("label %s no longer exists in group %s", labelName, group))
 	}
 
 	return nil
