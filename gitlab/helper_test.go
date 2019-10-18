@@ -3,7 +3,7 @@ package gitlab
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 // testAccCompareGitLabAttribute compares an attribute in two ResourceData's for
