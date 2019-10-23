@@ -12,13 +12,13 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-var gitlabProjectApprovalRuleSkipAttributes = []string{}
+var gitlabProjectApprovalRuleSkipAttributes = []string{"project"}
 
 type checkGitlabProjectApprovalRule struct {
 	SkippedAttributes []string
 }
 
-func (c *checkGitlabProjectApprovalRule) Aggregate(name string, expected *gitlab.ProjectApprovalRule) resource.TestCheckFunc {
+func (c *checkGitlabProjectApprovalRule) Aggregate(name string, expected gitlab.ProjectApprovalRule) resource.TestCheckFunc {
 	var received *gitlab.ProjectApprovalRule
 
 	checks := []resource.TestCheckFunc{
@@ -44,10 +44,10 @@ func (c *checkGitlabProjectApprovalRule) Aggregate(name string, expected *gitlab
 				} else {
 					return err
 				}
-
 			}
-			resourceGitLabProjectApprovalRuleSetToState(expectedData, expected)
-			resourceGitLabProjectApprovalRuleSetToState(receivedData, received)
+
+			resourceGitLabProjectApprovalRuleSetToState(expectedData, &expected, "0")
+			resourceGitLabProjectApprovalRuleSetToState(receivedData, received, "0")
 
 			return testAccCompareGitLabAttribute(attribute, expectedData, receivedData)
 		})
@@ -142,7 +142,6 @@ type gitlabProjectApprovalRuleFixtures struct {
 
 func (g *gitlabProjectApprovalRuleFixtures) newRule() gitlab.ProjectApprovalRule {
 	user1 := &gitlab.BasicUser{
-		ID:        0,
 		Name:      fmt.Sprintf("Foo %d", g.RandomInt),
 		Username:  "foo",
 		State:     "active",
@@ -156,7 +155,6 @@ func (g *gitlabProjectApprovalRuleFixtures) newRule() gitlab.ProjectApprovalRule
 	user2.WebURL = "http://localhost/foo2"
 
 	group1 := &gitlab.Group{
-		ID:                   0,
 		Name:                 fmt.Sprintf("foo-name-%d", g.RandomInt),
 		Path:                 fmt.Sprintf("foo-path-%d", g.RandomInt),
 		Description:          "Terraform acceptance tests - Approval Rule",
@@ -170,7 +168,6 @@ func (g *gitlabProjectApprovalRuleFixtures) newRule() gitlab.ProjectApprovalRule
 	}
 
 	return gitlab.ProjectApprovalRule{
-		ID:                   0,
 		Name:                 g.getName(""),
 		RuleType:             "regular",
 		ApprovalsRequired:    3,
@@ -183,6 +180,10 @@ func (g *gitlabProjectApprovalRuleFixtures) newRule() gitlab.ProjectApprovalRule
 
 func (g *gitlabProjectApprovalRuleFixtures) getName(id string) string {
 	return fmt.Sprintf("foo-%s-%d", id, g.RandomInt)
+}
+
+func (g *gitlabProjectApprovalRuleFixtures) getResourceName() string {
+	return fmt.Sprintf("%s.foo", g.ResourceName)
 }
 
 func (g *gitlabProjectApprovalRuleFixtures) resourceConfig() string {
@@ -260,8 +261,6 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	}
 	testChecks := checkGitlabProjectApprovalRule{gitlabProjectApprovalRuleSkipAttributes}
 
-	resourceName := fmt.Sprintf("%s.foo", testConfig.ResourceName)
-
 	defaultRule := testConfig.newRule()
 	updateExpected := testConfig.newRule()
 	updateExpected.Name = testConfig.getName("test")
@@ -272,26 +271,17 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 		PreCheck:     func() { testAccPreCheck(t) },
 		CheckDestroy: testChecks.Destroy,
 		Steps: []resource.TestStep{
-			// Create Rule
-			resource.TestStep{
+			{ // Create Rule
 				Config: testConfig.createConfig("", 3),
-				Check: resource.ComposeTestCheckFunc(
-					testChecks.Aggregate(resourceName, &defaultRule),
-				),
+				Check:  testChecks.Aggregate(testConfig.getResourceName(), defaultRule),
 			},
-			// Update Rule
-			resource.TestStep{
+			{ // Update Rule
 				Config: testConfig.createConfig("test", 1),
-				Check: resource.ComposeTestCheckFunc(
-					testChecks.Aggregate(resourceName, &updateExpected),
-				),
+				Check:  testChecks.Aggregate(testConfig.getResourceName(), updateExpected),
 			},
-			// Reset Rule
-			resource.TestStep{
+			{ // Reset Rule
 				Config: testConfig.createConfig("", 3),
-				Check: resource.ComposeTestCheckFunc(
-					testChecks.Aggregate(resourceName, &defaultRule),
-				),
+				Check:  testChecks.Aggregate(testConfig.getResourceName(), defaultRule),
 			},
 		},
 	})
@@ -304,8 +294,6 @@ func TestAccGitLabProjectApprovalRule_willError(t *testing.T) {
 	}
 	testChecks := checkGitlabProjectApprovalRule{gitlabProjectApprovalRuleSkipAttributes}
 
-	resourceName := fmt.Sprintf("%s.foo", testConfig.ResourceName)
-
 	defaultRule := testConfig.newRule()
 
 	willError := defaultRule
@@ -316,27 +304,18 @@ func TestAccGitLabProjectApprovalRule_willError(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
-			// Create rule
-			resource.TestStep{
+			{ // Create rule
 				Config: testConfig.createConfig("", 3),
-				Check: resource.ComposeTestCheckFunc(
-					testChecks.Aggregate(resourceName, &defaultRule),
-				),
+				Check:  testChecks.Aggregate(testConfig.getResourceName(), defaultRule),
 			},
-			// Verify that name is set by passing bad values.
-			resource.TestStep{
+			{ // Verify that name is set by passing bad values.
 				Config:      testConfig.createConfig("notthename", 3),
+				Check:       testChecks.Aggregate(testConfig.getResourceName(), willError),
 				ExpectError: regexp.MustCompile(`\sname\sexpected\s.+thisisnotthename.+\sreceived`),
-				Check: resource.ComposeTestCheckFunc(
-					testChecks.Aggregate(resourceName, &willError),
-				),
 			},
-			// Reset
-			resource.TestStep{
+			{ // Reset
 				Config: testConfig.createConfig("", 3),
-				Check: resource.ComposeTestCheckFunc(
-					testChecks.Aggregate(resourceName, &defaultRule),
-				),
+				Check:  testChecks.Aggregate(testConfig.getResourceName(), defaultRule),
 			},
 		},
 	})
@@ -353,11 +332,11 @@ func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{ // Create Rule
 				Config: testConfig.createConfig("", 3),
 			},
-			resource.TestStep{
-				ResourceName:      fmt.Sprintf("%s.foo", testConfig.ResourceName),
+			{ // Verify Import
+				ResourceName:      testConfig.getResourceName(),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},

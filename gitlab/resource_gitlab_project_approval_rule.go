@@ -2,6 +2,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
@@ -27,25 +28,22 @@ var resourceGitLabProjectApprovalRuleSchema = map[string]*schema.Schema{
 		Required: true,
 	},
 	"user_ids": {
-		Type:     schema.TypeList,
+		Type:     schema.TypeSet,
 		Optional: true,
-		Elem: &schema.Schema{
-			Type: schema.TypeInt,
-		},
+		Elem:     &schema.Schema{Type: schema.TypeInt},
+		Set:      schema.HashInt,
 	},
 	"group_ids": {
-		Type:     schema.TypeList,
+		Type:     schema.TypeSet,
 		Optional: true,
-		Elem: &schema.Schema{
-			Type: schema.TypeInt,
-		},
+		Elem:     &schema.Schema{Type: schema.TypeInt},
+		Set:      schema.HashInt,
 	},
 }
 
 func resourceGitlabProjectApprovalRule() *schema.Resource {
 	return &schema.Resource{
 		Schema: resourceGitLabProjectApprovalRuleSchema,
-		Exists: resourceGitlabProjectApprovalRuleExists,
 		Create: resourceGitlabProjectApprovalRuleCreate,
 		Read:   resourceGitlabProjectApprovalRuleRead,
 		Update: resourceGitlabProjectApprovalRuleUpdate,
@@ -56,73 +54,44 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 	}
 }
 
-func resourceGitLabProjectApprovalRuleSetToState(d *schema.ResourceData, rule *gitlab.ProjectApprovalRule) {
+func resourceGitLabProjectApprovalRuleSetToState(d *schema.ResourceData, rule *gitlab.ProjectApprovalRule, project string) error {
+	d.SetId(buildTwoPartID(gitlab.String(project), gitlab.String(strconv.Itoa(rule.ID))))
+	d.Set("project", project)
 	d.Set("name", rule.Name)
 	d.Set("approvals_required", rule.ApprovalsRequired)
 
-	userIDs := []int{}
-	for _, uid := range rule.Users {
-		userIDs = append(userIDs, uid.ID)
-	}
-	d.Set("user_ids", userIDs)
+	// if err = d.Set("user_ids", rule.Users); err != nil {
+	// if err := d.Set("user_ids", flattenApprovalRuleUserIDs(rule.Users)); err != nil {
+	// 	return err
+	// }
+	d.Set("user_ids", flattenApprovalRuleUserIDs(rule.Users))
 
-	groupIDs := []int{}
-	for _, gid := range rule.Groups {
-		groupIDs = append(groupIDs, gid.ID)
-	}
-	d.Set("group_ids", groupIDs)
-}
+	// if err = d.Set("group_ids", rule.Groups); err != nil {
+	// if err := d.Set("user_ids", flattenApprovalRuleUserIDs(rule.Users)); err != nil {
+	// 	return err
+	// }
+	d.Set("group_ids", flattenApprovalRuleGroupIDs(rule.Groups))
 
-func resourceGitlabProjectApprovalRuleExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	var err error
-
-	project, ruleID, err := parseTwoPartID(d.Id())
-	if err != nil {
-		return false, err
-	}
-
-	if rule, err := getApprovalRuleByID(meta, project, ruleID); err == nil {
-		if rule != nil {
-			return true, err
-		}
-	}
-
-	return false, err
+	return nil
 }
 
 func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gitlab.Client)
-
-	project := d.Get("project").(string)
-	name := d.Get("name").(string)
-	approvalsRequired := d.Get("approvals_required").(int)
-
-	userIDs := []int{}
-	if uids, ok := d.GetOk("user_ids"); ok {
-		for _, uid := range uids.([]interface{}) {
-			userIDs = append(userIDs, uid.(int))
-		}
-	}
-
-	groupIDs := []int{}
-	if gids, ok := d.GetOk("group_ids"); ok {
-		for _, gid := range gids.([]interface{}) {
-			groupIDs = append(groupIDs, gid.(int))
-		}
-	}
-
-	log.Printf("[DEBUG] create gitlab project-level rule %s", name)
-	options := gitlab.CreateProjectLevelRuleOptions{
-		Name:              &name,
-		ApprovalsRequired: &approvalsRequired,
-		UserIDs:           userIDs,
-		GroupIDs:          groupIDs,
-	}
-
 	var err error
+
+	options := gitlab.CreateProjectLevelRuleOptions{
+		Name:              gitlab.String(d.Get("name").(string)),
+		ApprovalsRequired: gitlab.Int(d.Get("approvals_required").(int)),
+		UserIDs:           expandApproverIds(d.GetOk("user_ids")),
+		GroupIDs:          expandApproverIds(d.GetOk("group_ids")),
+	}
+	project := d.Get("project").(string)
+
+	log.Printf("[DEBUG] Project %s create gitlab project-level rule %+v", project, options)
+
+	client := meta.(*gitlab.Client)
 	if rule, _, err := client.Projects.CreateProjectApprovalRule(project, &options); err == nil {
-		ruleID := strconv.Itoa(rule.ID)
-		d.SetId(buildTwoPartID(&project, &ruleID))
+		log.Printf("[DEBUG] Project %s rule created %d", project, rule.ID)
+		d.SetId(buildTwoPartID(gitlab.String(project), gitlab.String(strconv.Itoa(rule.ID))))
 
 		return resourceGitlabProjectApprovalRuleRead(d, meta)
 	}
@@ -133,54 +102,40 @@ func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interf
 func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interface{}) error {
 	var err error
 
-	if project, ruleID, err := parseTwoPartID(d.Id()); err == nil {
-		log.Printf("[DEBUG] read gitlab project-level rule %s/%s", project, ruleID)
+	log.Printf("[DEBUG] read gitlab project-level rule %s", d.Id())
 
-		if rule, err := getApprovalRuleByID(meta, project, ruleID); err == nil {
-			resourceGitLabProjectApprovalRuleSetToState(d, rule)
-		}
+	rule, err := getApprovalRuleByID(meta, d.Id())
+	if err != nil {
+		return err
 	}
 
-	return err
+	project, _, err := parseTwoPartID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	return resourceGitLabProjectApprovalRuleSetToState(d, rule, project)
 }
 
 func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interface{}) error {
 	var err error
 
 	if project, ruleID, err := parseTwoPartID(d.Id()); err == nil {
-		log.Printf("[DEBUG] update gitlab project-level approval rule %s/%s", project, ruleID)
-
-		name := d.Get("name").(string)
-		approvalsRequired := d.Get("approvals_required").(int)
-
-		userIDs := []int{}
-		if uids, ok := d.GetOk("user_ids"); ok {
-			for _, uid := range uids.([]interface{}) {
-				userIDs = append(userIDs, uid.(int))
-			}
-		}
-
-		groupIDs := []int{}
-		if gids, ok := d.GetOk("group_ids"); ok {
-			for _, gid := range gids.([]interface{}) {
-				groupIDs = append(groupIDs, gid.(int))
-			}
-		}
-
 		options := gitlab.UpdateProjectLevelRuleOptions{
-			Name:              &name,
-			ApprovalsRequired: &approvalsRequired,
-			UserIDs:           userIDs,
-			GroupIDs:          groupIDs,
+			Name:              gitlab.String(d.Get("name").(string)),
+			ApprovalsRequired: gitlab.Int(d.Get("approvals_required").(int)),
+			UserIDs:           expandApproverIds(d.GetOk("user_ids")),
+			GroupIDs:          expandApproverIds(d.GetOk("group_ids")),
 		}
-
-		client := meta.(*gitlab.Client)
 
 		ruleIDInt, err := strconv.Atoi(ruleID)
 		if err != nil {
 			return err
 		}
 
+		log.Printf("[DEBUG] Project %s update gitlab project-level approval rule %s", project, *options.Name)
+
+		client := meta.(*gitlab.Client)
 		if _, _, err = client.Projects.UpdateProjectApprovalRule(project, ruleIDInt, &options); err == nil {
 			return resourceGitlabProjectVariableRead(d, meta)
 		}
@@ -193,41 +148,82 @@ func resourceGitlabProjectApprovalRuleDelete(d *schema.ResourceData, meta interf
 	var err error
 
 	if project, ruleID, err := parseTwoPartID(d.Id()); err == nil {
-		log.Printf("[DEBUG] Delete gitlab project-level approval rule %s/%s", project, ruleID)
-
-		client := meta.(*gitlab.Client)
-
 		ruleIDInt, err := strconv.Atoi(ruleID)
 		if err != nil {
 			return err
 		}
 
+		log.Printf("[DEBUG] Project %s delete gitlab project-level approval rule %d", project, ruleIDInt)
+
+		client := meta.(*gitlab.Client)
 		_, err = client.Projects.DeleteProjectApprovalRule(project, ruleIDInt)
 	}
 
 	return err
 }
 
-func getApprovalRuleByID(meta interface{}, pid string, ruleID string) (*gitlab.ProjectApprovalRule, error) {
+func getApprovalRuleByID(meta interface{}, id string) (*gitlab.ProjectApprovalRule, error) {
 	var rules []*gitlab.ProjectApprovalRule
 	var err error
 
-	client := meta.(*gitlab.Client)
-
-	if rules, _, err = client.Projects.GetProjectApprovalRules(pid); err != nil {
-		return nil, err
-	}
-
-	ruleIDInt, err := strconv.Atoi(ruleID)
+	projectID, ruleIDStr, err := parseTwoPartID(id)
+	fmt.Println(ruleIDStr)
+	fmt.Println(projectID)
 	if err != nil {
 		return nil, err
 	}
+	ruleIDInt, err := strconv.Atoi(ruleIDStr)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(ruleIDInt)
 
-	for _, r := range rules {
-		if r.ID == ruleIDInt {
-			return r, err
+	client := meta.(*gitlab.Client)
+	if rules, _, err = client.Projects.GetProjectApprovalRules(projectID); err == nil {
+		for _, r := range rules {
+			if r.ID == ruleIDInt {
+				log.Printf("[DEBUG] found project-leve rule %+v", r)
+				return r, nil
+			}
 		}
 	}
 
 	return nil, err
+}
+
+func flattenApprovalRuleUserIDs(users []*gitlab.BasicUser) []interface{} {
+	// if len(users) < 1 {
+	// 	return nil
+	// }
+
+	m := []interface{}{}
+	for _, user := range users {
+		m = append(m, user.ID)
+	}
+
+	return m
+}
+
+func flattenApprovalRuleGroupIDs(groups []*gitlab.Group) []interface{} {
+	// if len(groups) < 1 {
+	// 	return nil
+	// }
+
+	m := []interface{}{}
+	for _, group := range groups {
+		m = append(m, group.ID)
+	}
+
+	return m
+}
+
+func expandApproverIds(ids interface{}, hasItems bool) []int {
+	m := []int{}
+	if hasItems {
+		for _, id := range ids.(*schema.Set).List() {
+			m = append(m, id.(int))
+		}
+	}
+
+	return m
 }
