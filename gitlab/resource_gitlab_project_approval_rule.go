@@ -96,8 +96,20 @@ func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interf
 	project := d.Get("project").(string)
 	name := d.Get("name").(string)
 	approvalsRequired := d.Get("approvals_required").(int)
-	userIDs := d.Get("user_ids").([]int)
-	groupIDs := d.Get("group_ids").([]int)
+
+	userIDs := []int{}
+	if uids, ok := d.GetOk("user_ids"); ok {
+		for _, uid := range uids.([]interface{}) {
+			userIDs = append(userIDs, uid.(int))
+		}
+	}
+
+	groupIDs := []int{}
+	if gids, ok := d.GetOk("group_ids"); ok {
+		for _, gid := range gids.([]interface{}) {
+			groupIDs = append(groupIDs, gid.(int))
+		}
+	}
 
 	log.Printf("[DEBUG] create gitlab project-level rule %s", name)
 	options := gitlab.CreateProjectLevelRuleOptions{
@@ -140,8 +152,20 @@ func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interf
 
 		name := d.Get("name").(string)
 		approvalsRequired := d.Get("approvals_required").(int)
-		userIDs := d.Get("user_ids").([]int)
-		groupIDs := d.Get("group_ids").([]int)
+
+		userIDs := []int{}
+		if uids, ok := d.GetOk("user_ids"); ok {
+			for _, uid := range uids.([]interface{}) {
+				userIDs = append(userIDs, uid.(int))
+			}
+		}
+
+		groupIDs := []int{}
+		if gids, ok := d.GetOk("group_ids"); ok {
+			for _, gid := range gids.([]interface{}) {
+				groupIDs = append(groupIDs, gid.(int))
+			}
+		}
 
 		options := gitlab.UpdateProjectLevelRuleOptions{
 			Name:              &name,
