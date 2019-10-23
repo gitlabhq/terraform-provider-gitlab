@@ -231,7 +231,7 @@ resource "gitlab_group_membership" "foo2" {
 
 resource "gitlab_user" "foo2" {
 	name             = "foo %d"
-	username         = "partest%d"
+	username         = "partest2%d"
 	password         = "test%dtt"
 	email            = "partest%d@ssss.com"
 	is_admin         = false
