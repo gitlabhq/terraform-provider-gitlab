@@ -1,6 +1,8 @@
 package gitlab
 
 import (
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -81,8 +83,7 @@ func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 	if !found {
-		log.Printf("[WARN] removing label %s from state because it no longer exists in gitlab", labelName)
-		d.SetId("")
+		return errors.New(fmt.Sprintf("label %s does not exist or the user does not have permissions to see it", labelName))
 	}
 
 	return nil
