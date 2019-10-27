@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -44,7 +43,7 @@ func resourceGitlabPipelineScheduleVariable() *schema.Resource {
 func resourceGitlabPipelineScheduleVariableCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	scheduleId := d.Get("pipeline_schedule_id").(int)
+	scheduleID := d.Get("pipeline_schedule_id").(int)
 
 	options := &gitlab.CreatePipelineScheduleVariableOptions{
 		Key:   gitlab.String(d.Get("key").(string)),
@@ -53,12 +52,12 @@ func resourceGitlabPipelineScheduleVariableCreate(d *schema.ResourceData, meta i
 
 	log.Printf("[DEBUG] create gitlab PipelineScheduleVariable %s:%s", *options.Key, *options.Value)
 
-	scheduleVar, _, err := client.PipelineSchedules.CreatePipelineScheduleVariable(project, scheduleId, options)
+	scheduleVar, _, err := client.PipelineSchedules.CreatePipelineScheduleVariable(project, scheduleID, options)
 	if err != nil {
 		return err
 	}
 
-	id := strconv.Itoa(scheduleId)
+	id := strconv.Itoa(scheduleID)
 	d.SetId(buildTwoPartID(&id, &scheduleVar.Key))
 
 	return resourceGitlabPipelineScheduleVariableRead(d, meta)
@@ -67,12 +66,12 @@ func resourceGitlabPipelineScheduleVariableCreate(d *schema.ResourceData, meta i
 func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	scheduleId := d.Get("pipeline_schedule_id").(int)
+	scheduleID := d.Get("pipeline_schedule_id").(int)
 	pipelineVariableKey := d.Get("key").(string)
 
-	log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d", project, scheduleId)
+	log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d", project, scheduleID)
 
-	pipelineSchedule, _, err := client.PipelineSchedules.GetPipelineSchedule(project, scheduleId)
+	pipelineSchedule, _, err := client.PipelineSchedules.GetPipelineSchedule(project, scheduleID)
 	if err != nil {
 		return err
 	}
@@ -83,13 +82,13 @@ func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta int
 			d.Set("project", project)
 			d.Set("key", pipelineVariable.Key)
 			d.Set("value", pipelineVariable.Value)
-			d.Set("pipeline_schedule_id", scheduleId)
+			d.Set("pipeline_schedule_id", scheduleID)
 			found = true
 			break
 		}
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineScheduleVariable %s no longer exists", pipelineVariableKey))
+		return fmt.Errorf("PipelineScheduleVariable %s no longer exists", pipelineVariableKey)
 	}
 
 	return nil
@@ -99,7 +98,7 @@ func resourceGitlabPipelineScheduleVariableUpdate(d *schema.ResourceData, meta i
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	variableKey := d.Get("key").(string)
-	scheduleId := d.Get("pipeline_schedule_id").(int)
+	scheduleID := d.Get("pipeline_schedule_id").(int)
 
 	if d.HasChange("value") {
 		options := &gitlab.EditPipelineScheduleVariableOptions{
@@ -108,7 +107,7 @@ func resourceGitlabPipelineScheduleVariableUpdate(d *schema.ResourceData, meta i
 
 		log.Printf("[DEBUG] update gitlab PipelineScheduleVariable %s", d.Id())
 
-		_, _, err := client.PipelineSchedules.EditPipelineScheduleVariable(project, scheduleId, variableKey, options)
+		_, _, err := client.PipelineSchedules.EditPipelineScheduleVariable(project, scheduleID, variableKey, options)
 		if err != nil {
 			return err
 		}
@@ -121,9 +120,9 @@ func resourceGitlabPipelineScheduleVariableDelete(d *schema.ResourceData, meta i
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	variableKey := d.Get("key").(string)
-	scheduleId := d.Get("pipeline_schedule_id").(int)
+	scheduleID := d.Get("pipeline_schedule_id").(int)
 
-	_, resp, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleId, variableKey)
+	_, resp, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleID, variableKey)
 	if err != nil {
 		return fmt.Errorf("%s failed to delete pipeline schedule variable: %s", d.Id(), resp.Status)
 	}

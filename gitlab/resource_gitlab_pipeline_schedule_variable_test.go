@@ -16,9 +16,9 @@ func TestAccGitlabPipelineScheduleVariable_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
-		// CheckDestroy: testAccCheckGitlabPipelineScheduleVariableDestroy,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabPipelineScheduleVariableConfig(rInt),
@@ -61,19 +61,19 @@ func testAccCheckGitlabPipelineScheduleVariableExists(n string, variable *gitlab
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		//scheduleId := rs.Primary.Attributes["pipeline_schedule_id"]
+		//scheduleID := rs.Primary.Attributes["pipeline_schedule_id"]
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		scheduleId, err := strconv.Atoi(rs.Primary.Attributes["pipeline_schedule_id"])
+		scheduleID, err := strconv.Atoi(rs.Primary.Attributes["pipeline_schedule_id"])
 		if err != nil {
 			return fmt.Errorf("Could not convert PipelineSchedule.ID to int")
 		}
 
-		pipelineSchedule, _, err := conn.PipelineSchedules.GetPipelineSchedule(project, scheduleId)
+		pipelineSchedule, _, err := conn.PipelineSchedules.GetPipelineSchedule(project, scheduleID)
 		if err != nil {
 			return err
 		}
