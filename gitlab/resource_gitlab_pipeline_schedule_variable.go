@@ -88,7 +88,7 @@ func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta int
 		}
 	}
 	if !found {
-		return fmt.Errorf("PipelineScheduleVariable %s no longer exists", pipelineVariableKey)
+		return fmt.Errorf("PipelineScheduleVariable %s can not be found", pipelineVariableKey)
 	}
 
 	return nil

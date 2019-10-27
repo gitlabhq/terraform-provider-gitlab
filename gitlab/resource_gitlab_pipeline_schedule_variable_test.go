@@ -61,18 +61,13 @@ func testAccCheckGitlabPipelineScheduleVariableExists(n string, variable *gitlab
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		//scheduleID := rs.Primary.Attributes["pipeline_schedule_id"]
 		project := rs.Primary.Attributes["project"]
-		if project == "" {
-			return fmt.Errorf("No project ID is set")
-		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		scheduleID, err := strconv.Atoi(rs.Primary.Attributes["pipeline_schedule_id"])
 		if err != nil {
-			return fmt.Errorf("Could not convert PipelineSchedule.ID to int")
+			return fmt.Errorf("failed to convert PipelineSchedule.ID to int")
 		}
 
+		conn := testAccProvider.Meta().(*gitlab.Client)
 		pipelineSchedule, _, err := conn.PipelineSchedules.GetPipelineSchedule(project, scheduleID)
 		if err != nil {
 			return err
@@ -84,7 +79,7 @@ func testAccCheckGitlabPipelineScheduleVariableExists(n string, variable *gitlab
 				return nil
 			}
 		}
-		return fmt.Errorf("Pipeline Schedule Variable does not exist")
+		return fmt.Errorf("PipelineScheduleVariable %s does not exist", variable.Key)
 	}
 }
 
