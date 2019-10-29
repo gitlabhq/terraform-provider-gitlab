@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 // Provider returns a terraform.ResourceProvider.
@@ -54,10 +54,13 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_group":               resourceGitlabGroup(),
 			"gitlab_project":             resourceGitlabProject(),
 			"gitlab_label":               resourceGitlabLabel(),
+			"gitlab_group_label":         resourceGitlabGroupLabel(),
 			"gitlab_pipeline_schedule":   resourceGitlabPipelineSchedule(),
 			"gitlab_pipeline_trigger":    resourceGitlabPipelineTrigger(),
 			"gitlab_project_hook":        resourceGitlabProjectHook(),
+			"gitlab_project_push_rules":  resourceGitlabProjectPushRules(),
 			"gitlab_deploy_key":          resourceGitlabDeployKey(),
+			"gitlab_deploy_key_enable":   resourceGitlabDeployEnableKey(),
 			"gitlab_user":                resourceGitlabUser(),
 			"gitlab_project_membership":  resourceGitlabProjectMembership(),
 			"gitlab_group_membership":    resourceGitlabGroupMembership(),

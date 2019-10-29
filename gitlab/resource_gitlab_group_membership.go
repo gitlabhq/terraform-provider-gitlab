@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -41,7 +41,7 @@ func resourceGitlabGroupMembership() *schema.Resource {
 			},
 			"expires_at": {
 				Type:         schema.TypeString, // Format YYYY-MM-DD
-				ValidateFunc: validateDateFunc(),
+				ValidateFunc: validateDateFunc,
 				Optional:     true,
 			},
 		},

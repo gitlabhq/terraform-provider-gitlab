@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -43,7 +43,7 @@ func resourceGitlabServiceJira() *schema.Resource {
 			"url": {
 				Type:         schema.TypeString,
 				Required:     true,
-				ValidateFunc: validateURLFunc(),
+				ValidateFunc: validateURLFunc,
 			},
 			"project_key": {
 				Type:     schema.TypeString,

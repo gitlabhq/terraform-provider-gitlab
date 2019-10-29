@@ -4,19 +4,22 @@ matrix:
   include:
   - name: unit tests
     env: MAKE_TARGET=test GOFLAGS=-mod=vendor GO111MODULE=on
-    go: "1.11.x"
-  - name: acceptance tests
+    go: "1.12.x"
+  - name: acceptance tests EE
+    env: MAKE_TARGET=testacc GITLAB_LICENSE_FILE=JulienPivotto.gitlab-license GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
+    go: "1.12.x"
+  - name: acceptance tests CE
     env: MAKE_TARGET=testacc GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
-    go: "1.11.x"
+    go: "1.12.x"
   - name: govet tests
     env: MAKE_TARGET=vet GOFLAGS=-mod=vendor GO111MODULE=on
-    go: "1.11.x"
+    go: "1.12.x"
   - name: website tests
     env: MAKE_TARGET=website-test GOFLAGS=-mod=vendor GO111MODULE=on
-    go: "1.11.x"
+    go: "1.12.x"
   - name: unit tests (go 1.12)
     env: MAKE_TARGET=test GOFLAGS=-mod=vendor GO111MODULE=on
-    go: "1.12.x"
+    go: "1.13.x"
   - name: unit tests (go tip)
     env: MAKE_TARGET=test GOFLAGS=-mod=vendor GO111MODULE=on
     go: tip
@@ -26,6 +29,9 @@ matrix:
     go: tip
   - name: unit tests (go 1.12)
     env: MAKE_TARGET=test GOFLAGS=-mod=vendor GO111MODULE=on
+    go: "1.13.x"
+  - name: acceptance tests EE
+    env: MAKE_TARGET=testacc GITLAB_LICENSE_FILE=JulienPivotto.gitlab-license GOFLAGS=-mod=vendor GO111MODULE=on GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 GITLAB_TOKEN=ACCTEST
     go: "1.12.x"
 
 install:
@@ -34,6 +40,7 @@ install:
 # packages that live there.
 # See: https://github.com/golang/go/issues/12933
 - bash scripts/gogetcookie.sh
+- bash scripts/license.sh
 - bash scripts/start-gitlab.sh
 
 script:

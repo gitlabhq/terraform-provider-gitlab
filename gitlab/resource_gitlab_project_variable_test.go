@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform/helper/acctest"
-	"github.com/hashicorp/terraform/helper/resource"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -145,6 +145,7 @@ resource "gitlab_project_variable" "foo" {
   project = "${gitlab_project.foo.id}"
   key = "key_%s"
   value = "value-%s"
+  variable_type = "env_var"
 }
 	`, rString, rString, rString)
 }
