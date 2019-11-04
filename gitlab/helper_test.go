@@ -26,13 +26,13 @@ func testAccCompareGitLabAttribute(attr string, expected, received *schema.Resou
 }
 
 func testAccIsSkippedAttribute(needle string, haystack []string) bool {
-	if needle == "" {
-		return false
-	}
-	for _, hay := range haystack {
-		if hay == needle {
-			return true
+	if needle != "" {
+		for _, hay := range haystack {
+			if hay == needle {
+				return true
+			}
 		}
 	}
+
 	return false
 }
