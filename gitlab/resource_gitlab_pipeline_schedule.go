@@ -21,6 +21,7 @@ func resourceGitlabPipelineSchedule() *schema.Resource {
 			"project": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
