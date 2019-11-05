@@ -3,6 +3,7 @@
 test "$MAKE_TARGET" == "testacc" || { echo "not starting gitlab!"; exit 0; }
 test -z "$(docker ps -f 'name=gitlab' -q)" || { echo "Gitlab already running"; exit 0; }
 
+_gitlab_image="gitlab/gitlab-ce"
 if test -n "${GITLAB_LICENSE_FILE}"; then
   _license_dir=${GITLAB_LICENSE_DIR:-.license}
   _license_file=${GITLAB_LICENSE_FILE:-JulienPivotto.gitlab-license}
@@ -12,7 +13,7 @@ if test -n "${GITLAB_LICENSE_FILE}"; then
       echo No license
       exit 1
   fi
-
+  _gitlab_image=gitlab/gitlab-ee
   extra="-v $PWD/${_license_dir}:/license"
   extra+=" -e GITLAB_LICENSE_FILE=/license/${_license_file}"
 fi
@@ -25,7 +26,7 @@ echo "Starting gitlab container..."
     -e "GITLAB_ROOT_PASSWORD=${GITLAB_ROOT_PASSWORD:-adminadmin}" \
     -p 127.0.0.1:8080:80 \
     $extra \
-    "${GITLAB_IMAGE:-gitlab/gitlab-ee}"
+    "${GITLAB_IMAGE:-$_gitlab_image}"
 )
 
 echo -n "Waiting for gitlab to be ready "
