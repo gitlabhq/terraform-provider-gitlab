@@ -78,6 +78,24 @@ func TestAccGitlabUser_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabUser_password_reset(t *testing.T) {
+	var user gitlab.User
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			// Create a user
+			{
+				Config: testAccGitlabUserConfigPasswordReset(rInt),
+				Check:  testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabUserExists(n string, user *gitlab.User) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -178,6 +196,22 @@ resource "gitlab_user" "foo" {
   projects_limit   = 10
   can_create_group = true
   is_external      = true
+}
+  `, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabUserConfigPasswordReset(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name             = "foo %d"
+  username         = "listest%d"
+  password         = "test%dtt"
+  email            = "listest%d@ssss.com"
+  is_admin         = false
+  projects_limit   = 0
+  can_create_group = false
+  is_external      = false
+  password_reset   = true
 }
   `, rInt, rInt, rInt, rInt)
 }
