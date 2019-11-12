@@ -211,7 +211,7 @@ resource "gitlab_user" "foo" {
   projects_limit   = 0
   can_create_group = false
   is_external      = false
-  password_reset   = true
+  reset_password   = true
 }
   `, rInt, rInt, rInt, rInt)
 }
