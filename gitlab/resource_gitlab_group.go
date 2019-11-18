@@ -68,6 +68,11 @@ func resourceGitlabGroup() *schema.Resource {
 				ForceNew: true,
 				Default:  0,
 			},
+			"runners_token": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
 		},
 	}
 }
@@ -128,6 +133,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
 	d.Set("parent_id", group.ParentID)
+	d.Set("runners_token", group.RunnersToken)
 
 	return nil
 }

@@ -63,6 +63,8 @@ The resource exports the following attributes:
 
 * `web_url` - Web URL of the group.
 
+* `runners_token` - The group level registration token to use during runner setup.
+
 ## Importing groups
 
 You can import a group state using `terraform import <resource> <id>`.  The

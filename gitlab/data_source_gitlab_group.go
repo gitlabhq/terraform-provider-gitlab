@@ -2,9 +2,10 @@ package gitlab
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
-	"log"
 )
 
 func dataSourceGitlabGroup() *schema.Resource {
@@ -63,6 +64,11 @@ func dataSourceGitlabGroup() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"runners_token": {
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
+			},
 		},
 	}
 }
@@ -105,6 +111,7 @@ func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
 	d.Set("parent_id", group.ParentID)
+	d.Set("runners_token", group.RunnersToken)
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
