@@ -229,7 +229,7 @@ github.com/ulikunitz/xz/lzma
 # github.com/vmihailenco/msgpack v4.0.4+incompatible
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes
-# github.com/xanzy/go-gitlab v0.20.1
+# github.com/xanzy/go-gitlab v0.22.1
 github.com/xanzy/go-gitlab
 # github.com/zclconf/go-cty v1.1.0
 github.com/zclconf/go-cty/cty
@@ -282,7 +282,7 @@ golang.org/x/exp/cmd/apidiff
 # golang.org/x/lint v0.0.0-20190930215403-16217165b5de
 golang.org/x/lint
 golang.org/x/lint/golint
-# golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582
+# golang.org/x/net v0.0.0-20191118183410-d06c31c94cae
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
