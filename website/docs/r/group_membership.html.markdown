@@ -29,7 +29,7 @@ The following arguments are supported:
 
 * `user_id` - (Required) The id of the user.
 
-* `access_level` - (Required)  Acceptable values are: guest, reporter, developer, master, owner.
+* `access_level` - (Required)  Acceptable values are: guest, reporter, developer, maintainer, owner.
 
 * `expires_at` - (Optional) Expiration date for the group membership. Format: `YYYY-MM-DD`
 
