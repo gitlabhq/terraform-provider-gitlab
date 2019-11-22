@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -85,7 +84,9 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 
 	pipelineSchedules, _, err := client.PipelineSchedules.ListPipelineSchedules(project, nil)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab PipelineSchedule %s/%d: %s", project, pipelineScheduleID, err)
+		d.SetId("")
+		return nil
 	}
 	found := false
 	for _, pipelineSchedule := range pipelineSchedules {
@@ -100,7 +101,9 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		}
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID))
+		log.Printf("[DEBUG] PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
+		d.SetId("")
+		return nil
 	}
 
 	return nil

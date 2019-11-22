@@ -157,7 +157,9 @@ func resourceGitlabProjectClusterRead(d *schema.ResourceData, meta interface{}) 
 
 	cluster, _, err := client.ProjectCluster.GetCluster(project, clusterId)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab project cluster %q/%d: %s", project, clusterId, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("project", project)

@@ -70,7 +70,9 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 
 	labels, _, err := client.GroupLabels.ListGroupLabels(group, nil)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab group label %s/%s: %s", group, labelName, err)
+		d.SetId("")
+		return nil
 	}
 	found := false
 	for _, label := range labels {

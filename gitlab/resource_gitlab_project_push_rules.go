@@ -110,7 +110,9 @@ func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}
 	log.Printf("[DEBUG] read gitlab project %s", project)
 	pushRules, _, err := client.Projects.GetProjectPushRules(project)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab project %s: %s", project, err)
+		d.SetId("")
+		return nil
 	}
 	d.Set("commit_message_regex", pushRules.CommitMessageRegex)
 	d.Set("branch_name_regex", pushRules.BranchNameRegex)

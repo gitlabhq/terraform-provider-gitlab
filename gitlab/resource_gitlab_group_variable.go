@@ -88,7 +88,9 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 
 	v, _, err := client.GroupVariables.GetVariable(group, key)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab group variable %s/%s: %s", group, key, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("key", v.Key)

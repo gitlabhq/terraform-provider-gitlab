@@ -73,7 +73,9 @@ func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta int
 
 	pipelineSchedule, _, err := client.PipelineSchedules.GetPipelineSchedule(project, scheduleID)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d: %s", project, scheduleID, err)
+		d.SetId("")
+		return nil
 	}
 
 	found := false

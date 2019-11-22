@@ -209,7 +209,9 @@ func resourceGitlabServiceSlackRead(d *schema.ResourceData, meta interface{}) er
 
 	service, _, err := client.Services.GetSlackService(project)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab slack service for project %s: %s", project, err)
+		d.SetId("")
+		return nil
 	}
 
 	resourceGitlabServiceSlackSetToState(d, service)

@@ -114,7 +114,9 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 
 	group, _, err := client.Groups.GetGroup(d.Id())
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab group %s: %s", d.Id(), err)
+		d.SetId("")
+		return nil
 	}
 
 	d.SetId(fmt.Sprintf("%d", group.ID))

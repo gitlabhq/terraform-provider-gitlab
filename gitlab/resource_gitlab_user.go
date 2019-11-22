@@ -110,7 +110,9 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	user, _, err := client.Users.GetUser(id)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab user %s: %s", d.Id(), err)
+		d.SetId("")
+		return nil
 	}
 
 	resourceGitlabUserSetToState(d, user)

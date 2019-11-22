@@ -79,7 +79,9 @@ func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{
 
 	projectMember, _, err := client.ProjectMembers.GetProjectMember(projectId, userId)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab project projectMember %s: %s", id, err)
+		d.SetId("")
+		return nil
 	}
 
 	resourceGitlabProjectMembershipSetToState(d, projectMember, &projectId)

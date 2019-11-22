@@ -102,7 +102,9 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 
 	v, _, err := client.ProjectVariables.GetVariable(project, key)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab project variable %s/%s: %s", project, key, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("key", v.Key)

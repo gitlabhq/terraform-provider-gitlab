@@ -84,7 +84,9 @@ func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{})
 
 	groupMember, _, err := client.GroupMembers.GetGroupMember(groupId, userId)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab group groupMember %s: %s", id, err)
+		d.SetId("")
+		return nil
 	}
 
 	resourceGitlabGroupMembershipSetToState(d, groupMember, &groupId)

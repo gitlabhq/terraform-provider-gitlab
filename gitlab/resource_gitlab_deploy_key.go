@@ -80,7 +80,9 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab deploy key %s/%d: %s", project, deployKeyID, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("title", deployKey.Title)

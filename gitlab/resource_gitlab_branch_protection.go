@@ -89,7 +89,9 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab branch protection for project %s, branch %s: %s", project, branch, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("project", project)

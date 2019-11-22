@@ -76,7 +76,9 @@ func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{
 
 	projectInformation, _, err := client.Projects.GetProject(projectId, nil)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] read gitlab project projectMember %s: %s", id, err)
+		d.SetId("")
+		return nil
 	}
 
 	for _, v := range projectInformation.SharedWithGroups {

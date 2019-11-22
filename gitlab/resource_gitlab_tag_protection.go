@@ -81,7 +81,9 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 
 	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab tag protection for project %s, tag %s: %s", project, tag, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("project", project)

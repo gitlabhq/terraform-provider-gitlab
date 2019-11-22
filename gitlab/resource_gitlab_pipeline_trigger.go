@@ -65,7 +65,9 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 
 	pipelineTrigger, _, err := client.PipelineTriggers.GetPipelineTrigger(project, pipelineTriggerID)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab PipelineTrigger %s/%d: %s", project, pipelineTriggerID, err)
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("description", pipelineTrigger.Description)

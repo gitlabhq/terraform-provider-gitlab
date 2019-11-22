@@ -327,7 +327,9 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 
 	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] failed to read gitlab project %s: %s", d.Id(), err)
+		d.SetId("")
+		return nil
 	}
 
 	resourceGitlabProjectSetToState(d, project)

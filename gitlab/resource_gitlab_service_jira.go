@@ -97,7 +97,9 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 
 	jiraService, _, err := client.Services.GetJiraService(project)
 	if err != nil {
-		return err
+		log.Printf("[DEBUG] Read Gitlab Jira service %s: %s", d.Id(), err)
+		d.SetId("")
+		return nil
 	}
 
 	if v := jiraService.Properties.URL; v != "" {
