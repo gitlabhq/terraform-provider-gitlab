@@ -64,4 +64,6 @@ The resource exports the following attributes:
 
 * `web_url` - Web URL of the group.
 
+* `runners_token` - The group level registration token to use during runner setup.
+
 [doc]: https://docs.gitlab.com/ee/api/groups.html#details-of-a-group
