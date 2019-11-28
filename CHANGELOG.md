@@ -1,7 +1,25 @@
-## 2.3.1 (Unreleased)
+## 2.4.0 (Unreleased)
 
 FEATURES:
 * **New Resource:** `gitlab_group_label` ([#186](https://github.com/terraform-providers/terraform-provider-gitlab/pull/186))
+* **New Resource:** `gitlab_group_cluster`
+  ([#178](https://github.com/terraform-providers/terraform-provider-gitlab/pull/178))
+* **New Resource:** `gitlab_pipeline_schedule_variable`
+  ([#204](https://github.com/terraform-providers/terraform-provider-gitlab/pull/204))
+
+ENHANCEMENTS:
+* Add `runners_token` to gitlab groups ([#218](https://github.com/terraform-providers/terraform-provider-gitlab/pull/218))
+* Add `reset_password` to `gitlab_user` ([#127](https://github.com/terraform-providers/terraform-provider-gitlab/pull/127))
+* Update `access_level` available values ([#220](https://github.com/terraform-providers/terraform-provider-gitlab/pull/220))
+* Make read callbacks graceful for `gitlab_project_share_group`, `gitlab_branch_protection` and
+  `gitlab_label` resources ([#223](https://github.com/terraform-providers/terraform-provider-gitlab/pull/223))
+
+
+BUGFIXES:
+* Fix state not being updated for gitlab_branch_protection
+  ([#166](https://github.com/terraform-providers/terraform-provider-gitlab/pull/166))
+* Set ForceNew for `gitlab_pipeline_schedule` `project`
+  ([#203](https://github.com/terraform-providers/terraform-provider-gitlab/pull/203))
 
 ## 2.3.0 (October 17, 2019)
 
