@@ -1,4 +1,4 @@
-## 2.4.0 (Unreleased)
+## 2.4.0 (November 28, 2019)
 
 FEATURES:
 * **New Resource:** `gitlab_group_label` ([#186](https://github.com/terraform-providers/terraform-provider-gitlab/pull/186))
