@@ -16,7 +16,7 @@ ENHANCEMENTS:
 
 
 BUGFIXES:
-* Fix state not being updated for gitlab_branch_protection
+* Fix state not being updated for `gitlab_branch_protection`
   ([#166](https://github.com/terraform-providers/terraform-provider-gitlab/pull/166))
 * Set ForceNew for `gitlab_pipeline_schedule` `project`
   ([#203](https://github.com/terraform-providers/terraform-provider-gitlab/pull/203))
