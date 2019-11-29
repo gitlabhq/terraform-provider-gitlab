@@ -31,6 +31,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
 		ContainerRegistryEnabled:         true,
+		LFSEnabled:                       true,
 		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
@@ -68,6 +69,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						TagList:                          []string{"tag1", "tag2"},
 						ApprovalsBeforeMerge:             0,
 						ContainerRegistryEnabled:         false,
+						LFSEnabled:                       false,
 						SharedRunnersEnabled:             false,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
@@ -101,6 +103,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							WikiEnabled:                      true,
 							SnippetsEnabled:                  true,
 							ContainerRegistryEnabled:         true,
+							LFSEnabled:                       true,
 							SharedRunnersEnabled:             false,
 							Visibility:                       gitlab.PublicVisibility,
 							MergeMethod:                      gitlab.FastForwardMerge,
@@ -134,6 +137,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
 						ContainerRegistryEnabled:         true,
+						LFSEnabled:                       true,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: false,
@@ -208,6 +212,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
 		ContainerRegistryEnabled:         true,
+		LFSEnabled:                       true,
 		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
@@ -492,6 +497,7 @@ resource "gitlab_project" "foo" {
   wiki_enabled = false
   snippets_enabled = false
   container_registry_enabled = false
+  lfs_enabled = false
 	shared_runners_enabled = false
 	archived = true
 }

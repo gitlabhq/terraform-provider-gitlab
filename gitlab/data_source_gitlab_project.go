@@ -57,6 +57,11 @@ func dataSourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"lfs_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 			"visibility_level": {
 				Type:     schema.TypeString,
 				Optional: true,

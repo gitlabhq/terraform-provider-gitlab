@@ -45,6 +45,8 @@ The following attributes are exported:
 
 * `snippets_enabled` - Enable snippets for the project.
 
+* `lfs_enabled` - Enable LFS for the project.
+
 * `visibility_level` -  Repositories are created as private by default.
 
 * `id` - Integer that uniquely identifies the project within the gitlab install.
