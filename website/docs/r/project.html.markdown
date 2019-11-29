@@ -52,6 +52,8 @@ The following arguments are supported:
 
 * `container_registry_enabled` - (Optional) Enable container registry for the project.
 
+* `lfs_enabled` - (Optional) Enable LFS for the project.
+
 * `visibility_level` - (Optional) Set to `public` to create a public project.
   Valid values are `private`, `internal`, `public`.
   Repositories are created as private by default.
