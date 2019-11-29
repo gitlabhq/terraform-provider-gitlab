@@ -28,6 +28,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		RequestAccessEnabled:             true,
 		IssuesEnabled:                    true,
 		MergeRequestsEnabled:             true,
+		JobsEnabled:                      true,
 		ApprovalsBeforeMerge:             0,
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
@@ -68,6 +69,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Path:                             fmt.Sprintf("foo.%d", rInt),
 						Description:                      "Terraform acceptance tests!",
 						TagList:                          []string{"tag1", "tag2"},
+						JobsEnabled:                      false,
 						ApprovalsBeforeMerge:             0,
 						RequestAccessEnabled:             false,
 						ContainerRegistryEnabled:         false,
@@ -103,6 +105,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							RequestAccessEnabled:             true,
 							IssuesEnabled:                    true,
 							MergeRequestsEnabled:             true,
+							JobsEnabled:                      true,
 							WikiEnabled:                      true,
 							SnippetsEnabled:                  true,
 							ContainerRegistryEnabled:         true,
@@ -138,6 +141,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						RequestAccessEnabled:             true,
 						IssuesEnabled:                    true,
 						MergeRequestsEnabled:             true,
+						JobsEnabled:                      true,
 						WikiEnabled:                      true,
 						SnippetsEnabled:                  true,
 						ContainerRegistryEnabled:         true,
@@ -213,6 +217,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		RequestAccessEnabled:             true,
 		IssuesEnabled:                    true,
 		MergeRequestsEnabled:             true,
+		JobsEnabled:                      true,
 		ApprovalsBeforeMerge:             0,
 		WikiEnabled:                      true,
 		SnippetsEnabled:                  true,
@@ -499,6 +504,7 @@ resource "gitlab_project" "foo" {
   request_access_enabled = false
   issues_enabled = false
   merge_requests_enabled = false
+  pipelines_enabled = false
   approvals_before_merge = 0
   wiki_enabled = false
   snippets_enabled = false

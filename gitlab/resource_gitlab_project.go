@@ -78,6 +78,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 		Default:  true,
 	},
+	"pipelines_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
 	"approvals_before_merge": {
 		Type:     schema.TypeInt,
 		Optional: true,
@@ -209,6 +214,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("request_access_enabled", project.RequestAccessEnabled)
 	d.Set("issues_enabled", project.IssuesEnabled)
 	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
+	d.Set("pipelines_enabled", project.JobsEnabled)
 	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
 	d.Set("wiki_enabled", project.WikiEnabled)
 	d.Set("snippets_enabled", project.SnippetsEnabled)
@@ -237,6 +243,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		RequestAccessEnabled:             gitlab.Bool(d.Get("request_access_enabled").(bool)),
 		IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
 		MergeRequestsEnabled:             gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
+		JobsEnabled:                      gitlab.Bool(d.Get("pipelines_enabled").(bool)),
 		ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
 		WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
 		SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
@@ -258,6 +265,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		"request_access_enabled",
 		"issues_enabled",
 		"merge_requests_enabled",
+		"pipelines_enabled",
 		"approvals_before_merge",
 		"wiki_enabled",
 		"snippets_enabled",
@@ -413,6 +421,11 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	if d.HasChange("merge_requests_enabled") {
 		options.MergeRequestsEnabled = gitlab.Bool(d.Get("merge_requests_enabled").(bool))
 		updatedProperties = append(updatedProperties, "merge_requests_enabled")
+	}
+
+	if d.HasChange("pipelines_enabled") {
+		options.JobsEnabled = gitlab.Bool(d.Get("pipelines_enabled").(bool))
+		updatedProperties = append(updatedProperties, "pipelines_enabled")
 	}
 
 	if d.HasChange("approvals_before_merge") {

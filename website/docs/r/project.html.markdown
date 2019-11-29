@@ -46,6 +46,8 @@ The following arguments are supported:
 
 * `merge_requests_enabled` - (Optional) Enable merge requests for the project.
 
+* `pipelines_enabled` - (Optional) Enable pipelines for the project.
+
 * `approvals_before_merge` - (Optional) Number of merge request approvals required for merging. Default is 0.
 
 * `wiki_enabled` - (Optional) Enable wiki for the project.
