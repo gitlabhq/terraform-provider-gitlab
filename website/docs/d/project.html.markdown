@@ -41,6 +41,8 @@ The following attributes are exported:
 
 * `merge_requests_enabled` - Enable merge requests for the project.
 
+* `pipelines_enabled` - Enable pipelines for the project.
+
 * `wiki_enabled` - Enable wiki for the project.
 
 * `snippets_enabled` - Enable snippets for the project.
