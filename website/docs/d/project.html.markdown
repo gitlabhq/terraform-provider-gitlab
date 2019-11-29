@@ -37,6 +37,8 @@ The following attributes are exported:
 
 * `default_branch` - The default branch for the project.
 
+* `request_access_enabled` - Allow users to request member access.
+
 * `issues_enabled` - Enable issue tracking for the project.
 
 * `merge_requests_enabled` - Enable merge requests for the project.

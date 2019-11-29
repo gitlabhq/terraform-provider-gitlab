@@ -25,6 +25,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		Path:                             fmt.Sprintf("foo.%d", rInt),
 		Description:                      "Terraform acceptance tests",
 		TagList:                          []string{"tag1"},
+		RequestAccessEnabled:             true,
 		IssuesEnabled:                    true,
 		MergeRequestsEnabled:             true,
 		ApprovalsBeforeMerge:             0,
@@ -67,6 +68,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Description:                      "Terraform acceptance tests!",
 						TagList:                          []string{"tag1", "tag2"},
 						ApprovalsBeforeMerge:             0,
+						RequestAccessEnabled:             false,
 						ContainerRegistryEnabled:         false,
 						SharedRunnersEnabled:             false,
 						Visibility:                       gitlab.PublicVisibility,
@@ -96,6 +98,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							Name:                             fmt.Sprintf("foo-%d", rInt),
 							Path:                             fmt.Sprintf("foo.%d", rInt),
 							Description:                      "Terraform acceptance tests",
+							RequestAccessEnabled:             true,
 							IssuesEnabled:                    true,
 							MergeRequestsEnabled:             true,
 							WikiEnabled:                      true,
@@ -129,6 +132,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Name:                             fmt.Sprintf("foo-%d", rInt),
 						Path:                             fmt.Sprintf("foo.%d", rInt),
 						Description:                      "Terraform acceptance tests",
+						RequestAccessEnabled:             true,
 						IssuesEnabled:                    true,
 						MergeRequestsEnabled:             true,
 						WikiEnabled:                      true,
@@ -202,6 +206,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		Path:                             fmt.Sprintf("foo.%d", rInt),
 		Description:                      "Terraform acceptance tests",
 		TagList:                          []string{"tag1"},
+		RequestAccessEnabled:             true,
 		IssuesEnabled:                    true,
 		MergeRequestsEnabled:             true,
 		ApprovalsBeforeMerge:             0,
@@ -486,6 +491,7 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
 
+  request_access_enabled = false
   issues_enabled = false
   merge_requests_enabled = false
   approvals_before_merge = 0
