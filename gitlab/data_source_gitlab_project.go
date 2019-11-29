@@ -37,6 +37,11 @@ func dataSourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"request_access_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 			"issues_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -118,6 +123,7 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("path", found.Path)
 	d.Set("description", found.Description)
 	d.Set("default_branch", found.DefaultBranch)
+	d.Set("request_access_enabled", found.RequestAccessEnabled)
 	d.Set("issues_enabled", found.IssuesEnabled)
 	d.Set("merge_requests_enabled", found.MergeRequestsEnabled)
 	d.Set("wiki_enabled", found.WikiEnabled)

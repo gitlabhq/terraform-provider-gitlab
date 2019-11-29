@@ -63,6 +63,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			return old == new
 		},
 	},
+	"request_access_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
 	"issues_enabled": {
 		Type:     schema.TypeBool,
 		Optional: true,
@@ -201,6 +206,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("path", project.Path)
 	d.Set("description", project.Description)
 	d.Set("default_branch", project.DefaultBranch)
+	d.Set("request_access_enabled", project.RequestAccessEnabled)
 	d.Set("issues_enabled", project.IssuesEnabled)
 	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
 	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
@@ -228,6 +234,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	options := &gitlab.CreateProjectOptions{
 		Name:                             gitlab.String(d.Get("name").(string)),
+		RequestAccessEnabled:             gitlab.Bool(d.Get("request_access_enabled").(bool)),
 		IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
 		MergeRequestsEnabled:             gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
 		ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
@@ -248,6 +255,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	d.Partial(true)
 	setProperties := []string{
 		"name",
+		"request_access_enabled",
 		"issues_enabled",
 		"merge_requests_enabled",
 		"approvals_before_merge",
@@ -390,6 +398,11 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	if d.HasChange("only_allow_merge_if_all_discussions_are_resolved") {
 		options.OnlyAllowMergeIfAllDiscussionsAreResolved = gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool))
 		updatedProperties = append(updatedProperties, "only_allow_merge_if_all_discussions_are_resolved")
+	}
+
+	if d.HasChange("request_access_enabled") {
+		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
+		updatedProperties = append(updatedProperties, "request_access_enabled")
 	}
 
 	if d.HasChange("issues_enabled") {
