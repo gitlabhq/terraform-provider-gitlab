@@ -1,4 +1,11 @@
 ## 2.5.0 (Unreleased)
+
+ENHANCEMENTS:
+* Implement `lfs_enabled`, `request_access_enabled`, and `pipelines_enabled` parameters for `gitlab_project`
+  ([#225](https://github.com/terraform-providers/terraform-provider-gitlab/pull/225),
+   [#226](https://github.com/terraform-providers/terraform-provider-gitlab/pull/226),
+   [#227](https://github.com/terraform-providers/terraform-provider-gitlab/pull/227))
+
 ## 2.4.0 (November 28, 2019)
 
 FEATURES:
