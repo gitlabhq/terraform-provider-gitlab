@@ -1,8 +1,6 @@
 package gitlab
 
 import (
-	"errors"
-	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -68,26 +66,27 @@ func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
 	labelName := d.Id()
 	log.Printf("[DEBUG] read gitlab label %s/%s", project, labelName)
 
-	labels, _, err := client.Labels.ListLabels(project, nil)
-	if err != nil {
-		log.Printf("[DEBUG] failed to read gitlab label %s/%s: %s", project, labelName, err)
-		d.SetId("")
-		return nil
-	}
-	found := false
-	for _, label := range labels {
-		if label.Name == labelName {
-			d.Set("description", label.Description)
-			d.Set("color", label.Color)
-			d.Set("name", label.Name)
-			found = true
-			break
+	page := 1
+	labelsLen := 0
+	for page == 1 || labelsLen != 0 {
+		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{Page: page})
+		if err != nil {
+			return err
 		}
-	}
-	if !found {
-		return errors.New(fmt.Sprintf("label %s does not exist or the user does not have permissions to see it", labelName))
+		for _, label := range labels {
+			if label.Name == labelName {
+				d.Set("description", label.Description)
+				d.Set("color", label.Color)
+				d.Set("name", label.Name)
+				return nil
+			}
+		}
+		labelsLen = len(labels)
+		page = page + 1
 	}
 
+	log.Printf("[DEBUG] failed to read gitlab label %s/%s", project, labelName)
+	d.SetId("")
 	return nil
 }
 
