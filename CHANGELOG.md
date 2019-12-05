@@ -1,4 +1,4 @@
-## 2.5.0 (Unreleased)
+## 2.5.0 (December 05, 2019)
 
 ENHANCEMENTS:
 * Implement `lfs_enabled`, `request_access_enabled`, and `pipelines_enabled` parameters for `gitlab_project`
