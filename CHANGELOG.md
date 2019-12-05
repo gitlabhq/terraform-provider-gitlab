@@ -6,6 +6,10 @@ ENHANCEMENTS:
    [#226](https://github.com/terraform-providers/terraform-provider-gitlab/pull/226),
    [#227](https://github.com/terraform-providers/terraform-provider-gitlab/pull/227))
 
+BUGFIXES:
+* Fix label support when there is more than 20 labels on a project
+  ([#229](https://github.com/terraform-providers/terraform-provider-gitlab/pull/229))
+
 ## 2.4.0 (November 28, 2019)
 
 FEATURES:
