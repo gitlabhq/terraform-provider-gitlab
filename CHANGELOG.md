@@ -11,6 +11,8 @@ BUGFIXES:
   ([#229](https://github.com/terraform-providers/terraform-provider-gitlab/pull/229))
 * Enable `environment_scope` for `gitlab_project_variable` lookup
   ([#228](https://github.com/terraform-providers/terraform-provider-gitlab/pull/229))
+* Fix users data source when there is more than 20 users returned
+  ([#230](https://github.com/terraform-providers/terraform-provider-gitlab/pull/230))
 
 ## 2.4.0 (November 28, 2019)
 
