@@ -114,7 +114,7 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 	//For now I'm ignoring environment_scope when reading back data. (this can cause configuration drift so it is bad).
 	//However I'm unable to stop terraform from gratuitously updating this to values that are unacceptable by Gitlab)
 	//I don't have an enterprise license to properly test this either.
-	//d.Set("environment_scope", v.EnvironmentScope)
+	d.Set("environment_scope", v.EnvironmentScope)
 	return nil
 }
 
