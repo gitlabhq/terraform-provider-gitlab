@@ -180,10 +180,18 @@ func dataSourceGitlabUsersRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-	users, _, err := client.Users.ListUsers(listUsersOptions)
-
-	if err != nil {
-		return err
+	page := 1
+	userslen := 0
+	var users []*gitlab.User
+	for page == 1 || userslen != 0 {
+		listUsersOptions.Page = page
+		paginatedUsers, _, err := client.Users.ListUsers(listUsersOptions)
+		if err != nil {
+			return err
+		}
+		users = append(users, paginatedUsers...)
+		userslen = len(paginatedUsers)
+		page = page + 1
 	}
 
 	d.Set("users", flattenGitlabUsers(users))
