@@ -156,6 +156,36 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_disappears(t *testing.T) {
+	var group gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupDisappears(&group),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
+func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := testAccProvider.Meta().(*gitlab.Client)
+
+		_, err := conn.Groups.DeleteGroup(group.ID)
+		return err
+	}
+}
+
 func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
