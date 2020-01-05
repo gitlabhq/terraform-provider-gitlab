@@ -31,7 +31,7 @@ func resourceGitlabUserSSHKey() *schema.Resource {
 					return oldV == newTrimmed
 				},
 			},
-			"id": {
+			"key_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -44,7 +44,7 @@ func resourceGitlabUserSSHKey() *schema.Resource {
 }
 
 func resourceGitlabUserSSHKeySetToState(d *schema.ResourceData, userkey *gitlab.SSHKey) {
-	d.Set("id", userkey.ID)
+	d.Set("key_id", userkey.ID)
 	d.Set("title", userkey.Title)
 	d.Set("key", userkey.Key)
 	d.Set("created_at", userkey.CreatedAt)
