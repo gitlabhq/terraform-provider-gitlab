@@ -54,15 +54,22 @@ func resourceGitlabProjectApprovalsConfiguration() *schema.Resource {
 func resourceGitlabProjectApprovalsConfigurationCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
+
+	approvalsBeforeMerge := d.Get("approvals_before_merge").(int)
+	resetApprovalsOnPush := d.Get("reset_approvals_on_push").(bool)
+	disableOverridingApproversPerMergeRequest := d.Get("disable_overriding_approvers_per_merge_request").(bool)
+	mergeRequestsAuthorApproval := d.Get("merge_requests_author_approval").(bool)
+	mergeRequestsDisableCommittersApproval := d.Get("merge_requests_disable_committers_approval").(bool)
+
 	options := &gitlab.ChangeApprovalConfigurationOptions{
-		ApprovalsBeforeMerge:                      gitlab.Int(d.Get("approvals_before_merge").(int)),
-		ResetApprovalsOnPush:                      gitlab.Bool(d.Get("reset_approvals_on_push").(bool)),
-		DisableOverridingApproversPerMergeRequest: gitlab.Bool(d.Get("disable_overriding_approvers_per_merge_request").(bool)),
-		MergeRequestsAuthorApproval:               gitlab.Bool(d.Get("merge_requests_author_approval").(bool)),
-		MergeRequestsDisableCommittersApproval:    gitlab.Bool(d.Get("merge_requests_disable_committers_approval").(bool)),
+		ApprovalsBeforeMerge:                      gitlab.Int(approvalsBeforeMerge),
+		ResetApprovalsOnPush:                      gitlab.Bool(resetApprovalsOnPush),
+		DisableOverridingApproversPerMergeRequest: gitlab.Bool(disableOverridingApproversPerMergeRequest),
+		MergeRequestsAuthorApproval:               gitlab.Bool(mergeRequestsAuthorApproval),
+		MergeRequestsDisableCommittersApproval:    gitlab.Bool(mergeRequestsDisableCommittersApproval),
 	}
 
-	log.Printf("[DEBUG] create gitlab approvals configuration for project %s", project)
+	log.Printf("[DEBUG] create gitlab approvals configuration for project %s, approvalsBeforeMerge: %d, resetApprovalsOnPush: %t, disableOverridingApproversPerMergeRequest: %t, mergeRequestsAuthorApproval: %t, mergeRequestsDisableCommittersApproval: %t", project, approvalsBeforeMerge, resetApprovalsOnPush, disableOverridingApproversPerMergeRequest, mergeRequestsAuthorApproval, mergeRequestsDisableCommittersApproval)
 
 	_, _, err := client.Projects.ChangeApprovalConfiguration(project, options)
 	if err != nil {
@@ -77,9 +84,8 @@ func resourceGitlabProjectApprovalsConfigurationRead(d *schema.ResourceData, met
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
-	log.Printf("[DEBUG] read gitlab approvals configuration for project %s", project)
-
 	approvals, _, err := client.Projects.GetApprovalConfiguration(project)
+	log.Printf("[DEBUG] read gitlab approvals configuration for project %s, approvalsBeforeMerge: %d, resetApprovalsOnPush: %t, disableOverridingApproversPerMergeRequest: %t, mergeRequestsAuthorApproval: %t, mergeRequestsDisableCommittersApproval: %t", project, approvals.ApprovalsBeforeMerge, approvals.ResetApprovalsOnPush, approvals.DisableOverridingApproversPerMergeRequest, approvals.MergeRequestsAuthorApproval, approvals.MergeRequestsDisableCommittersApproval)
 	if err != nil {
 		return err
 	}
