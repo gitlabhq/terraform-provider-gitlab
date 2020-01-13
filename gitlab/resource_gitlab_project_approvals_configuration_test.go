@@ -25,7 +25,6 @@ func TestAccGitlabProjectApprovalsConfiguration_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalsConfigurationExists("gitlab_project_approvals_configuration.approvals", &approvals),
 					testAccCheckGitlabProjectApprovalsConfigurationAttributes(&approvals, &testAccGitlabProjectApprovalsConfigurationExpectedAttributes{
-						approvalsBeforeMerge:                      2,
 						resetApprovalsOnPush:                      true,
 						disableOverridingApproversPerMergeRequest: true,
 						mergeRequestsAuthorApproval:               true,

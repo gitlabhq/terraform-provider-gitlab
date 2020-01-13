@@ -63,7 +63,7 @@ func resourceGitlabProjectApprovalsConfigurationCreate(d *schema.ResourceData, m
 		MergeRequestsDisableCommittersApproval:    gitlab.Bool(mergeRequestsDisableCommittersApproval),
 	}
 
-	log.Printf("[DEBUG] create gitlab approvals configuration for project %s, resetApprovalsOnPush: %t, disableOverridingApproversPerMergeRequest: %t, mergeRequestsAuthorApproval: %t, mergeRequestsDisableCommittersApproval: %t", project, , resetApprovalsOnPush, disableOverridingApproversPerMergeRequest, mergeRequestsAuthorApproval, mergeRequestsDisableCommittersApproval)
+	log.Printf("[DEBUG] create gitlab approvals configuration for project %s, resetApprovalsOnPush: %t, disableOverridingApproversPerMergeRequest: %t, mergeRequestsAuthorApproval: %t, mergeRequestsDisableCommittersApproval: %t", project, resetApprovalsOnPush, disableOverridingApproversPerMergeRequest, mergeRequestsAuthorApproval, mergeRequestsDisableCommittersApproval)
 
 	_, _, err := client.Projects.ChangeApprovalConfiguration(project, options)
 	if err != nil {
