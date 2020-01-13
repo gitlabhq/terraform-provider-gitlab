@@ -24,7 +24,6 @@ resource "gitlab_project" "example" {
 
 resource "gitlab_project_approvals_configuration" "approvals" {
   project_id                                     = gitlab_project.example.id
-  approvals_before_merge                         = 2
   reset_approvals_on_push                        = true
   disable_overriding_approvers_per_merge_request = true
   merge_requests_author_approval                 = false
@@ -37,8 +36,6 @@ resource "gitlab_project_approvals_configuration" "approvals" {
 The following arguments are supported:
 
 * `project_id` - (Required) The id of the project to add the label to.
-
-* `approvals_before_merge` - (Required) Number of approvals required before merge. **Deprecated in 12.0** in favor of [Approval Rules API](https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-project-level-rules).
 
 * `reset_approvals_on_push` - (Optional) If set to true number of approvals is set to 0 after each push to the merge request.
 

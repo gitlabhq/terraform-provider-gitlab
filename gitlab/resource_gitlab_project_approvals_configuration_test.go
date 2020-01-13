@@ -47,7 +47,6 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_project_approvals_configuration" "approvals" {
 	project                                        = gitlab_project.foo.id
-	approvals_before_merge						   = 2
 	reset_approvals_on_push                        = true
 	disable_overriding_approvers_per_merge_request = true
 	merge_requests_author_approval                 = true
@@ -100,7 +99,6 @@ func testAccCheckGitlabProjectApprovalsConfigurationExists(n string, approvals *
 }
 
 type testAccGitlabProjectApprovalsConfigurationExpectedAttributes struct {
-	approvalsBeforeMerge                      int
 	resetApprovalsOnPush                      bool
 	disableOverridingApproversPerMergeRequest bool
 	mergeRequestsAuthorApproval               bool
@@ -109,9 +107,6 @@ type testAccGitlabProjectApprovalsConfigurationExpectedAttributes struct {
 
 func testAccCheckGitlabProjectApprovalsConfigurationAttributes(approvals *gitlab.ProjectApprovals, want *testAccGitlabProjectApprovalsConfigurationExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if approvals.ApprovalsBeforeMerge != want.approvalsBeforeMerge {
-			return fmt.Errorf("got approvals before merge %q; want %q", approvals.ApprovalsBeforeMerge, want.approvalsBeforeMerge)
-		}
 		if approvals.ResetApprovalsOnPush != want.resetApprovalsOnPush {
 			return fmt.Errorf("got reset approvals on push %t; want %t", approvals.ResetApprovalsOnPush, want.resetApprovalsOnPush)
 		}
