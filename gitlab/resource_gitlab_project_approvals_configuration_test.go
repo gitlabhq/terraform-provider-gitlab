@@ -110,7 +110,7 @@ type testAccGitlabProjectApprovalsConfigurationExpectedAttributes struct {
 func testAccCheckGitlabProjectApprovalsConfigurationAttributes(approvals *gitlab.ProjectApprovals, want *testAccGitlabProjectApprovalsConfigurationExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if approvals.ApprovalsBeforeMerge != want.approvalsBeforeMerge {
-			return fmt.Errorf("got description %q; want %q", approvals.ApprovalsBeforeMerge, want.approvalsBeforeMerge)
+			return fmt.Errorf("got approvals before merge %q; want %q", approvals.ApprovalsBeforeMerge, want.approvalsBeforeMerge)
 		}
 		if approvals.ResetApprovalsOnPush != want.resetApprovalsOnPush {
 			return fmt.Errorf("got reset approvals on push %t; want %t", approvals.ResetApprovalsOnPush, want.resetApprovalsOnPush)

@@ -54,18 +54,12 @@ func resourceGitlabProjectApprovalsConfiguration() *schema.Resource {
 func resourceGitlabProjectApprovalsConfigurationCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	approvalsBeforeMerge := d.Get("approvals_before_merge").(int)
-	resetApprovalsOnPush := d.Get("reset_approvals_on_push").(bool)
-	disableOverridingApproversPerMergeRequest := d.Get("disable_overriding_approvers_per_merge_request").(bool)
-	mergeRequestsAuthorsApproval := d.Get("merge_requests_author_approval").(bool)
-	mergeRequestsDisableCommittersApproval := d.Get("merge_requests_disable_committers_approval").(bool)
-
 	options := &gitlab.ChangeApprovalConfigurationOptions{
-		ApprovalsBeforeMerge:                      &approvalsBeforeMerge,
-		ResetApprovalsOnPush:                      &resetApprovalsOnPush,
-		DisableOverridingApproversPerMergeRequest: &disableOverridingApproversPerMergeRequest,
-		MergeRequestsAuthorApproval:               &mergeRequestsAuthorsApproval,
-		MergeRequestsDisableCommittersApproval:    &mergeRequestsDisableCommittersApproval,
+		ApprovalsBeforeMerge:                      gitlab.Int(d.Get("approvals_before_merge").(int)),
+		ResetApprovalsOnPush:                      gitlab.Bool(d.Get("reset_approvals_on_push").(bool)),
+		DisableOverridingApproversPerMergeRequest: gitlab.Bool(d.Get("disable_overriding_approvers_per_merge_request").(bool)),
+		MergeRequestsAuthorApproval:               gitlab.Bool(d.Get("merge_requests_author_approval").(bool)),
+		MergeRequestsDisableCommittersApproval:    gitlab.Bool(d.Get("merge_requests_disable_committers_approval").(bool)),
 	}
 
 	log.Printf("[DEBUG] create gitlab approvals configuration for project %s", project)
@@ -106,15 +100,12 @@ func resourceGitlabProjectApprovalsConfigurationDelete(d *schema.ResourceData, m
 
 	log.Printf("[DEBUG] delete (reset) gitlab approvals configuration for project %s", project)
 
-	f := false
-	zero := 0
-
 	options := &gitlab.ChangeApprovalConfigurationOptions{
-		ApprovalsBeforeMerge:                      &zero,
-		ResetApprovalsOnPush:                      &f,
-		DisableOverridingApproversPerMergeRequest: &f,
-		MergeRequestsAuthorApproval:               &f,
-		MergeRequestsDisableCommittersApproval:    &f,
+		ApprovalsBeforeMerge:                      gitlab.Int(0),
+		ResetApprovalsOnPush:                      gitlab.Bool(false),
+		DisableOverridingApproversPerMergeRequest: gitlab.Bool(false),
+		MergeRequestsAuthorApproval:               gitlab.Bool(false),
+		MergeRequestsDisableCommittersApproval:    gitlab.Bool(false),
 	}
 	_, _, err := client.Projects.ChangeApprovalConfiguration(project, options)
 	return err
