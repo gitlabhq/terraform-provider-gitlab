@@ -57,6 +57,14 @@ func resourceGitlabProjectPushRules() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"commit_committer_check": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"reject_unsigned_commits": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -120,6 +128,8 @@ func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}
 	d.Set("member_check", pushRules.MemberCheck)
 	d.Set("prevent_secrets", pushRules.PreventSecrets)
 	d.Set("max_file_size", pushRules.MaxFileSize)
+	d.Set("commit_committer_check", pushRules.CommitCommitterCheck)
+	d.Set("reject_unsigned_commits", pushRules.RejectUnsignedCommits)
 	return nil
 }
 

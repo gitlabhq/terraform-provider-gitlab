@@ -48,6 +48,8 @@ The following arguments are supported:
 
 * `commit_committer_check` - (Optional, bool) Users can only push commits to this repository that were committed with one of their own verified emails
 
+* `reject_unsigned_commits` - (Optional, bool) Reject commit when it is not signed through GPG.
+
 ## Attributes Reference
 
 The resource exports the following attributes:
