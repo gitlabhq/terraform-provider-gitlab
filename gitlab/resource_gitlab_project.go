@@ -29,7 +29,6 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"namespace_id": {
 		Type:     schema.TypeInt,
 		Optional: true,
-		ForceNew: true,
 		Computed: true,
 	},
 	"description": {
@@ -362,6 +361,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	client := meta.(*gitlab.Client)
 
 	options := &gitlab.EditProjectOptions{}
+	transferOptions := &gitlab.TransferProjectOptions{}
 
 	// need to manage partial state since project archiving requires
 	// a separate API call which could fail
@@ -376,6 +376,11 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	if d.HasChange("path") && (d.Get("path").(string) != "") {
 		options.Path = gitlab.String(d.Get("path").(string))
 		updatedProperties = append(updatedProperties, "path")
+	}
+
+	if d.HasChange("namespace_id") {
+		transferOptions.Namespace = gitlab.Int(d.Get("namespace_id").(int))
+		updatedProperties = append(updatedProperties, "namespace_id")
 	}
 
 	if d.HasChange("description") {
@@ -473,6 +478,16 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 			log.Printf("[DEBUG] partial gitlab project %s update of property %q", d.Id(), updatedProperty)
 			d.SetPartial(updatedProperty)
 		}
+	}
+
+	if *transferOptions != (gitlab.TransferProjectOptions{}) {
+		log.Printf("[DEBUG] transferring project %s to namespace %d", d.Id(), transferOptions.Namespace)
+		_, _, err := client.Projects.TransferProject(d.Id(), transferOptions)
+		if err != nil {
+			return err
+		}
+		log.Printf("[DEBUG] partial gitlab project %s update of property namespace_id", d.Id())
+		d.SetPartial("namespace_id")
 	}
 
 	if d.HasChange("shared_with_groups") {
