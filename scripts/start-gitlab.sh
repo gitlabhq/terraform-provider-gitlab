@@ -4,17 +4,18 @@ test "$MAKE_TARGET" == "testacc" || { echo "not starting gitlab!"; exit 0; }
 test -z "$(docker ps -f 'name=gitlab' -q)" || { echo "Gitlab already running"; exit 0; }
 
 _gitlab_image="gitlab/gitlab-ce"
+extra=""
 if test -n "${GITLAB_LICENSE_FILE}"; then
   _license_dir=${GITLAB_LICENSE_DIR:-.license}
   _license_file=${GITLAB_LICENSE_FILE:-JulienPivotto.gitlab-license}
 
   if ! test -f "${_license_dir}/${_license_file}"
   then
-      echo No license
+      echo "No license"
       exit 1
   fi
   _gitlab_image=gitlab/gitlab-ee
-  extra="-v $PWD/${_license_dir}:/license"
+  extra+="-v $PWD/${_license_dir}:/license"
   extra+=" -e GITLAB_LICENSE_FILE=/license/${_license_file}"
 fi
 
