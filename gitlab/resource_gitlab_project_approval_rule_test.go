@@ -329,8 +329,11 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	updateExpected.ApprovalsRequired = 1
 
 	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		PreCheck:     func() { testGitLabLicensePreCheck(t) },
+		Providers: testAccProviders,
+		PreCheck: func() {
+			testAccPreCheck(t)
+			testGitLabLicensePreCheck(t)
+		},
 		CheckDestroy: testChecks.Destroy,
 		Steps: []resource.TestStep{
 			{ // Create Rule
@@ -362,8 +365,11 @@ func TestAccGitLabProjectApprovalRule_willError(t *testing.T) {
 	willError.Name = testConfig.getName("notthename")
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testGitLabLicensePreCheck(t) },
-		Providers:    testAccProviders,
+		Providers: testAccProviders,
+		PreCheck: func() {
+			testAccPreCheck(t)
+			testGitLabLicensePreCheck(t)
+		},
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{ // Create rule
@@ -390,8 +396,11 @@ func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testGitLabLicensePreCheck(t) },
-		Providers:    testAccProviders,
+		Providers: testAccProviders,
+		PreCheck: func() {
+			testAccPreCheck(t)
+			testGitLabLicensePreCheck(t)
+		},
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{ // Create Rule

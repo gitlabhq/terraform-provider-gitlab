@@ -35,7 +35,6 @@ func testAccPreCheck(t *testing.T) {
 }
 
 func testGitLabLicensePreCheck(t *testing.T) {
-	testAccPreCheck(t)
 	if v := os.Getenv("GITLAB_LICENSE_FILE"); v == "" {
 		t.Skipf("GITLAB_LICENSE_FILE must be set to run EE tests.")
 	}
