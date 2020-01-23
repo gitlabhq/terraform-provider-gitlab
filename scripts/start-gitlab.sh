@@ -9,9 +9,9 @@ if test -n "${GITLAB_LICENSE_FILE}"; then
   _license_dir=${GITLAB_LICENSE_DIR:-.license}
   _license_file=${GITLAB_LICENSE_FILE:-JulienPivotto.gitlab-license}
 
-  if ! test -f "${_license_dir}/${_license_file}"
+  if ! test -r "${_license_dir}/${_license_file}"
   then
-      echo "No license"
+      echo "No license at ${_license_dir}/${_license_file}"
       exit 1
   fi
   _gitlab_image=gitlab/gitlab-ee
