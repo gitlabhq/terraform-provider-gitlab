@@ -264,7 +264,11 @@ func expandApproverIds(ids interface{}, hasItems bool) []int {
 // This method attempts to work around a bug in GitLab where there are instances
 // where the `users` attribute in the response will be empty under certain
 // conditions.
+//
+// Reference: https://gitlab.com/gitlab-org/gitlab/issues/35008
 func getProjectApprovalRuleUserIDs(client *gitlab.Client, ruleID string) ([]int, error) {
+	log.Print("[DEBUG] Looking up project approval rule User IDs as a workaround for bug in GitLab.")
+
 	userIDs := newMemberList([]int{})
 
 	rule, err := getApprovalRuleByID(client, ruleID)
