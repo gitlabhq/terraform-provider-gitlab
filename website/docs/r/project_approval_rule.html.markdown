@@ -18,11 +18,11 @@ documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#proje
 
 ```hcl
 resource "gitlab_project_approval_rule" "example" {
-  project = 5
-  name = "Example"
+  project            = 5
+  name               = "Example"
   approvals_required = 3
-  user_ids = [50, 500]
-  group_ids = [51]
+  user_ids           = [50, 500]
+  group_ids          = [51]
 }
 ```
 
@@ -36,7 +36,7 @@ The following arguments are supported:
 
 * `approvals_required` - (Required) The number of approvals required for this rule.
 
-* `user_ids` - (Required)  A list of specific User IDs to add to the list of approvers.
+* `user_ids` - (Optional)  A list of specific User IDs to add to the list of approvers.
 
 * `group_ids` - (Optional) A list of group IDs who's members can approve of the merge request
 
@@ -48,7 +48,7 @@ The resource exports the following additional attributes:
 
 ## Import
 
-GitLab project approval rules imported using an id made up of `project-id:rule-id`, e.g.
+GitLab project approval rules can be imported using an id consisting of `project-id:rule-id`, e.g.
 
 ```
 $ terraform import gitlab_project_approval_rule.example "12345:6"
