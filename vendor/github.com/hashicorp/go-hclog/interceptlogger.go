@@ -12,7 +12,7 @@ var _ Logger = &interceptLogger{}
 type interceptLogger struct {
 	Logger
 
-	sync.Mutex
+	mu        *sync.Mutex
 	sinkCount *int32
 	Sinks     map[SinkAdapter]struct{}
 }
@@ -20,6 +20,7 @@ type interceptLogger struct {
 func NewInterceptLogger(opts *LoggerOptions) InterceptLogger {
 	intercept := &interceptLogger{
 		Logger:    New(opts),
+		mu:        new(sync.Mutex),
 		sinkCount: new(int32),
 		Sinks:     make(map[SinkAdapter]struct{}),
 	}
@@ -29,6 +30,19 @@ func NewInterceptLogger(opts *LoggerOptions) InterceptLogger {
 	return intercept
 }
 
+func (i *interceptLogger) Log(level Level, msg string, args ...interface{}) {
+	i.Logger.Log(level, msg, args...)
+	if atomic.LoadInt32(i.sinkCount) == 0 {
+		return
+	}
+
+	i.mu.Lock()
+	defer i.mu.Unlock()
+	for s := range i.Sinks {
+		s.Accept(i.Name(), level, msg, i.retrieveImplied(args...)...)
+	}
+}
+
 // Emit the message and args at TRACE level to log and sinks
 func (i *interceptLogger) Trace(msg string, args ...interface{}) {
 	i.Logger.Trace(msg, args...)
@@ -36,8 +50,8 @@ func (i *interceptLogger) Trace(msg string, args ...interface{}) {
 		return
 	}
 
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 	for s := range i.Sinks {
 		s.Accept(i.Name(), Trace, msg, i.retrieveImplied(args...)...)
 	}
@@ -50,8 +64,8 @@ func (i *interceptLogger) Debug(msg string, args ...interface{}) {
 		return
 	}
 
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 	for s := range i.Sinks {
 		s.Accept(i.Name(), Debug, msg, i.retrieveImplied(args...)...)
 	}
@@ -64,8 +78,8 @@ func (i *interceptLogger) Info(msg string, args ...interface{}) {
 		return
 	}
 
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 	for s := range i.Sinks {
 		s.Accept(i.Name(), Info, msg, i.retrieveImplied(args...)...)
 	}
@@ -78,8 +92,8 @@ func (i *interceptLogger) Warn(msg string, args ...interface{}) {
 		return
 	}
 
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 	for s := range i.Sinks {
 		s.Accept(i.Name(), Warn, msg, i.retrieveImplied(args...)...)
 	}
@@ -92,8 +106,8 @@ func (i *interceptLogger) Error(msg string, args ...interface{}) {
 		return
 	}
 
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 	for s := range i.Sinks {
 		s.Accept(i.Name(), Error, msg, i.retrieveImplied(args...)...)
 	}
@@ -178,8 +192,8 @@ func (i *interceptLogger) With(args ...interface{}) Logger {
 
 // RegisterSink attaches a SinkAdapter to interceptLoggers sinks.
 func (i *interceptLogger) RegisterSink(sink SinkAdapter) {
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 
 	i.Sinks[sink] = struct{}{}
 
@@ -188,8 +202,8 @@ func (i *interceptLogger) RegisterSink(sink SinkAdapter) {
 
 // DeregisterSink removes a SinkAdapter from interceptLoggers sinks.
 func (i *interceptLogger) DeregisterSink(sink SinkAdapter) {
-	i.Lock()
-	defer i.Unlock()
+	i.mu.Lock()
+	defer i.mu.Unlock()
 
 	delete(i.Sinks, sink)
 
