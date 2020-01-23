@@ -324,7 +324,7 @@ func getApproversNotInProject(client *gitlab.ProjectMembersService, userIDs []in
 
 	if len(members) != 0 {
 		for _, member := range members {
-			if member.AccessLevel >= 30 {
+			if member.AccessLevel >= gitlab.DeveloperPermissions {
 				memberIDs.Add(member.ID)
 			}
 		}
