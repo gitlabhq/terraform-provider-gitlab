@@ -37,7 +37,13 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Computed: true,
 			},
 			"notify_only_default_branch": {
-				Type:     schema.TypeBool,
+				Type:       schema.TypeBool,
+				Optional:   true,
+				Computed:   true,
+				Deprecated: "use 'branches_to_be_notified' argument instead",
+			},
+			"branches_to_be_notified": {
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
@@ -140,6 +146,7 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	d.Set("username", service.Properties.Username)
 	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON)
 	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)
+	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
 	d.Set("push_events", service.PushEvents)
 	d.Set("push_channel", service.Properties.PushChannel)
 	d.Set("issues_events", service.IssuesEvents)
@@ -175,6 +182,7 @@ func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) 
 	opts.Username = gitlab.String(d.Get("username").(string))
 	opts.NotifyOnlyBrokenPipelines = gitlab.Bool(d.Get("notify_only_broken_pipelines").(bool))
 	opts.NotifyOnlyDefaultBranch = gitlab.Bool(d.Get("notify_only_default_branch").(bool))
+	opts.BranchesToBeNotified = gitlab.String(d.Get("branches_to_be_notified").(string))
 	opts.PushEvents = gitlab.Bool(d.Get("push_events").(bool))
 	opts.PushChannel = gitlab.String(d.Get("push_channel").(string))
 	opts.IssuesEvents = gitlab.Bool(d.Get("issues_events").(bool))
