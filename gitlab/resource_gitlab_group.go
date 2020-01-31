@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -117,8 +118,13 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab group %s", d.Id())
 
-	group, _, err := client.Groups.GetGroup(d.Id())
+	group, resp, err := client.Groups.GetGroup(d.Id())
 	if err != nil {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

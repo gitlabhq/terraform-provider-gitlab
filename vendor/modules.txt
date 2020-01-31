@@ -232,7 +232,7 @@ github.com/ulikunitz/xz/lzma
 # github.com/vmihailenco/msgpack v4.0.4+incompatible
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes
-# github.com/xanzy/go-gitlab v0.22.2
+# github.com/xanzy/go-gitlab v0.22.3
 github.com/xanzy/go-gitlab
 # github.com/zclconf/go-cty v1.2.0
 github.com/zclconf/go-cty/cty
@@ -285,7 +285,9 @@ golang.org/x/exp/cmd/apidiff
 # golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 golang.org/x/lint
 golang.org/x/lint/golint
+
 # golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553
+
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
@@ -294,7 +296,7 @@ golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
-# golang.org/x/oauth2 v0.0.0-20191202225959-858c2ad4c8b6
+# golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 golang.org/x/oauth2
 golang.org/x/oauth2/google
 golang.org/x/oauth2/internal
