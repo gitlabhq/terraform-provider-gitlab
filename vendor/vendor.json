@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "rC7xX4MBLCni9eeUAL0HoftAgX8=",
+			"path": "github.com/terraform-providers/terraform-provider-tls/tls",
+			"revision": "cb21e556b00b4d8d5fc4073b941ddd5a9c2c0395",
+			"revisionTime": "2019-09-25T21:26:36Z"
+		}
+	],
+	"rootPath": "github.com/terraform-providers/terraform-provider-gitlab"
+}
