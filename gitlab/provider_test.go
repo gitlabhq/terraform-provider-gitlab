@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"gitlab.com/terraform-providers/terraform-provider-tls/tls"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
@@ -15,6 +16,7 @@ func init() {
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"gitlab": testAccProvider,
+		"tls":	tls.Provider(),
 	}
 }
 
