@@ -239,6 +239,22 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 			return fmt.Errorf("got request_access_enabled %t; want %t", group.RequestAccessEnabled, want.RequestAccessEnabled)
 		}
 
+		if group.ProjectCreationLevel != want.ProjectCreationLevel {
+			return fmt.Errorf("got project_creation_level %t; want %t", group.ProjectCreationLevel, want.ProjectCreationLevel)
+		}
+
+		if group.SubgroupCreationLevel != want.SubgroupCreationLevel {
+			return fmt.Errorf("got subgroup_creation_level %t; want %t", group.SubgroupCreationLevel, want.SubgroupCreationLevel)
+		}
+
+		if group.RequireTwoFactorAuthentication != want.RequireTwoFactorAuthentication {
+			return fmt.Errorf("got require_two_factor_authentication %t; want %t", group.RequireTwoFactorAuthentication, want.RequireTwoFactorAuthentication)
+		}
+
+		if group.TwoFactorGracePeriod != want.TwoFactorGracePeriod {
+			return fmt.Errorf("got two_factor_grace_period %t; want %t", group.TwoFactorGracePeriod, want.TwoFactorGracePeriod)
+		}
+
 		if want.Parent != nil {
 			if group.ParentID != want.Parent.ID {
 				return fmt.Errorf("got parent_id %d; want %d", group.ParentID, want.Parent.ID)
@@ -297,6 +313,10 @@ resource "gitlab_group" "foo" {
   description = "Terraform acceptance tests! Updated description"
   lfs_enabled = false
   request_access_enabled = true
+  project_creation_level = developer
+  subgroup_creation_level = maintainer
+  require_two_factor_authentication = false
+  two_factor_grace_period = 48
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing

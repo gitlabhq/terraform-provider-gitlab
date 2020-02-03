@@ -63,6 +63,28 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
+			"project_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
+			},
+			"subgroup_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"owners", "maintainers"}, true),
+			},
+			"require_two_factor_authentication": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"two_factor_grace_period": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  48,
+			},
 			"parent_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -96,6 +118,22 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("project_creation_level"); ok {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("subgroup_creation_level"); ok {
+		options.SubgroupCreationLevel = stringToSubgroupCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("require_two_factor_authentication"); ok {
+		options.RequireTwoFactorAuthentication = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("two_factor_grace_period"); ok {
+		options.TwoFactorGracePeriod = gitlab.Int(v(int))
 	}
 
 	if v, ok := d.GetOk("parent_id"); ok {
@@ -138,6 +176,10 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
+	d.Set("project_creation_level", group.ProjectCreationLevel)
+	d.Set("subgroup_creation_level", group.SubgroupCreationLevel)
+	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuthentication)
+	d.Set("two_factor_grace_period", group.TwoFactorGracePeriod)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
 
@@ -173,6 +215,22 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	// https://gitlab.com/gitlab-org/gitlab-ce/issues/38459
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if d.HasChange("project_creation_level") {
+		options.ProjectCreationLevel = gitlab.String(d.Get("project_creation_level").(string))
+	}
+
+	if d.HasChange("subgroup_creation_level") {
+		options.SubgroupCreationLevel = gitlab.String(d.Get("subgroup_creation_level").(string))
+	}
+
+	if d.HasChange("require_two_factor_authentication") {
+		options.RequireTwoFactorAuthentication = gitlab.Bool(d.Get("require_two_factor_authentication").(bool))
+	}
+
+	if d.HasChange("two_factor_grace_period") {
+		options.TwoFactorGracePeriod = gitlab.Int(d.Get("two_factor_grace_period").(int))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
