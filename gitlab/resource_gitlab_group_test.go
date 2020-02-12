@@ -283,6 +283,10 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 			return fmt.Errorf("got two_factor_grace_period %t; want %t", group.TwoFactorGracePeriod, want.TwoFactorGracePeriod)
 		}
 
+		if group.ShareWithGroupLock != want.ShareWithGroupLock {
+			return fmt.Errorf("got share_with_group_lock %t; want %t", group.ShareWithGroupLock, want.ShareWithGroupLock)
+		}
+
 		if want.Parent != nil {
 			if group.ParentID != want.Parent.ID {
 				return fmt.Errorf("got parent_id %d; want %d", group.ParentID, want.Parent.ID)
@@ -350,6 +354,7 @@ resource "gitlab_group" "foo" {
   mentions_disabled = false
   shared_runners_minutes_limit = 60
   extra_shared_runners_minutes_limit = 60
+  share_with_group_lock = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing

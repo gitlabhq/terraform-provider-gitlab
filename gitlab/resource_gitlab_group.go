@@ -245,6 +245,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
+    d.Set("share_with_group_lock", group.ShareWithGroupLock)
 
 	return nil
 }
@@ -306,6 +307,10 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("mentions_disabled") {
 		options.MentionsDisabled = gitlab.Bool(d.Get("mentions_disabled").(bool))
+	}
+
+	if d.HasChange("share_with_group_lock") {
+		options.ShareWithGroupLock = gitlab.Bool(d.Get("share_with_group_lock").(bool))
 	}
 
 	if d.HasChange("shared_runners_minutes_limit") {
