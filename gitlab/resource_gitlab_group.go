@@ -63,6 +63,32 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
+			"share_with_group_lock": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"project_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
+			},
+			"auto_devops_enabled": {
+				Type:         schema.TypeBool,
+				Optional:     true,
+				Default:  false,
+			},
+			"emails_disabled": {
+				Type:         schema.TypeBool,
+				Optional:     true,
+				Default:  false,
+			},
+			"mentions_disabled": {
+				Type:         schema.TypeBool,
+				Optional:     true,
+				Default:  false,
+			},
 			"project_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -95,6 +121,14 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:      schema.TypeString,
 				Computed:  true,
 				Sensitive: true,
+			},
+			"shared_runners_minutes_limit": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"extra_shared_runners_minutes_limit": {
+				Type:     schema.TypeInt,
+				Optional: true,
 			},
 		},
 	}
@@ -204,6 +238,11 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("subgroup_creation_level", group.SubGroupCreationLevel)
 	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuth)
 	d.Set("two_factor_grace_period", group.TwoFactorGracePeriod)
+    d.Set("auto_devops_enabled", group.AutoDevopsEnabled)
+    d.Set("emails_disabled", group.EmailsDisabled)
+    d.Set("mentions_disabled", group.MentionsDisabled)
+    d.Set("shared_runners_minutes_limit", group.SharedRunnersMinutesLimit)
+    d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
 
