@@ -125,15 +125,15 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if v, ok := d.GetOk("subgroup_creation_level"); ok {
-		options.SubgroupCreationLevel = stringToSubgroupCreationLevel(v.(string))
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
 	}
 
 	if v, ok := d.GetOk("require_two_factor_authentication"); ok {
-		options.RequireTwoFactorAuthentication = gitlab.Bool(v.(bool))
+		options.RequireTwoFactorAuth = gitlab.Bool(v.(bool))
 	}
 
 	if v, ok := d.GetOk("two_factor_grace_period"); ok {
-		options.TwoFactorGracePeriod = gitlab.Int(v(int))
+		options.TwoFactorGracePeriod = gitlab.Int(v.(int))
 	}
 
 	if v, ok := d.GetOk("parent_id"); ok {
@@ -177,8 +177,8 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
 	d.Set("project_creation_level", group.ProjectCreationLevel)
-	d.Set("subgroup_creation_level", group.SubgroupCreationLevel)
-	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuthentication)
+	d.Set("subgroup_creation_level", group.SubGroupCreationLevel)
+	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuth)
 	d.Set("two_factor_grace_period", group.TwoFactorGracePeriod)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
@@ -217,16 +217,16 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
-	if d.HasChange("project_creation_level") {
-		options.ProjectCreationLevel = gitlab.String(d.Get("project_creation_level").(string))
+	if v, ok := d.GetOk("project_creation_level"); ok {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
 	}
 
-	if d.HasChange("subgroup_creation_level") {
-		options.SubgroupCreationLevel = gitlab.String(d.Get("subgroup_creation_level").(string))
+	if v, ok := d.GetOk("subgroup_creation_level"); ok {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
 	}
 
 	if d.HasChange("require_two_factor_authentication") {
-		options.RequireTwoFactorAuthentication = gitlab.Bool(d.Get("require_two_factor_authentication").(bool))
+		options.RequireTwoFactorAuth = gitlab.Bool(d.Get("require_two_factor_authentication").(bool))
 	}
 
 	if d.HasChange("two_factor_grace_period") {

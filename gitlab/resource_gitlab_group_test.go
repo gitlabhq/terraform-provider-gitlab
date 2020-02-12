@@ -243,8 +243,8 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 			return fmt.Errorf("got project_creation_level %t; want %t", group.ProjectCreationLevel, want.ProjectCreationLevel)
 		}
 
-		if group.SubgroupCreationLevel != want.SubgroupCreationLevel {
-			return fmt.Errorf("got subgroup_creation_level %t; want %t", group.SubgroupCreationLevel, want.SubgroupCreationLevel)
+		if group.SubGroupCreationLevel != want.SubGroupCreationLevel {
+			return fmt.Errorf("got subgroup_creation_level %t; want %t", group.SubGroupCreationLevel, want.SubGroupCreationLevel)
 		}
 
 		if group.RequireTwoFactorAuthentication != want.RequireTwoFactorAuthentication {
