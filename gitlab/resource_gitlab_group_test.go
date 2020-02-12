@@ -345,6 +345,11 @@ resource "gitlab_group" "foo" {
   subgroup_creation_level = maintainer
   require_two_factor_authentication = false
   two_factor_grace_period = 48
+  auto_devops_enabled = false
+  emails_disabled = false
+  mentions_disabled = false
+  shared_runners_minutes_limit = 60
+  extra_shared_runners_minutes_limit = 60
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
