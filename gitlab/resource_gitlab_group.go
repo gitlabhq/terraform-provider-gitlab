@@ -280,12 +280,12 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
-	if v, ok := d.GetOk("project_creation_level"); ok {
-		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
+	if d.HasChange("project_creation_level") {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(d.Get("project_creation_level").(string))
 	}
 
-	if v, ok := d.GetOk("subgroup_creation_level"); ok {
-		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
+	if d.HasChange("subgroup_creation_level") {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(d.Get("subgroup_creation_level").(string))
 	}
 
 	if d.HasChange("require_two_factor_authentication") {
@@ -294,6 +294,26 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("two_factor_grace_period") {
 		options.TwoFactorGracePeriod = gitlab.Int(d.Get("two_factor_grace_period").(int))
+	}
+
+	if d.HasChange("auto_devops_enabled") {
+		options.AutoDevopsEnabled = gitlab.Bool(d.Get("auto_devops_enabled").(bool))
+	}
+
+	if d.HasChange("emails_disabled") {
+		options.EmailsDisabled = gitlab.Bool(d.Get("emails_disabled").(bool))
+	}
+
+	if d.HasChange("mentions_disabled") {
+		options.MentionsDisabled = gitlab.Bool(d.Get("mentions_disabled").(bool))
+	}
+
+	if d.HasChange("shared_runners_minutes_limit") {
+		options.SharedRunnersMinutesLimit = gitlab.Int(d.Get("shared_runners_minutes_limit").(int))
+	}
+
+	if d.HasChange("extra_shared_runners_minutes_limit") {
+		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(d.Get("extra_shared_runners_minutes_limit").(int))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
