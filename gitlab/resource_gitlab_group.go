@@ -120,12 +120,8 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
-	if v, ok := d.GetOk("project_creation_level"); ok {
-		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
-	}
-
-	if v, ok := d.GetOk("subgroup_creation_level"); ok {
-		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
+	if v, ok := d.GetOk("share_with_group_lock"); ok {
+		options.ShareWithGroupLock = gitlab.Bool(v.(bool))
 	}
 
 	if v, ok := d.GetOk("require_two_factor_authentication"); ok {
@@ -136,8 +132,36 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		options.TwoFactorGracePeriod = gitlab.Int(v.(int))
 	}
 
+	if v, ok := d.GetOk("project_creation_level"); ok {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("auto_devops_enabled"); ok {
+		options.AutoDevopsEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("subgroup_creation_level"); ok {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("emails_disabled"); ok {
+		options.EmailsDisabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("mentions_disabled"); ok {
+		options.MentionsDisabled = gitlab.Bool(v.(bool))
+	}
+
 	if v, ok := d.GetOk("parent_id"); ok {
 		options.ParentID = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("shared_runners_minutes_limit"); ok {
+		options.SharedRunnersMinutesLimit = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("extra_shared_runners_minutes_limit"); ok {
+		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(v.(int))
 	}
 
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
