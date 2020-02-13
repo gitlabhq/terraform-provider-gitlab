@@ -245,7 +245,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
-    d.Set("share_with_group_lock", group.ShareWithGroupLock)
+	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 
 	return nil
 }
