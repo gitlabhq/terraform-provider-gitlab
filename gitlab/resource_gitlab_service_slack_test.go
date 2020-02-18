@@ -213,6 +213,7 @@ resource "gitlab_service_slack" "slack" {
   wiki_page_channel            = "test"
   notify_only_broken_pipelines = true
   notify_only_default_branch   = true
+  branches_to_be_notified      = "all"
 }
 `, rInt)
 }
@@ -251,6 +252,7 @@ resource "gitlab_service_slack" "slack" {
   wiki_page_channel            = "test wiki_page_channel"
   notify_only_broken_pipelines = false
   notify_only_default_branch   = false
+  branches_to_be_notified      = "all"
 }
 `, rInt)
 }

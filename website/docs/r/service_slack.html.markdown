@@ -40,7 +40,9 @@ The following arguments are supported:
 
 * `notify_only_broken_pipelines` - (Optional) Send notifications for broken pipelines.
 
-* `notify_only_default_branch` - (Optional) Send notifications only for the default branch.
+* `notify_only_default_branch` - (Optional) DEPRECATED: This parameter has been replaced with `branches_to_be_notified`.
+
+* `branches_to_be_notified` - (Optional) Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected".
 
 * `push_events` - (Optional) Enable notifications for push events.
 
