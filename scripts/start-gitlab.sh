@@ -4,7 +4,7 @@ echo "Starting gitlab container..."
 if [[ -n $GITLAB_LICENSE_FILE ]]
 then
     extra="-v $PWD/license:/license -e GITLAB_LICENSE_FILE=/license/$GITLAB_LICENSE_FILE"
-    img=gitlab/gitlab-ee:12.6.4-ce.0
+    img=gitlab/gitlab-ee:12.6.4-ee.0
     if [[ ! -f license/$GITLAB_LICENSE_FILE ]]
     then
         echo No license
