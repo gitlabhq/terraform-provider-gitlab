@@ -135,6 +135,10 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.Username = gitlab.String(d.Get("username").(string))
 	}
 
+	if d.HasChange("email") {
+		options.Email = gitlab.String(d.Get("email").(string))
+	}
+
 	if d.HasChange("is_admin") {
 		options.Admin = gitlab.Bool(d.Get("is_admin").(bool))
 	}
@@ -149,6 +153,10 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("is_external") {
 		options.Admin = gitlab.Bool(d.Get("is_external").(bool))
+	}
+
+	if d.HasChange("skip_confirmation") {
+		options.SkipReconfirmation = gitlab.Bool(d.Get("skip_confirmation").(bool))
 	}
 
 	log.Printf("[DEBUG] update gitlab user %s", d.Id())
