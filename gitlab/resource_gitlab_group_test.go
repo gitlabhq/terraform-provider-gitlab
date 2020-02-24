@@ -209,12 +209,23 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 }
 
 type testAccGitlabGroupExpectedAttributes struct {
-	Name                 string
-	Path                 string
-	Description          string
-	Parent               *gitlab.Group
-	LFSEnabled           bool
-	RequestAccessEnabled bool
+	Name                           string
+	Path                           string
+	Description                    string
+	Parent                         *gitlab.Group
+	LFSEnabled                     bool
+	RequestAccessEnabled           bool
+	Visibility                     gitlab.VisibilityValue
+	ShareWithGroupLock             bool
+	AutoDevopsEnabled              bool
+	EmailsDisabled                 bool
+	MentionsDisabled               bool
+	SharedRunnersMinutesLimit      int
+	ExtraSharedRunnersMinutesLimit int
+	ProjectCreationLevel           gitlab.ProjectCreationLevelValue
+	SubGroupCreationLevel          gitlab.SubGroupCreationLevelValue
+	RequireTwoFactorAuth           bool
+	TwoFactorGracePeriod           int
 }
 
 func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabGroupExpectedAttributes) resource.TestCheckFunc {
@@ -235,32 +246,28 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 			return fmt.Errorf("got lfs_enabled %t; want %t", group.LFSEnabled, want.LFSEnabled)
 		}
 
-		if group.RequestVisibilityLevel != want.RequestVisibilityLevel {
-			return fmt.Errorf("got request_visibility_level: %t; want %t", group.RequestVisibilityLevel, want.RequestVisibilityLevel)
+		if group.Visibility != want.Visibility {
+			return fmt.Errorf("got request_visibility_level: %q; want %q", group.Visibility, want.Visibility)
 		}
 
-		if group.RequestShareWithGroupLock != want.RequestShareWithGroupLock {
-			return fmt.Errorf("got request_share_with_group_lock: %t; want %t", group.RequestShareWithGroupLock, want.RequestShareWithGroupLock)
+		if group.AutoDevopsEnabled != want.AutoDevopsEnabled {
+			return fmt.Errorf("got request_auto_devops_enabled: %t; want %t", group.AutoDevopsEnabled, want.AutoDevopsEnabled)
 		}
 
-		if group.RequestAutoDevopsEnabled != want.RequestAutoDevopsEnabled {
-			return fmt.Errorf("got request_auto_devops_enabled: %t; want %t", group.RequestAutoDevopsEnabled, want.RequestAutoDevopsEnabled)
+		if group.EmailsDisabled != want.EmailsDisabled {
+			return fmt.Errorf("got request_emails_disabled: %t; want %t", group.EmailsDisabled, want.EmailsDisabled)
 		}
 
-		if group.RequestEmailsDisabled != want.RequestEmailsDisabled {
-			return fmt.Errorf("got request_emails_disabled: %t; want %t", group.RequestEmailsDisabled, want.RequestEmailsDisabled)
+		if group.MentionsDisabled != want.MentionsDisabled {
+			return fmt.Errorf("got request_mentions_disabled: %t; want %t", group.MentionsDisabled, want.MentionsDisabled)
 		}
 
-		if group.RequestMentionsDisabled != want.RequestMentionsDisabled {
-			return fmt.Errorf("got request_mentions_disabled: %t; want %t", group.RequestMentionsDisabled, want.RequestMentionsDisabled)
+		if group.SharedRunnersMinutesLimit != want.SharedRunnersMinutesLimit {
+			return fmt.Errorf("got request_shared_runners_minutes_limit: %d; want %d", group.SharedRunnersMinutesLimit, want.SharedRunnersMinutesLimit)
 		}
 
-		if group.RequestSharedRunnersMinutesLimit != want.RequestSharedRunnersMinutesLimit {
-			return fmt.Errorf("got request_shared_runners_minutes_limit: %t; want %t", group.RequestSharedRunnersMinutesLimit, want.RequestSharedRunnersMinutesLimit)
-		}
-
-		if group.RequestExtraSharedRunnersMinutesLimit != want.RequestExtraSharedRunnersMinutesLimit {
-			return fmt.Errorf("got request_extra_shared_runners_minutes_limit: %t; want %t", group.RequestExtraSharedRunnersMinutesLimit, want.RequestExtraSharedRunnersMinutesLimit)
+		if group.ExtraSharedRunnersMinutesLimit != want.ExtraSharedRunnersMinutesLimit {
+			return fmt.Errorf("got request_extra_shared_runners_minutes_limit: %d; want %d", group.ExtraSharedRunnersMinutesLimit, want.ExtraSharedRunnersMinutesLimit)
 		}
 
 		if group.RequestAccessEnabled != want.RequestAccessEnabled {
@@ -268,19 +275,19 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 		}
 
 		if group.ProjectCreationLevel != want.ProjectCreationLevel {
-			return fmt.Errorf("got project_creation_level %t; want %t", group.ProjectCreationLevel, want.ProjectCreationLevel)
+			return fmt.Errorf("got project_creation_level %s; want %s", group.ProjectCreationLevel, want.ProjectCreationLevel)
 		}
 
 		if group.SubGroupCreationLevel != want.SubGroupCreationLevel {
-			return fmt.Errorf("got subgroup_creation_level %t; want %t", group.SubGroupCreationLevel, want.SubGroupCreationLevel)
+			return fmt.Errorf("got subgroup_creation_level %s; want %s", group.SubGroupCreationLevel, want.SubGroupCreationLevel)
 		}
 
-		if group.RequireTwoFactorAuthentication != want.RequireTwoFactorAuthentication {
-			return fmt.Errorf("got require_two_factor_authentication %t; want %t", group.RequireTwoFactorAuthentication, want.RequireTwoFactorAuthentication)
+		if group.RequireTwoFactorAuth != want.RequireTwoFactorAuth {
+			return fmt.Errorf("got require_two_factor_authentication %t; want %t", group.RequireTwoFactorAuth, want.RequireTwoFactorAuth)
 		}
 
 		if group.TwoFactorGracePeriod != want.TwoFactorGracePeriod {
-			return fmt.Errorf("got two_factor_grace_period %t; want %t", group.TwoFactorGracePeriod, want.TwoFactorGracePeriod)
+			return fmt.Errorf("got two_factor_grace_period %d; want %d", group.TwoFactorGracePeriod, want.TwoFactorGracePeriod)
 		}
 
 		if group.ShareWithGroupLock != want.ShareWithGroupLock {
