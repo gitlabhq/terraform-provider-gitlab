@@ -92,6 +92,10 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("name", user.Name)
 	d.Set("can_create_group", user.CanCreateGroup)
 	d.Set("projects_limit", user.ProjectsLimit)
+	d.Set("email", user.Email)
+	d.Set("is_admin", user.IsAdmin)
+	d.Set("is_external", user.External)
+	d.Set("skip_confirmation", !user.ConfirmedAt.IsZero())
 }
 
 func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
@@ -117,8 +121,6 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
-	d.Set("is_admin", user.IsAdmin)
-	d.Set("is_external", user.External)
 
 	return resourceGitlabUserRead(d, meta)
 }
