@@ -170,7 +170,7 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("is_external") {
-		options.Admin = gitlab.Bool(d.Get("is_external").(bool))
+		options.External = gitlab.Bool(d.Get("is_external").(bool))
 	}
 
 	log.Printf("[DEBUG] update gitlab user %s", d.Id())
