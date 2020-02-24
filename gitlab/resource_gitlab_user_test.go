@@ -52,7 +52,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:            true,
 						CanCreateGroup:   true,
 						SkipConfirmation: false,
-						External:         true,
+						External:         false,
 					}),
 				),
 			},
@@ -224,7 +224,7 @@ resource "gitlab_user" "foo" {
   is_admin         = true
   projects_limit   = 10
   can_create_group = true
-  is_external      = true
+  is_external      = false
 }
   `, rInt, rInt, rInt, rInt)
 }
