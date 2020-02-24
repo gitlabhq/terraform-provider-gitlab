@@ -44,7 +44,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            fmt.Sprintf("listest%d@ssss.com", rInt),
+						Email:            fmt.Sprintf("listest%d@tttt.com", rInt),
 						Password:         fmt.Sprintf("test%dtt", rInt),
 						Username:         fmt.Sprintf("listest%d", rInt),
 						Name:             fmt.Sprintf("bar %d", rInt),
@@ -220,7 +220,7 @@ resource "gitlab_user" "foo" {
   name             = "bar %d"
   username         = "listest%d"
   password         = "test%dtt"
-  email            = "listest%d@ssss.com"
+  email            = "listest%d@tttt.com"
   is_admin         = true
   projects_limit   = 10
   can_create_group = true

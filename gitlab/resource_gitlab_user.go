@@ -48,7 +48,6 @@ func resourceGitlabUser() *schema.Resource {
 			"email": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -151,6 +150,11 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("username") {
 		options.Username = gitlab.String(d.Get("username").(string))
+	}
+
+	if d.HasChange("email") {
+		options.Email = gitlab.String(d.Get("email").(string))
+		options.SkipReconfirmation = gitlab.Bool(true)
 	}
 
 	if d.HasChange("is_admin") {
