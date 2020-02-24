@@ -89,12 +89,6 @@ func resourceGitlabGroup() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"project_creation_level": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Computed:     true,
-				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
-			},
 			"subgroup_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,

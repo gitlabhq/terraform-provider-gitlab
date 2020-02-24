@@ -232,7 +232,7 @@ github.com/ulikunitz/xz/lzma
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes
 # github.com/xanzy/go-gitlab v0.22.3
-github.com/xanzy/go-gitlab
+github.com/xanzy/go-gitlab v0.26.0
 # github.com/zclconf/go-cty v1.1.1
 github.com/zclconf/go-cty/cty
 github.com/zclconf/go-cty/cty/convert
