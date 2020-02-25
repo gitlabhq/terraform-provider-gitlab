@@ -37,9 +37,9 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 				})),
 			},
 
-			// Update the group member to change the access level back
+			// Update the group member by username to change the access level back
 			{
-				Config: testAccGitlabGroupMembershipConfig(rInt),
+				Config: testAccGitlabGroupMembershipConfigUsername(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
 					accessLevel: fmt.Sprintf("developer"),
 				})),
@@ -165,5 +165,26 @@ resource "gitlab_group_membership" "foo" {
   user_id 		= "${gitlab_user.test.id}"
   expires_at    = "2099-01-01"
   access_level 	= "guest"
+}`, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabGroupMembershipConfigUsername(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo%d"
+  path = "foo%d"
+}
+
+resource "gitlab_user" "test" {
+  name 	= "foo%d"
+  username  = "listest%d"
+  password  = "test%dtt"
+  email 	= "listest%d@ssss.com"
+}
+
+resource "gitlab_group_membership" "foo" {
+  group_id 		= "${gitlab_group.foo.id}"
+  username 		= "${gitlab_user.test.username}"
+  access_level 	= "developer"
 }`, rInt, rInt, rInt, rInt, rInt, rInt)
 }

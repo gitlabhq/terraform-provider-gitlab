@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -32,7 +33,20 @@ func resourceGitlabGroupMembership() *schema.Resource {
 			"user_id": {
 				Type:     schema.TypeInt,
 				ForceNew: true,
-				Required: true,
+				Optional: true,
+				Computed: true,
+				ConflictsWith: []string{
+					"username",
+				},
+			},
+			"username": {
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Optional: true,
+				Computed: true,
+				ConflictsWith: []string{
+					"user_id",
+				},
 			},
 			"access_level": {
 				Type:         schema.TypeString,
@@ -51,10 +65,39 @@ func resourceGitlabGroupMembership() *schema.Resource {
 func resourceGitlabGroupMembershipCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	userId := d.Get("user_id").(int)
+	var userId int
+
+	userIdData, userIdOk := d.GetOk("user_id")
+	usernameData, usernameOk := d.GetOk("username")
 	groupId := d.Get("group_id").(string)
 	expiresAt := d.Get("expires_at").(string)
 	accessLevelId := accessLevelID[d.Get("access_level").(string)]
+
+	if usernameOk {
+		username := strings.ToLower(usernameData.(string))
+
+		listUsersOptions := &gitlab.ListUsersOptions{
+			Username: gitlab.String(username),
+		}
+
+		var users []*gitlab.User
+		users, _, err := client.Users.ListUsers(listUsersOptions)
+		if err != nil {
+			return err
+		}
+
+		if len(users) == 0 {
+			return fmt.Errorf("couldn't find a user matching: %s", username)
+		} else if len(users) != 1 {
+			return fmt.Errorf("more than one user found matching: %s", username)
+		}
+
+		userId = users[0].ID
+	} else if userIdOk {
+		userId = userIdData.(int)
+	} else {
+		return fmt.Errorf("one and only one of user_id or username must be set")
+	}
 
 	options := &gitlab.AddGroupMemberOptions{
 		UserID:      &userId,
@@ -106,10 +149,39 @@ func groupIdAndUserIdFromId(id string) (string, int, error) {
 func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	userId := d.Get("user_id").(int)
+	var userId int
+
+	userIdData, userIdOk := d.GetOk("user_id")
+	usernameData, usernameOk := d.GetOk("username")
 	groupId := d.Get("group_id").(string)
 	expiresAt := d.Get("expires_at").(string)
 	accessLevelId := accessLevelID[strings.ToLower(d.Get("access_level").(string))]
+
+	if usernameOk {
+		username := strings.ToLower(usernameData.(string))
+
+		listUsersOptions := &gitlab.ListUsersOptions{
+			Username: gitlab.String(username),
+		}
+
+		var users []*gitlab.User
+		users, _, err := client.Users.ListUsers(listUsersOptions)
+		if err != nil {
+			return err
+		}
+
+		if len(users) == 0 {
+			return fmt.Errorf("couldn't find a user matching: %s", username)
+		} else if len(users) != 1 {
+			return fmt.Errorf("more than one user found matching: %s", username)
+		}
+
+		userId = users[0].ID
+	} else if userIdOk {
+		userId = userIdData.(int)
+	} else {
+		return fmt.Errorf("one and only one of user_id or username must be set")
+	}
 
 	options := gitlab.EditGroupMemberOptions{
 		AccessLevel: &accessLevelId,
@@ -144,6 +216,7 @@ func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember
 
 	d.Set("group_id", groupId)
 	d.Set("user_id", groupMember.ID)
+	d.Set("username", groupMember.Username)
 	d.Set("access_level", accessLevel[groupMember.AccessLevel])
 	d.Set("expires_at", groupMember.ExpiresAt)
 
