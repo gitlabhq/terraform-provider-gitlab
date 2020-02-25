@@ -339,7 +339,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt)
 }
@@ -352,8 +352,8 @@ resource "gitlab_group" "foo" {
   description = "Terraform acceptance tests! Updated description"
   lfs_enabled = false
   request_access_enabled = true
-  project_creation_level = developer
-  subgroup_creation_level = maintainer
+  project_creation_level = "developer"
+  subgroup_creation_level = "maintainer"
   require_two_factor_authentication = false
   two_factor_grace_period = 48
   auto_devops_enabled = false
@@ -365,7 +365,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt)
 }
@@ -379,7 +379,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "foo2" {
   name = "foo2-name-%d"
@@ -388,7 +388,7 @@ resource "gitlab_group" "foo2" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "nested_foo" {
   name = "nfoo-name-%d"
@@ -398,7 +398,7 @@ resource "gitlab_group" "nested_foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -412,7 +412,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "foo2" {
   name = "foo2-name-%d"
@@ -421,7 +421,7 @@ resource "gitlab_group" "foo2" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "nested_foo" {
   name = "nfoo-name-%d"
@@ -430,7 +430,7 @@ resource "gitlab_group" "nested_foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -444,7 +444,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "foo2" {
   name = "foo2-name-%d"
@@ -453,7 +453,7 @@ resource "gitlab_group" "foo2" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "nested_foo" {
   name = "nfoo-name-%d"
@@ -463,7 +463,7 @@ resource "gitlab_group" "nested_foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
