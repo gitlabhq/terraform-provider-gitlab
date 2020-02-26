@@ -44,6 +44,14 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 					accessLevel: fmt.Sprintf("developer"),
 				})),
 			},
+
+			// Add the same member again
+			{
+				Config: testAccGitlabGroupMembershipConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
+					accessLevel: fmt.Sprintf("developer"),
+				})),
+			},
 		},
 	})
 }
