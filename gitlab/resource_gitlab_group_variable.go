@@ -45,6 +45,11 @@ func resourceGitlabGroupVariable() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"masked": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -57,12 +62,14 @@ func resourceGitlabGroupVariableCreate(d *schema.ResourceData, meta interface{})
 	value := d.Get("value").(string)
 	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
+	masked := d.Get("masked").(bool)
 
 	options := gitlab.CreateGroupVariableOptions{
 		Key:          &key,
 		Value:        &value,
 		VariableType: variableType,
 		Protected:    &protected,
+		Masked:       &masked,
 	}
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", group, key)
 
@@ -96,6 +103,7 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 	d.Set("variable_type", v.VariableType)
 	d.Set("group", group)
 	d.Set("protected", v.Protected)
+	d.Set("masked", v.Masked)
 	return nil
 }
 
@@ -107,11 +115,13 @@ func resourceGitlabGroupVariableUpdate(d *schema.ResourceData, meta interface{})
 	value := d.Get("value").(string)
 	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
+	masked := d.Get("masked").(bool)
 
 	options := &gitlab.UpdateGroupVariableOptions{
 		Value:        &value,
 		Protected:    &protected,
 		VariableType: variableType,
+		Masked:       &masked,
 	}
 	log.Printf("[DEBUG] update gitlab group variable %s/%s", group, key)
 
