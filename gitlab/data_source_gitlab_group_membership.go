@@ -3,12 +3,18 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabGroupMembership() *schema.Resource {
+	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
+	for k := range accessLevelID {
+		acceptedAccessLevels = append(acceptedAccessLevels, k)
+	}
 	return &schema.Resource{
 		Read: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{
@@ -27,6 +33,12 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 				ConflictsWith: []string{
 					"group_id",
 				},
+			},
+			"access_level": {
+				Type:         schema.TypeString,
+				Computed:     true,
+				Optional:     true,
+				ValidateFunc: validateValueFunc(acceptedAccessLevels),
 			},
 			"members": {
 				Type:     schema.TypeList,
@@ -111,16 +123,34 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 
-	d.Set("members", flattenGitlabMembers(gm))
-	d.SetId(fmt.Sprintf("%d", group.ID))
+	d.Set("members", flattenGitlabMembers(d, gm))
+
+	var optionsHash strings.Builder
+	optionsHash.WriteString(strconv.Itoa(group.ID))
+
+	if data, ok := d.GetOk("access_level"); ok {
+		optionsHash.WriteString(data.(string))
+	}
+
+	id := schema.HashString(optionsHash.String())
+	d.SetId(fmt.Sprintf("%d", id))
 
 	return nil
 }
 
-func flattenGitlabMembers(members []*gitlab.GroupMember) []interface{} {
+func flattenGitlabMembers(d *schema.ResourceData, members []*gitlab.GroupMember) []interface{} {
 	membersList := []interface{}{}
 
+	var filterAccessLevel gitlab.AccessLevelValue = gitlab.NoPermissions
+	if data, ok := d.GetOk("access_level"); ok {
+		filterAccessLevel = accessLevelID[data.(string)]
+	}
+
 	for _, member := range members {
+		if filterAccessLevel != gitlab.NoPermissions && filterAccessLevel != member.AccessLevel {
+			continue
+		}
+
 		values := map[string]interface{}{
 			"id":           member.ID,
 			"username":     member.Username,

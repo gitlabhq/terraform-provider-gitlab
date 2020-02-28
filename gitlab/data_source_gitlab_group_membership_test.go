@@ -32,6 +32,14 @@ func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.gitlab_group_membership.foo", "members.1.username", fmt.Sprintf("listest%d", rInt)),
 				),
 			},
+
+			// Get group using its ID, but return maintainers only
+			{
+				Config: testAccDataSourceGitlabGroupMembershipConfigFilterAccessLevel(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.gitlab_group_membership.foomaintainers", "members.#", "0"),
+				),
+			},
 		},
 	})
 }
@@ -66,5 +74,18 @@ resource "gitlab_group" "foo" {
 
 data "gitlab_group_membership" "foo" {
   group_id = "${gitlab_group.foo.id}"
+}`, rInt, rInt)
+}
+
+func testAccDataSourceGitlabGroupMembershipConfigFilterAccessLevel(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo%d"
+  path = "foo%d"
+}
+
+data "gitlab_group_membership" "foomaintainers" {
+  group_id     = "${gitlab_group.foo.id}"
+  access_level = "maintainer"
 }`, rInt, rInt)
 }

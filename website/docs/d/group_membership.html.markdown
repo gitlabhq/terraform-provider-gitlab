@@ -36,6 +36,8 @@ The following arguments are supported:
 
 * `full_path` - (Optional) The full path of the group.
 
+* `access_level` - (Optional) Only return members with the desidered access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
+
 **Note**: exactly one of group_id or full_path must be provided.
 
 ## Attributes Reference
