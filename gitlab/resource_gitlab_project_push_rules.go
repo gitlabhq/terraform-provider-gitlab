@@ -98,7 +98,17 @@ func resourceGitlabProjectPushRulesCreate(d *schema.ResourceData, meta interface
 
 	pushRules, _, err := client.Projects.AddProjectPushRule(project, options)
 	if err != nil {
-		return err
+		// Delete existing push rules
+		_, err := client.Projects.DeleteProjectPushRule(project)
+		if err != nil {
+			return err
+		}
+
+		// Add push rules
+		pushRules, _, err = client.Projects.AddProjectPushRule(project, options)
+		if err != nil {
+			return err
+		}
 	}
 	d.SetId(fmt.Sprintf("%d", pushRules.ID))
 	return resourceGitlabProjectPushRulesRead(d, meta)
