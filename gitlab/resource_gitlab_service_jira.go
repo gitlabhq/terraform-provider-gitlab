@@ -63,6 +63,21 @@ func resourceGitlabServiceJira() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"commit_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"merge_requests_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"comment_on_event_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -119,7 +134,9 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("active", jiraService.Active)
 	d.Set("push_events", jiraService.PushEvents)
 	d.Set("issues_events", jiraService.IssuesEvents)
+	d.Set("commit_events", jiraService.CommitEvents)
 	d.Set("merge_requests_events", jiraService.MergeRequestsEvents)
+	d.Set("comment_on_event_enabled", jiraService.CommentOnEventEnabled)
 	d.Set("tag_push_events", jiraService.TagPushEvents)
 	d.Set("note_events", jiraService.NoteEvents)
 	d.Set("pipeline_events", jiraService.PipelineEvents)
@@ -152,6 +169,9 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 	setJiraServiceOptions.ProjectKey = gitlab.String(d.Get("project_key").(string))
 	setJiraServiceOptions.Username = gitlab.String(d.Get("username").(string))
 	setJiraServiceOptions.Password = gitlab.String(d.Get("password").(string))
+	setJiraServiceOptions.CommitEvents = gitlab.Bool(d.Get("commit_events").(bool))
+	setJiraServiceOptions.MergeRequestsEvents = gitlab.Bool(d.Get("merge_requests_events").(bool))
+	setJiraServiceOptions.CommentOnEventEnabled = gitlab.Bool(d.Get("comment_on_event_enabled").(bool))
 
 	// Set optional properties
 	if val := d.Get("jira_issue_transition_id"); val != nil {
