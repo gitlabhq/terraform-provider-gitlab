@@ -88,9 +88,10 @@ func testAccCheckGitlabProjectVariableExists(n string, projectVariable *gitlab.P
 }
 
 type testAccGitlabProjectVariableExpectedAttributes struct {
-	Key       string
-	Value     string
-	Protected bool
+	Key              string
+	Value            string
+	Protected        bool
+	EnvironmentScope string
 }
 
 func testAccCheckGitlabProjectVariableAttributes(variable *gitlab.ProjectVariable, want *testAccGitlabProjectVariableExpectedAttributes) resource.TestCheckFunc {
