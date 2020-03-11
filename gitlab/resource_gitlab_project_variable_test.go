@@ -25,8 +25,8 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:   fmt.Sprintf("key_%s", rString),
-						Value: fmt.Sprintf("value-%s", rString),
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
 						EnvironmentScope: "*",
 					}),
 				),
@@ -37,9 +37,9 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-inverse-%s", rString),
-						Protected: true,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-inverse-%s", rString),
+						Protected:        true,
 						EnvironmentScope: "*",
 					}),
 				),
@@ -50,9 +50,9 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-%s", rString),
-						Protected: false,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						Protected:        false,
 						EnvironmentScope: "*",
 					}),
 				),
