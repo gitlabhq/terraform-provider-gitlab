@@ -27,6 +27,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
 						Key:   fmt.Sprintf("key_%s", rString),
 						Value: fmt.Sprintf("value-%s", rString),
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -39,6 +40,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 						Key:       fmt.Sprintf("key_%s", rString),
 						Value:     fmt.Sprintf("value-inverse-%s", rString),
 						Protected: true,
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -51,6 +53,7 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 						Key:       fmt.Sprintf("key_%s", rString),
 						Value:     fmt.Sprintf("value-%s", rString),
 						Protected: false,
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -102,6 +105,10 @@ func testAccCheckGitlabProjectVariableAttributes(variable *gitlab.ProjectVariabl
 
 		if variable.Protected != want.Protected {
 			return fmt.Errorf("got protected %t; want %t", variable.Protected, want.Protected)
+		}
+
+		if variable.EnvironmentScope != want.EnvironmentScope {
+			return fmt.Errorf("got environment_scope %s; want %s", variable.EnvironmentScope, want.EnvironmentScope)
 		}
 
 		return nil
