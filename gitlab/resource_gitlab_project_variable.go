@@ -53,7 +53,7 @@ func resourceGitlabProjectVariable() *schema.Resource {
 			"environment_scope": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  false,
+				Default:  "*",
 			},
 		},
 	}
