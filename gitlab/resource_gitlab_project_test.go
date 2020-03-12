@@ -196,7 +196,29 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Config: testAccGitlabProjectConfigInitializeWithReadme(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					testAccCheckGitlabProjectInitializeWithReadme(&project, &testAccGitlabProjectExpectedAttributes{
+					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "master",
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_templateName(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigTemplateName(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
 						DefaultBranch: "master",
 					}),
 				),
@@ -431,10 +453,10 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 	return resource.ComposeAggregateTestCheckFunc(checks...)
 }
 
-func testAccCheckGitlabProjectInitializeWithReadme(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabProjectDefaultBranch(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if project.DefaultBranch != want.DefaultBranch {
-			return fmt.Errorf("got description %q; want %q", project.DefaultBranch, want.DefaultBranch)
+			return fmt.Errorf("got default branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
 		}
 
 		return nil
@@ -664,6 +686,18 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = true
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigTemplateName(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  template_name = "spring"
+  default_branch = "master"
 }
 	`, rInt, rInt)
 }

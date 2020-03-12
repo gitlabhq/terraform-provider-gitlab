@@ -333,6 +333,21 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		setProperties = append(setProperties, "initialize_with_readme")
 	}
 
+	if v, ok := d.GetOk("template_name"); ok {
+		options.TemplateName = gitlab.String(v.(string))
+		setProperties = append(setProperties, "template_name")
+	}
+
+	if v, ok := d.GetOk("use_custom_template"); ok {
+		options.UseCustomTemplate = gitlab.Bool(v.(bool))
+		setProperties = append(setProperties, "use_custom_template")
+	}
+
+	if v, ok := d.GetOk("group_with_project_templates_id"); ok {
+		options.GroupWithProjectTemplatesID = gitlab.Int(v.(int))
+		setProperties = append(setProperties, "group_with_project_templates_id")
+	}
+
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
 
 	project, _, err := client.Projects.CreateProject(options)

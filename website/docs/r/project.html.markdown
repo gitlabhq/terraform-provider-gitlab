@@ -121,6 +121,12 @@ The following arguments are supported:
 
 - `group_with_project_templates_id` - (Optional) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true
 
+* `template_name` - (Optional) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template (enterprise edition).
+
+* `use_custom_template` - (Optional) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+
+* `group_with_project_templates_id` - (Optional) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+
 ## Attributes Reference
 
 The following additional attributes are exported:
