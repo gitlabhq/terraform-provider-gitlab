@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk v1.8.0
 	github.com/hashicorp/terraform-svchost v0.0.0-20191119180714-d2e4933b9136 // indirect
 	github.com/hashicorp/yamux v0.0.0-20190923154419-df201c70410d // indirect
+	github.com/mitchellh/hashstructure v1.0.0
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/ulikunitz/xz v0.5.7 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
