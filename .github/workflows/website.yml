@@ -2,7 +2,7 @@ name: Website Build
 on: [push,pull_request]
 
 jobs:
-  test:
+  website:
     runs-on: ubuntu-latest
 
     steps:
