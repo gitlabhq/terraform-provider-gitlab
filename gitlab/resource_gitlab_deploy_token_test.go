@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"testing"
 
@@ -88,6 +89,7 @@ func testAccCheckGitlabDeployTokenAttributes(deployToken *gitlab.DeployToken, wa
 			return fmt.Errorf("got name %q; want %q", deployToken.Name, want.Name)
 		}
 
+		// TODO Uncomment once this bug is fixed https://gitlab.com/gitlab-org/gitlab/-/issues/211963
 		// if deployToken.Username != want.Username {
 		// 	return fmt.Errorf("got username %q; want %q", deployToken.Username, want.Username)
 		// }
@@ -113,22 +115,26 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 		group := rs.Primary.Attributes["group"]
 
 		var gotDeployTokens []*gitlab.DeployToken
+		var resp *gitlab.Response
 
 		if project != "" {
-			gotDeployTokens, _, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
+			gotDeployTokens, resp, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
 		} else if group != "" {
-			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
+			gotDeployTokens, resp, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
 		} else {
-			return fmt.Errorf("Somehow neither project nor group were set")
-		}
-		if err != nil {
-			return err
+			return fmt.Errorf("somehow neither project nor group were set")
 		}
 
-		for _, token := range gotDeployTokens {
-			if token.ID == deployTokenID {
-				return fmt.Errorf("Deploy token still exists")
+		if err == nil {
+			for _, token := range gotDeployTokens {
+				if token.ID == deployTokenID {
+					return fmt.Errorf("Deploy token still exists")
+				}
 			}
+		}
+
+		if resp.StatusCode != http.StatusNotFound {
+			return err
 		}
 	}
 
@@ -149,7 +155,10 @@ resource "gitlab_project" "foo" {
 resource "gitlab_deploy_token" "foo" {
   project  = "${gitlab_project.foo.id}"
   name     = "deployToken-%d"
-  username = "my-username"
+  # TODO Uncomment once this bug is fixed https://gitlab.com/gitlab-org/gitlab/-/issues/211963
+  # username = "my-username"
+
+  expires_at = "2021-03-14T07:20:50Z"
 
   scopes = [
 	"read_registry",
