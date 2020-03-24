@@ -30,4 +30,4 @@ website/vendor
 !command/test-fixtures/**/*.tfstate
 !command/test-fixtures/**/.terraform/
 
-license/JulienPivotto.gitlab-license
+license/*
