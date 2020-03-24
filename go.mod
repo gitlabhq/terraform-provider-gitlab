@@ -17,13 +17,13 @@ require (
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/ulikunitz/xz v0.5.6 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
-	github.com/xanzy/go-gitlab v0.28.1-0.20200316171023-390fda840a9c
+	github.com/xanzy/go-gitlab v0.29.0
 	github.com/zclconf/go-cty v1.1.1 // indirect
 	go.opencensus.io v0.22.2 // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd // indirect
 	golang.org/x/exp v0.0.0-20191129062945-2f5052295587 // indirect
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
-	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/net v0.0.0-20200320220750-118fecf932d8 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/sys v0.0.0-20191204072324-ce4227a45e2e // indirect
 	golang.org/x/tools v0.0.0-20191205205310-69111344d4a5 // indirect
