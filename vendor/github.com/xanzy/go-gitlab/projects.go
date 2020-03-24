@@ -69,6 +69,7 @@ type Project struct {
 	ImportStatus                              string            `json:"import_status"`
 	ImportError                               string            `json:"import_error"`
 	Permissions                               *Permissions      `json:"permissions"`
+	MarkedForDeletionAt                       *time.Time        `json:"marked_for_deletion_at"`
 	Archived                                  bool              `json:"archived"`
 	AvatarURL                                 string            `json:"avatar_url"`
 	SharedRunnersEnabled                      bool              `json:"shared_runners_enabled"`
@@ -92,10 +93,12 @@ type Project struct {
 		GroupName        string `json:"group_name"`
 		GroupAccessLevel int    `json:"group_access_level"`
 	} `json:"shared_with_groups"`
-	Statistics       *ProjectStatistics `json:"statistics"`
-	Links            *Links             `json:"_links,omitempty"`
-	CIConfigPath     *string            `json:"ci_config_path"`
-	CustomAttributes []*CustomAttribute `json:"custom_attributes"`
+	Statistics        *ProjectStatistics `json:"statistics"`
+	Links             *Links             `json:"_links,omitempty"`
+	CIConfigPath      string             `json:"ci_config_path"`
+	CIDefaultGitDepth int                `json:"ci_default_git_depth"`
+	CustomAttributes  []*CustomAttribute `json:"custom_attributes"`
+	PendingDelete     bool               `json:"pending_delete"`
 }
 
 // Repository represents a repository.
@@ -550,6 +553,7 @@ type EditProjectOptions struct {
 	TagList                                   *[]string         `url:"tag_list,omitempty" json:"tag_list,omitempty"`
 	BuildCoverageRegex                        *string           `url:"build_coverage_regex,omitempty" json:"build_coverage_regex,omitempty"`
 	CIConfigPath                              *string           `url:"ci_config_path,omitempty" json:"ci_config_path,omitempty"`
+	CIDefaultGitDepth                         *int              `url:"ci_default_git_depth,omitempty" json:"ci_default_git_depth,omitempty"`
 	ApprovalsBeforeMerge                      *int              `url:"approvals_before_merge,omitempty" json:"approvals_before_merge,omitempty"`
 	ExternalAuthorizationClassificationLabel  *string           `url:"external_authorization_classification_label,omitempty" json:"external_authorization_classification_label,omitempty"`
 	Mirror                                    *bool             `url:"mirror,omitempty" json:"mirror,omitempty"`
@@ -797,6 +801,8 @@ type ProjectMember struct {
 	CreatedAt   *time.Time       `json:"created_at"`
 	ExpiresAt   *ISOTime         `json:"expires_at"`
 	AccessLevel AccessLevelValue `json:"access_level"`
+	WebURL      string           `json:"web_url"`
+	AvatarURL   string           `json:"avatar_url"`
 }
 
 // ProjectHook represents a project hook.
@@ -806,6 +812,7 @@ type ProjectMember struct {
 type ProjectHook struct {
 	ID                       int        `json:"id"`
 	URL                      string     `json:"url"`
+	ConfidentialNoteEvents   bool       `json:"confidential_note_events"`
 	ProjectID                int        `json:"project_id"`
 	PushEvents               bool       `json:"push_events"`
 	IssuesEvents             bool       `json:"issues_events"`
@@ -881,6 +888,7 @@ func (s *ProjectsService) GetProjectHook(pid interface{}, hook int, options ...O
 // https://docs.gitlab.com/ce/api/projects.html#add-project-hook
 type AddProjectHookOptions struct {
 	URL                      *string `url:"url,omitempty" json:"url,omitempty"`
+	ConfidentialNoteEvents   *bool   `url:"confidential_note_events,omitempty" json:"confidential_note_events,omitempty"`
 	PushEvents               *bool   `url:"push_events,omitempty" json:"push_events,omitempty"`
 	IssuesEvents             *bool   `url:"issues_events,omitempty" json:"issues_events,omitempty"`
 	ConfidentialIssuesEvents *bool   `url:"confidential_issues_events,omitempty" json:"confidential_issues_events,omitempty"`
@@ -925,6 +933,7 @@ func (s *ProjectsService) AddProjectHook(pid interface{}, opt *AddProjectHookOpt
 // https://docs.gitlab.com/ce/api/projects.html#edit-project-hook
 type EditProjectHookOptions struct {
 	URL                      *string `url:"url,omitempty" json:"url,omitempty"`
+	ConfidentialNoteEvents   *bool   `url:"confidential_note_events,omitempty" json:"confidential_note_events,omitempty"`
 	PushEvents               *bool   `url:"push_events,omitempty" json:"push_events,omitempty"`
 	IssuesEvents             *bool   `url:"issues_events,omitempty" json:"issues_events,omitempty"`
 	ConfidentialIssuesEvents *bool   `url:"confidential_issues_events,omitempty" json:"confidential_issues_events,omitempty"`

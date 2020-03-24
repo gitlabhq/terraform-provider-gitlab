@@ -19,6 +19,7 @@ package gitlab
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -91,6 +92,10 @@ type Issue struct {
 	Links             *IssueLinks      `json:"_links"`
 	IssueLinkID       int              `json:"issue_link_id"`
 	MergeRequestCount int              `json:"merge_requests_count"`
+	TaskCompletionStatus struct {
+		Count          int `json:"count"`
+		CompletedCount int `json:"completed_count"`
+	} `json:"task_completion_status"`
 }
 
 func (i Issue) String() string {
@@ -103,6 +108,12 @@ type Labels []string
 // MarshalJSON implements the json.Marshaler interface.
 func (l *Labels) MarshalJSON() ([]byte, error) {
 	return json.Marshal(strings.Join(*l, ","))
+}
+
+// EncodeValues implements the query.EncodeValues interface
+func (l *Labels) EncodeValues(key string, v *url.Values) error {
+	v.Set(key, strings.Join(*l, ","))
+	return nil
 }
 
 // ListIssuesOptions represents the available ListIssues() options.
