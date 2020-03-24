@@ -1,3 +1,5 @@
+<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
+
 Terraform Provider for Gitlab
 =============================
 
@@ -8,9 +10,6 @@ Terraform Provider for Gitlab
   - ![Unit Tests](https://github.com/terraform-providers/terraform-provider-gitlab/workflows/Unit%20Tests/badge.svg)
   - ![Acceptance Tests](https://github.com/terraform-providers/terraform-provider-gitlab/workflows/Acceptance%20Tests/badge.svg)
   - ![Website Build](https://github.com/terraform-providers/terraform-provider-gitlab/workflows/Website%20Build/badge.svg)
-
-
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
 
 Requirements
 ------------
