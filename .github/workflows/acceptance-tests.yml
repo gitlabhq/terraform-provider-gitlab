@@ -1,0 +1,29 @@
+name: Acceptance Tests
+on: [push,pull_request]
+
+jobs:
+  acceptance-ce:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.12
+      id: go
+
+    - name: Check out code repository source code
+      uses: actions/checkout@v2
+
+    # https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+    - name: Set build variables
+      run: |
+        echo "::set-env name=MAKE_TARGET::testacc"
+        echo "::set-env name=GO_FLAGS::-mod=vendor"
+        echo "::set-env name=GO111MODULE::on"
+        echo "::set-env name=GITLAB_TOKEN::20char-testing-token"
+        echo "::set-env name=GITLAB_BASE_URL::http://127.0.0.1:8080/api/v4"
+
+    - name: Start Gitlab and run acceptance tests
+      run: |
+        bash scripts/start-gitlab.sh
+        make $MAKE_TARGET
