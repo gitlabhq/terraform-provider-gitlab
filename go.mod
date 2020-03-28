@@ -21,7 +21,8 @@ require (
 	github.com/terraform-providers/terraform-provider-tls v1.2.0
 	github.com/ulikunitz/xz v0.5.6 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
-	github.com/xanzy/go-gitlab v0.22.3
+	github.com/xanzy/go-gitlab v0.22.3	
+	github.com/zclconf/go-cty v1.1.1 // indirect
 	go.opencensus.io v0.22.2 // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd // indirect
 	golang.org/x/exp v0.0.0-20191129062945-2f5052295587 // indirect

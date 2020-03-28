@@ -83,12 +83,25 @@ type BuildStateValue string
 // These constants represent all valid build states.
 const (
 	Pending  BuildStateValue = "pending"
+	Created  BuildStateValue = "created"
 	Running  BuildStateValue = "running"
 	Success  BuildStateValue = "success"
 	Failed   BuildStateValue = "failed"
 	Canceled BuildStateValue = "canceled"
 	Skipped  BuildStateValue = "skipped"
 	Manual   BuildStateValue = "manual"
+)
+
+// DeploymentStatusValue represents a Gitlab deployment status.
+type DeploymentStatusValue string
+
+// These constants represent all valid deployment statuses.
+const (
+	DeploymentStatusCreated  DeploymentStatusValue = "created"
+	DeploymentStatusRunning  DeploymentStatusValue = "running"
+	DeploymentStatusSuccess  DeploymentStatusValue = "success"
+	DeploymentStatusFailed   DeploymentStatusValue = "failed"
+	DeploymentStatusCanceled DeploymentStatusValue = "canceled"
 )
 
 // ISOTime represents an ISO 8601 formatted date
@@ -213,6 +226,33 @@ const (
 	PrivateVisibility  VisibilityValue = "private"
 	InternalVisibility VisibilityValue = "internal"
 	PublicVisibility   VisibilityValue = "public"
+)
+
+// ProjectCreationLevelValue represents a project creation level within GitLab.
+//
+// GitLab API docs: https://docs.gitlab.com/ce/api/
+type ProjectCreationLevelValue string
+
+// List of available project creation levels.
+//
+// GitLab API docs: https://docs.gitlab.com/ce/api/
+const (
+	NoOneProjectCreation      ProjectCreationLevelValue = "noone"
+	MaintainerProjectCreation ProjectCreationLevelValue = "maintainer"
+	DeveloperProjectCreation  ProjectCreationLevelValue = "developer"
+)
+
+// SubGroupCreationLevelValue represents a sub group creation level within GitLab.
+//
+// GitLab API docs: https://docs.gitlab.com/ce/api/
+type SubGroupCreationLevelValue string
+
+// List of available sub group creation levels.
+//
+// GitLab API docs: https://docs.gitlab.com/ce/api/
+const (
+	OwnerSubGroupCreationLevelValue      SubGroupCreationLevelValue = "owner"
+	MaintainerSubGroupCreationLevelValue SubGroupCreationLevelValue = "maintainer"
 )
 
 // VariableTypeValue represents a variable type within GitLab.
@@ -901,6 +941,14 @@ func BuildState(v BuildStateValue) *BuildStateValue {
 	return p
 }
 
+// DeploymentStatus is a helper routine that allocates a new
+// DeploymentStatusValue to store v and returns a pointer to it.
+func DeploymentStatus(v DeploymentStatusValue) *DeploymentStatusValue {
+	p := new(DeploymentStatusValue)
+	*p = v
+	return p
+}
+
 // NotificationLevel is a helper routine that allocates a new NotificationLevelValue
 // to store v and returns a pointer to it.
 func NotificationLevel(v NotificationLevelValue) *NotificationLevelValue {
@@ -921,6 +969,22 @@ func VariableType(v VariableTypeValue) *VariableTypeValue {
 // to store v and returns a pointer to it.
 func Visibility(v VisibilityValue) *VisibilityValue {
 	p := new(VisibilityValue)
+	*p = v
+	return p
+}
+
+// ProjectCreationLevel is a helper routine that allocates a new ProjectCreationLevelValue
+// to store v and returns a pointer to it.
+func ProjectCreationLevel(v ProjectCreationLevelValue) *ProjectCreationLevelValue {
+	p := new(ProjectCreationLevelValue)
+	*p = v
+	return p
+}
+
+// SubGroupCreationLevel is a helper routine that allocates a new SubGroupCreationLevelValue
+// to store v and returns a pointer to it.
+func SubGroupCreationLevel(v SubGroupCreationLevelValue) *SubGroupCreationLevelValue {
+	p := new(SubGroupCreationLevelValue)
 	*p = v
 	return p
 }

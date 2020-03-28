@@ -302,6 +302,56 @@ func TestAccGitlabProject_nestedImport(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_transfer(t *testing.T) {
+	var transferred, received gitlab.Project
+	rInt := acctest.RandInt()
+
+	transferred = gitlab.Project{
+		Namespace:                        &gitlab.ProjectNamespace{Name: fmt.Sprintf("foo2group-%d", rInt)},
+		Name:                             fmt.Sprintf("foo-%d", rInt),
+		Path:                             fmt.Sprintf("foo-%d", rInt),
+		Description:                      "Terraform acceptance tests",
+		TagList:                          []string{},
+		RequestAccessEnabled:             true,
+		IssuesEnabled:                    true,
+		MergeRequestsEnabled:             true,
+		JobsEnabled:                      true,
+		ApprovalsBeforeMerge:             0,
+		WikiEnabled:                      true,
+		SnippetsEnabled:                  true,
+		ContainerRegistryEnabled:         true,
+		LFSEnabled:                       true,
+		SharedRunnersEnabled:             true,
+		Visibility:                       gitlab.PublicVisibility,
+		MergeMethod:                      gitlab.NoFastForwardMerge,
+		OnlyAllowMergeIfPipelineSucceeds: false,
+		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			// Create a project in a group
+			{
+				Config: testAccGitlabProjectInGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
+				),
+			},
+			// Create a second group and set the transfer the project to this group
+			{
+				Config: testAccGitlabProjectTransferBetweenGroups(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
+					testAccCheckAggregateGitlabProject(&transferred, &received),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		var err error
@@ -429,6 +479,32 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 	`, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectTransferBetweenGroups(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foogroup-%d"
+  path = "foogroup-%d"
+  visibility_level = "public"
+}
+
+resource "gitlab_group" "foo2" {
+  name = "foo2group-%d"
+  path = "foo2group-%d"
+  visibility_level = "public"
+}
+
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+  namespace_id = "${gitlab_group.foo2.id}"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectConfigDefaultBranch(rInt int, defaultBranch string) string {
