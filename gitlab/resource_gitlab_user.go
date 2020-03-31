@@ -125,7 +125,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] read gitlab user %s", d.Id())
+	log.Printf("[DEBUG] import -- read gitlab user %s", d.Id())
 
 	id, _ := strconv.Atoi(d.Id())
 
