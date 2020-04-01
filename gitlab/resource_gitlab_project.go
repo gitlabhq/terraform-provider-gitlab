@@ -189,6 +189,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeBool,
 		Optional: true,
 	},
+	"remove_source_branch_after_merge": {
+		Type:     schema.TypeBool,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -232,6 +236,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
 	d.Set("tags", project.TagList)
 	d.Set("archived", project.Archived)
+	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -253,6 +258,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
+		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 	}
 
 	// need to manage partial state since project creation may require
@@ -275,6 +281,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		"only_allow_merge_if_pipeline_succeeds",
 		"only_allow_merge_if_all_discussions_are_resolved",
 		"shared_runners_enabled",
+		"remove_source_branch_after_merge",
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -471,6 +478,11 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	if d.HasChange("lfs_enabled") {
 		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
 		updatedProperties = append(updatedProperties, "lfs_enabled")
+	}
+
+	if d.HasChange("remove_source_branch_after_merge") {
+		options.RemoveSourceBranchAfterMerge = gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool))
+		updatedProperties = append(updatedProperties, "remove_source_branch_after_merge")
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
