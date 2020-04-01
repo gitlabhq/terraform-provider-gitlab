@@ -59,6 +59,7 @@ jobs:
         echo "::set-env name=GO111MODULE::on"
         echo "::set-env name=GITLAB_TOKEN::20char-testing-token"
         echo "::set-env name=GITLAB_BASE_URL::http://127.0.0.1:8080/api/v4"
+        echo "::set-env name=TF_LOG::DEBUG"
 
     - name: Start Gitlab and run acceptance tests
       run: |
