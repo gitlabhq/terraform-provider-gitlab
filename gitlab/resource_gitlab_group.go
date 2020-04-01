@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -127,6 +128,11 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 		}
 		return err
 	}
+	if group.MarkedForDeletionOn != nil {
+		log.Printf("[DEBUG] gitlab group %s is marked for deletion", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 	d.Set("name", group.Name)
@@ -190,7 +196,7 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Delete gitlab group %s", d.Id())
 
 	_, err := client.Groups.DeleteGroup(d.Id())
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "Group has been already marked for deletion") {
 		return fmt.Errorf("error deleting group %s: %s", d.Id(), err)
 	}
 
@@ -207,6 +213,10 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 				}
 				log.Printf("[ERROR] Received error: %#v", err)
 				return out, "Error", err
+			}
+			if out.MarkedForDeletionOn != nil {
+				// Represents a Gitlab EE soft-delete
+				return out, "Deleted", nil
 			}
 			return out, "Deleting", nil
 		},
