@@ -119,7 +119,9 @@ func testAccCheckGitlabGroupVariableDestroy(s *terraform.State) error {
 		_, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
 		if err == nil {
 			//if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-			//	return fmt.Errorf("Repository still exists")
+			//	if gotRepo.MarkedForDeletionAt == nil {
+			//		return fmt.Errorf("Repository still exists")
+			//	}
 			//}
 		}
 		if resp.StatusCode != 404 {

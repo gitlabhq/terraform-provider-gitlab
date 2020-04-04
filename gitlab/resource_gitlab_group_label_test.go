@@ -119,7 +119,9 @@ func testAccCheckGitlabGroupLabelDestroy(s *terraform.State) error {
 		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
-				return fmt.Errorf("Group still exists")
+				if group.MarkedForDeletionOn == nil {
+					return fmt.Errorf("Group still exists")
+				}
 			}
 		}
 		if resp.StatusCode != 404 {
