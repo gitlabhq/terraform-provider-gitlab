@@ -137,21 +137,22 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 					}),
 				),
 			},
-			{
-				Config: testAccGitlabNestedGroupConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
-					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
-					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
-					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
-						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
-						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
-						Description: "Terraform acceptance tests",
-						LFSEnabled:  true,
-						Parent:      &group,
-					}),
-				),
-			},
+			// TODO In EE version, re-creating on the same path where a previous group was soft-deleted doesn't work.
+			// {
+			// 	Config: testAccGitlabNestedGroupConfig(rInt),
+			// 	Check: resource.ComposeTestCheckFunc(
+			// 		testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+			// 		testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+			// 		testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+			// 		testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+			// 			Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+			// 			Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+			// 			Description: "Terraform acceptance tests",
+			// 			LFSEnabled:  true,
+			// 			Parent:      &group,
+			// 		}),
+			// 	),
+			// },
 		},
 	})
 }
