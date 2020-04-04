@@ -1,4 +1,11 @@
 ## 2.5.1 (Unreleased)
+
+BUGFIXES:
+* Support for soft-delete of groups and projects in Gitlab Enterprise Edition ([GH-282][GH-283][GH-285][GH-291])
+
+ENHANCEMENTS:
+* Switched from Travis CI to Github Actions ([GH-216])
+
 ## 2.5.0 (December 05, 2019)
 
 ENHANCEMENTS:

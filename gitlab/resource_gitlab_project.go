@@ -352,6 +352,11 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
+	if project.MarkedForDeletionAt != nil {
+		log.Printf("[DEBUG] gitlab project %s is marked for deletion", d.Id())
+		d.SetId("")
+		return nil
+	}
 
 	resourceGitlabProjectSetToState(d, project)
 	return nil
@@ -543,6 +548,10 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 				}
 				log.Printf("[ERROR] Received error: %#v", err)
 				return out, "Error", err
+			}
+			if out.MarkedForDeletionAt != nil {
+				// Represents a Gitlab EE soft-delete
+				return out, "Deleted", nil
 			}
 			return out, "Deleting", nil
 		},

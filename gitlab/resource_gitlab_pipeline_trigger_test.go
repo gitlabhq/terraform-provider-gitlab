@@ -107,7 +107,9 @@ func testAccCheckGitlabPipelineTriggerDestroy(s *terraform.State) error {
 		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				return fmt.Errorf("Repository still exists")
+				if gotRepo.MarkedForDeletionAt == nil {
+					return fmt.Errorf("Repository still exists")
+				}
 			}
 		}
 		if resp.StatusCode != 404 {
