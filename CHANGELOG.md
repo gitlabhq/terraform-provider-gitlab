@@ -1,8 +1,8 @@
-## 2.6.0 (Unreleased)
+## 2.6.0 (April 08, 2020)
 
 ENHANCEMENTS:
 * Add jira flags
-  ([GH-274])
+  ([[#274](https://github.com/terraform-providers/terraform-provider-gitlab/issues/274)])
 
 ## 2.5.1 (April 06, 2020)
 
