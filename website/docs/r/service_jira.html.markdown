@@ -43,6 +43,12 @@ The following arguments are supported:
 
 * `jira_issue_transition_id` - (Optional) The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2.
 
+* `commit_events` - (Optional) Enable notifications for commit events
+
+* `merge_requests_events` - (Optional) Enable notifications for merge request events
+
+* `comment_on_event_enabled` - (Optional) Enable comments inside Jira issues on each GitLab event (commit / merge request)
+
 ## Importing Jira service
 
  You can import a service_jira state using `terraform import <resource> <project_id>`:
