@@ -1,11 +1,21 @@
 ## 2.6.0 (Unreleased)
+
+ENHANCEMENTS:
+* Add jira flags
+  ([GH-274])
+
 ## 2.5.1 (April 06, 2020)
 
 BUGFIXES:
-* Support for soft-delete of groups and projects in Gitlab Enterprise Edition ([[#282](https://github.com/terraform-providers/terraform-provider-gitlab/issues/282)][[#283](https://github.com/terraform-providers/terraform-provider-gitlab/issues/283)][[#285](https://github.com/terraform-providers/terraform-provider-gitlab/issues/285)][[#291](https://github.com/terraform-providers/terraform-provider-gitlab/issues/291)])
+* Support for soft-delete of groups and projects in Gitlab Enterprise Edition 
+  ([#282](https://github.com/terraform-providers/terraform-provider-gitlab/issues/282),
+   [#283](https://github.com/terraform-providers/terraform-provider-gitlab/issues/283),
+   [#285](https://github.com/terraform-providers/terraform-provider-gitlab/issues/285),
+   [#291](https://github.com/terraform-providers/terraform-provider-gitlab/issues/291))
 
 ENHANCEMENTS:
-* Switched from Travis CI to Github Actions ([[#216](https://github.com/terraform-providers/terraform-provider-gitlab/issues/216)])
+* Switched from Travis CI to Github Actions 
+  ([#216](https://github.com/terraform-providers/terraform-provider-gitlab/issues/216))
 
 ## 2.5.0 (December 05, 2019)
 
