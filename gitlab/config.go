@@ -16,6 +16,8 @@ type Config struct {
 	BaseURL    string
 	Insecure   bool
 	CACertFile string
+	ClientCert string
+	ClientKey  string
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
@@ -38,6 +40,14 @@ func (c *Config) Client() (interface{}, error) {
 	// If configured as insecure, turn off SSL verification
 	if c.Insecure {
 		tlsConfig.InsecureSkipVerify = true
+	}
+
+	if c.ClientCert != "" && c.ClientKey != "" {
+		clientPair, err := tls.LoadX509KeyPair(c.ClientCert, c.ClientKey)
+		if err != nil {
+			return nil, err
+		}
+		tlsConfig.Certificates = []tls.Certificate{clientPair}
 	}
 
 	t := &http.Transport{
