@@ -89,10 +89,9 @@ func testAccCheckGitlabDeployTokenAttributes(deployToken *gitlab.DeployToken, wa
 			return fmt.Errorf("got name %q; want %q", deployToken.Name, want.Name)
 		}
 
-		// TODO Uncomment once this bug is fixed https://gitlab.com/gitlab-org/gitlab/-/issues/211963
-		// if deployToken.Username != want.Username {
-		// 	return fmt.Errorf("got username %q; want %q", deployToken.Username, want.Username)
-		// }
+		if deployToken.Username != want.Username {
+			return fmt.Errorf("got username %q; want %q", deployToken.Username, want.Username)
+		}
 
 		return nil
 	}
@@ -155,8 +154,7 @@ resource "gitlab_project" "foo" {
 resource "gitlab_deploy_token" "foo" {
   project  = "${gitlab_project.foo.id}"
   name     = "deployToken-%d"
-  # TODO Uncomment once this bug is fixed https://gitlab.com/gitlab-org/gitlab/-/issues/211963
-  # username = "my-username"
+  username = "my-username"
 
   expires_at = "2021-03-14T07:20:50Z"
 
