@@ -3,12 +3,13 @@ on: [push,pull_request]
 
 jobs:
   acceptance-ce:
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
     - name: Set up Go
       uses: actions/setup-go@v1
       with:
-        go-version: 1.12
+        go-version: 1.14
       id: go
 
     - name: Check out code repository source code
@@ -22,6 +23,43 @@ jobs:
         echo "::set-env name=GO111MODULE::on"
         echo "::set-env name=GITLAB_TOKEN::20char-testing-token"
         echo "::set-env name=GITLAB_BASE_URL::http://127.0.0.1:8080/api/v4"
+
+    - name: Start Gitlab and run acceptance tests
+      run: |
+        bash scripts/start-gitlab.sh
+        make $MAKE_TARGET
+
+  acceptance-ee:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.14
+      id: go
+
+    - name: Check out code repository source code
+      uses: actions/checkout@v2
+
+    - name: Set up Enterprise Edition License file
+      run: |
+        openssl version
+        mkdir license
+        [[ -n "${{ secrets.ENCRYPT_PASSWORD }}" ]] && echo decrypt
+        [[ -n "${{ secrets.ENCRYPT_PASSWORD }}" ]] && openssl enc  -d -aes-256-cbc -pbkdf2 -iter 20000 -in Gitlab-license.encrypted -out license/Gitlab-license.txt -pass "pass:${{ secrets.ENCRYPT_PASSWORD }}"
+        chmod 666 license/Gitlab-license.txt || true
+        echo "::set-env name=GITLAB_LICENSE_FILE::Gitlab-license.txt"
+
+    # https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
+    - name: Set build variables
+      run: |
+        echo "::set-env name=MAKE_TARGET::testacc"
+        echo "::set-env name=GO_FLAGS::-mod=vendor"
+        echo "::set-env name=GO111MODULE::on"
+        echo "::set-env name=GITLAB_TOKEN::20char-testing-token"
+        echo "::set-env name=GITLAB_BASE_URL::http://127.0.0.1:8080/api/v4"
+        echo "::set-env name=TF_LOG::DEBUG"
 
     - name: Start Gitlab and run acceptance tests
       run: |

@@ -28,6 +28,9 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(jiraResourceName, "url", "https://test.com"),
 					resource.TestCheckResourceAttr(jiraResourceName, "username", "user1"),
 					resource.TestCheckResourceAttr(jiraResourceName, "password", "mypass"),
+					resource.TestCheckResourceAttr(jiraResourceName, "commit_events", "true"),
+					resource.TestCheckResourceAttr(jiraResourceName, "merge_requests_events", "false"),
+					resource.TestCheckResourceAttr(jiraResourceName, "comment_on_event_enabled", "false"),
 				),
 			},
 			// Update the jira service
@@ -39,6 +42,9 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(jiraResourceName, "username", "user2"),
 					resource.TestCheckResourceAttr(jiraResourceName, "password", "mypass_update"),
 					resource.TestCheckResourceAttr(jiraResourceName, "jira_issue_transition_id", "3"),
+					resource.TestCheckResourceAttr(jiraResourceName, "commit_events", "false"),
+					resource.TestCheckResourceAttr(jiraResourceName, "merge_requests_events", "true"),
+					resource.TestCheckResourceAttr(jiraResourceName, "comment_on_event_enabled", "true"),
 				),
 			},
 			// Update the jira service to get back to previous settings
@@ -49,6 +55,9 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(jiraResourceName, "url", "https://test.com"),
 					resource.TestCheckResourceAttr(jiraResourceName, "username", "user1"),
 					resource.TestCheckResourceAttr(jiraResourceName, "password", "mypass"),
+					resource.TestCheckResourceAttr(jiraResourceName, "commit_events", "true"),
+					resource.TestCheckResourceAttr(jiraResourceName, "merge_requests_events", "false"),
+					resource.TestCheckResourceAttr(jiraResourceName, "comment_on_event_enabled", "false"),
 				),
 			},
 		},
@@ -114,7 +123,9 @@ func testAccCheckGitlabServiceJiraDestroy(s *terraform.State) error {
 		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				return fmt.Errorf("Repository still exists")
+				if gotRepo.MarkedForDeletionAt == nil {
+					return fmt.Errorf("Repository still exists")
+				}
 			}
 		}
 		if resp.StatusCode != 404 {
@@ -156,6 +167,9 @@ resource "gitlab_service_jira" "jira" {
   url      = "https://test.com"
   username = "user1"
   password = "mypass"
+  commit_events = true
+  merge_requests_events    = false
+  comment_on_event_enabled = false
 }
 `, rInt)
 }
@@ -176,6 +190,9 @@ resource "gitlab_service_jira" "jira" {
   username = "user2"
   password = "mypass_update"
   jira_issue_transition_id = "3"
+  commit_events = false
+  merge_requests_events    = true
+  comment_on_event_enabled = true
 }
 `, rInt)
 }
