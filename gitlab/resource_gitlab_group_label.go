@@ -80,9 +80,9 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 				d.Set("name", label.Name)
 				return nil
 			}
-			labelsLen = len(labels)
-			page = page + 1
 		}
+		labelsLen = len(labels)
+		page = page + 1
 	}
 
 	log.Printf("[DEBUG] failed to read gitlab label %s/%s", group, labelName)

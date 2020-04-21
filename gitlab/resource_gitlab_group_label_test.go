@@ -229,7 +229,7 @@ resource "gitlab_group_label" "fixme" {
   name = format("FIXME%%02d", count.index+1)
   count = 99
   color = "#ff0000"
-  description = "fix this test"
+  description = "red label"
 }
 	`, rInt, rInt)
 }
