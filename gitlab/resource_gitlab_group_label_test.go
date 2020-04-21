@@ -206,7 +206,7 @@ resource "gitlab_group" "foo" {
 }
 
 resource "gitlab_group_label" "fixme" {
-  project = "${gitlab_group.foo.id}"
+  group = "${gitlab_group.foo.id}"
   name = format("FIXME%%02d", count.index+1)
   count = 100
   color = "#ffcc00"
@@ -225,7 +225,7 @@ resource "gitlab_group" "foo" {
 }
 
 resource "gitlab_group_label" "fixme" {
-  project = "${gitlab_group.foo.id}"
+  group = "${gitlab_group.foo.id}"
   name = format("FIXME%%02d", count.index+1)
   count = 99
   color = "#ff0000"
