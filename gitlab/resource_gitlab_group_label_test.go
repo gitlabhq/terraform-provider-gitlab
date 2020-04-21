@@ -52,6 +52,34 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 					}),
 				),
 			},
+			{
+				Config: testAccGitlabGroupLabelLargeConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.20", &label),
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.30", &label),
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.40", &label),
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.10", &label),
+					testAccCheckGitlabGroupLabelAttributes(&label, &testAccGitlabGroupLabelExpectedAttributes{
+						Name:        "FIXME11",
+						Color:       "#ffcc00",
+						Description: "fix this test",
+					}),
+				),
+			},
+			{
+				Config: testAccGitlabGroupLabelUpdateLargeConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.20", &label),
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.30", &label),
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.40", &label),
+					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.10", &label),
+					testAccCheckGitlabGroupLabelAttributes(&label, &testAccGitlabGroupLabelExpectedAttributes{
+						Name:        "FIXME11",
+						Color:       "#ff0000",
+						Description: "red label",
+					}),
+				),
+			},
 		},
 	})
 }
@@ -70,7 +98,7 @@ func testAccCheckGitlabGroupLabelExists(n string, label *gitlab.GroupLabel) reso
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		labels, _, err := conn.GroupLabels.ListGroupLabels(groupName, nil)
+		labels, _, err := conn.GroupLabels.ListGroupLabels(groupName, &gitlab.ListGroupLabelsOptions{PerPage: 1000})
 		if err != nil {
 			return err
 		}
@@ -166,4 +194,42 @@ resource "gitlab_group_label" "fixme" {
   description = "red label"
 }
 	`, rInt, rInt, rInt)
+}
+
+func testAccGitlabGroupLabelLargeConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name             = "foo-%d"
+  path             = "foo-%d"
+  description      = "Terraform acceptance tests"
+  visibility_level = "public"
+}
+
+resource "gitlab_group_label" "fixme" {
+  project = "${gitlab_group.foo.id}"
+  name = format("FIXME%%02d", count.index+1)
+  count = 100
+  color = "#ffcc00"
+  description = "fix this test"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabGroupLabelUpdateLargeConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name             = "foo-%d"
+  path             = "foo-%d"
+  description      = "Terraform acceptance tests"
+  visibility_level = "public"
+}
+
+resource "gitlab_group_label" "fixme" {
+  project = "${gitlab_group.foo.id}"
+  name = format("FIXME%%02d", count.index+1)
+  count = 99
+  color = "#ff0000"
+  description = "fix this test"
+}
+	`, rInt, rInt)
 }
