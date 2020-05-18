@@ -64,6 +64,18 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
+			"subgroup_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"owner", "maintainer"}, true),
+			},
+			"project_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"noone", "developer", "maintainer"}, true),
+			},
 			"parent_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -97,6 +109,14 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("subgroup_creation_level"); ok {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("project_creation_level"); ok {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
 	}
 
 	if v, ok := d.GetOk("parent_id"); ok {
@@ -144,6 +164,8 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
+	d.Set("subgroup_creation_level", group.SubGroupCreationLevel)
+	d.Set("project_creation_level", group.ProjectCreationLevel)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
 
@@ -179,6 +201,14 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	// https://gitlab.com/gitlab-org/gitlab-ce/issues/38459
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if d.HasChange("subgroup_creation_level") {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(d.Get("subgroup_creation_level").(string))
+	}
+
+	if d.HasChange("project_creation_level") {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(d.Get("project_creation_level").(string))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

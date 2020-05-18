@@ -46,7 +46,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the group to put the anem and description back
+			// Update the group to put the name and description back
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -56,6 +56,102 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Path:        fmt.Sprintf("foo-path-%d", rInt),
 						Description: "Terraform acceptance tests",
 						LFSEnabled:  true,
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabGroup_subgroup(t *testing.T) {
+	var group gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			// Create a group with subgroup_creation_level set to owner
+			{
+				Config: testAccGitlabSubGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						SubGroupCreationLevel: "owner",
+						LFSEnabled:            true,
+					}),
+				),
+			},
+			// Update the group to change the level to maintainer
+			{
+				Config: testAccGitlabSubGroupUpdateConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						SubGroupCreationLevel: "maintainer",
+						LFSEnabled:            true,
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabGroup_projects(t *testing.T) {
+	var group gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			// Create a group with project_creation_level set to noone
+			{
+				Config: testAccGitlabGroupProjectConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-name-%d", rInt),
+						Path:                 fmt.Sprintf("foo-path-%d", rInt),
+						Description:          "Terraform acceptance tests",
+						ProjectCreationLevel: "noone",
+						LFSEnabled:           true,
+					}),
+				),
+			},
+			// Update the group to change the level to developer
+			{
+				Config: testAccGitlabGroupUpdateProjectConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-name-%d", rInt),
+						Path:                 fmt.Sprintf("foo-path-%d", rInt),
+						Description:          "Terraform acceptance tests",
+						ProjectCreationLevel: "developer",
+						LFSEnabled:           true,
+					}),
+				),
+			},
+			// Update the group to change the level to maintainer
+			{
+				Config: testAccGitlabGroupUpdateProjectConfigWithMaintainer(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                 fmt.Sprintf("foo-name-%d", rInt),
+						Path:                 fmt.Sprintf("foo-path-%d", rInt),
+						Description:          "Terraform acceptance tests",
+						ProjectCreationLevel: "maintainer",
+						LFSEnabled:           true,
 					}),
 				),
 			},
@@ -228,12 +324,14 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 }
 
 type testAccGitlabGroupExpectedAttributes struct {
-	Name                 string
-	Path                 string
-	Description          string
-	Parent               *gitlab.Group
-	LFSEnabled           bool
-	RequestAccessEnabled bool
+	Name                  string
+	Path                  string
+	Description           string
+	Parent                *gitlab.Group
+	LFSEnabled            bool
+	RequestAccessEnabled  bool
+	ProjectCreationLevel  gitlab.ProjectCreationLevelValue
+	SubGroupCreationLevel gitlab.SubGroupCreationLevelValue
 }
 
 func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabGroupExpectedAttributes) resource.TestCheckFunc {
@@ -268,6 +366,18 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 			}
 		}
 
+		if want.ProjectCreationLevel != "" {
+			if group.ProjectCreationLevel != want.ProjectCreationLevel {
+				return fmt.Errorf("got project_creation_level %q; want %q", group.ProjectCreationLevel, want.ProjectCreationLevel)
+			}
+		}
+
+		if want.SubGroupCreationLevel != "" {
+			if group.SubGroupCreationLevel != want.SubGroupCreationLevel {
+				return fmt.Errorf("got subgroup_creation_level %q; want %q", group.SubGroupCreationLevel, want.SubGroupCreationLevel)
+			}
+		}
+
 		return nil
 	}
 }
@@ -294,6 +404,81 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
+}
+
+func testAccGitlabGroupProjectConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+  project_creation_level = "noone"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt)
+}
+
+func testAccGitlabGroupUpdateProjectConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+  project_creation_level = "developer"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt)
+}
+
+func testAccGitlabGroupUpdateProjectConfigWithMaintainer(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+  project_creation_level = "maintainer"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt)
+}
+
+func testAccGitlabSubGroupConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+  subgroup_creation_level = "owner"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt)
+}
+
+func testAccGitlabSubGroupUpdateConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+  subgroup_creation_level = "maintainer"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt, rInt)
 }
 
 func testAccGitlabGroupConfig(rInt int) string {

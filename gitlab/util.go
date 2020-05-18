@@ -87,6 +87,33 @@ func stringToVisibilityLevel(s string) *gitlab.VisibilityValue {
 	return &value
 }
 
+func stringToProjectCreationLevel(s string) *gitlab.ProjectCreationLevelValue {
+	lookup := map[string]gitlab.ProjectCreationLevelValue{
+		"noone":      gitlab.NoOneProjectCreation,
+		"maintainer": gitlab.MaintainerProjectCreation,
+		"developer":  gitlab.DeveloperProjectCreation,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
+func stringToSubGroupCreationLevel(s string) *gitlab.SubGroupCreationLevelValue {
+	lookup := map[string]gitlab.SubGroupCreationLevelValue{
+		"maintainer": gitlab.MaintainerSubGroupCreationLevelValue,
+		"owner":      gitlab.OwnerSubGroupCreationLevelValue,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
 func stringToVariableType(s string) *gitlab.VariableTypeValue {
 	lookup := map[string]gitlab.VariableTypeValue{
 		"env_var": gitlab.EnvVariableType,

@@ -50,13 +50,19 @@ enable users to request access to the group.
 
 * `parent_id` - (Optional) Integer, id of the parent group (creates a nested group).
 
+* `subgroup_creation_level` - (Optional) Define who can create sub groups.
+  Valid values are `owner` or `maintainer`.
+
+* `project_creation_level` - (Optional) Determine if developers can create projects in the group.
+  Valid values are `noone`, `developer` and `maintainer`.
+
 ## Attributes Reference
 
 The resource exports the following attributes:
 
 * `id` - The unique id assigned to the group by the GitLab server.  Serves as a
   namespace id where one is needed.
-  
+
 * `full_path` - The full path of the group.
 
 * `full_name` - The full name of the group.
