@@ -21,6 +21,7 @@ resource "gitlab_group_variable" "example" {
    key       = "group_variable_key"
    value     = "group_variable_value"
    protected = false
+   masked    = false
 }
 ```
 
@@ -37,6 +38,8 @@ The following arguments are supported:
 * `variable_type` - (Optional, string)  The type of a variable. Available types are: env_var (default) and file.
 
 * `protected` - (Optional, boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+
+* `masked ` - (Optional, boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 
 ## Import
 

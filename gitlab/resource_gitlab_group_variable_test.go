@@ -88,6 +88,7 @@ type testAccGitlabGroupVariableExpectedAttributes struct {
 	Key       string
 	Value     string
 	Protected bool
+	Masked    bool
 }
 
 func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, want *testAccGitlabGroupVariableExpectedAttributes) resource.TestCheckFunc {
@@ -102,6 +103,10 @@ func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, w
 
 		if variable.Protected != want.Protected {
 			return fmt.Errorf("got protected %t; want %t", variable.Protected, want.Protected)
+		}
+
+		if variable.Masked != want.Masked {
+			return fmt.Errorf("got masked %t; want %t", variable.Masked, want.Masked)
 		}
 
 		return nil
@@ -144,6 +149,7 @@ resource "gitlab_group_variable" "foo" {
   key = "key_%s"
   value = "value-%s"
   variable_type = "file"
+  masked = false
 }
 	`, rString, rString, rString, rString)
 }
@@ -160,6 +166,7 @@ resource "gitlab_group_variable" "foo" {
   key = "key_%s"
   value = "value-inverse-%s"
   protected = true
+  masked = false
 }
 	`, rString, rString, rString, rString)
 }
