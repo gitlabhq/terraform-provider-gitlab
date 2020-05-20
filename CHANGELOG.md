@@ -1,7 +1,7 @@
-## 2.7.0 (Unreleased)
+## 2.7.0 (May 20, 2020)
 
 * Implement `masked` parameters for `gitlab_group_variable`
-  ([GH-271])
+  ([[#271](https://github.com/terraform-providers/terraform-provider-gitlab/issues/271)])
 
 ## 2.6.0 (April 08, 2020)
 
