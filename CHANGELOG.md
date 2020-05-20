@@ -1,3 +1,4 @@
+## 2.8.0 (Unreleased)
 ## 2.7.0 (May 20, 2020)
 
 * Implement `masked` parameters for `gitlab_group_variable`
