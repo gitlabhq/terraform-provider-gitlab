@@ -1,4 +1,8 @@
 ## 2.7.0 (Unreleased)
+
+* Implement `masked` parameters for `gitlab_group_variable`
+  ([GH-271])
+
 ## 2.6.0 (April 08, 2020)
 
 ENHANCEMENTS:
