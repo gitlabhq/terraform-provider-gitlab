@@ -44,24 +44,26 @@ func (c *Config) Client() (interface{}, error) {
 		Proxy:           http.ProxyFromEnvironment,
 		TLSClientConfig: tlsConfig,
 	}
-	transport := logging.NewTransport("GitLab", t)
 
-	httpClient := &http.Client{Transport: transport}
-
-	client := gitlab.NewClient(httpClient, c.Token)
-	if c.BaseURL != "" {
-		err := client.SetBaseURL(c.BaseURL)
-		if err != nil {
-			// The BaseURL supplied wasn't valid, bail.
-			return nil, err
-		}
+	opts := []gitlab.ClientOptionFunc{
+		gitlab.WithHTTPClient(
+			&http.Client{
+				Transport: logging.NewTransport("GitLab", t),
+			},
+		),
 	}
 
-	// Test the credentials by checking we can get information about the authenticated user.
-	_, _, err := client.Users.CurrentUser()
+	if c.BaseURL != "" {
+		opts = append(opts, gitlab.WithBaseURL(c.BaseURL))
+	}
+
+	client, err := gitlab.NewClient(c.Token, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return client, nil
+	// Test the credentials by checking we can get information about the authenticated user.
+	_, _, err = client.Users.CurrentUser()
+
+	return client, err
 }
