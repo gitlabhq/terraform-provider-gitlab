@@ -1,4 +1,8 @@
 ## 2.8.0 (Unreleased)
+
+* Increase MaxIdleConnsPerHost in http.Transport
+  ([GH-305])
+
 ## 2.7.0 (May 20, 2020)
 
 * Implement `masked` parameters for `gitlab_group_variable`
