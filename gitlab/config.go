@@ -40,10 +40,9 @@ func (c *Config) Client() (interface{}, error) {
 		tlsConfig.InsecureSkipVerify = true
 	}
 
-	t := &http.Transport{
-		Proxy:           http.ProxyFromEnvironment,
-		TLSClientConfig: tlsConfig,
-	}
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.TLSClientConfig = tlsConfig
+	t.MaxIdleConnsPerHost = 100
 
 	opts := []gitlab.ClientOptionFunc{
 		gitlab.WithHTTPClient(
