@@ -39,6 +39,18 @@ func Provider() terraform.ResourceProvider {
 				Default:     false,
 				Description: descriptions["insecure"],
 			},
+			"client_cert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "",
+				Description: descriptions["client_cert"],
+			},
+			"client_key": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "",
+				Description: descriptions["client_key"],
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -89,6 +101,10 @@ func init() {
 		"cacert_file": "A file containing the ca certificate to use in case ssl certificate is not from a standard chain",
 
 		"insecure": "Disable SSL verification of API calls",
+
+		"client_cert": "File path to client certificate when GitLab instance is behind company proxy. File  must contain PEM encoded data.",
+
+		"client_key": "File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data.",
 	}
 }
 
@@ -98,6 +114,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		BaseURL:    d.Get("base_url").(string),
 		CACertFile: d.Get("cacert_file").(string),
 		Insecure:   d.Get("insecure").(bool),
+		ClientCert: d.Get("client_cert").(string),
+		ClientKey:  d.Get("client_key").(string),
 	}
 
 	return config.Client()
