@@ -78,3 +78,7 @@ The following arguments are supported in the `provider` block:
 
 * `insecure` - (Optional; boolean, defaults to false) When set to true this disables SSL verification of the connection to the
   GitLab instance.
+
+* `client_cert` - (Optional) File path to client certificate when GitLab instance is behind company proxy. File  must contain PEM encoded data.
+
+* `client_key` - (Optional) File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data. Required when `client_cert` is set.

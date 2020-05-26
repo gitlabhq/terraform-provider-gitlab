@@ -2,6 +2,8 @@
 
 * Increase MaxIdleConnsPerHost in http.Transport
   ([GH-305])
+* Provide a way to specify client cert and key
+  ([GH-315])
 
 ## 2.7.0 (May 20, 2020)
 
