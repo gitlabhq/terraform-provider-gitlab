@@ -29,14 +29,14 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 		t.Skipf("[WARNING] Skipping test until test data is configured in %s.", testDataFile)
 	} else {
 		resource.Test(t, resource.TestCase{
-			//PreCheck:     func() {testAccPreCheck(t)},
 			Providers:    testAccProviders,
 			CheckDestroy: testAccCheckGitlabGroupLdapLinkDestroy,
 			Steps: []resource.TestStep{
 
 				// Create a group LDAP link as a developer (uses testAccGitlabGroupLdapLinkCreateConfig for Config)
 				{
-					Config: testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
+					SkipFunc: isRunningInCE,
+					Config:   testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
 					Check: resource.ComposeTestCheckFunc(
 						testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
 						testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
@@ -46,7 +46,8 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 				// Update the group LDAP link to change the access level (uses testAccGitlabGroupLdapLinkUpdateConfig for Config)
 				{
-					Config: testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
+					SkipFunc: isRunningInCE,
+					Config:   testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
 					Check: resource.ComposeTestCheckFunc(
 						testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
 						testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
@@ -56,7 +57,8 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 				// Force create the same group LDAP link in a different resource (uses testAccGitlabGroupLdapLinkForceCreateConfig for Config)
 				{
-					Config: testAccGitlabGroupLdapLinkForceCreateConfig(rInt, &testLdapLink),
+					SkipFunc: isRunningInCE,
+					Config:   testAccGitlabGroupLdapLinkForceCreateConfig(rInt, &testLdapLink),
 					Check: resource.ComposeTestCheckFunc(
 						testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
 						testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
