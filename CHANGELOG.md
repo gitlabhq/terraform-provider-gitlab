@@ -1,9 +1,20 @@
 ## 2.8.0 (Unreleased)
 
-* Increase MaxIdleConnsPerHost in http.Transport
-  ([GH-305])
+FEATURES:
+* **New Resource:** `gitlab_group_ldap_link`
+  ([GH-296],
+   [GH-316])
+
+ENHANCEMENTS:
+
+* Update resource gitlab_group_label to read labels from all pages
+  ([GH-302])
 * Provide a way to specify client cert and key
   ([GH-315])
+
+BUGFIXES:
+* Increase MaxIdleConnsPerHost in http.Transport
+  ([GH-305])
 
 ## 2.7.0 (May 20, 2020)
 
