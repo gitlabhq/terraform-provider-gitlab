@@ -1,20 +1,20 @@
-## 2.8.0 (Unreleased)
+## 2.8.0 (May 28, 2020)
 
 FEATURES:
 * **New Resource:** `gitlab_group_ldap_link`
-  ([GH-296],
-   [GH-316])
+  ([[#296](https://github.com/terraform-providers/terraform-provider-gitlab/issues/296)],
+   [[#316](https://github.com/terraform-providers/terraform-provider-gitlab/issues/316)])
 
 ENHANCEMENTS:
 
 * Update resource gitlab_group_label to read labels from all pages
-  ([GH-302])
+  ([[#302](https://github.com/terraform-providers/terraform-provider-gitlab/issues/302)])
 * Provide a way to specify client cert and key
-  ([GH-315])
+  ([[#315](https://github.com/terraform-providers/terraform-provider-gitlab/issues/315)])
 
 BUGFIXES:
 * Increase MaxIdleConnsPerHost in http.Transport
-  ([GH-305])
+  ([[#305](https://github.com/terraform-providers/terraform-provider-gitlab/issues/305)])
 
 ## 2.7.0 (May 20, 2020)
 
