@@ -87,6 +87,10 @@ func resourceGitlabGroupCluster() *schema.Resource {
 				Default:      "rbac",
 				ValidateFunc: validation.StringInSlice([]string{"rbac", "abac", "unknown_authorization"}, false),
 			},
+			"management_project_id": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -121,6 +125,10 @@ func resourceGitlabGroupClusterCreate(d *schema.ResourceData, meta interface{}) 
 
 	if v, ok := d.GetOk("environment_scope"); ok {
 		options.EnvironmentScope = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("management_project_id"); ok {
+		options.ManagementProjectID = gitlab.String(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab group cluster %q/%q", group, *options.Name)
@@ -165,6 +173,12 @@ func resourceGitlabGroupClusterRead(d *schema.ResourceData, meta interface{}) er
 	d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
 	d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
 
+	if cluster.ManagementProject == nil {
+		d.Set("management_project_id", "")
+	} else {
+		d.Set("management_project_id", strconv.Itoa(cluster.ManagementProject.ID))
+	}
+
 	return nil
 }
 
@@ -206,6 +220,10 @@ func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) 
 
 	if *pk != (gitlab.EditGroupPlatformKubernetesOptions{}) {
 		options.PlatformKubernetes = pk
+	}
+
+	if d.HasChange("management_project_id") {
+		options.ManagementProjectID = gitlab.String(d.Get("management_project_id").(string))
 	}
 
 	if *options != (gitlab.EditGroupClusterOptions{}) {
