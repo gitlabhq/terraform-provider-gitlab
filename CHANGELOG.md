@@ -1,32 +1,37 @@
 ## 2.9.0 (Unreleased)
+
+ENHANCEMENTS:
+* Add management_project_id for Group and Project Clusters
+  (GH-301)
+
 ## 2.8.0 (May 28, 2020)
 
 FEATURES:
 * **New Resource:** `gitlab_group_ldap_link`
-  ([[#296](https://github.com/terraform-providers/terraform-provider-gitlab/issues/296)],
-   [[#316](https://github.com/terraform-providers/terraform-provider-gitlab/issues/316)])
+  ([#296](https://github.com/terraform-providers/terraform-provider-gitlab/issues/296),
+   [#316](https://github.com/terraform-providers/terraform-provider-gitlab/issues/316))
 
 ENHANCEMENTS:
 
 * Update resource gitlab_group_label to read labels from all pages
-  ([[#302](https://github.com/terraform-providers/terraform-provider-gitlab/issues/302)])
+  ([#302](https://github.com/terraform-providers/terraform-provider-gitlab/issues/302))
 * Provide a way to specify client cert and key
-  ([[#315](https://github.com/terraform-providers/terraform-provider-gitlab/issues/315)])
+  ([#315](https://github.com/terraform-providers/terraform-provider-gitlab/issues/315))
 
 BUGFIXES:
 * Increase MaxIdleConnsPerHost in http.Transport
-  ([[#305](https://github.com/terraform-providers/terraform-provider-gitlab/issues/305)])
+  ([#305](https://github.com/terraform-providers/terraform-provider-gitlab/issues/305))
 
 ## 2.7.0 (May 20, 2020)
 
 * Implement `masked` parameters for `gitlab_group_variable`
-  ([[#271](https://github.com/terraform-providers/terraform-provider-gitlab/issues/271)])
+  ([#271](https://github.com/terraform-providers/terraform-provider-gitlab/issues/271))
 
 ## 2.6.0 (April 08, 2020)
 
 ENHANCEMENTS:
 * Add jira flags
-  ([[#274](https://github.com/terraform-providers/terraform-provider-gitlab/issues/274)])
+  ([#274](https://github.com/terraform-providers/terraform-provider-gitlab/issues/274))
 
 ## 2.5.1 (April 06, 2020)
 
