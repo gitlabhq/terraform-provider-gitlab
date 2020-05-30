@@ -1,7 +1,11 @@
 ## 2.9.0 (Unreleased)
 
+FEATURES:
+* **New DataSource:** `gitlab_projects`
+  (GH-279)
+
 ENHANCEMENTS:
-* Add management_project_id for Group and Project Clusters
+* Add `management_project_id` for Group and Project Clusters
   (GH-301)
 
 ## 2.8.0 (May 28, 2020)
