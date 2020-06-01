@@ -1,14 +1,14 @@
-## 2.9.0 (Unreleased)
+## 2.9.0 (June 01, 2020)
 
 FEATURES:
 * **New DataSource:** `gitlab_projects`
-  (GH-279)
+  ([#279](https://github.com/terraform-providers/terraform-provider-gitlab/issues/279))
 * **New Resource:** `gitlab_deploy_token`
-  (GH-284)
+  ([#284](https://github.com/terraform-providers/terraform-provider-gitlab/issues/284))
 
 ENHANCEMENTS:
 * Add `management_project_id` for Group and Project Clusters
-  (GH-301)
+  ([#301](https://github.com/terraform-providers/terraform-provider-gitlab/issues/301))
 
 ## 2.8.0 (May 28, 2020)
 
