@@ -3,6 +3,8 @@
 FEATURES:
 * **New DataSource:** `gitlab_projects`
   (GH-279)
+* **New Resource:** `gitlab_deploy_token`
+  (GH-284)
 
 ENHANCEMENTS:
 * Add `management_project_id` for Group and Project Clusters
