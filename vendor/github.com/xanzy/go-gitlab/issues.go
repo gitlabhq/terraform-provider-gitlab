@@ -60,6 +60,16 @@ type IssueReferences struct {
 	Full     string `json:"full"`
 }
 
+// IssueCloser represents a closer of the issue.
+type IssueCloser struct {
+	ID        int    `json:"id"`
+	State     string `json:"state"`
+	WebURL    string `json:"web_url"`
+	Name      string `json:"name"`
+	AvatarURL string `json:"avatar_url"`
+	Username  string `json:"username"`
+}
+
 // IssueLinks represents links of the issue.
 type IssueLinks struct {
 	Self       string `json:"self"`
@@ -83,9 +93,11 @@ type Issue struct {
 	Assignee             *IssueAssignee   `json:"assignee"`
 	UpdatedAt            *time.Time       `json:"updated_at"`
 	ClosedAt             *time.Time       `json:"closed_at"`
+	ClosedBy             *IssueCloser     `json:"closed_by"`
 	Title                string           `json:"title"`
 	CreatedAt            *time.Time       `json:"created_at"`
 	Labels               Labels           `json:"labels"`
+	LabelDetails         []*LabelDetails  `json:"label_details"`
 	Upvotes              int              `json:"upvotes"`
 	Downvotes            int              `json:"downvotes"`
 	DueDate              *ISOTime         `json:"due_date"`
@@ -100,6 +112,7 @@ type Issue struct {
 	Links                *IssueLinks      `json:"_links"`
 	IssueLinkID          int              `json:"issue_link_id"`
 	MergeRequestCount    int              `json:"merge_requests_count"`
+	EpicIssueID          int              `json:"epic_issue_id"`
 	TaskCompletionStatus struct {
 		Count          int `json:"count"`
 		CompletedCount int `json:"completed_count"`
@@ -108,6 +121,40 @@ type Issue struct {
 
 func (i Issue) String() string {
 	return Stringify(i)
+}
+
+func (i *Issue) UnmarshalJSON(data []byte) error {
+	type alias Issue
+
+	raw := make(map[string]interface{})
+	err := json.Unmarshal(data, &raw)
+	if err != nil {
+		return err
+	}
+
+	labelDetails, ok := raw["labels"].([]interface{})
+	if ok && len(labelDetails) > 0 {
+		// We only want to change anything if we got label details.
+		if _, ok := labelDetails[0].(map[string]interface{}); !ok {
+			return json.Unmarshal(data, (*alias)(i))
+		}
+
+		labels := make([]interface{}, len(labelDetails))
+		for i, details := range labelDetails {
+			labels[i] = details.(map[string]interface{})["name"]
+		}
+
+		// Set the correct values
+		raw["labels"] = labels
+		raw["label_details"] = labelDetails
+
+		data, err = json.Marshal(raw)
+		if err != nil {
+			return err
+		}
+	}
+
+	return json.Unmarshal(data, (*alias)(i))
 }
 
 // Labels is a custom type with specific marshaling characteristics.
@@ -122,6 +169,16 @@ func (l *Labels) MarshalJSON() ([]byte, error) {
 func (l *Labels) EncodeValues(key string, v *url.Values) error {
 	v.Set(key, strings.Join(*l, ","))
 	return nil
+}
+
+// LabelDetails represents detailed label information.
+type LabelDetails struct {
+	ID              int    `json:"id"`
+	Name            string `json:"name"`
+	Color           string `json:"color"`
+	Description     string `json:"description"`
+	DescriptionHTML string `json:"description_html"`
+	TextColor       string `json:"text_color"`
 }
 
 // ListIssuesOptions represents the available ListIssues() options.
@@ -172,22 +229,25 @@ func (s *IssuesService) ListIssues(opt *ListIssuesOptions, options ...RequestOpt
 // GitLab API docs: https://docs.gitlab.com/ce/api/issues.html#list-group-issues
 type ListGroupIssuesOptions struct {
 	ListOptions
-	State           *string    `url:"state,omitempty" json:"state,omitempty"`
-	Labels          Labels     `url:"labels,comma,omitempty" json:"labels,omitempty"`
-	IIDs            []int      `url:"iids[],omitempty" json:"iids,omitempty"`
-	Milestone       *string    `url:"milestone,omitempty" json:"milestone,omitempty"`
-	Scope           *string    `url:"scope,omitempty" json:"scope,omitempty"`
-	AuthorID        *int       `url:"author_id,omitempty" json:"author_id,omitempty"`
-	AssigneeID      *int       `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
-	MyReactionEmoji *string    `url:"my_reaction_emoji,omitempty" json:"my_reaction_emoji,omitempty"`
-	OrderBy         *string    `url:"order_by,omitempty" json:"order_by,omitempty"`
-	Sort            *string    `url:"sort,omitempty" json:"sort,omitempty"`
-	Search          *string    `url:"search,omitempty" json:"search,omitempty"`
-	In              *string    `url:"in,omitempty" json:"in,omitempty"`
-	CreatedAfter    *time.Time `url:"created_after,omitempty" json:"created_after,omitempty"`
-	CreatedBefore   *time.Time `url:"created_before,omitempty" json:"created_before,omitempty"`
-	UpdatedAfter    *time.Time `url:"updated_after,omitempty" json:"updated_after,omitempty"`
-	UpdatedBefore   *time.Time `url:"updated_before,omitempty" json:"updated_before,omitempty"`
+	State            *string    `url:"state,omitempty" json:"state,omitempty"`
+	Labels           Labels     `url:"labels,comma,omitempty" json:"labels,omitempty"`
+	WithLabelDetails *bool      `url:"with_labels_details,omitempty" json:"with_labels_details,omitempty"`
+	IIDs             []int      `url:"iids[],omitempty" json:"iids,omitempty"`
+	Milestone        *string    `url:"milestone,omitempty" json:"milestone,omitempty"`
+	Scope            *string    `url:"scope,omitempty" json:"scope,omitempty"`
+	AuthorID         *int       `url:"author_id,omitempty" json:"author_id,omitempty"`
+	AuthorUsername   *string    `url:"author_username,omitempty" json:"author_username,omitempty"`
+	AssigneeID       *int       `url:"assignee_id,omitempty" json:"assignee_id,omitempty"`
+	AssigneeUsername *string    `url:"assignee_username,omitempty" json:"assignee_username,omitempty"`
+	MyReactionEmoji  *string    `url:"my_reaction_emoji,omitempty" json:"my_reaction_emoji,omitempty"`
+	OrderBy          *string    `url:"order_by,omitempty" json:"order_by,omitempty"`
+	Sort             *string    `url:"sort,omitempty" json:"sort,omitempty"`
+	Search           *string    `url:"search,omitempty" json:"search,omitempty"`
+	In               *string    `url:"in,omitempty" json:"in,omitempty"`
+	CreatedAfter     *time.Time `url:"created_after,omitempty" json:"created_after,omitempty"`
+	CreatedBefore    *time.Time `url:"created_before,omitempty" json:"created_before,omitempty"`
+	UpdatedAfter     *time.Time `url:"updated_after,omitempty" json:"updated_after,omitempty"`
+	UpdatedBefore    *time.Time `url:"updated_before,omitempty" json:"updated_before,omitempty"`
 }
 
 // ListGroupIssues gets a list of group issues. This function accepts
