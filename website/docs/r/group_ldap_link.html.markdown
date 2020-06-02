@@ -6,7 +6,7 @@ description: |-
   Adds an LDAP link to an existing GitLab group.
 ---
 
-# gitlab\_group_ldap_link
+# gitlab\_group\_ldap\_link
 
 This resource allows you to add an LDAP link to an existing GitLab group.
 
