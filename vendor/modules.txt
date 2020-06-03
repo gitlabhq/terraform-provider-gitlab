@@ -229,6 +229,9 @@ github.com/mitchellh/go-homedir
 github.com/mitchellh/go-testing-interface
 # github.com/mitchellh/go-wordwrap v1.0.0
 github.com/mitchellh/go-wordwrap
+# github.com/mitchellh/hashstructure v1.0.0
+## explicit
+github.com/mitchellh/hashstructure
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/mitchellh/reflectwalk v1.0.1
@@ -253,7 +256,7 @@ github.com/ulikunitz/xz/lzma
 ## explicit
 github.com/vmihailenco/msgpack
 github.com/vmihailenco/msgpack/codes
-# github.com/xanzy/go-gitlab v0.31.0
+# github.com/xanzy/go-gitlab v0.32.1
 ## explicit
 github.com/xanzy/go-gitlab
 # github.com/zclconf/go-cty v1.2.1

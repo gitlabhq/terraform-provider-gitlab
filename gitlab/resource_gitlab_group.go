@@ -208,7 +208,7 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 		Refresh: func() (interface{}, string, error) {
 			out, response, err := client.Groups.GetGroup(d.Id())
 			if err != nil {
-				if response.StatusCode == 404 {
+				if response != nil && response.StatusCode == 404 {
 					return out, "Deleted", nil
 				}
 				log.Printf("[ERROR] Received error: %#v", err)

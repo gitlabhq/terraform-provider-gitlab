@@ -79,6 +79,21 @@ func TestAccGitlabGroupCluster_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Create cluster with management_project_id
+			{
+				Config: testAccGitlabGroupClusterManagement(rInt, true),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupClusterExists("gitlab_group_cluster.foo", &cluster),
+					testAccCheckGitlabGroupClusterAttributes(&cluster, &testAccGitlabGroupClusterExpectedAttributes{
+						Name:                        fmt.Sprintf("foo-cluster-%d", rInt),
+						Domain:                      "example.com",
+						EnvironmentScope:            "*",
+						KubernetesApiURL:            "https://123.123.123",
+						KubernetesCACert:            groupClusterFakeCert,
+						KubernetesAuthorizationType: "abac",
+					}),
+				),
+			},
 		},
 	})
 }
@@ -111,6 +126,7 @@ type testAccGitlabGroupClusterExpectedAttributes struct {
 	KubernetesApiURL            string
 	KubernetesCACert            string
 	KubernetesAuthorizationType string
+	ManagementProjectID         string
 }
 
 func testAccCheckGitlabGroupClusterExists(n string, cluster *gitlab.GroupCluster) resource.TestCheckFunc {
@@ -259,6 +275,48 @@ resource gitlab_group_cluster "foo" {
   kubernetes_authorization_type = "%s"
 }
 `, groupClusterFakeCert, rInt, rInt, rInt, authType)
+}
+
+func testAccGitlabGroupClusterManagement(rInt int, managed bool) string {
+	m := "false"
+	if managed {
+		m = "true"
+	}
+
+	return fmt.Sprintf(`
+variable "cert" {
+  default = <<EOF
+%s
+EOF
+}
+
+resource "gitlab_group" "foo" {
+  name = "foo-group-%d"
+  path = "foo-group-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_project" "cluster-management" {
+	name                   = "cluster-management"
+	namespace_id           = gitlab_group.foo.id
+}
+
+resource gitlab_group_cluster "foo" {
+  group                       = "${gitlab_group.foo.id}"
+  name                          = "foo-cluster-%d"
+  domain                        = "example.com"
+  managed                       = "%s"
+  kubernetes_api_url            = "https://123.123.123"
+  kubernetes_token              = "some-token"
+  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_authorization_type = "abac"
+  management_project_id         = "${gitlab_project.cluster-management.id}"
+}
+`, groupClusterFakeCert, rInt, rInt, rInt, m)
 }
 
 var groupClusterFakeCert = `-----BEGIN CERTIFICATE-----

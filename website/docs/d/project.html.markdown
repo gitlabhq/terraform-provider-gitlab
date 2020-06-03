@@ -66,3 +66,5 @@ The following attributes are exported:
 * `runners_token` - Registration token to use during runner setup.
 
 * `archived` - Whether the project is in read-only mode (archived).
+
+* `remove_source_branch_after_merge` - Enable `Delete source branch` option by default for all new merge requests

@@ -2,12 +2,13 @@ package gitlab
 
 import (
 	"fmt"
-	"testing"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
+	"net/http"
+	"testing"
+	"time"
 )
 
 func TestAccGitlabGroup_basic(t *testing.T) {
@@ -183,7 +184,24 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		_, err := conn.Groups.DeleteGroup(group.ID)
-		return err
+		if err != nil {
+			return err
+		}
+		// Fixes groups API async deletion issue
+		// https://github.com/terraform-providers/terraform-provider-gitlab/issues/319
+		for start := time.Now(); time.Since(start) < 15*time.Second; {
+			g, resp, err := conn.Groups.GetGroup(group.ID)
+			if resp != nil && resp.StatusCode == http.StatusNotFound {
+				return nil
+			}
+			if g != nil && g.MarkedForDeletionOn != nil {
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+		}
+		return fmt.Errorf("waited for more than 15 seconds for group to be asynchronously deleted")
 	}
 }
 

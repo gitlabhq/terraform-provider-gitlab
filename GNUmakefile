@@ -13,6 +13,12 @@ test: fmtcheck
 	echo $(TEST) | \
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
+testacc-prepareenv:
+	MAKE_TARGET=testacc GITLAB_TOKEN=ACCTEST LC_ALL=en_US sh -c "'$(CURDIR)/scripts/start-gitlab.sh'"
+
+testacc-cleanenv:
+	docker stop gitlab
+
 testacc: fmtcheck
 	TF_ACC=1 go test -v $(TEST) $(TESTARGS) -timeout 40m
 
