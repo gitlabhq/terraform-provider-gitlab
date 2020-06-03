@@ -100,6 +100,9 @@ The following additional attributes are exported:
 * `shared_with_groups` - List of the groups the project is shared with.
   * `group_name` - Group's name.
 
+* `remove_source_branch_after_merge` - Enable `Delete source branch` option by default for all new merge requests.
+
+
 ## Importing projects
 
 You can import a project state using `terraform import <resource> <id>`.  The

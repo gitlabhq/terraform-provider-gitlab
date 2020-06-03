@@ -107,6 +107,11 @@ func dataSourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"remove_source_branch_after_merge": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -141,5 +146,6 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("web_url", found.WebURL)
 	d.Set("runners_token", found.RunnersToken)
 	d.Set("archived", found.Archived)
+	d.Set("remove_source_branch_after_merge", found.RemoveSourceBranchAfterMerge)
 	return nil
 }
