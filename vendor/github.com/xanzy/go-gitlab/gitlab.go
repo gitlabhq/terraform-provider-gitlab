@@ -75,7 +75,7 @@ type Client struct {
 	// disableRetries is used to disable the default retry logic.
 	disableRetries bool
 
-	// configLimiter is used to make sure the limiter is configured exactly
+	// configureLimiterOnce is used to make sure the limiter is configured exactly
 	// once and block all other calls until the initial (one) call is done.
 	configureLimiterOnce sync.Once
 
@@ -92,7 +92,7 @@ type Client struct {
 	token string
 
 	// Protects the token field from concurrent read/write accesses.
-	tokenLock sync.Mutex
+	tokenLock sync.RWMutex
 
 	// User agent used when communicating with the GitLab API.
 	UserAgent string
@@ -219,37 +219,6 @@ func NewOAuthClient(token string, options ...ClientOptionFunc) (*Client, error) 
 	client.authType = oAuthToken
 	client.token = token
 	return client, nil
-}
-
-func (c *Client) requestOAuthToken(ctx context.Context) error {
-	token := c.token
-
-	c.tokenLock.Lock()
-	defer c.tokenLock.Unlock()
-
-	// Return early if the token has been updated
-	// while we were waiting for the lock.
-	if c.token != token {
-		return nil
-	}
-
-	config := &oauth2.Config{
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  fmt.Sprintf("%s://%s/oauth/authorize", c.BaseURL().Scheme, c.BaseURL().Host),
-			TokenURL: fmt.Sprintf("%s://%s/oauth/token", c.BaseURL().Scheme, c.BaseURL().Host),
-		},
-	}
-
-	ctx = context.WithValue(ctx, oauth2.HTTPClient, c.client.HTTPClient)
-	t, err := config.PasswordCredentialsToken(ctx, c.username, c.password)
-	if err != nil {
-		return err
-	}
-
-	// Update token with the new access token.
-	c.token = t.AccessToken
-
-	return nil
 }
 
 func newClient(options ...ClientOptionFunc) (*Client, error) {
@@ -620,18 +589,28 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	c.configureLimiterOnce.Do(func() { c.configureLimiter() })
 
 	// Wait will block until the limiter can obtain a new token.
-	if err := c.limiter.Wait(req.Context()); err != nil {
+	err := c.limiter.Wait(req.Context())
+	if err != nil {
 		return nil, err
 	}
 
-	if c.authType == basicAuth && c.token == "" {
-		if err := c.requestOAuthToken(req.Context()); err != nil {
-			return nil, err
-		}
-	}
-
+	// Set the correct authentication header. If using basic auth, then check
+	// if we already have a token and if not first authenticate and get one.
+	var basicAuthToken string
 	switch c.authType {
-	case basicAuth, oAuthToken:
+	case basicAuth:
+		c.tokenLock.RLock()
+		basicAuthToken = c.token
+		c.tokenLock.RUnlock()
+		if basicAuthToken == "" {
+			// If we don't have a token yet, we first need to request one.
+			basicAuthToken, err = c.requestOAuthToken(req.Context(), basicAuthToken)
+			if err != nil {
+				return nil, err
+			}
+		}
+		req.Header.Set("Authorization", "Bearer "+basicAuthToken)
+	case oAuthToken:
 		req.Header.Set("Authorization", "Bearer "+c.token)
 	case privateToken:
 		req.Header.Set("PRIVATE-TOKEN", c.token)
@@ -644,8 +623,8 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusUnauthorized && c.authType == basicAuth {
-		err = c.requestOAuthToken(req.Context())
-		if err != nil {
+		// The token most likely expired, so we need to request a new one and try again.
+		if _, err := c.requestOAuthToken(req.Context(), basicAuthToken); err != nil {
 			return nil, err
 		}
 		return c.Do(req, v)
@@ -669,6 +648,32 @@ func (c *Client) Do(req *retryablehttp.Request, v interface{}) (*Response, error
 	}
 
 	return response, err
+}
+
+func (c *Client) requestOAuthToken(ctx context.Context, token string) (string, error) {
+	c.tokenLock.Lock()
+	defer c.tokenLock.Unlock()
+
+	// Return early if the token was updated while waiting for the lock.
+	if c.token != token {
+		return c.token, nil
+	}
+
+	config := &oauth2.Config{
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  fmt.Sprintf("%s://%s/oauth/authorize", c.BaseURL().Scheme, c.BaseURL().Host),
+			TokenURL: fmt.Sprintf("%s://%s/oauth/token", c.BaseURL().Scheme, c.BaseURL().Host),
+		},
+	}
+
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, c.client.HTTPClient)
+	t, err := config.PasswordCredentialsToken(ctx, c.username, c.password)
+	if err != nil {
+		return "", err
+	}
+	c.token = t.AccessToken
+
+	return c.token, nil
 }
 
 // Helper function to accept and format both the project ID or name as project
