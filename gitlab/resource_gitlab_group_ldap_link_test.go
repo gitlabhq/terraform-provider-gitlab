@@ -25,48 +25,57 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 		t.Fatalf("[ERROR] Failed to load test data: %s", err.Error())
 	}
 
-	if testLdapLink.CN == "default" || testLdapLink.Provider == "default" {
-		t.Skipf("[WARNING] Skipping test until test data is configured in %s.", testDataFile)
-	} else {
-		resource.Test(t, resource.TestCase{
-			Providers:    testAccProviders,
-			CheckDestroy: testAccCheckGitlabGroupLdapLinkDestroy,
-			Steps: []resource.TestStep{
+	resource.Test(t, resource.TestCase{
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupLdapLinkDestroy,
+		Steps: []resource.TestStep{
 
-				// Create a group LDAP link as a developer (uses testAccGitlabGroupLdapLinkCreateConfig for Config)
-				{
-					SkipFunc: isRunningInCE,
-					Config:   testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
-					Check: resource.ComposeTestCheckFunc(
-						testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
-						testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-							accessLevel: fmt.Sprintf("developer"),
-						})),
-				},
-
-				// Update the group LDAP link to change the access level (uses testAccGitlabGroupLdapLinkUpdateConfig for Config)
-				{
-					SkipFunc: isRunningInCE,
-					Config:   testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
-					Check: resource.ComposeTestCheckFunc(
-						testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
-						testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-							accessLevel: fmt.Sprintf("maintainer"),
-						})),
-				},
-
-				// Force create the same group LDAP link in a different resource (uses testAccGitlabGroupLdapLinkForceCreateConfig for Config)
-				{
-					SkipFunc: isRunningInCE,
-					Config:   testAccGitlabGroupLdapLinkForceCreateConfig(rInt, &testLdapLink),
-					Check: resource.ComposeTestCheckFunc(
-						testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
-						testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-							accessLevel: fmt.Sprintf("developer"),
-						})),
-				},
+			// Create a group LDAP link as a developer (uses testAccGitlabGroupLdapLinkCreateConfig for Config)
+			{
+				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider, testDataFile),
+				Config:   testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
+					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
+						accessLevel: fmt.Sprintf("developer"),
+					})),
 			},
-		})
+
+			// Update the group LDAP link to change the access level (uses testAccGitlabGroupLdapLinkUpdateConfig for Config)
+			{
+				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider, testDataFile),
+				Config:   testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
+					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
+						accessLevel: fmt.Sprintf("maintainer"),
+					})),
+			},
+
+			// Force create the same group LDAP link in a different resource (uses testAccGitlabGroupLdapLinkForceCreateConfig for Config)
+			{
+				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider, testDataFile),
+				Config:   testAccGitlabGroupLdapLinkForceCreateConfig(rInt, &testLdapLink),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
+					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
+						accessLevel: fmt.Sprintf("developer"),
+					})),
+			},
+		},
+	})
+}
+
+func testAccGitlabGroupLdapLinkSkipFunc(testCN string, testProvider string, testDataFile string) func() (bool, error) {
+	return func() (bool, error) {
+		if isCE, _ := isRunningInCE(); isCE {
+			return true, nil
+		} else if testCN == "default" || testProvider == "default" {
+			fmt.Printf("[WARNING] Skipping test until test data is configured in %s.\n", testDataFile)
+			return true, nil
+		}
+
+		return false, nil
 	}
 }
 
