@@ -38,10 +38,9 @@ Using the provider
 ----------------------
 ## Fill in for each provider
 
-Developing the Provider
----------------------------
+# Developing the Provider
 
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.11+ is *required*). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
+If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.14+ is *required*).
 
 To compile the provider, run `make build`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
 
@@ -53,7 +52,8 @@ $ $GOPATH/bin/terraform-provider-gitlab
 ```
 
 ### Running tests
-The Terraform Provider only has acceptance tests, these can run against a gitlab instance where you have a token with administrator permissions (likely not gitlab.com). 
+
+The Terraform Provider only has acceptance tests, these can run against a gitlab instance where you have a token with administrator permissions (likely not gitlab.com).
 There is excellent documentation on [how to run gitlab from docker at gitlab.com](https://docs.gitlab.com/omnibus/docker/)
 
 In order to run the full suite of acceptance tests, export the environment variables: 
@@ -66,3 +66,13 @@ and run `make testacc`.
 ```sh
 $ make testacc
 ```
+
+### Gitlab Community Edition and Gitlab Entreprise Edition
+
+This module supports both Gitlab CE and Gitlab EE. We run tests on Gitlab EE,
+but can't run them on pull requests from forks.
+
+Features that only work on one flavour can use the following helpers as
+SkipFunc: `isRunningInEE` and `isRunningInCE`. You can see an exemple of this
+for [gitlab_project_push_rules](gitlab/resource_gitlab_project_push_rules_test.go)
+tests.

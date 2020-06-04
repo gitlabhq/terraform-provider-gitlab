@@ -1,9 +1,12 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/xanzy/go-gitlab"
 )
 
 // testAccCompareGitLabAttribute compares an attribute in two ResourceData's for
@@ -35,4 +38,28 @@ func testAccIsSkippedAttribute(needle string, haystack []string) bool {
 		}
 	}
 	return false
+}
+
+// Returns true if the acceptance test is running Gitlab EE.
+// Meant to be used as SkipFunc to skip tests that work only on Gitlab CE.
+func isRunningInEE() (bool, error) {
+	if conn, ok := testAccProvider.Meta().(*gitlab.Client); ok {
+		version, _, err := conn.Version.GetVersion()
+		if err != nil {
+			return false, err
+		}
+		if strings.Contains(version.String(), "-ee") {
+			return true, nil
+		}
+	} else {
+		return false, errors.New("Provider not initialized, unable to get GitLab connection")
+	}
+	return false, nil
+}
+
+// Returns true if the acceptance test is running Gitlab CE.
+// Meant to be used as SkipFunc to skip tests that work only on Gitlab EE.
+func isRunningInCE() (bool, error) {
+	isEE, err := isRunningInEE()
+	return !isEE, err
 }
