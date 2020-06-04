@@ -32,7 +32,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 			// Create a group LDAP link as a developer (uses testAccGitlabGroupLdapLinkCreateConfig for Config)
 			{
-				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider, testDataFile),
+				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider),
 				Config:   testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
@@ -43,7 +43,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 			// Update the group LDAP link to change the access level (uses testAccGitlabGroupLdapLinkUpdateConfig for Config)
 			{
-				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider, testDataFile),
+				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider),
 				Config:   testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
@@ -54,7 +54,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 			// Force create the same group LDAP link in a different resource (uses testAccGitlabGroupLdapLinkForceCreateConfig for Config)
 			{
-				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider, testDataFile),
+				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider),
 				Config:   testAccGitlabGroupLdapLinkForceCreateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
@@ -66,16 +66,13 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 	})
 }
 
-func testAccGitlabGroupLdapLinkSkipFunc(testCN string, testProvider string, testDataFile string) func() (bool, error) {
+func testAccGitlabGroupLdapLinkSkipFunc(testCN string, testProvider string) func() (bool, error) {
 	return func() (bool, error) {
-		if isCE, _ := isRunningInCE(); isCE {
-			return true, nil
-		} else if testCN == "default" || testProvider == "default" {
-			fmt.Printf("[WARNING] Skipping test until test data is configured in %s.\n", testDataFile)
+		if testCN == "default" || testProvider == "default" {
 			return true, nil
 		}
 
-		return false, nil
+		return isRunningInCE()
 	}
 }
 
