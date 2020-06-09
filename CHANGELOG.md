@@ -1,4 +1,19 @@
 ## 2.10.0 (Unreleased)
+
+FEATURES:
+* **New Resource:** `gitlab_service_github`
+  (GH-311)
+
+ENHANCEMENTS:
+* add attribute remove_source_branch_after_merge to projects
+  (GH-289)
+
+BUGFIXES:
+* fix for flaky `gitlab_group` tests
+  (GH-320)
+* Creating custom skip function for group_ldap_link tests.
+  (GH-328)
+
 ## 2.9.0 (June 01, 2020)
 
 FEATURES:
