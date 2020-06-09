@@ -1,18 +1,18 @@
-## 2.10.0 (Unreleased)
+## 2.10.0 (June 09, 2020)
 
 FEATURES:
 * **New Resource:** `gitlab_service_github`
-  (GH-311)
+  ([#311](https://github.com/terraform-providers/terraform-provider-gitlab/issues/311))
 
 ENHANCEMENTS:
 * add attribute remove_source_branch_after_merge to projects
-  (GH-289)
+  ([#289](https://github.com/terraform-providers/terraform-provider-gitlab/issues/289))
 
 BUGFIXES:
 * fix for flaky `gitlab_group` tests
-  (GH-320)
+  ([#320](https://github.com/terraform-providers/terraform-provider-gitlab/issues/320))
 * Creating custom skip function for group_ldap_link tests.
-  (GH-328)
+  ([#328](https://github.com/terraform-providers/terraform-provider-gitlab/issues/328))
 
 ## 2.9.0 (June 01, 2020)
 
