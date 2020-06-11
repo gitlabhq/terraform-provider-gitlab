@@ -23,6 +23,37 @@ resource "gitlab_project" "example" {
 }
 ```
 
+### Template Examples
+
+Project templates can pre-populate a new project with the necessary files to get you started quickly.
+
+### Built-In Template Project
+
+Gitlab has [built-in templates](https://docs.gitlab.com/ee/gitlab-basics/create-project.html#built-in-templates), sourced from the following groups:
+* [project-templates](https://gitlab.com/gitlab-org/project-templates)
+* [pages](https://gitlab.com/pages)
+
+
+```hcl
+resource "gitlab_project" "template" {
+  name          = "template"
+  template_name = "gatsby"
+}
+```
+
+###  Custom Template Project
+
+GitLab administrators and users can configure their own [Custom project templates](https://docs.gitlab.com/ee/gitlab-basics/create-project.html#custom-project-templates-premium) 
+
+```hcl
+resource "gitlab_project" "custom_template" {
+  name = "my-new-project"
+  template_name = "my-custom-template"
+  use_custom_template= true
+  group_with_project_templates_id = 1
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
@@ -81,6 +112,11 @@ The following arguments are supported:
 
 * `initialize_with_readme` - (Optional) Create master branch with first commit containing a README.md file.
 
+* `template_name` - (Optional)  Create project from existing template. When used without `use_custom_template`, name of a built-in project template. When used with `use_custom_template`, name of a custom project template
+
+* `use_custom_template` - (Optional) Use either custom instance or group (with `group_with_project_templates_id`) project template
+
+* `group_with_project_templates_id` - (Optional) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true
 ## Attributes Reference
 
 The following additional attributes are exported:
