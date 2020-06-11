@@ -75,6 +75,12 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:  true,
 				Sensitive: true,
 			},
+			"project_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainer", "developer"}, true),
+			},
 		},
 	}
 }
@@ -146,6 +152,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("visibility_level", group.Visibility)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
+	d.Set("project_creation_level", group.ProjectCreationLevel)
 
 	return nil
 }
@@ -179,6 +186,10 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	// https://gitlab.com/gitlab-org/gitlab-ce/issues/38459
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if d.HasChange("project_creation_level") {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(d.Get("project_creation_level").(string))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

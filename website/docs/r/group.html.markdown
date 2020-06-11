@@ -44,11 +44,14 @@ support for projects in this group.
 * `request_access_enabled` - (Optional) Boolean, defaults to false.  Whether to
 enable users to request access to the group.
 
-* `visibility_level` - (Optional) Set to `public` to create a public group.
-  Valid values are `private`, `internal`, `public`.
-  Groups are created as private by default.
+* `visibility_level` - (Optional) Defaults to `developer` to allow Maintainer + Developers to create projects.
+  Valid values are `noone`, `maintainer`, `developer`.
 
 * `parent_id` - (Optional) Integer, id of the parent group (creates a nested group).
+
+* `project_creation_level` - (Optional) Set to `public` to create a public group.
+  Valid values are `private`, `internal`, `public`.
+  Groups are created as private by default.
 
 ## Attributes Reference
 
@@ -56,7 +59,7 @@ The resource exports the following attributes:
 
 * `id` - The unique id assigned to the group by the GitLab server.  Serves as a
   namespace id where one is needed.
-  
+
 * `full_path` - The full path of the group.
 
 * `full_name` - The full name of the group.
