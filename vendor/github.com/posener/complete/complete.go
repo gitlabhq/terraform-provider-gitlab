@@ -1,3 +1,8 @@
+// Package complete provides a tool for bash writing bash completion in go.
+//
+// Writing bash completion scripts is a hard work. This package provides an easy way
+// to create bash completion scripts for any command, and also an easy way to install/uninstall
+// the completion of the command.
 package complete
 
 import (
@@ -6,9 +11,9 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/posener/complete/cmd"
+	"github.com/posener/complete/match"
 )
 
 const (
@@ -72,7 +77,7 @@ func (c *Complete) Complete() bool {
 	// filter only options that match the last argument
 	matches := []string{}
 	for _, option := range options {
-		if strings.HasPrefix(option, a.Last) {
+		if match.Prefix(option, a.Last) {
 			matches = append(matches, option)
 		}
 	}

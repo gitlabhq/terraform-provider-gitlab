@@ -1,12 +1,21 @@
-// Copyright 2017 Google LLC.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// Copyright 2017 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 // Package internal supports the options and transport packages.
 package internal
 
 import (
-	"crypto/tls"
 	"errors"
 	"net/http"
 
@@ -18,24 +27,19 @@ import (
 // DialSettings holds information needed to establish a connection with a
 // Google API service.
 type DialSettings struct {
-	Endpoint          string
-	DefaultEndpoint   string
-	Scopes            []string
-	TokenSource       oauth2.TokenSource
-	Credentials       *google.Credentials
-	CredentialsFile   string // if set, Token Source is ignored.
-	CredentialsJSON   []byte
-	UserAgent         string
-	APIKey            string
-	Audiences         []string
-	HTTPClient        *http.Client
-	GRPCDialOpts      []grpc.DialOption
-	GRPCConn          *grpc.ClientConn
-	GRPCConnPool      ConnPool
-	GRPCConnPoolSize  int
-	NoAuth            bool
-	TelemetryDisabled bool
-	ClientCertSource  func(*tls.CertificateRequestInfo) (*tls.Certificate, error)
+	Endpoint        string
+	Scopes          []string
+	TokenSource     oauth2.TokenSource
+	Credentials     *google.Credentials
+	CredentialsFile string // if set, Token Source is ignored.
+	CredentialsJSON []byte
+	UserAgent       string
+	APIKey          string
+	Audiences       []string
+	HTTPClient      *http.Client
+	GRPCDialOpts    []grpc.DialOption
+	GRPCConn        *grpc.ClientConn
+	NoAuth          bool
 
 	// Google API system parameters. For more information please read:
 	// https://cloud.google.com/apis/docs/system-parameters
@@ -75,12 +79,6 @@ func (ds *DialSettings) Validate() error {
 	if nCreds > 1 && !(nCreds == 2 && ds.TokenSource != nil && ds.CredentialsFile != "") {
 		return errors.New("multiple credential options provided")
 	}
-	if ds.GRPCConn != nil && ds.GRPCConnPool != nil {
-		return errors.New("WithGRPCConn is incompatible with WithConnPool")
-	}
-	if ds.HTTPClient != nil && ds.GRPCConnPool != nil {
-		return errors.New("WithHTTPClient is incompatible with WithConnPool")
-	}
 	if ds.HTTPClient != nil && ds.GRPCConn != nil {
 		return errors.New("WithHTTPClient is incompatible with WithGRPCConn")
 	}
@@ -92,12 +90,6 @@ func (ds *DialSettings) Validate() error {
 	}
 	if ds.HTTPClient != nil && ds.RequestReason != "" {
 		return errors.New("WithHTTPClient is incompatible with RequestReason")
-	}
-	if ds.HTTPClient != nil && ds.ClientCertSource != nil {
-		return errors.New("WithHTTPClient is incompatible with WithClientCertSource")
-	}
-	if ds.ClientCertSource != nil && (ds.GRPCConn != nil || ds.GRPCConnPool != nil || ds.GRPCConnPoolSize != 0 || ds.GRPCDialOpts != nil) {
-		return errors.New("WithClientCertSource is currently only supported for HTTP. gRPC settings are incompatible")
 	}
 
 	return nil
