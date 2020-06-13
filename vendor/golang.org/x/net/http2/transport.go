@@ -1892,9 +1892,7 @@ func (rl *clientConnReadLoop) handleResponse(cs *clientStream, f *MetaHeadersFra
 		return nil, errors.New("malformed response from server: malformed non-numeric status pseudo header")
 	}
 
-	regularFields := f.RegularFields()
-	strs := make([]string, len(regularFields))
-	header := make(http.Header, len(regularFields))
+	header := make(http.Header)
 	res := &http.Response{
 		Proto:      "HTTP/2.0",
 		ProtoMajor: 2,
@@ -1902,7 +1900,7 @@ func (rl *clientConnReadLoop) handleResponse(cs *clientStream, f *MetaHeadersFra
 		StatusCode: statusCode,
 		Status:     status + " " + http.StatusText(statusCode),
 	}
-	for _, hf := range regularFields {
+	for _, hf := range f.RegularFields() {
 		key := http.CanonicalHeaderKey(hf.Name)
 		if key == "Trailer" {
 			t := res.Trailer
@@ -1914,18 +1912,7 @@ func (rl *clientConnReadLoop) handleResponse(cs *clientStream, f *MetaHeadersFra
 				t[http.CanonicalHeaderKey(v)] = nil
 			})
 		} else {
-			vv := header[key]
-			if vv == nil && len(strs) > 0 {
-				// More than likely this will be a single-element key.
-				// Most headers aren't multi-valued.
-				// Set the capacity on strs[0] to 1, so any future append
-				// won't extend the slice into the other strings.
-				vv, strs = strs[:1:1], strs[1:]
-				vv[0] = hf.Value
-				header[key] = vv
-			} else {
-				header[key] = append(vv, hf.Value)
-			}
+			header[key] = append(header[key], hf.Value)
 		}
 	}
 
