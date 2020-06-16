@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -107,6 +108,16 @@ func resourceGitlabServiceJiraCreate(d *schema.ResourceData, meta interface{}) e
 func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
+
+	p, resp, err := client.Projects.GetProject(project, nil)
+	if err != nil {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Removing Gitlab Jira service %s because project %s not found", d.Id(), p.Name)
+			d.SetId("")
+			return nil
+		}
+		return err
+	}
 
 	log.Printf("[DEBUG] Read Gitlab Jira service %s", d.Id())
 
