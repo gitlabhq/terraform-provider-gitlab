@@ -86,7 +86,7 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 
 func TestAccGitlabGroupLabel_import(t *testing.T) {
 	rInt := acctest.RandInt()
-	resourceName := "gitlab_group_label.foo"
+	resourceName := "gitlab_group_label.fixme"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
