@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -142,7 +143,7 @@ func resourceGitlabGroupLabelImporter(d *schema.ResourceData, meta interface{}) 
 		return nil, err
 	}
 
-	if err := d.Set("group", group.ID); err != nil {
+	if err := d.Set("group", strconv.Itoa(group.ID)); err != nil {
 		return nil, err
 	}
 
