@@ -16,7 +16,23 @@ func resourceGitlabUser() *schema.Resource {
 		Update: resourceGitlabUserUpdate,
 		Delete: resourceGitlabUserDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				client := meta.(*gitlab.Client)
+				log.Printf("[DEBUG] read gitlab user %s", d.Id())
+
+				id, _ := strconv.Atoi(d.Id())
+
+				user, _, err := client.Users.GetUser(id)
+				if err != nil {
+					return nil, err
+				}
+
+				resourceGitlabUserSetToState(d, user)
+				d.Set("email", user.Email)
+				d.Set("is_admin", user.IsAdmin)
+				d.Set("is_external", user.External)
+				return []*schema.ResourceData{d}, nil
+			},
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -26,7 +42,7 @@ func resourceGitlabUser() *schema.Resource {
 			},
 			"password": {
 				Type:      schema.TypeString,
-				Required:  true,
+				Optional:  true,
 				Sensitive: true,
 			},
 			"email": {
@@ -109,7 +125,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] read gitlab user %s", d.Id())
+	log.Printf("[DEBUG] import -- read gitlab user %s", d.Id())
 
 	id, _ := strconv.Atoi(d.Id())
 
