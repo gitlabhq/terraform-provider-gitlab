@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -28,6 +29,17 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
 						Title: fmt.Sprintf("deployKey-%d", rInt),
 						Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1",
+					}),
+				),
+			},
+			// Do not pass ssh key comments
+			{
+				Config: testAccGitlabDeployKeyConfig(rInt, ""),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabDeployKeyExists("gitlab_deploy_key.foo", &deployKey),
+					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
+						Title: fmt.Sprintf("deployKey-%d", rInt),
+						Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d",
 					}),
 				),
 			},
@@ -134,7 +146,11 @@ func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.DeployKey, want *te
 		}
 
 		if deployKey.Key != want.Key {
-			return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
+			switch strings.Contains(deployKey.Key, want.Key) {
+			case true:
+			default:
+				return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
+			}
 		}
 
 		if deployKey.CanPush != nil && *deployKey.CanPush != want.CanPush {

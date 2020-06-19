@@ -17,7 +17,8 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	keyTitle := "main"
-	key := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDblguSWgpqiXIjHPSas4+N3Dten7MTLJMlGQXxGpaqN9nGPdNmuRB2YXyjT/nrryoY/qrtuVkPnis5WVo8N/s3hAnJbeJPUS2WKEGjpBlL34AQ+ANnlmGY8L6zr82Hp2Ommb7XGGtlq5D3yLCgTfcXLjC51tgcdwHsdH1U+RisgLwaTSrP/HF4G7IAr5ATsyYjtCwQRQ8ijdf5A34+XN6h8J6TLXKab5eZDuH38s9LxJuS7MRxx/P2UTOsqfjtrZWoQgE5adEGvnDxKyruex9PzNbCNVahzsma7tdikDbzxlHLIZ1aht6rKuai3iyLgcZfGIYtkq4xvg/bnNXxSsGf worker@kg.getwifi.com"
+	key1 := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDblguSWgpqiXIjHPSas4+N3Dten7MTLJMlGQXxGpaqN9nGPdNmuRB2YXyjT/nrryoY/qrtuVkPnis5WVo8N/s3hAnJbeJPUS2WKEGjpBlL34AQ+ANnlmGY8L6zr82Hp2Ommb7XGGtlq5D3yLCgTfcXLjC51tgcdwHsdH1U+RisgLwaTSrP/HF4G7IAr5ATsyYjtCwQRQ8ijdf5A34+XN6h8J6TLXKab5eZDuH38s9LxJuS7MRxx/P2UTOsqfjtrZWoQgE5adEGvnDxKyruex9PzNbCNVahzsma7tdikDbzxlHLIZ1aht6rKuai3iyLgcZfGIYtkq4xvg/bnNXxSsGf worker@kg.getwifi.com"
+	key2 := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDblguSWgpqiXIjHPSas4+N3Dten7MTLJMlGQXxGpaqN9nGPdNmuRB2YXyjT/nrryoY/qrtuVkPnis5WVo8N/s3hAnJbeJPUS2WKEGjpBlL34AQ+ANnlmGY8L6zr82Hp2Ommb7XGGtlq5D3yLCgTfcXLjC51tgcdwHsdH1U+RisgLwaTSrP/HF4G7IAr5ATsyYjtCwQRQ8ijdf5A34+XN6h8J6TLXKab5eZDuH38s9LxJuS7MRxx/P2UTOsqfjtrZWoQgE5adEGvnDxKyruex9PzNbCNVahzsma7tdikDbzxlHLIZ1aht6rKuai3iyLgcZfGIYtkq4xvg/bnNXxSsGf"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -26,12 +27,23 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with default options
 			{
-				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyTitle, key),
+				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyTitle, key1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
 					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
 						Title: keyTitle,
-						Key:   key,
+						Key:   key1,
+					}),
+				),
+			},
+			// Create a project and deployKey with default options, key without comments
+			{
+				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyTitle, key2),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
+					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
+						Title: keyTitle,
+						Key:   key2,
 					}),
 				),
 			},

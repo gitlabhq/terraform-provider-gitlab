@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -35,7 +36,8 @@ func resourceGitlabDeployKey() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					return old == strings.TrimSpace(new)
+					r := regexp.MustCompile(` [\w-\.@]+(\s\([\w-]+\)\s)?\s*$`)
+					return old == r.ReplaceAllString(new, "")
 				},
 			},
 			"can_push": {

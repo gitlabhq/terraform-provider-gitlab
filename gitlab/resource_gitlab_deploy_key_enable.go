@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -39,6 +40,10 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					r := regexp.MustCompile(` [\w-\.@]+(\s\([\w-]+\)\s)?\s*$`)
+					return old == r.ReplaceAllString(new, "")
+				},
 			},
 			"can_push": {
 				Type:     schema.TypeBool,
