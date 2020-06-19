@@ -41,8 +41,8 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					r := regexp.MustCompile(` [\w-\.@]+(\s\([\w-]+\)\s)?\s*$`)
-					return old == r.ReplaceAllString(new, "")
+					r := regexp.MustCompile(`^([\S]+\s\S+)\s+.*$`)
+					return strings.TrimSpace(r.ReplaceAllString(old, "$1")) == strings.TrimSpace(r.ReplaceAllString(new, "$1"))
 				},
 			},
 			"can_push": {

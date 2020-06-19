@@ -90,7 +90,11 @@ func testAccCheckGitlabDeployKeyEnableAttributes(deployKey *gitlab.DeployKey, wa
 		}
 
 		if deployKey.Key != want.Key {
-			return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
+			switch strings.Contains(deployKey.Key, want.Key) {
+			case true:
+			default:
+				return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
+			}
 		}
 
 		if deployKey.CanPush != nil && *deployKey.CanPush != want.CanPush {
