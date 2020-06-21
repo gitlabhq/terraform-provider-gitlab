@@ -69,7 +69,7 @@ func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
 	page := 1
 	labelsLen := 0
 	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{Page: page})
+		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}})
 		if err != nil {
 			return err
 		}

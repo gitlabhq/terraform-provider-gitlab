@@ -84,6 +84,48 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroupLabel_import(t *testing.T) {
+	rInt := acctest.RandInt()
+	resourceName := "gitlab_group_label.fixme"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupLabelDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabGroupLabelConfig(rInt),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateIdFunc: getGroupLabelImportID(resourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func getGroupLabelImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
+		}
+
+		labelID := rs.Primary.ID
+		if labelID == "" {
+			return "", fmt.Errorf("No deploy key ID is set")
+		}
+		groupID := rs.Primary.Attributes["group"]
+		if groupID == "" {
+			return "", fmt.Errorf("No group ID is set")
+		}
+
+		return fmt.Sprintf("%s:%s", groupID, labelID), nil
+	}
+}
+
 func testAccCheckGitlabGroupLabelExists(n string, label *gitlab.GroupLabel) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

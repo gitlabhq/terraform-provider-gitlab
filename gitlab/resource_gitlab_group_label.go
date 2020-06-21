@@ -1,7 +1,10 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -13,6 +16,9 @@ func resourceGitlabGroupLabel() *schema.Resource {
 		Read:   resourceGitlabGroupLabelRead,
 		Update: resourceGitlabGroupLabelUpdate,
 		Delete: resourceGitlabGroupLabelDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabGroupLabelImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group": {
@@ -122,4 +128,26 @@ func resourceGitlabGroupLabelDelete(d *schema.ResourceData, meta interface{}) er
 
 	_, err := client.GroupLabels.DeleteGroupLabel(group, options)
 	return err
+}
+
+func resourceGitlabGroupLabelImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*gitlab.Client)
+	parts := strings.SplitN(d.Id(), ":", 2)
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid label id (should be <group ID>.<label name>): %s", d.Id())
+	}
+
+	d.SetId(parts[1])
+	group, _, err := client.Groups.GetGroup(parts[0])
+	if err != nil {
+		return nil, err
+	}
+
+	if err := d.Set("group", strconv.Itoa(group.ID)); err != nil {
+		return nil, err
+	}
+
+	err = resourceGitlabGroupLabelRead(d, meta)
+
+	return []*schema.ResourceData{d}, err
 }

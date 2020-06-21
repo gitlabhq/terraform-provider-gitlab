@@ -7,30 +7,30 @@ Terraform Provider for Gitlab
 - [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 - Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
 - Build status:
-  - ![Unit Tests](https://github.com/terraform-providers/terraform-provider-gitlab/workflows/Unit%20Tests/badge.svg?branch=master)
-  - ![Acceptance Tests](https://github.com/terraform-providers/terraform-provider-gitlab/workflows/Acceptance%20Tests/badge.svg?branch=master)
-  - ![Website Build](https://github.com/terraform-providers/terraform-provider-gitlab/workflows/Website%20Build/badge.svg?branch=master)
+  - ![Unit Tests](https://github.com/gitlabhq/terraform-provider-gitlab/workflows/Unit%20Tests/badge.svg?branch=master)
+  - ![Acceptance Tests](https://github.com/gitlabhq/terraform-provider-gitlab/workflows/Acceptance%20Tests/badge.svg?branch=master)
+  - ![Website Build](https://github.com/gitlabhq/terraform-provider-gitlab/workflows/Website%20Build/badge.svg?branch=master)
 
 Requirements
 ------------
 
 -	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
--	[Go](https://golang.org/doc/install) >= 1.13 (to build the provider plugin)
+-	[Go](https://golang.org/doc/install) >= 1.14 (to build the provider plugin)
 
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-gitlab`
+Clone repository to: `$GOPATH/src/github.com/gitlabhq/terraform-provider-gitlab`
 
 ```sh
-$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone git@github.com:terraform-providers/terraform-provider-gitlab
+$ mkdir -p $GOPATH/src/github.com/gitlabhq; cd $GOPATH/src/github.com/gitlabhq
+$ git clone git@github.com:gitlabhq/terraform-provider-gitlab
 ```
 
 Enter the provider directory and build the provider
 
 ```sh
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-gitlab
+$ cd $GOPATH/src/github.com/gitlabhq/terraform-provider-gitlab
 $ make build
 ```
 
