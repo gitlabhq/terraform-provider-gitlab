@@ -2,8 +2,6 @@ package gitlab
 
 import (
 	"bytes"
-	"crypto/rand"
-	"crypto/rsa"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"log"
@@ -59,11 +57,7 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 
 					switch old == "" {
 					case true:
-						dummyKey, err := rsa.GenerateKey(rand.Reader, 1024)
-						if err != nil {
-							panic(err)
-						}
-						oldPubKey, err = ssh.NewPublicKey(&dummyKey.PublicKey)
+						return false
 					case false:
 						oldPubKey, _, _, _, err = ssh.ParseAuthorizedKey([]byte(old))
 						if err != nil {
