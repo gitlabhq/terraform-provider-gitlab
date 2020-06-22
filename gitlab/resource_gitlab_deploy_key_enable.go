@@ -1,9 +1,12 @@
 package gitlab
 
 import (
+	"bytes"
+	"crypto/rand"
+	"crypto/rsa"
 	"fmt"
+	"golang.org/x/crypto/ssh"
 	"log"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -41,8 +44,33 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					r := regexp.MustCompile(`^([\S]+\s\S+)\s+.*$`)
-					return strings.TrimSpace(r.ReplaceAllString(old, "$1")) == strings.TrimSpace(r.ReplaceAllString(new, "$1"))
+					var oldPubKey, newPubKey ssh.PublicKey
+					var err error
+
+					switch new == "" {
+					case true:
+						return false
+					case false:
+						newPubKey, _, _, _, err = ssh.ParseAuthorizedKey([]byte(new))
+						if err != nil {
+							panic(err)
+						}
+					}
+
+					switch old == "" {
+					case true:
+						dummyKey, err := rsa.GenerateKey(rand.Reader, 1024)
+						if err != nil {
+							panic(err)
+						}
+						oldPubKey, err = ssh.NewPublicKey(&dummyKey.PublicKey)
+					case false:
+						oldPubKey, _, _, _, err = ssh.ParseAuthorizedKey([]byte(old))
+						if err != nil {
+							panic(err)
+						}
+					}
+					return string(bytes.TrimSpace(oldPubKey.Marshal())) == string(bytes.TrimSpace(newPubKey.Marshal()))
 				},
 			},
 			"can_push": {
