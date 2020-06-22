@@ -39,8 +39,8 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeString,
 		Optional: true,
 		DiffSuppressFunc: func(k, current, planned string, d *schema.ResourceData) bool {
-			old := current
-			new := planned
+			old := current // current value on GitLab side
+			new := planned // value that Terraform plans to set there
 
 			log.Printf("[DEBUG] default_branch DiffSuppressFunc old new")
 			log.Printf("[DEBUG]   (%T) %#v, (%T) %#v", old, old, new, new)
@@ -50,6 +50,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			// with 400 error. The check will defer the setting of a default branch
 			// to a time when the repository is no longer empty.
 			if old == "" {
+				if new != "" {
+					log.Printf("[WARN] not setting default_branch %#v on empty repo", new)
+				}
 				return true
 			}
 
