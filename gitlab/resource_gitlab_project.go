@@ -216,25 +216,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("name", project.Name)
 	d.Set("path", project.Path)
 	d.Set("description", project.Description)
-
-	log.Printf("[DEBUG] default_branch before setting in Read function")
-	log.Printf("[DEBUG]  gitlab.Project (%T) %#v", project.DefaultBranch, project.DefaultBranch)
-	default_branch := d.Get("default_branch")
-	db, ok := d.GetOk("default_branch")
-	changed := d.HasChange("default_branch")
-	old, new := d.GetChange("default_branch")
-	log.Printf("[DEBUG]  d.Get()   (%T) %#v", default_branch, default_branch)
-	log.Printf("[DEBUG]  d.GetOk()  (%T) %#v - %#v", db, db, ok)
-	log.Printf("[DEBUG]  d.HasChange()  %#v", changed)
-	log.Printf("[DEBUG]  d.GetChange()  (%T) %#v, (%T) %#v", old, old, new, new)
-
 	d.Set("default_branch", project.DefaultBranch)
-
-	log.Printf("[DEBUG] default_branch after setting in Read function")
-	db, ok = d.GetOk("default_branch")
-	log.Printf("[DEBUG]  d.GetOk()  (%T) %#v - %#v", db, db, ok)
-	log.Printf("[DEBUG]  d.HasChange()  %#v", d.HasChange("default_branch"))
-
 	d.Set("request_access_enabled", project.RequestAccessEnabled)
 	d.Set("issues_enabled", project.IssuesEnabled)
 	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
