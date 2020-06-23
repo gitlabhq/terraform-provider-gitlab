@@ -17,6 +17,9 @@ func resourceGitlabTagProtection() *schema.Resource {
 		Create: resourceGitlabTagProtectionCreate,
 		Read:   resourceGitlabTagProtectionRead,
 		Delete: resourceGitlabTagProtectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
