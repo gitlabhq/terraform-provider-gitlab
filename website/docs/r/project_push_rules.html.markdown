@@ -53,3 +53,11 @@ The following arguments are supported:
 The resource exports the following attributes:
 
 * `id` - The unique id assigned to the push rules by the GitLab server.
+
+## Import
+
+GitLab push rules can be imported using the project id or name, as when importing a project, e.g.
+
+```
+$ terraform import gitlab_project_push_rules.test richardc/example
+```

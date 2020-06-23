@@ -14,6 +14,9 @@ func resourceGitlabProjectPushRules() *schema.Resource {
 		Read:   resourceGitlabProjectPushRulesRead,
 		Update: resourceGitlabProjectPushRulesUpdate,
 		Delete: resourceGitlabProjectPushRulesDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabProjectPushRulesImport,
+		},
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -130,4 +133,10 @@ func resourceGitlabProjectPushRulesDelete(d *schema.ResourceData, meta interface
 	log.Println(project)
 	_, err := client.Projects.DeleteProjectPushRule(project)
 	return err
+}
+
+func resourceGitlabProjectPushRulesImport(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	d.Set("project", d.Id())
+	err := resourceGitlabProjectPushRulesRead(d, meta)
+	return []*schema.ResourceData{d}, err
 }
