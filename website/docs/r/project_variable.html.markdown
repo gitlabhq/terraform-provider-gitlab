@@ -40,7 +40,7 @@ The following arguments are supported:
 
 * `masked` - (Optional, boolean) If set to `true`, the variable will be masked if it would have been written to the logs. Defaults to `false`.
 
-* `environment_scope` -  (Optional, string) The environment_scope of the variable
+* `environment_scope` -  (Optional, string) The environment_scope of the variable. Use asterisk * for All (default) scope.
 
 ## Import
 
