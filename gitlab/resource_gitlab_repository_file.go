@@ -45,10 +45,6 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"ignore_content_changes": {
-				Type:     schema.TypeBool,
-				Optional: true,
-			},
 		},
 	}
 }
@@ -108,7 +104,6 @@ func resourceGitlabRepositoryFileUpdate(d *schema.ResourceData, meta interface{}
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	file := d.Get("file").(string)
-	// ignoreContentChanges := d.Get("ignore_content_changes").(bool)
 	options := &gitlab.UpdateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
