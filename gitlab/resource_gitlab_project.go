@@ -38,9 +38,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"default_branch": {
 		Type:     schema.TypeString,
 		Optional: true,
-		DiffSuppressFunc: func(k, current, planned string, d *schema.ResourceData) bool {
-			old := current // current value on GitLab side
-			new := planned // value that Terraform plans to set there
+		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+			// `old` is the current value on GitLab side
+			// `new` is the value that Terraform plans to set there
 
 			log.Printf("[DEBUG] default_branch DiffSuppressFunc old new")
 			log.Printf("[DEBUG]   (%T) %#v, (%T) %#v", old, old, new, new)
