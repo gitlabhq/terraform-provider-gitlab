@@ -2,6 +2,8 @@ package gitlab
 
 import (
 	"fmt"
+	"time"
+	"math/rand"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -43,6 +45,10 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"ignore_content_changes": {
+				Type: schema.TypeBool,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -60,6 +66,12 @@ func resourceGitlabRepositoryFileCreate(d *schema.ResourceData, meta interface{}
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
 		Encoding:      gitlab.String("base64"),
 	}
+
+	// Sleep so the API doesn't derp out
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Intn(30)
+	nPlus := n + 2
+	time.Sleep(time.Duration(nPlus)*time.Second)	
 
 	repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, file, options)
 	if err != nil {
@@ -96,12 +108,14 @@ func resourceGitlabRepositoryFileUpdate(d *schema.ResourceData, meta interface{}
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	file := d.Get("file").(string)
+	// ignoreContentChanges := d.Get("ignore_content_changes").(bool)
 	options := &gitlab.UpdateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
 		AuthorName:    gitlab.String(d.Get("author_name").(string)),
 		Content:       gitlab.String(d.Get("content").(string)),
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
+		Encoding: gitlab.String("base64"),
 		//TODO: add LastCommitID
 	}
 
@@ -143,6 +157,13 @@ func resourceGitlabRepositoryFileDelete(d *schema.ResourceData, meta interface{}
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
 		//TODO: add LastCommitID
 	}
+
+
+	// Sleep so the API doesn't derp out
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Intn(30)
+	nPlus := n + 2
+	time.Sleep(time.Duration(nPlus)*time.Second)	
 
 	resp, err := client.RepositoryFiles.DeleteFile(project, file, options)
 	if err != nil {
