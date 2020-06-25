@@ -118,6 +118,12 @@ func resourceGitlabEnvironmentDelete(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
+	// Environment must be stopped prior to deletion or a 403 will be received
+	stopResp, err := client.Environments.StopEnvironment(project, environmentID)
+	if err != nil {
+		return fmt.Errorf("%s failed to stop environment prior to delete: %s", d.Id(), stopResp.Status)
+	}
+
 	resp, err := client.Environments.DeleteEnvironment(project, environmentID)
 	if err != nil {
 		return fmt.Errorf("%s failed to delete environment: %s", d.Id(), resp.Status)
