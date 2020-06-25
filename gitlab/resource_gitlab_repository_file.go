@@ -2,8 +2,8 @@ package gitlab
 
 import (
 	"fmt"
-	"time"
 	"math/rand"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -46,7 +46,7 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 				Required: true,
 			},
 			"ignore_content_changes": {
-				Type: schema.TypeBool,
+				Type:     schema.TypeBool,
 				Optional: true,
 			},
 		},
@@ -71,7 +71,7 @@ func resourceGitlabRepositoryFileCreate(d *schema.ResourceData, meta interface{}
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(30)
 	nPlus := n + 2
-	time.Sleep(time.Duration(nPlus)*time.Second)	
+	time.Sleep(time.Duration(nPlus) * time.Second)
 
 	repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, file, options)
 	if err != nil {
@@ -115,7 +115,7 @@ func resourceGitlabRepositoryFileUpdate(d *schema.ResourceData, meta interface{}
 		AuthorName:    gitlab.String(d.Get("author_name").(string)),
 		Content:       gitlab.String(d.Get("content").(string)),
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
-		Encoding: gitlab.String("base64"),
+		Encoding:      gitlab.String("base64"),
 		//TODO: add LastCommitID
 	}
 
@@ -158,12 +158,11 @@ func resourceGitlabRepositoryFileDelete(d *schema.ResourceData, meta interface{}
 		//TODO: add LastCommitID
 	}
 
-
 	// Sleep so the API doesn't derp out
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(30)
 	nPlus := n + 2
-	time.Sleep(time.Duration(nPlus)*time.Second)	
+	time.Sleep(time.Duration(nPlus) * time.Second)
 
 	resp, err := client.RepositoryFiles.DeleteFile(project, file, options)
 	if err != nil {
