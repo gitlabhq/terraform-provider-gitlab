@@ -21,7 +21,7 @@ resource "gitlab_group" "foo" {
   path = "foo-path"
 }
 
-resource gitlab_group_cluster "bar" {
+resource "gitlab_group_cluster" "bar" {
   group                       = "${gitlab_group.foo.id}"
   name                          = "bar-cluster"
   domain                        = "example.com"
