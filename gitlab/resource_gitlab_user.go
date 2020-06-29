@@ -109,6 +109,10 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		ResetPassword:    gitlab.Bool(d.Get("reset_password").(bool)),
 	}
 
+	if *options.Password == "" && !*options.ResetPassword {
+		return fmt.Errorf("At least one of either password or reset_password must be defined")
+	}
+
 	log.Printf("[DEBUG] create gitlab user %q", *options.Username)
 
 	user, _, err := client.Users.CreateUser(options)
