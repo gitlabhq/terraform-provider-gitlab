@@ -21,7 +21,8 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 		CheckDestroy: testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
 					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
