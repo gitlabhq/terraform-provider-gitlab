@@ -40,6 +40,10 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 			},
+			"code_owner_approval_required": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -50,11 +54,13 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 	branch := gitlab.String(d.Get("branch").(string))
 	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+	codeOwnerApprovalRequired := getOptionalBool(d, "code_owner_approval_required")
 
 	options := &gitlab.ProtectRepositoryBranchesOptions{
-		Name:             branch,
-		MergeAccessLevel: &mergeAccessLevel,
-		PushAccessLevel:  &pushAccessLevel,
+		Name:                      branch,
+		MergeAccessLevel:          &mergeAccessLevel,
+		PushAccessLevel:           &pushAccessLevel,
+		CodeOwnerApprovalRequired: codeOwnerApprovalRequired,
 	}
 
 	log.Printf("[DEBUG] create gitlab branch protection on %v for project %s", options.Name, project)
@@ -98,6 +104,7 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	d.Set("branch", pb.Name)
 	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
 	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
+	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 

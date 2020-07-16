@@ -190,3 +190,12 @@ func stringSetToStringSlice(stringSet *schema.Set) *[]string {
 	}
 	return &ret
 }
+
+func getOptionalBool(d *schema.ResourceData, key string) *bool {
+	var result *bool
+	if value, isSet := d.GetOk(key); isSet {
+		valueBool := value.(bool)
+		result = &valueBool
+	}
+	return result
+}
