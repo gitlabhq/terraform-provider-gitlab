@@ -110,7 +110,7 @@ func resourceGitlabProjectPushRulesCreate(d *schema.ResourceData, meta interface
 func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	log.Printf("[DEBUG] read gitlab project %s", project)
+	log.Printf("[DEBUG] read gitlab project %s push rules", project)
 	pushRules, _, err := client.Projects.GetProjectPushRules(project)
 	if err != nil {
 		return err
@@ -129,7 +129,7 @@ func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}
 func resourceGitlabProjectPushRulesDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	log.Printf("[DEBUG] Delete gitlab project push rules %s", project)
+	log.Printf("[DEBUG] Delete gitlab project %s push rules", project)
 	log.Println(project)
 	_, err := client.Projects.DeleteProjectPushRule(project)
 	return err
@@ -142,7 +142,7 @@ func resourceGitlabProjectPushRulesImporter(d *schema.ResourceData, meta interfa
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
-	log.Printf("[DEBUG] read gitlab project %s", project)
+	log.Printf("[DEBUG] read gitlab project %s push rules", project)
 
 	pushRules, _, err := client.Projects.GetProjectPushRules(project)
 	if err != nil {
