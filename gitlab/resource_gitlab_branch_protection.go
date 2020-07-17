@@ -16,6 +16,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabBranchProtectionCreate,
 		Read:   resourceGitlabBranchProtectionRead,
+		Update: resourceGitlabBranchProtectionUpdate,
 		Delete: resourceGitlabBranchProtectionDelete,
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -43,7 +44,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				ForceNew: true,
+				Computed: true,
 			},
 		},
 	}
@@ -110,6 +111,30 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
 	return nil
+}
+
+func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface{}) error {
+	// NOTE: At the time of writing, the only value that does not force re-creation is code_owner_approval_required,
+	// so therefore that is the only update that needs to be handled.
+
+	client := meta.(*gitlab.Client)
+	project := d.Get("project").(string)
+	branch := d.Get("branch").(string)
+	codeOwnerApprovalRequired := getOptionalBool(d, "code_owner_approval_required")
+
+	log.Printf("[DEBUG] update gitlab branch protection for project %s, branch %s", project, branch)
+
+	options := &gitlab.RequireCodeOwnerApprovalsOptions{
+		CodeOwnerApprovalRequired: codeOwnerApprovalRequired,
+	}
+
+	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+		return err
+	}
+
+	d.SetId(buildTwoPartID(&project, &branch))
+
+	return resourceGitlabBranchProtectionRead(d, meta)
 }
 
 func resourceGitlabBranchProtectionDelete(d *schema.ResourceData, meta interface{}) error {
