@@ -43,6 +43,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
+				ForceNew: true,
 			},
 		},
 	}
