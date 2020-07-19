@@ -81,6 +81,71 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				SkipFunc:    isRunningInEE,
 				Config:      testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
 				ExpectError: regexp.MustCompile("feature unavailable: code owner approvals"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+			// Update the Branch Protection to get back to initial settings
+			{
+				Config: testAccGitlabBranchProtectionConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
+	var pb gitlab.ProtectedBranch
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabBranchProtectionDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and Branch Protection with code owner approval enabled
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
+						MergeAccessLevel:          accessLevel[gitlab.DeveloperPermissions],
+						CodeOwnerApprovalRequired: true,
+					}),
+				),
+			},
+			// Attempting to update code owner approval setting on CE should fail safely and with an informative error message
+			{
+				SkipFunc:    isRunningInEE,
+				Config:      testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
+				ExpectError: regexp.MustCompile("feature unavailable: code owner approvals"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+					}),
+				),
 			},
 			// Update the Branch Protection to get back to initial settings
 			{

@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -84,7 +85,17 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 
 	d.SetId(buildTwoPartID(&project, &bp.Name))
 
-	return resourceGitlabBranchProtectionRead(d, meta)
+	if err := resourceGitlabBranchProtectionRead(d, meta); err != nil {
+		return err
+	}
+
+	// If the GitLab tier does not support the code owner approval feature, the resulting plan will be inconsistent.
+	// We return an error because otherwise Terraform would report this inconsistency as a "bug in the provider" to the user.
+	if codeOwnerApprovalRequired && !d.Get("code_owner_approval_required").(bool) {
+		return errors.New("feature unavailable: code owner approvals")
+	}
+
+	return nil
 }
 
 func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}) error {
