@@ -25,12 +25,12 @@ resource "gitlab_branch_protection" "BranchProtect" {
 
 The following arguments are supported:
 
-* `project` - (Required, string) The id of the project.
+* `project` - (Required) The id of the project.
 
-* `branch` - (Required, string) Name of the branch.
+* `branch` - (Required) Name of the branch.
 
-* `push_access_level` - (Required, string) One of five levels of access to the project.
+* `push_access_level` - (Required) One of five levels of access to the project.
 
-* `merge_access_level` - (Required, string) One of five levels of access to the project.
+* `merge_access_level` - (Required) One of five levels of access to the project.
 
-* `code_owner_approval_required` (Optional, bool) Can be set to true to enable code owner approval requirement. Requires GitLab Silver/Premium.
+* `code_owner_approval_required` (Optional) Bool, defaults to false. Can be set to true to require code owner approval before merging.
