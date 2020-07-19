@@ -2,13 +2,12 @@ package gitlab
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
-	"net/http"
-	"testing"
-	"time"
 )
 
 func TestAccGitlabGroup_basic(t *testing.T) {
@@ -138,22 +137,21 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 					}),
 				),
 			},
-			// TODO In EE version, re-creating on the same path where a previous group was soft-deleted doesn't work.
-			// {
-			// 	Config: testAccGitlabNestedGroupConfig(rInt),
-			// 	Check: resource.ComposeTestCheckFunc(
-			// 		testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
-			// 		testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
-			// 		testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
-			// 		testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
-			// 			Name:        fmt.Sprintf("nfoo-name-%d", rInt),
-			// 			Path:        fmt.Sprintf("nfoo-path-%d", rInt),
-			// 			Description: "Terraform acceptance tests",
-			// 			LFSEnabled:  true,
-			// 			Parent:      &group,
-			// 		}),
-			// 	),
-			// },
+			{
+				Config: testAccGitlabNestedGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests",
+						LFSEnabled:  true,
+						Parent:      &group,
+					}),
+				),
+			},
 		},
 	})
 }
@@ -184,24 +182,7 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		_, err := conn.Groups.DeleteGroup(group.ID)
-		if err != nil {
-			return err
-		}
-		// Fixes groups API async deletion issue
-		// https://github.com/terraform-providers/terraform-provider-gitlab/issues/319
-		for start := time.Now(); time.Since(start) < 15*time.Second; {
-			g, resp, err := conn.Groups.GetGroup(group.ID)
-			if resp != nil && resp.StatusCode == http.StatusNotFound {
-				return nil
-			}
-			if g != nil && g.MarkedForDeletionOn != nil {
-				return nil
-			}
-			if err != nil {
-				return err
-			}
-		}
-		return fmt.Errorf("waited for more than 15 seconds for group to be asynchronously deleted")
+		return err
 	}
 }
 
@@ -228,12 +209,23 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 }
 
 type testAccGitlabGroupExpectedAttributes struct {
-	Name                 string
-	Path                 string
-	Description          string
-	Parent               *gitlab.Group
-	LFSEnabled           bool
-	RequestAccessEnabled bool
+	Name                           string
+	Path                           string
+	Description                    string
+	Parent                         *gitlab.Group
+	LFSEnabled                     bool
+	RequestAccessEnabled           bool
+	Visibility                     gitlab.VisibilityValue
+	ShareWithGroupLock             bool
+	AutoDevopsEnabled              bool
+	EmailsDisabled                 bool
+	MentionsDisabled               bool
+	SharedRunnersMinutesLimit      int
+	ExtraSharedRunnersMinutesLimit int
+	ProjectCreationLevel           gitlab.ProjectCreationLevelValue
+	SubGroupCreationLevel          gitlab.SubGroupCreationLevelValue
+	RequireTwoFactorAuth           bool
+	TwoFactorGracePeriod           int
 }
 
 func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabGroupExpectedAttributes) resource.TestCheckFunc {
@@ -254,8 +246,52 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 			return fmt.Errorf("got lfs_enabled %t; want %t", group.LFSEnabled, want.LFSEnabled)
 		}
 
+		if group.Visibility != want.Visibility {
+			return fmt.Errorf("got request_visibility_level: %q; want %q", group.Visibility, want.Visibility)
+		}
+
+		if group.AutoDevopsEnabled != want.AutoDevopsEnabled {
+			return fmt.Errorf("got request_auto_devops_enabled: %t; want %t", group.AutoDevopsEnabled, want.AutoDevopsEnabled)
+		}
+
+		if group.EmailsDisabled != want.EmailsDisabled {
+			return fmt.Errorf("got request_emails_disabled: %t; want %t", group.EmailsDisabled, want.EmailsDisabled)
+		}
+
+		if group.MentionsDisabled != want.MentionsDisabled {
+			return fmt.Errorf("got request_mentions_disabled: %t; want %t", group.MentionsDisabled, want.MentionsDisabled)
+		}
+
+		if group.SharedRunnersMinutesLimit != want.SharedRunnersMinutesLimit {
+			return fmt.Errorf("got request_shared_runners_minutes_limit: %d; want %d", group.SharedRunnersMinutesLimit, want.SharedRunnersMinutesLimit)
+		}
+
+		if group.ExtraSharedRunnersMinutesLimit != want.ExtraSharedRunnersMinutesLimit {
+			return fmt.Errorf("got request_extra_shared_runners_minutes_limit: %d; want %d", group.ExtraSharedRunnersMinutesLimit, want.ExtraSharedRunnersMinutesLimit)
+		}
+
 		if group.RequestAccessEnabled != want.RequestAccessEnabled {
 			return fmt.Errorf("got request_access_enabled %t; want %t", group.RequestAccessEnabled, want.RequestAccessEnabled)
+		}
+
+		if group.ProjectCreationLevel != want.ProjectCreationLevel {
+			return fmt.Errorf("got project_creation_level %s; want %s", group.ProjectCreationLevel, want.ProjectCreationLevel)
+		}
+
+		if group.SubGroupCreationLevel != want.SubGroupCreationLevel {
+			return fmt.Errorf("got subgroup_creation_level %s; want %s", group.SubGroupCreationLevel, want.SubGroupCreationLevel)
+		}
+
+		if group.RequireTwoFactorAuth != want.RequireTwoFactorAuth {
+			return fmt.Errorf("got require_two_factor_authentication %t; want %t", group.RequireTwoFactorAuth, want.RequireTwoFactorAuth)
+		}
+
+		if group.TwoFactorGracePeriod != want.TwoFactorGracePeriod {
+			return fmt.Errorf("got two_factor_grace_period %d; want %d", group.TwoFactorGracePeriod, want.TwoFactorGracePeriod)
+		}
+
+		if group.ShareWithGroupLock != want.ShareWithGroupLock {
+			return fmt.Errorf("got share_with_group_lock %t; want %t", group.ShareWithGroupLock, want.ShareWithGroupLock)
 		}
 
 		if want.Parent != nil {
@@ -283,9 +319,7 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
-				if group.MarkedForDeletionOn == nil {
-					return fmt.Errorf("Group still exists")
-				}
+				return fmt.Errorf("Group still exists")
 			}
 		}
 		if resp.StatusCode != 404 {
@@ -305,7 +339,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt)
 }
@@ -318,10 +352,20 @@ resource "gitlab_group" "foo" {
   description = "Terraform acceptance tests! Updated description"
   lfs_enabled = false
   request_access_enabled = true
+  project_creation_level = "developer"
+  subgroup_creation_level = "maintainer"
+  require_two_factor_authentication = false
+  two_factor_grace_period = 48
+  auto_devops_enabled = false
+  emails_disabled = false
+  mentions_disabled = false
+  shared_runners_minutes_limit = 60
+  extra_shared_runners_minutes_limit = 60
+  share_with_group_lock = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt)
 }
@@ -335,7 +379,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "foo2" {
   name = "foo2-name-%d"
@@ -344,7 +388,7 @@ resource "gitlab_group" "foo2" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "nested_foo" {
   name = "nfoo-name-%d"
@@ -354,7 +398,7 @@ resource "gitlab_group" "nested_foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -368,7 +412,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "foo2" {
   name = "foo2-name-%d"
@@ -377,7 +421,7 @@ resource "gitlab_group" "foo2" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "nested_foo" {
   name = "nfoo-name-%d"
@@ -386,7 +430,7 @@ resource "gitlab_group" "nested_foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -400,7 +444,7 @@ resource "gitlab_group" "foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "foo2" {
   name = "foo2-name-%d"
@@ -409,7 +453,7 @@ resource "gitlab_group" "foo2" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
 resource "gitlab_group" "nested_foo" {
   name = "nfoo-name-%d"
@@ -419,7 +463,7 @@ resource "gitlab_group" "nested_foo" {
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
-  visibility_level = "public"
+  request_visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }

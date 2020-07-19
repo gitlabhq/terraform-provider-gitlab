@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -64,6 +63,48 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
+			"share_with_group_lock": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"project_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
+			},
+			"auto_devops_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"emails_disabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"mentions_disabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"subgroup_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"owners", "maintainers"}, true),
+			},
+			"require_two_factor_authentication": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"two_factor_grace_period": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  48,
+			},
 			"parent_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -74,6 +115,14 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:      schema.TypeString,
 				Computed:  true,
 				Sensitive: true,
+			},
+			"shared_runners_minutes_limit": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"extra_shared_runners_minutes_limit": {
+				Type:     schema.TypeInt,
+				Optional: true,
 			},
 		},
 	}
@@ -99,8 +148,48 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
+	if v, ok := d.GetOk("share_with_group_lock"); ok {
+		options.ShareWithGroupLock = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("require_two_factor_authentication"); ok {
+		options.RequireTwoFactorAuth = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("two_factor_grace_period"); ok {
+		options.TwoFactorGracePeriod = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("project_creation_level"); ok {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("auto_devops_enabled"); ok {
+		options.AutoDevopsEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("subgroup_creation_level"); ok {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("emails_disabled"); ok {
+		options.EmailsDisabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("mentions_disabled"); ok {
+		options.MentionsDisabled = gitlab.Bool(v.(bool))
+	}
+
 	if v, ok := d.GetOk("parent_id"); ok {
 		options.ParentID = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("shared_runners_minutes_limit"); ok {
+		options.SharedRunnersMinutesLimit = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("extra_shared_runners_minutes_limit"); ok {
+		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(v.(int))
 	}
 
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
@@ -128,11 +217,6 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 		}
 		return err
 	}
-	if group.MarkedForDeletionOn != nil {
-		log.Printf("[DEBUG] gitlab group %s is marked for deletion", d.Id())
-		d.SetId("")
-		return nil
-	}
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 	d.Set("name", group.Name)
@@ -144,8 +228,18 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
+	d.Set("project_creation_level", group.ProjectCreationLevel)
+	d.Set("subgroup_creation_level", group.SubGroupCreationLevel)
+	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuth)
+	d.Set("two_factor_grace_period", group.TwoFactorGracePeriod)
+	d.Set("auto_devops_enabled", group.AutoDevopsEnabled)
+	d.Set("emails_disabled", group.EmailsDisabled)
+	d.Set("mentions_disabled", group.MentionsDisabled)
+	d.Set("shared_runners_minutes_limit", group.SharedRunnersMinutesLimit)
+	d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
+	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 
 	return nil
 }
@@ -181,6 +275,46 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.Visibility = stringToVisibilityLevel(v.(string))
 	}
 
+	if d.HasChange("project_creation_level") {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(d.Get("project_creation_level").(string))
+	}
+
+	if d.HasChange("subgroup_creation_level") {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(d.Get("subgroup_creation_level").(string))
+	}
+
+	if d.HasChange("require_two_factor_authentication") {
+		options.RequireTwoFactorAuth = gitlab.Bool(d.Get("require_two_factor_authentication").(bool))
+	}
+
+	if d.HasChange("two_factor_grace_period") {
+		options.TwoFactorGracePeriod = gitlab.Int(d.Get("two_factor_grace_period").(int))
+	}
+
+	if d.HasChange("auto_devops_enabled") {
+		options.AutoDevopsEnabled = gitlab.Bool(d.Get("auto_devops_enabled").(bool))
+	}
+
+	if d.HasChange("emails_disabled") {
+		options.EmailsDisabled = gitlab.Bool(d.Get("emails_disabled").(bool))
+	}
+
+	if d.HasChange("mentions_disabled") {
+		options.MentionsDisabled = gitlab.Bool(d.Get("mentions_disabled").(bool))
+	}
+
+	if d.HasChange("share_with_group_lock") {
+		options.ShareWithGroupLock = gitlab.Bool(d.Get("share_with_group_lock").(bool))
+	}
+
+	if d.HasChange("shared_runners_minutes_limit") {
+		options.SharedRunnersMinutesLimit = gitlab.Int(d.Get("shared_runners_minutes_limit").(int))
+	}
+
+	if d.HasChange("extra_shared_runners_minutes_limit") {
+		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(d.Get("extra_shared_runners_minutes_limit").(int))
+	}
+
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
 
 	_, _, err := client.Groups.UpdateGroup(d.Id(), options)
@@ -196,7 +330,7 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Delete gitlab group %s", d.Id())
 
 	_, err := client.Groups.DeleteGroup(d.Id())
-	if err != nil && !strings.Contains(err.Error(), "Group has been already marked for deletion") {
+	if err != nil {
 		return fmt.Errorf("error deleting group %s: %s", d.Id(), err)
 	}
 
@@ -208,15 +342,11 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 		Refresh: func() (interface{}, string, error) {
 			out, response, err := client.Groups.GetGroup(d.Id())
 			if err != nil {
-				if response != nil && response.StatusCode == 404 {
+				if response.StatusCode == 404 {
 					return out, "Deleted", nil
 				}
 				log.Printf("[ERROR] Received error: %#v", err)
 				return out, "Error", err
-			}
-			if out.MarkedForDeletionOn != nil {
-				// Represents a Gitlab EE soft-delete
-				return out, "Deleted", nil
 			}
 			return out, "Deleting", nil
 		},
