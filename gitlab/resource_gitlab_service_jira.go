@@ -94,9 +94,8 @@ func resourceGitlabServiceJiraCreate(d *schema.ResourceData, meta interface{}) e
 
 	log.Printf("[DEBUG] Create Gitlab Jira service")
 
-	_, setServiceErr := client.Services.SetJiraService(project, jiraOptions)
-	if err != nil {
-		return fmt.Errorf("[ERROR] Couldn't create Gitlab Jira service: %s", setServiceErr)
+	if _, err := client.Services.SetJiraService(project, jiraOptions); err != nil {
+		return fmt.Errorf("couldn't create Gitlab Jira service: %w", err)
 	}
 
 	d.SetId(project)
