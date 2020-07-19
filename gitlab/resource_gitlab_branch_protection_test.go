@@ -76,11 +76,11 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Attempting to update code owner approval setting on CE should fail safely
+			// Attempting to update code owner approval setting on CE should fail safely and with an informative error message
 			{
 				SkipFunc:    isRunningInEE,
 				Config:      testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
-				ExpectError: regexp.MustCompile("404 Not Found"),
+				ExpectError: regexp.MustCompile("feature unavailable: code owner approvals"),
 			},
 			// Update the Branch Protection to get back to initial settings
 			{

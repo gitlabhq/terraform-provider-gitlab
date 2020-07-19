@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -129,6 +130,12 @@ func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface
 	}
 
 	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+		// The user might be running a version of GitLab that does not support this feature.
+		// We enhance the generic 404 error with a more informative message.
+		if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
+			return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+		}
+
 		return err
 	}
 
