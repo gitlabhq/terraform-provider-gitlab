@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -75,41 +76,15 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the Branch Protection to get back to initial settings.
-			// Since code_owner_approval_required is an optional setting, it does not revert to its original setting.
-			// This test ensures that the addition of this optional value is backward compatible and does not overwrite existing settings in GitLab when it is unset.
+			// Attempting to update code owner approval setting on CE should fail safely
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabBranchProtectionConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
-						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
-						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
-						MergeAccessLevel:          accessLevel[gitlab.DeveloperPermissions],
-						CodeOwnerApprovalRequired: true,
-					}),
-				),
+				SkipFunc:    isRunningInEE,
+				Config:      testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
+				ExpectError: regexp.MustCompile("404 Not Found"),
 			},
-			// Update the the Branch Protection to explicitly disable code owner approval, to truly reset state back to initial settings.
+			// Update the Branch Protection to get back to initial settings
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabBranchProtectionUpdateConfigCodeOwnerFalse(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
-						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
-						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
-						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
-					}),
-				),
-			},
-			// Update the Branch Protection to get back to initial settings.
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabBranchProtectionConfig(rInt),
+				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
 					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
@@ -284,27 +259,6 @@ resource "gitlab_branch_protection" "BranchProtect" {
   push_access_level = "developer"
   merge_access_level = "developer"
   code_owner_approval_required = true
-}
-	`, rInt, rInt)
-}
-
-func testAccGitlabBranchProtectionUpdateConfigCodeOwnerFalse(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_branch_protection" "BranchProtect" {
-  project = "${gitlab_project.foo.id}"
-  branch = "BranchProtect-%d"
-  push_access_level = "developer"
-  merge_access_level = "developer"
-  code_owner_approval_required = false
 }
 	`, rInt, rInt)
 }

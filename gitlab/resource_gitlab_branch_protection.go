@@ -44,7 +44,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  false,
 			},
 		},
 	}
@@ -132,8 +132,6 @@ func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface
 		return err
 	}
 
-	d.SetId(buildTwoPartID(&project, &branch))
-
 	return resourceGitlabBranchProtectionRead(d, meta)
 }
 
@@ -152,7 +150,7 @@ func projectAndBranchFromID(id string) (string, string, error) {
 	project, branch, err := parseTwoPartID(id)
 
 	if err != nil {
-		log.Printf("[WARN] cannot get group member id from input: %v", id)
+		log.Printf("[WARN] cannot get branch protection id from input: %v", id)
 	}
 	return project, branch, err
 }
