@@ -46,16 +46,10 @@ also need to be included in the approvers list in order to be able to approve th
 
 * `merge_requests_disable_committers_approval` - (Optional) Set to `true` if you want to prevent approval of merge requests by merge request committers. Default is `false`.
 
-## Attributes Reference
-
-The resource exports the following attributes:
-
-* `id` - The unique id assigned to the approval configuration by the GitLab server.
-
 ## Importing approval configuration
 
-You can import an approval configuration to terraform state using `terraform import <resource> <id>`.
-The `id` must be an integer for the id of the approval configuration you want to import,
+You can import an approval configuration state using `terraform import <resource> <project_id>`.
+
 For example:
 
 ```bash
