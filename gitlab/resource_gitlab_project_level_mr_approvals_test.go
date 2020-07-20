@@ -109,6 +109,27 @@ func testAccCheckGitlabProjectLevelMRApprovalsExists(n string, projectApprovals 
 	}
 }
 
+func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectLevelMRApprovalsDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_project_level_mr_approvals.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
