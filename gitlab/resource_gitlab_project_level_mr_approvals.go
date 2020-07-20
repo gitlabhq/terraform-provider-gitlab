@@ -55,11 +55,10 @@ func resourceGitlabProjectLevelMRApprovalsCreate(d *schema.ResourceData, meta in
 		MergeRequestsDisableCommittersApproval:    gitlab.Bool(d.Get("merge_requests_disable_committers_approval").(bool)),
 	}
 
-	log.Printf("[DEBUG] Creating new MR approval configuration for project %s: %#v", projectId, options)
+	log.Printf("[DEBUG] Creating new MR approval configuration for project %s:", projectId)
 
-	_, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options)
-	if err != nil {
-		return fmt.Errorf("Error creating approval configuration: %s", err)
+	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options); err != nil {
+		return fmt.Errorf("couldn't create approval configuration: %w", err)
 	}
 
 	d.SetId(projectId)
@@ -74,7 +73,7 @@ func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta inte
 
 	approvalConfig, _, err := client.Projects.GetApprovalConfiguration(projectId)
 	if err != nil {
-		return fmt.Errorf("Error reading approval configuration: %s", err)
+		return fmt.Errorf("couldn't read approval configuration: %w", err)
 	}
 
 	d.Set("projectId", projectId)
@@ -90,6 +89,9 @@ func resourceGitlabProjectLevelMRApprovalsUpdate(d *schema.ResourceData, meta in
 	client := meta.(*gitlab.Client)
 	options := &gitlab.ChangeApprovalConfigurationOptions{}
 
+	projectId := d.Id()
+	log.Printf("[DEBUG] Updating approval configuration for project %s:", projectId)
+
 	if d.HasChange("reset_approvals_on_push") {
 		options.ResetApprovalsOnPush = gitlab.Bool(d.Get("reset_approvals_on_push").(bool))
 	}
@@ -103,9 +105,8 @@ func resourceGitlabProjectLevelMRApprovalsUpdate(d *schema.ResourceData, meta in
 		options.MergeRequestsDisableCommittersApproval = gitlab.Bool(d.Get("merge_requests_disable_committers_approval").(bool))
 	}
 
-	_, _, err := client.Projects.ChangeApprovalConfiguration(d.Id(), options)
-	if err != nil {
-		return fmt.Errorf("Error updating approval configuration: %s", err)
+	if _, _, err := client.Projects.ChangeApprovalConfiguration(d.Id(), options); err != nil {
+		return fmt.Errorf("couldn't update approval configuration: %w", err)
 	}
 
 	return resourceGitlabProjectLevelMRApprovalsRead(d, meta)
@@ -122,8 +123,11 @@ func resourceGitlabProjectLevelMRApprovalsDelete(d *schema.ResourceData, meta in
 		MergeRequestsDisableCommittersApproval:    gitlab.Bool(false),
 	}
 
-	log.Printf("[DEBUG] Resetting approval configuration for project %s: %#v", projectId, options)
+	log.Printf("[DEBUG] Resetting approval configuration for project %s:", projectId)
 
-	_, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options)
-	return err
+	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options); err != nil {
+		return fmt.Errorf("couldn't reset approval configuration: %w", err)
+	}
+
+	return nil
 }
