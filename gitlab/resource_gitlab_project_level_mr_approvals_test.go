@@ -93,13 +93,13 @@ func testAccCheckGitlabProjectLevelMRApprovalsExists(n string, projectApprovals 
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		project_id := rs.Primary.ID
-		if project_id == "" {
+		projectId := rs.Primary.ID
+		if projectId == "" {
 			return fmt.Errorf("No project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotApprovalConfig, _, err := conn.Projects.GetApprovalConfiguration(project_id)
+		gotApprovalConfig, _, err := conn.Projects.GetApprovalConfiguration(projectId)
 		if err != nil {
 			return err
 		}
@@ -107,27 +107,6 @@ func testAccCheckGitlabProjectLevelMRApprovalsExists(n string, projectApprovals 
 		*projectApprovals = *gotApprovalConfig
 		return nil
 	}
-}
-
-func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectLevelMRApprovalsDestroy,
-		Steps: []resource.TestStep{
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
-			},
-			{
-				ResourceName:      "gitlab_project_level_mr_approvals.foo",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
 }
 
 func testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt int) string {
