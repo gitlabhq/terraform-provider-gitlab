@@ -37,6 +37,29 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
+	resourceName := "gitlab_project_level_mr_approvals.foo"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectLevelMRApprovalsDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"project_id"},
+			},
+		},
+	})
+}
+
 type testAccGitlabProjectLevelMRApprovalsExpectedAttributes struct {
 	resetApprovalsOnPush                      bool
 	disableOverridingApproversPerMergeRequest bool
