@@ -1,8 +1,8 @@
-## 2.11.0 (Unreleased)
+## 2.11.0 (July 24, 2020)
 
 ENHANCEMENTS:
 * Improvements to resource `gitlab_user` import
-  (GH-340)
+  ([#340](https://github.com/terraform-providers/terraform-provider-gitlab/issues/340))
 
 ## 2.10.0 (June 09, 2020)
 
