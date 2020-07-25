@@ -349,12 +349,10 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 			out, response, err := client.Groups.GetGroup(d.Id())
 			if err != nil {
 				if response != nil && response.StatusCode == 404 {
-				    if response.StatusCode == 404 {
-					    return out, "Deleted", nil
-				    }
-				    log.Printf("[ERROR] Received error: %#v", err)
-				    return out, "Error", err
+					return out, "Deleted", nil
 				}
+				log.Printf("[ERROR] Received error: %#v", err)
+				return out, "Error", err
 			}
 			if out.MarkedForDeletionOn != nil {
 				// Represents a Gitlab EE soft-delete
