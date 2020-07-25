@@ -218,6 +218,12 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	if group.MarkedForDeletionOn != nil {
+		log.Printf("[DEBUG] gitlab group %s is marked for deletion", d.Id())
+		d.SetId("")
+		return nil
+	}
+
 	d.SetId(fmt.Sprintf("%d", group.ID))
 	d.Set("name", group.Name)
 	d.Set("path", group.Path)
@@ -318,7 +324,7 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
 
 	_, _, err := client.Groups.UpdateGroup(d.Id(), options)
-	if err != nil {
+    if err != nil && !strings.Contains(err.Error(), "Group has been already marked for deletion") {
 		return err
 	}
 
@@ -341,12 +347,16 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
 			out, response, err := client.Groups.GetGroup(d.Id())
-			if err != nil {
+            if response != nil && response.StatusCode == 404 {
 				if response.StatusCode == 404 {
 					return out, "Deleted", nil
 				}
 				log.Printf("[ERROR] Received error: %#v", err)
 				return out, "Error", err
+			}
+            if out.MarkedForDeletionOn != nil {
+				// Represents a Gitlab EE soft-delete	
+				return out, "Deleted", nil
 			}
 			return out, "Deleting", nil
 		},
