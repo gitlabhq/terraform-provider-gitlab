@@ -44,7 +44,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Path:                 fmt.Sprintf("bar-path-%d", rInt),
 						Description:          "Terraform acceptance tests! Updated description",
 						RequestAccessEnabled: true,
-						Visibility:  gitlab.PublicVisibility,
+						Visibility:           gitlab.PublicVisibility,
 					}),
 				),
 			},
