@@ -6,9 +6,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
-    "net/http"
+	"net/http"
 	"testing"
-    "time"
+	"time"
 )
 
 func TestAccGitlabGroup_basic(t *testing.T) {
@@ -138,7 +138,7 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 					}),
 				),
 			},
-            // TODO In EE version, re-creating on the same path where a previous group was soft-deleted doesn't work.
+			// TODO In EE version, re-creating on the same path where a previous group was soft-deleted doesn't work.
 			// {
 			// 	Config: testAccGitlabNestedGroupConfig(rInt),
 			// 	Check: resource.ComposeTestCheckFunc(
@@ -184,11 +184,11 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		_, err := conn.Groups.DeleteGroup(group.ID)
-        if err != nil {
-           return err
+		if err != nil {
+			return err
 		}
-		// Fixes groups API async deletion issue	
-		// https://github.com/terraform-providers/terraform-provider-gitlab/issues/319	
+		// Fixes groups API async deletion issue
+		// https://github.com/terraform-providers/terraform-provider-gitlab/issues/319
 		for start := time.Now(); time.Since(start) < 15*time.Second; {
 			g, resp, err := conn.Groups.GetGroup(group.ID)
 			if resp != nil && resp.StatusCode == http.StatusNotFound {
@@ -338,7 +338,7 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
-                if group.MarkedForDeletionOn == nil {
+				if group.MarkedForDeletionOn == nil {
 					return fmt.Errorf("Group still exists")
 				}
 			}
