@@ -26,14 +26,16 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("foo-name-%d", rInt),
-						Path:                  fmt.Sprintf("foo-path-%d", rInt),
-						Description:           "Terraform acceptance tests",
-						LFSEnabled:            true,
-						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "developer",  // default value
-						SubGroupCreationLevel: "maintainer", // default value
-						TwoFactorGracePeriod:  48,           // default value
+						Name:                           fmt.Sprintf("foo-name-%d", rInt),
+						Path:                           fmt.Sprintf("foo-path-%d", rInt),
+						Description:                    "Terraform acceptance tests",
+						LFSEnabled:                     true,
+						Visibility:                     "public",     // default value
+						ProjectCreationLevel:           "developer",  // default value
+						SubGroupCreationLevel:          "maintainer", // default value
+						TwoFactorGracePeriod:           48,           // default value
+						SharedRunnersMinutesLimit:      0,            // default value
+						ExtraSharedRunnersMinutesLimit: 0,            // default value
 					}),
 				),
 			},
@@ -72,18 +74,12 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Path:                           fmt.Sprintf("foo-path-%d", rInt),
 						Description:                    "Terraform acceptance tests",
 						LFSEnabled:                     true,
-						Visibility:                     "public", // default value
-						RequestAccessEnabled:           true,
-						ProjectCreationLevel:           "maintainer",
-						SubGroupCreationLevel:          "owner",
-						RequireTwoFactorAuth:           true,
-						TwoFactorGracePeriod:           56,
-						AutoDevopsEnabled:              true,
-						EmailsDisabled:                 true,
-						MentionsDisabled:               true,
-						SharedRunnersMinutesLimit:      45,
-						ExtraSharedRunnersMinutesLimit: 45,
-						ShareWithGroupLock:             true,
+						Visibility:                     "public",     // default value
+						ProjectCreationLevel:           "developer",  // default value
+						SubGroupCreationLevel:          "maintainer", // default value
+						TwoFactorGracePeriod:           48,           // default value
+						SharedRunnersMinutesLimit:      0,            // default value
+						ExtraSharedRunnersMinutesLimit: 0,            // default value
 					}),
 				),
 			},
