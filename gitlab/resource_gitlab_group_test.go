@@ -125,8 +125,8 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						LFSEnabled:            true,
 						Parent:                &group,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "developer",  // default value
-						SubGroupCreationLevel: "maintainer", // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
@@ -144,8 +144,8 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						LFSEnabled:            true,
 						Parent:                &group2,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "developer",  // default value
-						SubGroupCreationLevel: "maintainer", // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
@@ -162,8 +162,8 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						Description:           "Terraform acceptance tests - updated",
 						LFSEnabled:            true,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "developer",  // default value
-						SubGroupCreationLevel: "maintainer", // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
@@ -182,9 +182,9 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 			// 			LFSEnabled:  true,
 			// 			Parent:      &group,
 			//			Visibility:            "public",     // default value
-			//			ProjectCreationLevel:  "developer",  // default value
-			//			SubGroupCreationLevel: "maintainer", // default value
-			//			TwoFactorGracePeriod:  48, // default value
+			//			ProjectCreationLevel:  "maintainer", // default value
+			//			SubGroupCreationLevel: "owner",      // default value
+			//			TwoFactorGracePeriod:  48,           // default value
 			// 		}),
 			// 	),
 			// },
