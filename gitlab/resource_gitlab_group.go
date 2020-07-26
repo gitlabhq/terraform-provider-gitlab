@@ -61,7 +61,6 @@ func resourceGitlabGroup() *schema.Resource {
 			"visibility_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Computed:     true,
 				Default:      "private",
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
@@ -73,7 +72,6 @@ func resourceGitlabGroup() *schema.Resource {
 			"project_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Computed:     true,
 				Default:      "maintainers",
 				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
 			},
@@ -95,7 +93,6 @@ func resourceGitlabGroup() *schema.Resource {
 			"subgroup_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Computed:     true,
 				Default:      "owners",
 				ValidateFunc: validation.StringInSlice([]string{"owners", "maintainers"}, true),
 			},
