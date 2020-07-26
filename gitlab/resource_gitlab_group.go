@@ -72,8 +72,8 @@ func resourceGitlabGroup() *schema.Resource {
 			"project_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "maintainers",
-				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
+				Default:      "developer",
+				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainer", "developer"}, true),
 			},
 			"auto_devops_enabled": {
 				Type:     schema.TypeBool,
@@ -93,8 +93,8 @@ func resourceGitlabGroup() *schema.Resource {
 			"subgroup_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "owners",
-				ValidateFunc: validation.StringInSlice([]string{"owners", "maintainers"}, true),
+				Default:      "owner",
+				ValidateFunc: validation.StringInSlice([]string{"owner", "maintainer"}, true),
 			},
 			"require_two_factor_authentication": {
 				Type:     schema.TypeBool,
