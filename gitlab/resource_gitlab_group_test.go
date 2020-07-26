@@ -31,8 +31,8 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Description:           "Terraform acceptance tests",
 						LFSEnabled:            true,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "maintainer",  // default value
-						SubGroupCreationLevel: "owner", // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
@@ -71,8 +71,8 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Description:           "Terraform acceptance tests",
 						LFSEnabled:            true,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "maintainer",  // default value
-						SubGroupCreationLevel: "owner", // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
