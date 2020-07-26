@@ -62,6 +62,7 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
+				Default:      "private",
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
 			"share_with_group_lock": {
@@ -73,6 +74,7 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
+				Default:      "maintainers",
 				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainers", "developers"}, true),
 			},
 			"auto_devops_enabled": {
@@ -94,6 +96,7 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Computed:     true,
+				Default:      "owners",
 				ValidateFunc: validation.StringInSlice([]string{"owners", "maintainers"}, true),
 			},
 			"require_two_factor_authentication": {
