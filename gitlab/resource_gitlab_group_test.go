@@ -46,7 +46,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Name:                           fmt.Sprintf("bar-name-%d", rInt),
 						Path:                           fmt.Sprintf("bar-path-%d", rInt),
 						Description:                    "Terraform acceptance tests! Updated description",
-						LFSEnabled:                     true,
+						LFSEnabled:                     false,
 						Visibility:                     "public", // default value
 						RequestAccessEnabled:           true,
 						ProjectCreationLevel:           "maintainer",
