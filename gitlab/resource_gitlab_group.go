@@ -119,13 +119,13 @@ func resourceGitlabGroup() *schema.Resource {
 			},
 			"shared_runners_minutes_limit": {
 				Type:     schema.TypeInt,
+				Computed: true,
 				Optional: true,
-				Default:  60,
 			},
 			"extra_shared_runners_minutes_limit": {
 				Type:     schema.TypeInt,
+				Computed: true,
 				Optional: true,
-				Default:  60,
 			},
 		},
 	}
