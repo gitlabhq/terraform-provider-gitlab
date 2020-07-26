@@ -93,7 +93,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"subgroup_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "owner",
+				Default:      "maintainer",
 				ValidateFunc: validation.StringInSlice([]string{"owner", "maintainer"}, true),
 			},
 			"require_two_factor_authentication": {
