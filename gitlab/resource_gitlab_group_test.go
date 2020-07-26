@@ -26,14 +26,10 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("foo-name-%d", rInt),
-						Path:                  fmt.Sprintf("foo-path-%d", rInt),
-						Description:           "Terraform acceptance tests",
-						LFSEnabled:            true,
-						Visibility:            gitlab.PublicVisibility,
-						ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-						SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-						TwoFactorGracePeriod:  48,
+						Name:        fmt.Sprintf("foo-name-%d", rInt),
+						Path:        fmt.Sprintf("foo-path-%d", rInt),
+						Description: "Terraform acceptance tests",
+						LFSEnabled:  true,
 					}),
 				),
 			},
@@ -43,31 +39,45 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("bar-name-%d", rInt),
-						Path:                  fmt.Sprintf("bar-path-%d", rInt),
-						Description:           "Terraform acceptance tests! Updated description",
-						RequestAccessEnabled:  true,
-						Visibility:            gitlab.PublicVisibility,
-						ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-						SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-						TwoFactorGracePeriod:  48,
+						Name:                           fmt.Sprintf("bar-name-%d", rInt),
+						Path:                           fmt.Sprintf("bar-path-%d", rInt),
+						Description:                    "Terraform acceptance tests! Updated description",
+						LFSEnabled:                     true,
+						RequestAccessEnabled:           true,
+						ProjectCreationLevel:           "maintainer",
+						SubgroupCreationLevel:          "owner",
+						RequireTwoFactorAuthentication: true,
+						TwoFactorGracePeriod:           56,
+						AutoDevopsEnabled:              true,
+						EmailsDisabled:                 true,
+						MentionsDisabled:               true,
+						SharedRunnersMinutesLimit:      45,
+						ExtraSharedRunnersMinutesLimit: 45,
+						ShareWithGroupLock:             true,
 					}),
 				),
 			},
-			// Update the group to put the anem and description back
+			// Update the group to put the name and description back
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("foo-name-%d", rInt),
-						Path:                  fmt.Sprintf("foo-path-%d", rInt),
-						Description:           "Terraform acceptance tests",
-						LFSEnabled:            true,
-						Visibility:            gitlab.PublicVisibility,
-						ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-						SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-						TwoFactorGracePeriod:  48,
+						Name:                           fmt.Sprintf("foo-name-%d", rInt),
+						Path:                           fmt.Sprintf("foo-path-%d", rInt),
+						Description:                    "Terraform acceptance tests",
+						LFSEnabled:                     true,
+						RequestAccessEnabled:           true,
+						ProjectCreationLevel:           "maintainer",
+						SubgroupCreationLevel:          "owner",
+						RequireTwoFactorAuthentication: true,
+						TwoFactorGracePeriod:           56,
+						AutoDevopsEnabled:              true,
+						EmailsDisabled:                 true,
+						MentionsDisabled:               true,
+						SharedRunnersMinutesLimit:      45,
+						ExtraSharedRunnersMinutesLimit: 45,
+						ShareWithGroupLock:             true,
 					}),
 				),
 			},
@@ -113,15 +123,11 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
 					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
 					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("nfoo-name-%d", rInt),
-						Path:                  fmt.Sprintf("nfoo-path-%d", rInt),
-						Description:           "Terraform acceptance tests",
-						LFSEnabled:            true,
-						Parent:                &group,
-						Visibility:            gitlab.PublicVisibility,
-						ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-						SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-						TwoFactorGracePeriod:  48,
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests",
+						LFSEnabled:  true,
+						Parent:      &group,
 					}),
 				),
 			},
@@ -132,15 +138,11 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
 					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
 					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("nfoo-name-%d", rInt),
-						Path:                  fmt.Sprintf("nfoo-path-%d", rInt),
-						Description:           "Terraform acceptance tests - new parent",
-						LFSEnabled:            true,
-						Parent:                &group2,
-						Visibility:            gitlab.PublicVisibility,
-						ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-						SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-						TwoFactorGracePeriod:  48,
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests - new parent",
+						LFSEnabled:  true,
+						Parent:      &group2,
 					}),
 				),
 			},
@@ -151,14 +153,10 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
 					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
 					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("nfoo-name-%d", rInt),
-						Path:                  fmt.Sprintf("nfoo-path-%d", rInt),
-						Description:           "Terraform acceptance tests - updated",
-						LFSEnabled:            true,
-						Visibility:            gitlab.PublicVisibility,
-						ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-						SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-						TwoFactorGracePeriod:  48,
+						Name:        fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:        fmt.Sprintf("nfoo-path-%d", rInt),
+						Description: "Terraform acceptance tests - updated",
+						LFSEnabled:  true,
 					}),
 				),
 			},
@@ -175,10 +173,6 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 			// 			Description: "Terraform acceptance tests",
 			// 			LFSEnabled:  true,
 			// 			Parent:      &group,
-			//			Visibility:  gitlab.PublicVisibility,
-			//			ProjectCreationLevel:  gitlab.DeveloperProjectCreation,
-			//			SubGroupCreationLevel: gitlab.MaintainerSubGroupCreationLevelValue,
-			//			TwoFactorGracePeriod:  48,
 			// 		}),
 			// 	),
 			// },
@@ -401,16 +395,16 @@ resource "gitlab_group" "foo" {
   description = "Terraform acceptance tests! Updated description"
   lfs_enabled = false
   request_access_enabled = true
-  project_creation_level = "developer"
-  subgroup_creation_level = "maintainer"
-  require_two_factor_authentication = false
-  two_factor_grace_period = 48
-  auto_devops_enabled = false
-  emails_disabled = false
-  mentions_disabled = false
-  shared_runners_minutes_limit = 60
-  extra_shared_runners_minutes_limit = 60
-  share_with_group_lock = false
+  project_creation_level = "maintainer"
+  subgroup_creation_level = "owner"
+  require_two_factor_authentication = true
+  two_factor_grace_period = 56
+  auto_devops_enabled = true
+  emails_disabled = true
+  mentions_disabled = true
+  shared_runners_minutes_limit = 45
+  extra_shared_runners_minutes_limit = 45
+  share_with_group_lock = true
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing

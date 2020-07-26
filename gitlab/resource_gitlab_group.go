@@ -61,7 +61,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"visibility_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "private",
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
 			"share_with_group_lock": {
@@ -72,7 +72,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"project_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "developer",
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainer", "developer"}, true),
 			},
 			"auto_devops_enabled": {
@@ -93,7 +93,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"subgroup_creation_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "maintainer",
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"owner", "maintainer"}, true),
 			},
 			"require_two_factor_authentication": {
