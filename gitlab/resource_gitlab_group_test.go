@@ -123,11 +123,11 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						Path:                  fmt.Sprintf("nfoo-path-%d", rInt),
 						Description:           "Terraform acceptance tests",
 						LFSEnabled:            true,
-						Parent:                &group,
 						Visibility:            "public",     // default value
 						ProjectCreationLevel:  "maintainer", // default value
 						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
+						Parent:                &group,
 					}),
 				),
 			},
@@ -142,11 +142,11 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						Path:                  fmt.Sprintf("nfoo-path-%d", rInt),
 						Description:           "Terraform acceptance tests - new parent",
 						LFSEnabled:            true,
-						Parent:                &group2,
 						Visibility:            "public",     // default value
 						ProjectCreationLevel:  "maintainer", // default value
 						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
+						Parent:                &group2,
 					}),
 				),
 			},
@@ -180,11 +180,11 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 			// 			Path:        fmt.Sprintf("nfoo-path-%d", rInt),
 			// 			Description: "Terraform acceptance tests",
 			// 			LFSEnabled:  true,
-			// 			Parent:      &group,
 			//			Visibility:            "public",     // default value
 			//			ProjectCreationLevel:  "maintainer", // default value
 			//			SubGroupCreationLevel: "owner",      // default value
 			//			TwoFactorGracePeriod:  48,           // default value
+			// 			Parent:      &group,
 			// 		}),
 			// 	),
 			// },
