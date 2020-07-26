@@ -26,10 +26,13 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:        fmt.Sprintf("foo-name-%d", rInt),
-						Path:        fmt.Sprintf("foo-path-%d", rInt),
-						Description: "Terraform acceptance tests",
-						LFSEnabled:  true,
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						LFSEnabled:            true,
+						Visibility:            "public",     // default value
+						ProjectCreationLevel:  "developer",  // default value
+						SubGroupCreationLevel: "maintainer", // default value
 					}),
 				),
 			},
@@ -43,6 +46,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Path:                           fmt.Sprintf("bar-path-%d", rInt),
 						Description:                    "Terraform acceptance tests! Updated description",
 						LFSEnabled:                     true,
+						Visibility:                     "public", // default value
 						RequestAccessEnabled:           true,
 						ProjectCreationLevel:           "maintainer",
 						SubGroupCreationLevel:          "owner",
@@ -67,6 +71,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Path:                           fmt.Sprintf("foo-path-%d", rInt),
 						Description:                    "Terraform acceptance tests",
 						LFSEnabled:                     true,
+						Visibility:                     "public", // default value
 						RequestAccessEnabled:           true,
 						ProjectCreationLevel:           "maintainer",
 						SubGroupCreationLevel:          "owner",
