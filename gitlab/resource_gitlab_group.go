@@ -61,7 +61,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"visibility_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "public",
+				Default:      "private",
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
 			"share_with_group_lock": {
@@ -116,16 +116,6 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:      schema.TypeString,
 				Computed:  true,
 				Sensitive: true,
-			},
-			"shared_runners_minutes_limit": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  0,
-			},
-			"extra_shared_runners_minutes_limit": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  0,
 			},
 		},
 	}
@@ -187,14 +177,6 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		options.ParentID = gitlab.Int(v.(int))
 	}
 
-	if v, ok := d.GetOk("shared_runners_minutes_limit"); ok {
-		options.SharedRunnersMinutesLimit = gitlab.Int(v.(int))
-	}
-
-	if v, ok := d.GetOk("extra_shared_runners_minutes_limit"); ok {
-		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(v.(int))
-	}
-
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
 
 	group, _, err := client.Groups.CreateGroup(options)
@@ -243,8 +225,6 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("auto_devops_enabled", group.AutoDevopsEnabled)
 	d.Set("emails_disabled", group.EmailsDisabled)
 	d.Set("mentions_disabled", group.MentionsDisabled)
-	d.Set("shared_runners_minutes_limit", group.SharedRunnersMinutesLimit)
-	d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
 	d.Set("share_with_group_lock", group.ShareWithGroupLock)
@@ -313,14 +293,6 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("share_with_group_lock") {
 		options.ShareWithGroupLock = gitlab.Bool(d.Get("share_with_group_lock").(bool))
-	}
-
-	if d.HasChange("shared_runners_minutes_limit") {
-		options.SharedRunnersMinutesLimit = gitlab.Int(d.Get("shared_runners_minutes_limit").(int))
-	}
-
-	if d.HasChange("extra_shared_runners_minutes_limit") {
-		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(d.Get("extra_shared_runners_minutes_limit").(int))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

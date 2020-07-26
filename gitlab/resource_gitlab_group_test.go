@@ -26,16 +26,14 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                           fmt.Sprintf("foo-name-%d", rInt),
-						Path:                           fmt.Sprintf("foo-path-%d", rInt),
-						Description:                    "Terraform acceptance tests",
-						LFSEnabled:                     true,
-						Visibility:                     "public",     // default value
-						ProjectCreationLevel:           "developer",  // default value
-						SubGroupCreationLevel:          "maintainer", // default value
-						TwoFactorGracePeriod:           48,           // default value
-						SharedRunnersMinutesLimit:      0,            // default value
-						ExtraSharedRunnersMinutesLimit: 0,            // default value
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						LFSEnabled:            true,
+						Visibility:            "public",     // default value
+						ProjectCreationLevel:  "developer",  // default value
+						SubGroupCreationLevel: "maintainer", // default value
+						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
 			},
@@ -45,22 +43,20 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                           fmt.Sprintf("bar-name-%d", rInt),
-						Path:                           fmt.Sprintf("bar-path-%d", rInt),
-						Description:                    "Terraform acceptance tests! Updated description",
-						LFSEnabled:                     false,
-						Visibility:                     "public", // default value
-						RequestAccessEnabled:           true,
-						ProjectCreationLevel:           "maintainer",
-						SubGroupCreationLevel:          "owner",
-						RequireTwoFactorAuth:           true,
-						TwoFactorGracePeriod:           56,
-						AutoDevopsEnabled:              true,
-						EmailsDisabled:                 true,
-						MentionsDisabled:               true,
-						SharedRunnersMinutesLimit:      45,
-						ExtraSharedRunnersMinutesLimit: 45,
-						ShareWithGroupLock:             true,
+						Name:                  fmt.Sprintf("bar-name-%d", rInt),
+						Path:                  fmt.Sprintf("bar-path-%d", rInt),
+						Description:           "Terraform acceptance tests! Updated description",
+						LFSEnabled:            false,
+						Visibility:            "public", // default value
+						RequestAccessEnabled:  true,
+						ProjectCreationLevel:  "maintainer",
+						SubGroupCreationLevel: "owner",
+						RequireTwoFactorAuth:  true,
+						TwoFactorGracePeriod:  56,
+						AutoDevopsEnabled:     true,
+						EmailsDisabled:        true,
+						MentionsDisabled:      true,
+						ShareWithGroupLock:    true,
 					}),
 				),
 			},
@@ -70,16 +66,14 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                           fmt.Sprintf("foo-name-%d", rInt),
-						Path:                           fmt.Sprintf("foo-path-%d", rInt),
-						Description:                    "Terraform acceptance tests",
-						LFSEnabled:                     true,
-						Visibility:                     "public",     // default value
-						ProjectCreationLevel:           "developer",  // default value
-						SubGroupCreationLevel:          "maintainer", // default value
-						TwoFactorGracePeriod:           48,           // default value
-						SharedRunnersMinutesLimit:      0,            // default value
-						ExtraSharedRunnersMinutesLimit: 0,            // default value
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						LFSEnabled:            true,
+						Visibility:            "public",     // default value
+						ProjectCreationLevel:  "developer",  // default value
+						SubGroupCreationLevel: "maintainer", // default value
+						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
 			},
@@ -268,23 +262,21 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 }
 
 type testAccGitlabGroupExpectedAttributes struct {
-	Name                           string
-	Path                           string
-	Description                    string
-	Parent                         *gitlab.Group
-	LFSEnabled                     bool
-	RequestAccessEnabled           bool
-	Visibility                     gitlab.VisibilityValue
-	ShareWithGroupLock             bool
-	AutoDevopsEnabled              bool
-	EmailsDisabled                 bool
-	MentionsDisabled               bool
-	SharedRunnersMinutesLimit      int
-	ExtraSharedRunnersMinutesLimit int
-	ProjectCreationLevel           gitlab.ProjectCreationLevelValue
-	SubGroupCreationLevel          gitlab.SubGroupCreationLevelValue
-	RequireTwoFactorAuth           bool
-	TwoFactorGracePeriod           int
+	Name                  string
+	Path                  string
+	Description           string
+	Parent                *gitlab.Group
+	LFSEnabled            bool
+	RequestAccessEnabled  bool
+	Visibility            gitlab.VisibilityValue
+	ShareWithGroupLock    bool
+	AutoDevopsEnabled     bool
+	EmailsDisabled        bool
+	MentionsDisabled      bool
+	ProjectCreationLevel  gitlab.ProjectCreationLevelValue
+	SubGroupCreationLevel gitlab.SubGroupCreationLevelValue
+	RequireTwoFactorAuth  bool
+	TwoFactorGracePeriod  int
 }
 
 func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabGroupExpectedAttributes) resource.TestCheckFunc {
@@ -319,14 +311,6 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 
 		if group.MentionsDisabled != want.MentionsDisabled {
 			return fmt.Errorf("got request_mentions_disabled: %t; want %t", group.MentionsDisabled, want.MentionsDisabled)
-		}
-
-		if group.SharedRunnersMinutesLimit != want.SharedRunnersMinutesLimit {
-			return fmt.Errorf("got request_shared_runners_minutes_limit: %d; want %d", group.SharedRunnersMinutesLimit, want.SharedRunnersMinutesLimit)
-		}
-
-		if group.ExtraSharedRunnersMinutesLimit != want.ExtraSharedRunnersMinutesLimit {
-			return fmt.Errorf("got request_extra_shared_runners_minutes_limit: %d; want %d", group.ExtraSharedRunnersMinutesLimit, want.ExtraSharedRunnersMinutesLimit)
 		}
 
 		if group.RequestAccessEnabled != want.RequestAccessEnabled {
@@ -420,8 +404,6 @@ resource "gitlab_group" "foo" {
   auto_devops_enabled = true
   emails_disabled = true
   mentions_disabled = true
-  shared_runners_minutes_limit = 45
-  extra_shared_runners_minutes_limit = 45
   share_with_group_lock = true
 
   # So that acceptance tests can be run in a gitlab organization
