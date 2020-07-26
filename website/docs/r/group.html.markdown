@@ -51,7 +51,8 @@ enable users to request access to the group.
 * `share_with_group_lock` - (Optional) Boolean, defaults to false.  Prevent sharing
 a project with another group within this group.
 
-* `project_creation_level` - (Optional) Determine if developers can create projects
+* `project_creation_level` - (Optional), defaults to Maintainer
+Determine if developers can create projects
 in the group. Can be noone (No one), maintainer (Maintainers),
 or developer (Developers + Maintainers).
 
@@ -63,9 +64,9 @@ DevOps pipeline for all projects within this group.
 * `mentions_disabled` - (Optional) Boolean, defaults to false.  Disable the capability
 of a group from getting mentioned
 
-* `subgroup_creation_level` - (Optional).  Allowed to create subgroups.
+* `subgroup_creation_level` - (Optional), defaults to Owner
+ Allowed to create subgroups.
 Can be owner (Owners), or maintainer (Maintainers).
-Default is ???
 
 * `require_two_factor_authentication` - (Optional) Boolean, defaults to false.
 equire all users in this group to setup Two-factor authentication.

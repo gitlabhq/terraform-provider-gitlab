@@ -31,8 +31,8 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Description:           "Terraform acceptance tests",
 						LFSEnabled:            true,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "developer",  // default value
-						SubGroupCreationLevel: "maintainer", // default value
+						ProjectCreationLevel:  "maintainer",  // default value
+						SubGroupCreationLevel: "owner", // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
@@ -49,8 +49,8 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						LFSEnabled:            false,
 						Visibility:            "public", // default value
 						RequestAccessEnabled:  true,
-						ProjectCreationLevel:  "maintainer",
-						SubGroupCreationLevel: "owner",
+						ProjectCreationLevel:  "developer",
+						SubGroupCreationLevel: "maintainer",
 						RequireTwoFactorAuth:  true,
 						TwoFactorGracePeriod:  56,
 						AutoDevopsEnabled:     true,
@@ -71,8 +71,8 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						Description:           "Terraform acceptance tests",
 						LFSEnabled:            true,
 						Visibility:            "public",     // default value
-						ProjectCreationLevel:  "developer",  // default value
-						SubGroupCreationLevel: "maintainer", // default value
+						ProjectCreationLevel:  "maintainer",  // default value
+						SubGroupCreationLevel: "owner", // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
 				),
@@ -397,8 +397,8 @@ resource "gitlab_group" "foo" {
   description = "Terraform acceptance tests! Updated description"
   lfs_enabled = false
   request_access_enabled = true
-  project_creation_level = "maintainer"
-  subgroup_creation_level = "owner"
+  project_creation_level = "developer"
+  subgroup_creation_level = "maintainer"
   require_two_factor_authentication = true
   two_factor_grace_period = 56
   auto_devops_enabled = true
