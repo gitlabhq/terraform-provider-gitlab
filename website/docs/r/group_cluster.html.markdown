@@ -31,7 +31,7 @@ resource gitlab_group_cluster "bar" {
   kubernetes_ca_cert            = "some-cert"
   kubernetes_authorization_type = "rbac"
   environment_scope             = "*"
-  management_cluster_id         = "123456"
+  management_project_id         = "123456"
 }
 ```
 
@@ -59,7 +59,7 @@ The following arguments are supported:
 
 * `environment_scope` - (Optional, string) The associated environment to the cluster. Defaults to `*`.
 
-* `management_cluster_id` - (Optional, string) The ID of the management project for the cluster. 
+* `management_project_id` - (Optional, string) The ID of the management project for the cluster. 
 
 ## Import
 
