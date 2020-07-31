@@ -170,7 +170,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 					Type:     schema.TypeString,
 					Required: true,
 					ValidateFunc: validation.StringInSlice([]string{
-						"no one", "guest", "reporter", "developer", "maintainer"}, false),
+						"no one", "guest", "reporter", "developer", "maintainer", "owner"}, false),
 				},
 				"group_name": {
 					Type:     schema.TypeString,
@@ -233,7 +233,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("web_url", project.WebURL)
 	d.Set("runners_token", project.RunnersToken)
 	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
-	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
+	d.Set("shared_with_groups", flattenProjectSharedWithGroupsOptions(project))
 	d.Set("tags", project.TagList)
 	d.Set("archived", project.Archived)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
@@ -508,7 +508,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if d.HasChange("shared_with_groups") {
-		err := updateSharedWithGroups(d, meta)
+		err := updateProjectSharedWithGroups(d, meta)
 		// TODO: check if handling partial state update in this simplistic
 		// way is ok when an error in the "shared groups" API calls occurs
 		if err != nil {
@@ -600,7 +600,7 @@ func expandSharedWithGroupsOptions(v interface{}) []*gitlab.ShareWithGroupOption
 	return shareWithGroupOptionsList
 }
 
-func flattenSharedWithGroupsOptions(project *gitlab.Project) []interface{} {
+func flattenProjectSharedWithGroupsOptions(project *gitlab.Project) []interface{} {
 	sharedWithGroups := project.SharedWithGroups
 	sharedWithGroupsList := []interface{}{}
 
@@ -618,7 +618,7 @@ func flattenSharedWithGroupsOptions(project *gitlab.Project) []interface{} {
 	return sharedWithGroupsList
 }
 
-func findGroupProjectSharedWith(target *gitlab.ShareWithGroupOptions,
+func findGroupSharedWith(target *gitlab.ShareWithGroupOptions,
 	groups []*gitlab.ShareWithGroupOptions) (*gitlab.ShareWithGroupOptions, int, error) {
 	for i, group := range groups {
 		if *group.GroupID == *target.GroupID {
@@ -643,7 +643,7 @@ func getGroupsProjectSharedWith(project *gitlab.Project) []*gitlab.ShareWithGrou
 	return sharedGroups
 }
 
-func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
+func updateProjectSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	var groupsToUnshare []*gitlab.ShareWithGroupOptions
@@ -658,7 +658,7 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 	currentGroups := getGroupsProjectSharedWith(project)
 
 	for _, targetGroup := range targetGroups {
-		currentGroup, index, err := findGroupProjectSharedWith(targetGroup, currentGroups)
+		currentGroup, index, err := findGroupSharedWith(targetGroup, currentGroups)
 
 		// If no corresponding group is found, it must be added
 		if err != nil {

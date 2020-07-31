@@ -2,11 +2,12 @@ package gitlab
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/mitchellh/hashstructure"
 	"github.com/xanzy/go-gitlab"
-	"log"
 )
 
 // Schemas
@@ -151,7 +152,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"mirror_trigger_builds":               project.MirrorTriggerBuilds,
 				"only_mirror_protected_branches":      project.OnlyMirrorProtectedBranches,
 				"mirror_overwrites_diverged_branches": project.MirrorOverwritesDivergedBranches,
-				"shared_with_groups":                  flattenSharedWithGroupsOptions(project),
+				"shared_with_groups":                  flattenProjectSharedWithGroupsOptions(project),
 				"statistics":                          project.Statistics,
 				"_links":                              flattenProjectLinks(project.Links),
 				"ci_config_path":                      project.CIConfigPath,

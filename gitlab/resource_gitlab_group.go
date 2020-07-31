@@ -75,6 +75,32 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:  true,
 				Sensitive: true,
 			},
+			"shared_with_groups": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"group_id": {
+							Type:     schema.TypeInt,
+							Required: true,
+						},
+						"group_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"group_full_path": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"group_access_level": {
+							Type:     schema.TypeString,
+							Required: true,
+							ValidateFunc: validation.StringInSlice([]string{
+								"no one", "guest", "reporter", "developer", "maintainer", "owner"}, false),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -112,6 +138,15 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
+	if v, ok := d.GetOk("shared_with_groups"); ok {
+		for _, option := range expandSharedWithGroupsOptions(v) {
+			if _, _, err := client.GroupMembers.ShareWithGroup(group.ID, option); err != nil {
+				return err
+			}
+		}
+		d.SetPartial("shared_with_groups")
+	}
+
 	return resourceGitlabGroupRead(d, meta)
 }
 
@@ -146,6 +181,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("visibility_level", group.Visibility)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
+	d.Set("shared_with_groups", flattenGroupSharedWithGroupsOptions(group))
 
 	return nil
 }
@@ -179,6 +215,15 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	// https://gitlab.com/gitlab-org/gitlab-ce/issues/38459
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if d.HasChange("shared_with_groups") {
+		err := updateGroupSharedWithGroups(d, meta)
+		// TODO: check if handling partial state update in this simplistic
+		// way is ok when an error in the "shared groups" API calls occurs
+		if err != nil {
+			d.SetPartial("shared_with_groups")
+		}
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
@@ -231,4 +276,92 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("error waiting for group (%s) to become deleted: %s", d.Id(), err)
 	}
 	return err
+}
+
+func flattenGroupSharedWithGroupsOptions(group *gitlab.Group) []interface{} {
+	sharedWithGroups := group.SharedWithGroups
+	sharedWithGroupsList := []interface{}{}
+
+	for _, option := range sharedWithGroups {
+		values := map[string]interface{}{
+			"group_id":   option.GroupID,
+			"group_name": option.GroupName,
+			"group_access_level": accessLevelValueToName[gitlab.AccessLevelValue(
+				option.GroupAccessLevel)],
+			"group_full_path": option.GroupFullPath,
+		}
+
+		sharedWithGroupsList = append(sharedWithGroupsList, values)
+	}
+
+	return sharedWithGroupsList
+}
+
+func updateGroupSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*gitlab.Client)
+
+	var groupsToUnshare []*gitlab.ShareWithGroupOptions
+	var groupsToShare []*gitlab.ShareWithGroupOptions
+
+	// Get target groups from the TF config and current groups from Gitlab server
+	targetGroups := expandSharedWithGroupsOptions(d.Get("shared_with_groups"))
+	group, _, err := client.Groups.GetGroup(d.Id(), nil)
+	if err != nil {
+		return err
+	}
+	currentGroups := getGroupsGroupSharedWith(group)
+
+	for _, targetGroup := range targetGroups {
+		currentGroup, index, err := findGroupSharedWith(targetGroup, currentGroups)
+
+		// If no corresponding group is found, it must be added
+		if err != nil {
+			groupsToShare = append(groupsToShare, targetGroup)
+			continue
+		}
+
+		// If group is different it must be deleted and added again
+		if *targetGroup.GroupAccess != *currentGroup.GroupAccess {
+			groupsToShare = append(groupsToShare, targetGroup)
+			groupsToUnshare = append(groupsToUnshare, targetGroup)
+		}
+
+		// Remove currentGroup from from list
+		currentGroups = append(currentGroups[:index], currentGroups[index+1:]...)
+	}
+
+	// All groups still present in currentGroup must be deleted
+	groupsToUnshare = append(groupsToUnshare, currentGroups...)
+
+	// Unshare groups to delete and update
+	for _, group := range groupsToUnshare {
+		_, err := client.GroupMembers.RemoveShareWithGroup(d.Id(), *group.GroupID)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Share groups to add and update
+	for _, group := range groupsToShare {
+		_, _, err := client.GroupMembers.ShareWithGroup(d.Id(), group)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func getGroupsGroupSharedWith(group *gitlab.Group) []*gitlab.ShareWithGroupOptions {
+	sharedGroups := []*gitlab.ShareWithGroupOptions{}
+
+	for _, group := range group.SharedWithGroups {
+		sharedGroups = append(sharedGroups, &gitlab.ShareWithGroupOptions{
+			GroupID: gitlab.Int(group.GroupID),
+			GroupAccess: gitlab.AccessLevel(gitlab.AccessLevelValue(
+				group.GroupAccessLevel)),
+		})
+	}
+
+	return sharedGroups
 }
