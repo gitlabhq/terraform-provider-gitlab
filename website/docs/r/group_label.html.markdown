@@ -41,3 +41,11 @@ The following arguments are supported:
 The resource exports the following attributes:
 
 * `id` - The unique id assigned to the label by the GitLab server (the name of the label).
+
+## Import
+
+Gitlab group labels can be imported using an id made up of `{group_id}:{group_label_id}`, e.g.
+
+```
+$ terraform import gitlab_deploy_key_enable.example 12345:fixme
+```
