@@ -14,6 +14,9 @@ func resourceGitlabProjectPushRules() *schema.Resource {
 		Read:   resourceGitlabProjectPushRulesRead,
 		Update: resourceGitlabProjectPushRulesUpdate,
 		Delete: resourceGitlabProjectPushRulesDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabProjectPushRulesImporter,
+		},
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -107,7 +110,7 @@ func resourceGitlabProjectPushRulesCreate(d *schema.ResourceData, meta interface
 func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	log.Printf("[DEBUG] read gitlab project %s", project)
+	log.Printf("[DEBUG] read gitlab project %s push rules", project)
 	pushRules, _, err := client.Projects.GetProjectPushRules(project)
 	if err != nil {
 		return err
@@ -126,8 +129,30 @@ func resourceGitlabProjectPushRulesRead(d *schema.ResourceData, meta interface{}
 func resourceGitlabProjectPushRulesDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	log.Printf("[DEBUG] Delete gitlab project push rules %s", project)
+	log.Printf("[DEBUG] Delete gitlab project %s push rules", project)
 	log.Println(project)
 	_, err := client.Projects.DeleteProjectPushRule(project)
 	return err
+}
+
+func resourceGitlabProjectPushRulesImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	// Push rule IDs in GitLab are internal identifiers. For ease of use, we allow importing using the project ID instead.
+	// This means we need to lookup the push rule ID during import.
+
+	client := meta.(*gitlab.Client)
+	project := d.Id()
+
+	log.Printf("[DEBUG] read gitlab project %s push rules", project)
+
+	pushRules, _, err := client.Projects.GetProjectPushRules(project)
+	if err != nil {
+		return nil, err
+	}
+
+	d.SetId(fmt.Sprintf("%d", pushRules.ID))
+
+	// Since project is used as a primary key in the Read function, we set that too.
+	d.Set("project", project)
+
+	return []*schema.ResourceData{d}, nil
 }
