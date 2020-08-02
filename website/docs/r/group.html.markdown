@@ -38,10 +38,10 @@ The following arguments are supported:
 
 * `description` - (Optional) The description of the group.
 
-* `lfs_enabled` - (Optional) Boolean, defaults to true.  Whether to enable LFS
+* `lfs_enabled` - (Optional) Boolean, defaults to true. Whether to enable LFS
 support for projects in this group.
 
-* `request_access_enabled` - (Optional) Boolean, defaults to false.  Whether to
+* `request_access_enabled` - (Optional) Boolean, defaults to false. Whether to
 enable users to request access to the group.
 
 * `visibility_level` - (Optional) Set to `public` to create a public group.
@@ -54,9 +54,9 @@ enable users to request access to the group.
 
 The resource exports the following attributes:
 
-* `id` - The unique id assigned to the group by the GitLab server.  Serves as a
+* `id` - The unique id assigned to the group by the GitLab server. Serves as a
   namespace id where one is needed.
-  
+
 * `full_path` - The full path of the group.
 
 * `full_name` - The full name of the group.
@@ -65,12 +65,18 @@ The resource exports the following attributes:
 
 * `runners_token` - The group level registration token to use during runner setup.
 
+* `shared_with_groups` - (Optional) Enable sharing the group with a list of groups (maps).
+  * `group_id` - (Required) Group id of the group you want to share the group with.
+  * `group_access_level` - (Required) Group's max level sharing permissions. See [group members permission][group_members_permissions] for more info.
+  Valid values are `guest`, `reporter`, `developer`, `maintainer`, `owner`.
+
 ## Importing groups
 
-You can import a group state using `terraform import <resource> <id>`.  The
+You can import a group state using `terraform import <resource> <id>`. The
 `id` can be whatever the [details of a group][details_of_a_group] api takes for
 its `:id` value, so for example:
 
     terraform import gitlab_group.example example
 
 [details_of_a_group]: https://docs.gitlab.com/ee/api/groups.html#details-of-a-group
+[group_members_permissions]: https://docs.gitlab.com/ce/user/permissions.html#group-members-permissions

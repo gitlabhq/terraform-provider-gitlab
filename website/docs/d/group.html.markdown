@@ -57,7 +57,7 @@ The resource exports the following attributes:
 * `visibility_level` - Visibility level of the group. Possible values are `private`, `internal`, `public`.
 
 * `parent_id` - Integer, ID of the parent group.
-  
+
 * `full_path` - The full path of the group.
 
 * `full_name` - The full name of the group.
@@ -65,5 +65,11 @@ The resource exports the following attributes:
 * `web_url` - Web URL of the group.
 
 * `runners_token` - The group level registration token to use during runner setup.
+
+* `shared_with_groups` - List of groups the group is shared with (maps).
+  * `group_id` - Group id.
+  * `group_name` - Group name.
+  * `group_access_level` - Group's max level sharing permissions.
+  * `group_full_path` - Group full path.
 
 [doc]: https://docs.gitlab.com/ee/api/groups.html#details-of-a-group
