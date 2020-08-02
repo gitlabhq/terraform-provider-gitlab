@@ -69,6 +69,30 @@ func dataSourceGitlabGroup() *schema.Resource {
 				Computed:  true,
 				Sensitive: true,
 			},
+			"shared_with_groups": {
+				Type:     schema.TypeSet,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"group_id": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"group_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"group_full_path": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"group_access_level": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -112,6 +136,7 @@ func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("visibility_level", group.Visibility)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
+	d.Set("shared_with_groups", flattenGroupSharedWithGroupsOptions(group))
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
