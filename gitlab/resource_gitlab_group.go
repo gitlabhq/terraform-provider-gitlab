@@ -335,7 +335,7 @@ func updateGroupSharedWithGroups(d *schema.ResourceData, meta interface{}) error
 
 	// Unshare groups to delete and update
 	for _, group := range groupsToUnshare {
-		_, err := client.GroupMembers.RemoveShareWithGroup(d.Id(), *group.GroupID)
+		_, err := client.GroupMembers.DeleteShareWithGroup(d.Id(), *group.GroupID)
 		if err != nil {
 			return err
 		}
