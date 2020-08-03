@@ -7,12 +7,6 @@ default: build
 
 build: fmtcheck
 	go install
-	go build -o terraform-provider-gitlab
-
-build-example: build
-	mkdir -p example/.terraform/plugins/darwin_amd64
-	cp terraform-provider-gitlab example/.terraform/plugins/darwin_amd64/
-	cd example && terraform init
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
