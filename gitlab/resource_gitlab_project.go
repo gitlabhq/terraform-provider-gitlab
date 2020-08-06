@@ -198,7 +198,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 	},
 	"template_project_id": {
-		Type: 		schema.TypeInt,
+		Type:     schema.TypeInt,
 		Optional: true,
 	},
 	"use_custom_template": {
@@ -276,7 +276,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		TemplateName:                              gitlab.String(d.Get("template_name").(string)),
-		TemplateProjectId: 												 gitlab.Int(d.Get("template_project_id").(int)),
+		TemplateProjectID:                         gitlab.Int(d.Get("template_project_id").(int)),
 		UseCustomTemplate:                         gitlab.Bool(d.Get("use_custom_template").(bool)),
 		GroupWithProjectTemplatesID:               gitlab.Int(d.Get("group_with_project_templates_id").(int)),
 	}
@@ -336,6 +336,11 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	if v, ok := d.GetOk("template_name"); ok {
 		options.TemplateName = gitlab.String(v.(string))
 		setProperties = append(setProperties, "template_name")
+	}
+
+	if v, ok := d.GetOk("template_project_id"); ok {
+		options.TemplateProjectID = gitlab.Int(v.(int))
+		setProperties = append(setProperties, "template_project_id")
 	}
 
 	if v, ok := d.GetOk("use_custom_template"); ok {
