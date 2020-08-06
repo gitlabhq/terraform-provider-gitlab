@@ -200,7 +200,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"template_project_id": {
 		Type: 		schema.TypeInt,
 		Optional: true,
-	}
+	},
 	"use_custom_template": {
 		Type:     schema.TypeBool,
 		Optional: true,
@@ -276,7 +276,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		TemplateName:                              gitlab.String(d.Get("template_name").(string)),
-		TemplateProjectId: 												 gitlab.Int(d.Get("template_project_id").(int))
+		TemplateProjectId: 												 gitlab.Int(d.Get("template_project_id").(int)),
 		UseCustomTemplate:                         gitlab.Bool(d.Get("use_custom_template").(bool)),
 		GroupWithProjectTemplatesID:               gitlab.Int(d.Get("group_with_project_templates_id").(int)),
 	}
