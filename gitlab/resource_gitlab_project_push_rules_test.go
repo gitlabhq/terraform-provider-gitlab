@@ -78,6 +78,29 @@ func TestAccGitlabProjectPushRules_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectPushRules_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectPushRulesDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectPushRulesConfig(rInt),
+			},
+			{
+				SkipFunc:          isRunningInCE,
+				ResourceName:      "gitlab_project_push_rules.foo",
+				ImportStateId:     fmt.Sprintf("foo-%d", rInt),
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectPushRulesExists(n string, pushRules *gitlab.ProjectPushRules) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

@@ -1,4 +1,10 @@
-## 2.11.0 (Unreleased)
+## 2.12.0 (Unreleased)
+## 2.11.0 (July 24, 2020)
+
+ENHANCEMENTS:
+* Improvements to resource `gitlab_user` import
+  ([#340](https://github.com/terraform-providers/terraform-provider-gitlab/issues/340))
+
 ## 2.10.0 (June 09, 2020)
 
 FEATURES:
@@ -6,7 +12,7 @@ FEATURES:
   ([#311](https://github.com/terraform-providers/terraform-provider-gitlab/issues/311))
 
 ENHANCEMENTS:
-* add attribute remove_source_branch_after_merge to projects
+* add attribute `remove_source_branch_after_merge` to projects
   ([#289](https://github.com/terraform-providers/terraform-provider-gitlab/issues/289))
 
 BUGFIXES:
