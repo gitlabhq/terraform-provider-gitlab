@@ -51,6 +51,7 @@ func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
 				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
 			},
 			{
+				SkipFunc:                isRunningInCE,
 				ResourceName:            resourceName,
 				ImportState:             true,
 				ImportStateVerify:       true,
