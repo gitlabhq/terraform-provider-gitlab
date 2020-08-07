@@ -227,6 +227,28 @@ func TestAccGitlabProject_templateName(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_templateProjectID(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectTemplateProjectID(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "master",
+					}),
+				),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_willError(t *testing.T) {
 	var received, defaults gitlab.Project
 	rInt := acctest.RandInt()
@@ -697,6 +719,19 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   template_name = "spring"
+  default_branch = "master"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectTemplateProjectID(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+	template_project_id = 3842996
+	use_custom_template= true
   default_branch = "master"
 }
 	`, rInt, rInt)
