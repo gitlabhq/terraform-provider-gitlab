@@ -227,28 +227,6 @@ func TestAccGitlabProject_templateName(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProject_templateProjectID(t *testing.T) {
-	var project gitlab.Project
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabProjectTemplateProjectID(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
-						DefaultBranch: "master",
-					}),
-				),
-			},
-		},
-	})
-}
-
 func TestAccGitlabProject_willError(t *testing.T) {
 	var received, defaults gitlab.Project
 	rInt := acctest.RandInt()
@@ -514,12 +492,10 @@ resource "gitlab_group" "foo" {
   path = "foogroup-%d"
   visibility_level = "public"
 }
-
 resource "gitlab_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
   namespace_id = "${gitlab_group.foo.id}"
-
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
@@ -534,18 +510,15 @@ resource "gitlab_group" "foo" {
   path = "foogroup-%d"
   visibility_level = "public"
 }
-
 resource "gitlab_group" "foo2" {
   name = "foo2group-%d"
   path = "foo2group-%d"
   visibility_level = "public"
 }
-
 resource "gitlab_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
   namespace_id = "${gitlab_group.foo2.id}"
-
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
@@ -565,13 +538,10 @@ resource "gitlab_project" "foo" {
   name = "foo-%d"
   path = "foo.%d"
   description = "Terraform acceptance tests"
-
   %s
-
   tags = [
 	"tag1",
   ]
-
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
@@ -610,19 +580,16 @@ resource "gitlab_project" "foo" {
   name = "foo-%d"
   path = "foo.%d"
   description = "Terraform acceptance tests!"
-
   tags = [
 	"tag1",
 	"tag2",
   ]
-
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
-
   request_access_enabled = false
   issues_enabled = false
   merge_requests_enabled = false
@@ -648,13 +615,11 @@ resource "gitlab_project" "foo" {
   merge_method                                     = "ff"
   only_allow_merge_if_pipeline_succeeds            = false
   only_allow_merge_if_all_discussions_are_resolved = false
-
   shared_with_groups {
      group_id           = "${gitlab_group.foo.id}"
      group_access_level = "developer"
   }
 }
-
 resource "gitlab_group" "foo" {
   name             = "foo-name-%d"
   path             = "foo-path-%d"
@@ -674,7 +639,6 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = false
   only_allow_merge_if_all_discussions_are_resolved = false
-
   shared_with_groups {
       group_id           = "${gitlab_group.foo.id}"
       group_access_level = "guest"
@@ -684,14 +648,12 @@ resource "gitlab_project" "foo" {
       group_access_level = "developer"
   }
 }
-
 resource "gitlab_group" "foo" {
   name             = "foo-name-%d"
   path             = "foo-path-%d"
   description      = "Terraform acceptance tests!"
   visibility_level = "public"
 }
-
 resource "gitlab_group" "foo2" {
   name             = "foo2-name-%d"
   path             = "foo2-path-%d"
@@ -719,19 +681,6 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   template_name = "spring"
-  default_branch = "master"
-}
-	`, rInt, rInt)
-}
-
-func testAccGitlabProjectTemplateProjectID(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  path = "foo.%d"
-  description = "Terraform acceptance tests"
-	template_project_id = 3842996
-	use_custom_template= true
   default_branch = "master"
 }
 	`, rInt, rInt)

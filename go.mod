@@ -5,7 +5,7 @@ replace github.com/xanzy/go-gitlab v0.32.1 => github.com/sfang97/go-gitlab v0.33
 require (
 	github.com/hashicorp/terraform-plugin-sdk v1.13.1
 	github.com/mitchellh/hashstructure v1.0.0
-	github.com/xanzy/go-gitlab v0.32.1
+	github.com/xanzy/go-gitlab v0.34.1
 )
 
 go 1.14
