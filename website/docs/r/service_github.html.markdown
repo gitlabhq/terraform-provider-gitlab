@@ -22,7 +22,7 @@ resource "gitlab_project" "awesome_project" {
 }
 
 resource "gitlab_service_github" "github" {
-  project        = "${gitlab_project.awesome_project.id}"
+  project        = gitlab_project.awesome_project.id
   token          = "REDACTED"
   repository_url = "https://github.com/terraform-providers/terraform-provider-gitlab"
 }

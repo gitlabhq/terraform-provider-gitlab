@@ -20,7 +20,7 @@ resource "gitlab_project" "awesome_project" {
 }
 
 resource "gitlab_service_slack" "slack" {
-  project                    = "${gitlab_project.awesome_project.id}"
+  project                    = gitlab_project.awesome_project.id
   webhook                    = "https://webhook.com"
   username                   = "myuser"
   push_events                = true
