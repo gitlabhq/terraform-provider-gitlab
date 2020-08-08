@@ -1,12 +1,10 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
-	"strings"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
 )
 
 // testAccCompareGitLabAttribute compares an attribute in two ResourceData's for
