@@ -26,8 +26,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -39,8 +39,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.MasterPermissions],
@@ -52,8 +52,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -66,8 +66,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
@@ -82,8 +82,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				Config:      testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
 				ExpectError: regexp.MustCompile("feature unavailable: code owner approvals"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -95,8 +95,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -122,8 +122,8 @@ func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
@@ -138,8 +138,8 @@ func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 				Config:      testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
 				ExpectError: regexp.MustCompile("feature unavailable: code owner approvals"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -151,8 +151,8 @@ func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
@@ -278,8 +278,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
-  project = "${gitlab_project.foo.id}"
+resource "gitlab_branch_protection" "branch_protect" {
+  project = gitlab_project.foo.id
   branch = "BranchProtect-%d"
   push_access_level = "developer"
   merge_access_level = "developer"
@@ -298,8 +298,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
-	project = "${gitlab_project.foo.id}"
+resource "gitlab_branch_protection" "branch_protect" {
+	project = gitlab_project.foo.id
 	branch = "BranchProtect-%d"
 	push_access_level = "maintainer"
 	merge_access_level = "maintainer"
@@ -318,7 +318,7 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
+resource "gitlab_branch_protection" "branch_protect" {
   project = gitlab_project.foo.id
   branch = "BranchProtect-%d"
   push_access_level = "developer"
