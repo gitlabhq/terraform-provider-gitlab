@@ -319,7 +319,7 @@ resource "gitlab_project" "foo" {
 }
 
 resource "gitlab_branch_protection" "BranchProtect" {
-  project = "${gitlab_project.foo.id}"
+  project = gitlab_project.foo.id
   branch = "BranchProtect-%d"
   push_access_level = "developer"
   merge_access_level = "developer"
