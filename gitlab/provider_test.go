@@ -13,6 +13,9 @@ var testAccProvider *schema.Provider
 
 func init() {
 	testAccProvider = Provider().(*schema.Provider)
+	if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
+		panic(err)
+	}
 	testAccProviders = map[string]terraform.ResourceProvider{
 		"gitlab": testAccProvider,
 	}
