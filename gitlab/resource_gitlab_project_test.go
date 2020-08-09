@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"testing"
 
@@ -352,18 +353,55 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	})
 }
 
-func TestAccImportURL(t *testing.T) {
-	var received gitlab.Project
+func TestAccGitlabProject_importURL(t *testing.T) {
+	// Since we do some manual setup in this test, we need to handle the test skip first.
+	if os.Getenv(resource.TestEnvVar) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	}
+
+	client := testAccProvider.Meta().(*gitlab.Client)
+	rInt := acctest.RandInt()
+
+	// Create a base project for importing.
+	baseProject, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+		Name:       gitlab.String(fmt.Sprintf("base-%d", rInt)),
+		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
+	})
+	if err != nil {
+		t.Fatalf("failed to create base project: %v", err)
+	}
+
+	defer client.Projects.DeleteProject(baseProject.ID)
+
+	// Add a file to the base project, for later verifying the import.
+	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
+		Branch:        gitlab.String("master"),
+		CommitMessage: gitlab.String("add file"),
+		Content:       gitlab.String(""),
+	})
+	if err != nil {
+		t.Fatalf("failed to commit file to base project: %v", err)
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testImportURLOptions(),
+				Config: testAccGitlabProjectConfigImportURL(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.import_url", &received),
-					testAccCheckImportURL("gitlab/resource_gitlab_project.go", &received),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
 				),
 			},
 		},
@@ -686,48 +724,16 @@ resource "gitlab_project" "foo" {
 	`, rInt, rInt)
 }
 
-func testImportURLOptions() string {
+func testAccGitlabProjectConfigImportURL(rInt int, importURL string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "import_url" {
-  name = "import"
-  path = "import"
-  description = "Terraform Import URL Acceptance test"
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "master"
+  import_url = "%s"
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  merge_method = "ff"
-  only_allow_merge_if_pipeline_succeeds = true
-  only_allow_merge_if_all_discussions_are_resolved = true
-
-  issues_enabled = false
-  merge_requests_enabled = false
-  approvals_before_merge = 0
-  wiki_enabled = false
-  snippets_enabled = false
-  container_registry_enabled = false
-  shared_runners_enabled = false
-  archived = false
-  import_url = "https://github.com/terraform-providers/terraform-provider-gitlab.git"
-  default_branch = "master"
 }
-	`)
-}
-
-func testAccCheckImportURL(fp string, project *gitlab.Project) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		ref := &gitlab.GetFileOptions{
-			Ref: gitlab.String("master"),
-		}
-		f, _, err := conn.RepositoryFiles.GetFile(project.ID, fp, ref, nil)
-		if err != nil {
-			return fmt.Errorf("Cannot find file %s, error %s\n", fp, err)
-		}
-		if f == nil {
-			return fmt.Errorf("Did not find file\n")
-		}
-
-		return nil
-	}
+`, rInt, importURL)
 }

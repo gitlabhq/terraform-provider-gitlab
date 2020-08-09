@@ -62,6 +62,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			return old == new
 		},
 	},
+	"import_url": {
+		Type:     schema.TypeString,
+		Optional: true,
+		ForceNew: true,
+	},
 	"request_access_enabled": {
 		Type:     schema.TypeBool,
 		Optional: true,
@@ -112,10 +117,6 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:     true,
 		ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 		Default:      "private",
-	},
-	"import_url": {
-		Type:     schema.TypeString,
-		Optional: true,
 	},
 	"merge_method": {
 		Type:         schema.TypeString,
@@ -315,6 +316,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("import_url"); ok {
 		options.ImportURL = gitlab.String(v.(string))
+		setProperties = append(setProperties, "import_url")
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -332,6 +334,28 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	// from this point onwards no matter how we return, resource creation
 	// is committed to state since we set its ID
 	d.SetId(fmt.Sprintf("%d", project.ID))
+
+	if _, ok := d.GetOk("import_url"); ok {
+		log.Printf("[DEBUG] waiting for project %q import to finish", *options.Name)
+
+		stateConf := &resource.StateChangeConf{
+			Pending: []string{"scheduled", "started"},
+			Target:  []string{"finished"},
+			Timeout: time.Minute,
+			Refresh: func() (interface{}, string, error) {
+				status, _, err := client.ProjectImportExport.ImportStatus(d.Id())
+				if err != nil {
+					return nil, "", err
+				}
+
+				return status, status.ImportStatus, nil
+			},
+		}
+
+		if _, err := stateConf.WaitForState(); err != nil {
+			return fmt.Errorf("error while waiting for project %q import to finish: %w", *options.Name, err)
+		}
+	}
 
 	if v, ok := d.GetOk("shared_with_groups"); ok {
 		for _, option := range expandSharedWithGroupsOptions(v) {
@@ -360,7 +384,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
-	var project *gitlab.Project
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
@@ -372,13 +395,6 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] gitlab project %s is marked for deletion", d.Id())
 		d.SetId("")
 		return nil
-	}
-
-	for project.ImportStatus == "started" {
-		project, _, err = client.Projects.GetProject(d.Id(), nil)
-		if err != nil {
-			return err
-		}
 	}
 
 	resourceGitlabProjectSetToState(d, project)
