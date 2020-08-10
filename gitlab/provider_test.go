@@ -12,12 +12,14 @@ var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
 func init() {
-	testAccProvider = Provider().(*schema.Provider)
-	if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
-		panic(err)
-	}
-	testAccProviders = map[string]terraform.ResourceProvider{
-		"gitlab": testAccProvider,
+	if os.Getenv(resource.TestEnvVar) != "" {
+		testAccProvider = Provider().(*schema.Provider)
+		if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
+			panic(err)
+		}
+		testAccProviders = map[string]terraform.ResourceProvider{
+			"gitlab": testAccProvider,
+		}
 	}
 }
 
