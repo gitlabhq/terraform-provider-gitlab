@@ -22,7 +22,33 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectLevelMRApprovalsConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
+					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
+						resetApprovalsOnPush:                      true,
+						disableOverridingApproversPerMergeRequest: true,
+						mergeRequestsAuthorApproval:               true,
+						mergeRequestsDisableCommittersApproval:    true,
+					}),
+				),
+			},
+			{
+				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
+					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
+						resetApprovalsOnPush:                      false,
+						disableOverridingApproversPerMergeRequest: false,
+						mergeRequestsAuthorApproval:               false,
+						mergeRequestsDisableCommittersApproval:    false,
+					}),
+				),
+			},
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectLevelMRApprovalsConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
 					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
@@ -48,14 +74,13 @@ func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
+				Config:   testAccGitlabProjectLevelMRApprovalsConfig(rInt),
 			},
 			{
-				SkipFunc:                isRunningInCE,
-				ResourceName:            resourceName,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"project_id"},
+				SkipFunc:          isRunningInCE,
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -133,7 +158,7 @@ func testAccCheckGitlabProjectLevelMRApprovalsExists(n string, projectApprovals 
 	}
 }
 
-func testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt int) string {
+func testAccGitlabProjectLevelMRApprovalsConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
 	name              = "foo-%d"
@@ -147,6 +172,24 @@ resource "gitlab_project_level_mr_approvals" "foo" {
 	disable_overriding_approvers_per_merge_request = true
 	merge_requests_author_approval                 = true
 	merge_requests_disable_committers_approval     = true
+}
+	`, rInt)
+}
+
+func testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+	name              = "foo-%d"
+	description       = "Terraform acceptance tests"
+	visibility_level  = "public"
+}
+
+resource "gitlab_project_level_mr_approvals" "foo" {
+	project_id                                     = gitlab_project.foo.id
+	reset_approvals_on_push                        = false
+	disable_overriding_approvers_per_merge_request = false
+	merge_requests_author_approval                 = false
+	merge_requests_disable_committers_approval     = false
 }
 	`, rInt)
 }
