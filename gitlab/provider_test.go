@@ -10,6 +10,7 @@ import (
 
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
+
 const TestEnvVar = "TF_ACC"
 
 func init() {
