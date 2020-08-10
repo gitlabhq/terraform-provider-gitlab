@@ -6,7 +6,7 @@ description: |-
   Configures project-level MR approvals.
 ---
 
-# gitlab\_project\_approvals\_configuration
+# gitlab\_project\_level\_mr\_approvals
 
 This resource allows you to configure project-level MR approvals. for your GitLab projects.
 For further information on merge request approvals, consult the [GitLab API
