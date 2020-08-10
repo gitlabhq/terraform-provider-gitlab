@@ -12,7 +12,7 @@ var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
 func init() {
-	if os.Getenv(resource.TestEnvVar) != "" {
+	if os.Getenv(TestEnvVar) != "" {
 		testAccProvider = Provider().(*schema.Provider)
 		if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
 			panic(err)
