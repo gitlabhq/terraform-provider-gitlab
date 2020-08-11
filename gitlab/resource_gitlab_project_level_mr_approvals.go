@@ -19,7 +19,7 @@ func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				ForceNew: true,
 				Required: true,
 			},
