@@ -1,18 +1,18 @@
 package gitlab
 
 import (
-	"os"
-	"testing"
-
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"os"
+	"testing"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
 func init() {
-	if os.Getenv("TF_ACC") != "" {
+	if os.Getenv(resource.TestEnvVar) != "" {
 		testAccProvider = Provider().(*schema.Provider)
 		if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
 			panic(err)
