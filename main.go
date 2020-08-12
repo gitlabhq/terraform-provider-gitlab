@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/gitlabhq/terraform-provider-gitlab/gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"github.com/terraform-providers/terraform-provider-gitlab/gitlab"
 )
 
 func main() {
