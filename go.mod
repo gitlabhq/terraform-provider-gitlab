@@ -1,4 +1,4 @@
-module github.com/terraform-providers/terraform-provider-gitlab
+module github.com/gitlabhq/terraform-provider-gitlab
 
 require (
 	github.com/hashicorp/terraform-plugin-sdk v1.13.1
