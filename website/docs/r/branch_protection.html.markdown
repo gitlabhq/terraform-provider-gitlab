@@ -32,3 +32,9 @@ The following arguments are supported:
 * `push_access_level` - (Required) One of five levels of access to the project.
 
 * `merge_access_level` - (Required) One of five levels of access to the project.
+
+## Importing branch protection
+
+GitLab project group shares can be imported using an id made up of `projectid:branch`, e.g.
+
+    terraform import gitlab_project.example 1337:master

@@ -29,3 +29,9 @@ The following arguments are supported:
 * `tag` - (Required) Name of the tag or wildcard.
 
 * `create_access_level` - (Required) One of five levels of access to the project.
+
+## Importing tag protection
+
+GitLab project group shares can be imported using an id made up of `projectid:tagpattern`, e.g.
+
+    terraform import gitlab_project.example 12345:TagProtected
