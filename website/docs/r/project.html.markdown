@@ -6,7 +6,7 @@ description: |-
   Creates and manages projects within GitLab groups or within your user
 ---
 
-# gitlab_project
+# gitlab\_project
 
 This resource allows you to create and manage projects within your
 GitLab group or within your user.
