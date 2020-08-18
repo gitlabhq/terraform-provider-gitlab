@@ -26,7 +26,7 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 				Config:   testAccGitlabServiceGithubConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceGithubExists(githubResourceName, &githubService),
-					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/terraform-providers/terraform-provider-gitlab"),
+					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/gitlabhq/terraform-provider-gitlab"),
 					resource.TestCheckResourceAttr(githubResourceName, "static_context", "true"),
 				),
 			},
@@ -46,7 +46,7 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 				Config:   testAccGitlabServiceGithubConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceGithubExists(githubResourceName, &githubService),
-					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/terraform-providers/terraform-provider-gitlab"),
+					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/gitlabhq/terraform-provider-gitlab"),
 					resource.TestCheckResourceAttr(githubResourceName, "static_context", "true"),
 				),
 			},
@@ -155,7 +155,7 @@ resource "gitlab_project" "foo" {
 resource "gitlab_service_github" "github" {
 	project        = "${gitlab_project.foo.id}"
 	token          = "test"
-  repository_url = "https://github.com/terraform-providers/terraform-provider-gitlab"
+  repository_url = "https://github.com/gitlabhq/terraform-provider-gitlab"
 }
 `, rInt)
 }

@@ -188,7 +188,7 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 			return err
 		}
 		// Fixes groups API async deletion issue
-		// https://github.com/terraform-providers/terraform-provider-gitlab/issues/319
+		// https://github.com/gitlabhq/terraform-provider-gitlab/issues/319
 		for start := time.Now(); time.Since(start) < 15*time.Second; {
 			g, resp, err := conn.Groups.GetGroup(group.ID)
 			if resp != nil && resp.StatusCode == http.StatusNotFound {

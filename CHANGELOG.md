@@ -3,116 +3,116 @@
 
 ENHANCEMENTS:
 * Improvements to resource `gitlab_user` import
-  ([#340](https://github.com/terraform-providers/terraform-provider-gitlab/issues/340))
+  ([#340](https://github.com/gitlabhq/terraform-provider-gitlab/issues/340))
 
 ## 2.10.0 (June 09, 2020)
 
 FEATURES:
 * **New Resource:** `gitlab_service_github`
-  ([#311](https://github.com/terraform-providers/terraform-provider-gitlab/issues/311))
+  ([#311](https://github.com/gitlabhq/terraform-provider-gitlab/issues/311))
 
 ENHANCEMENTS:
 * add attribute `remove_source_branch_after_merge` to projects
-  ([#289](https://github.com/terraform-providers/terraform-provider-gitlab/issues/289))
+  ([#289](https://github.com/gitlabhq/terraform-provider-gitlab/issues/289))
 
 BUGFIXES:
 * fix for flaky `gitlab_group` tests
-  ([#320](https://github.com/terraform-providers/terraform-provider-gitlab/issues/320))
+  ([#320](https://github.com/gitlabhq/terraform-provider-gitlab/issues/320))
 * Creating custom skip function for group_ldap_link tests.
-  ([#328](https://github.com/terraform-providers/terraform-provider-gitlab/issues/328))
+  ([#328](https://github.com/gitlabhq/terraform-provider-gitlab/issues/328))
 
 ## 2.9.0 (June 01, 2020)
 
 FEATURES:
 * **New DataSource:** `gitlab_projects`
-  ([#279](https://github.com/terraform-providers/terraform-provider-gitlab/issues/279))
+  ([#279](https://github.com/gitlabhq/terraform-provider-gitlab/issues/279))
 * **New Resource:** `gitlab_deploy_token`
-  ([#284](https://github.com/terraform-providers/terraform-provider-gitlab/issues/284))
+  ([#284](https://github.com/gitlabhq/terraform-provider-gitlab/issues/284))
 
 ENHANCEMENTS:
 * Add `management_project_id` for Group and Project Clusters
-  ([#301](https://github.com/terraform-providers/terraform-provider-gitlab/issues/301))
+  ([#301](https://github.com/gitlabhq/terraform-provider-gitlab/issues/301))
 
 ## 2.8.0 (May 28, 2020)
 
 FEATURES:
 * **New Resource:** `gitlab_group_ldap_link`
-  ([#296](https://github.com/terraform-providers/terraform-provider-gitlab/issues/296),
-   [#316](https://github.com/terraform-providers/terraform-provider-gitlab/issues/316))
+  ([#296](https://github.com/gitlabhq/terraform-provider-gitlab/issues/296),
+   [#316](https://github.com/gitlabhq/terraform-provider-gitlab/issues/316))
 
 ENHANCEMENTS:
 
 * Update resource gitlab_group_label to read labels from all pages
-  ([#302](https://github.com/terraform-providers/terraform-provider-gitlab/issues/302))
+  ([#302](https://github.com/gitlabhq/terraform-provider-gitlab/issues/302))
 * Provide a way to specify client cert and key
-  ([#315](https://github.com/terraform-providers/terraform-provider-gitlab/issues/315))
+  ([#315](https://github.com/gitlabhq/terraform-provider-gitlab/issues/315))
 
 BUGFIXES:
 * Increase MaxIdleConnsPerHost in http.Transport
-  ([#305](https://github.com/terraform-providers/terraform-provider-gitlab/issues/305))
+  ([#305](https://github.com/gitlabhq/terraform-provider-gitlab/issues/305))
 
 ## 2.7.0 (May 20, 2020)
 
 * Implement `masked` parameters for `gitlab_group_variable`
-  ([#271](https://github.com/terraform-providers/terraform-provider-gitlab/issues/271))
+  ([#271](https://github.com/gitlabhq/terraform-provider-gitlab/issues/271))
 
 ## 2.6.0 (April 08, 2020)
 
 ENHANCEMENTS:
 * Add jira flags
-  ([#274](https://github.com/terraform-providers/terraform-provider-gitlab/issues/274))
+  ([#274](https://github.com/gitlabhq/terraform-provider-gitlab/issues/274))
 
 ## 2.5.1 (April 06, 2020)
 
 BUGFIXES:
 * Support for soft-delete of groups and projects in Gitlab Enterprise Edition 
-  ([#282](https://github.com/terraform-providers/terraform-provider-gitlab/issues/282),
-   [#283](https://github.com/terraform-providers/terraform-provider-gitlab/issues/283),
-   [#285](https://github.com/terraform-providers/terraform-provider-gitlab/issues/285),
-   [#291](https://github.com/terraform-providers/terraform-provider-gitlab/issues/291))
+  ([#282](https://github.com/gitlabhq/terraform-provider-gitlab/issues/282),
+   [#283](https://github.com/gitlabhq/terraform-provider-gitlab/issues/283),
+   [#285](https://github.com/gitlabhq/terraform-provider-gitlab/issues/285),
+   [#291](https://github.com/gitlabhq/terraform-provider-gitlab/issues/291))
 
 ENHANCEMENTS:
 * Switched from Travis CI to Github Actions 
-  ([#216](https://github.com/terraform-providers/terraform-provider-gitlab/issues/216))
+  ([#216](https://github.com/gitlabhq/terraform-provider-gitlab/issues/216))
 
 ## 2.5.0 (December 05, 2019)
 
 ENHANCEMENTS:
 * Implement `lfs_enabled`, `request_access_enabled`, and `pipelines_enabled` parameters for `gitlab_project`
-  ([#225](https://github.com/terraform-providers/terraform-provider-gitlab/pull/225),
-   [#226](https://github.com/terraform-providers/terraform-provider-gitlab/pull/226),
-   [#227](https://github.com/terraform-providers/terraform-provider-gitlab/pull/227))
+  ([#225](https://github.com/gitlabhq/terraform-provider-gitlab/pull/225),
+   [#226](https://github.com/gitlabhq/terraform-provider-gitlab/pull/226),
+   [#227](https://github.com/gitlabhq/terraform-provider-gitlab/pull/227))
 
 BUGFIXES:
 * Fix label support when there is more than 20 labels on a project
-  ([#229](https://github.com/terraform-providers/terraform-provider-gitlab/pull/229))
+  ([#229](https://github.com/gitlabhq/terraform-provider-gitlab/pull/229))
 * Enable `environment_scope` for `gitlab_project_variable` lookup
-  ([#228](https://github.com/terraform-providers/terraform-provider-gitlab/pull/229))
+  ([#228](https://github.com/gitlabhq/terraform-provider-gitlab/pull/229))
 * Fix users data source when there is more than 20 users returned
-  ([#230](https://github.com/terraform-providers/terraform-provider-gitlab/pull/230))
+  ([#230](https://github.com/gitlabhq/terraform-provider-gitlab/pull/230))
 
 ## 2.4.0 (November 28, 2019)
 
 FEATURES:
-* **New Resource:** `gitlab_group_label` ([#186](https://github.com/terraform-providers/terraform-provider-gitlab/pull/186))
+* **New Resource:** `gitlab_group_label` ([#186](https://github.com/gitlabhq/terraform-provider-gitlab/pull/186))
 * **New Resource:** `gitlab_group_cluster`
-  ([#178](https://github.com/terraform-providers/terraform-provider-gitlab/pull/178))
+  ([#178](https://github.com/gitlabhq/terraform-provider-gitlab/pull/178))
 * **New Resource:** `gitlab_pipeline_schedule_variable`
-  ([#204](https://github.com/terraform-providers/terraform-provider-gitlab/pull/204))
+  ([#204](https://github.com/gitlabhq/terraform-provider-gitlab/pull/204))
 
 ENHANCEMENTS:
-* Add `runners_token` to gitlab groups ([#218](https://github.com/terraform-providers/terraform-provider-gitlab/pull/218))
-* Add `reset_password` to `gitlab_user` ([#127](https://github.com/terraform-providers/terraform-provider-gitlab/pull/127))
-* Update `access_level` available values ([#220](https://github.com/terraform-providers/terraform-provider-gitlab/pull/220))
+* Add `runners_token` to gitlab groups ([#218](https://github.com/gitlabhq/terraform-provider-gitlab/pull/218))
+* Add `reset_password` to `gitlab_user` ([#127](https://github.com/gitlabhq/terraform-provider-gitlab/pull/127))
+* Update `access_level` available values ([#220](https://github.com/gitlabhq/terraform-provider-gitlab/pull/220))
 * Make read callbacks graceful for `gitlab_project_share_group`, `gitlab_branch_protection` and
-  `gitlab_label` resources ([#223](https://github.com/terraform-providers/terraform-provider-gitlab/pull/223))
+  `gitlab_label` resources ([#223](https://github.com/gitlabhq/terraform-provider-gitlab/pull/223))
 
 
 BUGFIXES:
 * Fix state not being updated for `gitlab_branch_protection`
-  ([#166](https://github.com/terraform-providers/terraform-provider-gitlab/pull/166))
+  ([#166](https://github.com/gitlabhq/terraform-provider-gitlab/pull/166))
 * Set ForceNew for `gitlab_pipeline_schedule` `project`
-  ([#203](https://github.com/terraform-providers/terraform-provider-gitlab/pull/203))
+  ([#203](https://github.com/gitlabhq/terraform-provider-gitlab/pull/203))
 
 ## 2.3.0 (October 17, 2019)
 
@@ -120,37 +120,37 @@ BUGFIXES:
 is now tested against Gitlab CE and Gitlab EE.*
 
 FEATURES:
-* **New Resource:** `gitlab_project_push_rules` ([#163](https://github.com/terraform-providers/terraform-provider-gitlab/pull/163))
-* **New Resource:** `gitlab_deploy_key_enable` ([#176](https://github.com/terraform-providers/terraform-provider-gitlab/pull/176))
-* **New Resource:** `gitlab_project_share_group` ([#167](https://github.com/terraform-providers/terraform-provider-gitlab/pull/167))
+* **New Resource:** `gitlab_project_push_rules` ([#163](https://github.com/gitlabhq/terraform-provider-gitlab/pull/163))
+* **New Resource:** `gitlab_deploy_key_enable` ([#176](https://github.com/gitlabhq/terraform-provider-gitlab/pull/176))
+* **New Resource:** `gitlab_project_share_group` ([#167](https://github.com/gitlabhq/terraform-provider-gitlab/pull/167))
 
 ENHANCEMENTS:
-* Add `initialize_with_readme` to `gitlab_project` ([#179](https://github.com/terraform-providers/terraform-provider-gitlab/issues/179))
-* Add support for more variable options ([#169](https://github.com/terraform-providers/terraform-provider-gitlab/issues/169))
-* Documentation improvements ([#168](https://github.com/terraform-providers/terraform-provider-gitlab/issues/168), [#187](https://github.com/terraform-providers/terraform-provider-gitlab/issues/187), [#171](https://github.com/terraform-providers/terraform-provider-gitlab/issues/171))
+* Add `initialize_with_readme` to `gitlab_project` ([#179](https://github.com/gitlabhq/terraform-provider-gitlab/issues/179))
+* Add support for more variable options ([#169](https://github.com/gitlabhq/terraform-provider-gitlab/issues/169))
+* Documentation improvements ([#168](https://github.com/gitlabhq/terraform-provider-gitlab/issues/168), [#187](https://github.com/gitlabhq/terraform-provider-gitlab/issues/187), [#171](https://github.com/gitlabhq/terraform-provider-gitlab/issues/171))
 
 BUGFIXES:
 * Fix tag protection URL
-  ([#156](https://github.com/terraform-providers/terraform-provider-gitlab/issues/156))
+  ([#156](https://github.com/gitlabhq/terraform-provider-gitlab/issues/156))
 * Properly manage the default branch in a git repo
-  ([#158](https://github.com/terraform-providers/terraform-provider-gitlab/issues/158))
+  ([#158](https://github.com/gitlabhq/terraform-provider-gitlab/issues/158))
 * Resolve triggers pagination issue by calling `GetPipelineTrigger`
-  ([#173](https://github.com/terraform-providers/terraform-provider-gitlab/issues/173))
+  ([#173](https://github.com/gitlabhq/terraform-provider-gitlab/issues/173))
 
 ## 2.2.0 (June 12, 2019)
 
 FEATURES:
-* **New Resource:** `gitlab_service_jira` ([#101](https://github.com/terraform-providers/terraform-provider-gitlab/pull/101))
-* **New Resource:** `gitlab_pipeline_schedule` ([#116](https://github.com/terraform-providers/terraform-provider-gitlab/pull/116))
+* **New Resource:** `gitlab_service_jira` ([#101](https://github.com/gitlabhq/terraform-provider-gitlab/pull/101))
+* **New Resource:** `gitlab_pipeline_schedule` ([#116](https://github.com/gitlabhq/terraform-provider-gitlab/pull/116))
 
 ENHANCEMENTS:
-* Add `archived` argument to `gitlab_project` ([#148](https://github.com/terraform-providers/terraform-provider-gitlab/issues/148))
-* Add `managed` argument to `gitlab_project_cluster` ([#137](https://github.com/terraform-providers/terraform-provider-gitlab/issues/137))
+* Add `archived` argument to `gitlab_project` ([#148](https://github.com/gitlabhq/terraform-provider-gitlab/issues/148))
+* Add `managed` argument to `gitlab_project_cluster` ([#137](https://github.com/gitlabhq/terraform-provider-gitlab/issues/137))
 
 ## 2.1.0 (May 29, 2019)
 
 FEATURES:
-* **New Datasource**: `gitlab_group` ([#129](https://github.com/terraform-providers/terraform-provider-gitlab/issues/129))
+* **New Datasource**: `gitlab_group` ([#129](https://github.com/gitlabhq/terraform-provider-gitlab/issues/129))
 
 
 ## 2.0.0 (May 23, 2019)
@@ -163,46 +163,46 @@ BACKWARDS INCOMPATIBILITIES:
   the state (e.g. `terraform state rm`). We have done this because we can not
   make the difference between permission denied and resources removed outside of
   terraform (gitlab returns 404 in both cases)
-  ([#130](https://github.com/terraform-providers/terraform-provider-gitlab/pull/130))
+  ([#130](https://github.com/gitlabhq/terraform-provider-gitlab/pull/130))
 
 
 FEATURES:
-* **New Resource:** `gitlab_tag_protection` ([#125](https://github.com/terraform-providers/terraform-provider-gitlab/pull/125))
+* **New Resource:** `gitlab_tag_protection` ([#125](https://github.com/gitlabhq/terraform-provider-gitlab/pull/125))
 
 
 ENHANCEMENTS:
-* Add `container_registry_enabled` argument to `gitlab_project` ([#115](https://github.com/terraform-providers/terraform-provider-gitlab/issues/115))
-* Add `shared_runners_enabled` argument to `gitlab_project` ([#134](https://github.com/terraform-providers/terraform-provider-gitlab/issues/134) [#104](https://github.com/terraform-providers/terraform-provider-gitlab/issues/104))
+* Add `container_registry_enabled` argument to `gitlab_project` ([#115](https://github.com/gitlabhq/terraform-provider-gitlab/issues/115))
+* Add `shared_runners_enabled` argument to `gitlab_project` ([#134](https://github.com/gitlabhq/terraform-provider-gitlab/issues/134) [#104](https://github.com/gitlabhq/terraform-provider-gitlab/issues/104))
 
 ## 1.3.0 (May 03, 2019)
 
 FEATURES:
-* **New Resource:** `gitlab_service_slack` ([#96](https://github.com/terraform-providers/terraform-provider-gitlab/issues/96))
-* **New Resource:** `gitlab_branch_protection` ([#68](https://github.com/terraform-providers/terraform-provider-gitlab/issues/68))
+* **New Resource:** `gitlab_service_slack` ([#96](https://github.com/gitlabhq/terraform-provider-gitlab/issues/96))
+* **New Resource:** `gitlab_branch_protection` ([#68](https://github.com/gitlabhq/terraform-provider-gitlab/issues/68))
 
 ENHANCEMENTS:
-* Support for request/response logging when >`DEBUG` severity is set ([#93](https://github.com/terraform-providers/terraform-provider-gitlab/issues/93))
-* Datasource `gitlab_user` supports user_id, email lookup and return lots of new attributes ([#102](https://github.com/terraform-providers/terraform-provider-gitlab/issues/102))
-* Resource `gitlab_deploy_key` can now be imported ([#197](https://github.com/terraform-providers/terraform-provider-gitlab/issues/97))
-* Add `tags` attribute for `gitlab_project` ([#106](https://github.com/terraform-providers/terraform-provider-gitlab/pull/106))
+* Support for request/response logging when >`DEBUG` severity is set ([#93](https://github.com/gitlabhq/terraform-provider-gitlab/issues/93))
+* Datasource `gitlab_user` supports user_id, email lookup and return lots of new attributes ([#102](https://github.com/gitlabhq/terraform-provider-gitlab/issues/102))
+* Resource `gitlab_deploy_key` can now be imported ([#197](https://github.com/gitlabhq/terraform-provider-gitlab/issues/97))
+* Add `tags` attribute for `gitlab_project` ([#106](https://github.com/gitlabhq/terraform-provider-gitlab/pull/106))
 
 
 BUGFIXES:
-* Documentation fixes ([#108](https://github.com/terraform-providers/terraform-provider-gitlab/issues/108), [#113](https://github.com/terraform-providers/terraform-provider-gitlab/issues/113))
+* Documentation fixes ([#108](https://github.com/gitlabhq/terraform-provider-gitlab/issues/108), [#113](https://github.com/gitlabhq/terraform-provider-gitlab/issues/113))
 
 ## 1.2.0 (February 19, 2019)
 
 FEATURES:
 
-* **New Datasource:** `gitlab_users` ([#79](https://github.com/terraform-providers/terraform-provider-gitlab/issues/79))
-* **New Resource:** `gitlab_pipeline_trigger` ([#82](https://github.com/terraform-providers/terraform-provider-gitlab/issues/82))
-* **New Resource:** `gitlab_project_cluster` ([#87](https://github.com/terraform-providers/terraform-provider-gitlab/issues/87))
+* **New Datasource:** `gitlab_users` ([#79](https://github.com/gitlabhq/terraform-provider-gitlab/issues/79))
+* **New Resource:** `gitlab_pipeline_trigger` ([#82](https://github.com/gitlabhq/terraform-provider-gitlab/issues/82))
+* **New Resource:** `gitlab_project_cluster` ([#87](https://github.com/gitlabhq/terraform-provider-gitlab/issues/87))
 
 ENHANCEMENTS:
 
-* Supports "No one" and "maintainer" permissions ([#83](https://github.com/terraform-providers/terraform-provider-gitlab/issues/83))
-* `gitlab_project.shared_with_groups` is now order-independent ([#86](https://github.com/terraform-providers/terraform-provider-gitlab/issues/86))
-* add `merge_method`, `only_allow_merge_if_*`, `approvals_before_merge` parameters to `gitlab_project` ([#72](https://github.com/terraform-providers/terraform-provider-gitlab/issues/72), [#88](https://github.com/terraform-providers/terraform-provider-gitlab/issues/88))
+* Supports "No one" and "maintainer" permissions ([#83](https://github.com/gitlabhq/terraform-provider-gitlab/issues/83))
+* `gitlab_project.shared_with_groups` is now order-independent ([#86](https://github.com/gitlabhq/terraform-provider-gitlab/issues/86))
+* add `merge_method`, `only_allow_merge_if_*`, `approvals_before_merge` parameters to `gitlab_project` ([#72](https://github.com/gitlabhq/terraform-provider-gitlab/issues/72), [#88](https://github.com/gitlabhq/terraform-provider-gitlab/issues/88))
 
 
 ## 1.1.0 (January 14, 2019)
@@ -210,9 +210,9 @@ ENHANCEMENTS:
 FEATURES:
 
 * **New Resource:** `gitlab_project_membership`
-* **New Resource:** `gitlab_group_membership` ([#8](https://github.com/terraform-providers/terraform-provider-gitlab/issues/8))
-* **New Resource:** `gitlab_project_variable` ([#47](https://github.com/terraform-providers/terraform-provider-gitlab/issues/47))
-* **New Resource:** `gitlab_group_variable` ([#47](https://github.com/terraform-providers/terraform-provider-gitlab/issues/47))
+* **New Resource:** `gitlab_group_membership` ([#8](https://github.com/gitlabhq/terraform-provider-gitlab/issues/8))
+* **New Resource:** `gitlab_project_variable` ([#47](https://github.com/gitlabhq/terraform-provider-gitlab/issues/47))
+* **New Resource:** `gitlab_group_variable` ([#47](https://github.com/gitlabhq/terraform-provider-gitlab/issues/47))
 
 BACKWARDS INCOMPATIBILITIES:
 
@@ -227,13 +227,13 @@ terraform import gitlab_project_membership.foo 12345:1337
 
 BACKWARDS INCOMPATIBILITIES:
 
-* This provider now uses the v4 api. It means that if you set up a custom API url, you need to update it to use the /api/v4 url. As a side effect, we no longer support Gitlab < 9.0. ([#20](https://github.com/terraform-providers/terraform-provider-gitlab/issues/20))
+* This provider now uses the v4 api. It means that if you set up a custom API url, you need to update it to use the /api/v4 url. As a side effect, we no longer support Gitlab < 9.0. ([#20](https://github.com/gitlabhq/terraform-provider-gitlab/issues/20))
 * We now support Parent ID for `gitlab_groups`. However, due to a limitation in
   the gitlab API, changing a Parent ID requires destroying and recreating the
   group. Since previous versions of this provider did not support it, there are
   chances that terraform will try do delete all your nested group when you
   update to 1.0.0. A workaround to prevent this is to use the `ignore_changes`
-  lifecycle parameter. ([#28](https://github.com/terraform-providers/terraform-provider-gitlab/issues/28))
+  lifecycle parameter. ([#28](https://github.com/gitlabhq/terraform-provider-gitlab/issues/28))
 
 ```
 resource "gitlab_group" "nested_group" {
@@ -247,18 +247,18 @@ resource "gitlab_group" "nested_group" {
 
 FEATURES:
 
-* **New Resource:** `gitlab_user` ([#23](https://github.com/terraform-providers/terraform-provider-gitlab/issues/23))
-* **New Resource:** `gitlab_label` ([#22](https://github.com/terraform-providers/terraform-provider-gitlab/issues/22))
+* **New Resource:** `gitlab_user` ([#23](https://github.com/gitlabhq/terraform-provider-gitlab/issues/23))
+* **New Resource:** `gitlab_label` ([#22](https://github.com/gitlabhq/terraform-provider-gitlab/issues/22))
 
 IMPROVEMENTS:
 
-* Add `cacert_file` and `insecure` options to the provider. ([#5](https://github.com/terraform-providers/terraform-provider-gitlab/issues/5))
-* Fix race conditions with `gitlab_project` deletion. ([#19](https://github.com/terraform-providers/terraform-provider-gitlab/issues/19))
-* Add `parent_id` argument to `gitlab_group`. ([#28](https://github.com/terraform-providers/terraform-provider-gitlab/issues/28))
-* Add support for `gitlab_project` import. ([#30](https://github.com/terraform-providers/terraform-provider-gitlab/issues/30))
-* Add support for `gitlab_groups` import. ([#31](https://github.com/terraform-providers/terraform-provider-gitlab/issues/31))
-* Add `path` argument for `gitlab_project`. ([#21](https://github.com/terraform-providers/terraform-provider-gitlab/issues/21))
-* Fix indempotency issue with `gitlab_deploy_key` and white spaces. ([#34](https://github.com/terraform-providers/terraform-provider-gitlab/issues/34))
+* Add `cacert_file` and `insecure` options to the provider. ([#5](https://github.com/gitlabhq/terraform-provider-gitlab/issues/5))
+* Fix race conditions with `gitlab_project` deletion. ([#19](https://github.com/gitlabhq/terraform-provider-gitlab/issues/19))
+* Add `parent_id` argument to `gitlab_group`. ([#28](https://github.com/gitlabhq/terraform-provider-gitlab/issues/28))
+* Add support for `gitlab_project` import. ([#30](https://github.com/gitlabhq/terraform-provider-gitlab/issues/30))
+* Add support for `gitlab_groups` import. ([#31](https://github.com/gitlabhq/terraform-provider-gitlab/issues/31))
+* Add `path` argument for `gitlab_project`. ([#21](https://github.com/gitlabhq/terraform-provider-gitlab/issues/21))
+* Fix indempotency issue with `gitlab_deploy_key` and white spaces. ([#34](https://github.com/gitlabhq/terraform-provider-gitlab/issues/34))
 
 ## 0.1.0 (June 20, 2017)
 
