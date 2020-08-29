@@ -168,6 +168,9 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 
 func resourceGitlabProjectMirrorSetToState(d *schema.ResourceData, projectMirror *gitlab.ProjectMirror, projectID *string) {
 	d.Set("enabled", projectMirror.Enabled)
-	d.Set("only_protected_branches", projectMirror.OnlyProtectedBranches)
+	d.Set("mirror_id", projectMirror.ID)
 	d.Set("keep_divergent_refs", projectMirror.KeepDivergentRefs)
+	d.Set("only_protected_branches", projectMirror.OnlyProtectedBranches)
+	d.Set("project", projectID)
+	d.Set("url", projectMirror.URL)
 }
