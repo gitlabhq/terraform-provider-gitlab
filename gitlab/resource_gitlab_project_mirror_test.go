@@ -1,7 +1,5 @@
 package gitlab
 
-// TODO convert to handle project mirror.
-
 import (
 	"errors"
 	"fmt"
@@ -79,10 +77,10 @@ func TestAccGitlabProjectMirror_import(t *testing.T) {
 				Config: testAccGitlabProjectMirrorConfig(rInt),
 			},
 			{
-				ResourceName:            "gitlab_project_mirror.foo",
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"enabled", "mirror_id", "project", "url"},
+				ResourceName:      "gitlab_project_mirror.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				//ImportStateVerifyIgnore: []string{"enabled", "mirror_id", "project", "url"},
 			},
 		},
 	})
@@ -137,13 +135,13 @@ func testAccCheckGitlabProjectMirrorAttributes(mirror *gitlab.ProjectMirror, wan
 		}
 
 		if mirror.Enabled != want.Enabled {
-			return fmt.Errorf("got enable_ssl_verification %t; want %t", mirror.Enabled, want.Enabled)
+			return fmt.Errorf("got enabled %t; want %t", mirror.Enabled, want.Enabled)
 		}
 		if mirror.OnlyProtectedBranches != want.OnlyProtectedBranches {
-			return fmt.Errorf("got enable_ssl_verification %t; want %t", mirror.OnlyProtectedBranches, want.OnlyProtectedBranches)
+			return fmt.Errorf("got only protected branches %t; want %t", mirror.OnlyProtectedBranches, want.OnlyProtectedBranches)
 		}
 		if mirror.KeepDivergentRefs != want.KeepDivergentRefs {
-			return fmt.Errorf("got enable_ssl_verification %t; want %t", mirror.KeepDivergentRefs, want.KeepDivergentRefs)
+			return fmt.Errorf("got keep divergent refs %t; want %t", mirror.KeepDivergentRefs, want.KeepDivergentRefs)
 		}
 		return nil
 	}

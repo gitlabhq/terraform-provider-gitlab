@@ -11,10 +11,10 @@ import (
 
 func resourceGitlabProjectMirror() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabMirrorCreate,
+		Create: resourceGitlabProjectMirrorCreate,
 		Read:   resourceGitlabProjectMirrorRead,
-		Update: resourceGitlabMirrorUpdate,
-		Delete: resourceGitlabMirrorDelete,
+		Update: resourceGitlabProjectMirrorUpdate,
+		Delete: resourceGitlabProjectMirrorDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -53,7 +53,7 @@ func resourceGitlabProjectMirror() *schema.Resource {
 	}
 }
 
-func resourceGitlabMirrorCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	projectID := d.Get("project").(string)
@@ -82,7 +82,7 @@ func resourceGitlabMirrorCreate(d *schema.ResourceData, meta interface{}) error 
 	return resourceGitlabProjectMirrorRead(d, meta)
 }
 
-func resourceGitlabMirrorUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	mirrorID := d.Get("mirror_id").(int)
@@ -106,7 +106,7 @@ func resourceGitlabMirrorUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 // Documented remote mirrors API does not support a delete method, instead mirror is disabled.
-func resourceGitlabMirrorDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	enabled := false
@@ -167,10 +167,7 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 }
 
 func resourceGitlabProjectMirrorSetToState(d *schema.ResourceData, projectMirror *gitlab.ProjectMirror, projectID *string) {
-
-	mirrorID := strconv.Itoa(projectMirror.ID)
 	d.Set("enabled", projectMirror.Enabled)
 	d.Set("only_protected_branches", projectMirror.OnlyProtectedBranches)
 	d.Set("keep_divergent_refs", projectMirror.KeepDivergentRefs)
-	d.SetId(buildTwoPartID(projectID, &mirrorID))
 }
