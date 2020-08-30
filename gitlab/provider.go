@@ -88,6 +88,8 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_share_group":        resourceGitlabProjectShareGroup(),
 			"gitlab_group_cluster":              resourceGitlabGroupCluster(),
 			"gitlab_group_ldap_link":            resourceGitlabGroupLdapLink(),
+			"gitlab_repository_file":            resourceGitlabRepositoryFile(),
+			"gitlab_environment":                resourceGitlabEnvironment(),
 		},
 
 		ConfigureFunc: providerConfigure,
