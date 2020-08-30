@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -62,12 +61,6 @@ func resourceGitlabRepositoryFileCreate(d *schema.ResourceData, meta interface{}
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
 		Encoding:      gitlab.String("base64"),
 	}
-
-	// Sleep so the API doesn't derp out
-	rand.Seed(time.Now().UnixNano())
-	n := rand.Intn(30)
-	nPlus := n + 2
-	time.Sleep(time.Duration(nPlus) * time.Second)
 
 	repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, file, options)
 	if err != nil {
@@ -152,12 +145,6 @@ func resourceGitlabRepositoryFileDelete(d *schema.ResourceData, meta interface{}
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
 		//TODO: add LastCommitID
 	}
-
-	// Sleep so the API doesn't derp out
-	rand.Seed(time.Now().UnixNano())
-	n := rand.Intn(30)
-	nPlus := n + 2
-	time.Sleep(time.Duration(nPlus) * time.Second)
 
 	resp, err := client.RepositoryFiles.DeleteFile(project, file, options)
 	if err != nil {
