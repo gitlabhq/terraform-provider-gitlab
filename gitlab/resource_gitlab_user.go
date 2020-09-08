@@ -48,7 +48,6 @@ func resourceGitlabUser() *schema.Resource {
 			"email": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -92,6 +91,10 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("name", user.Name)
 	d.Set("can_create_group", user.CanCreateGroup)
 	d.Set("projects_limit", user.ProjectsLimit)
+	d.Set("email", user.Email)
+	d.Set("is_admin", user.IsAdmin)
+	d.Set("is_external", user.External)
+	d.Set("skip_confirmation", !user.ConfirmedAt.IsZero())
 }
 
 func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
@@ -117,8 +120,6 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
-	d.Set("is_admin", user.IsAdmin)
-	d.Set("is_external", user.External)
 
 	return resourceGitlabUserRead(d, meta)
 }
@@ -151,6 +152,11 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.Username = gitlab.String(d.Get("username").(string))
 	}
 
+	if d.HasChange("email") {
+		options.Email = gitlab.String(d.Get("email").(string))
+		options.SkipReconfirmation = gitlab.Bool(true)
+	}
+
 	if d.HasChange("is_admin") {
 		options.Admin = gitlab.Bool(d.Get("is_admin").(bool))
 	}
@@ -164,7 +170,7 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if d.HasChange("is_external") {
-		options.Admin = gitlab.Bool(d.Get("is_external").(bool))
+		options.External = gitlab.Bool(d.Get("is_external").(bool))
 	}
 
 	log.Printf("[DEBUG] update gitlab user %s", d.Id())

@@ -26,7 +26,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            "listest%d@ssss.com",
+						Email:            fmt.Sprintf("listest%d@ssss.com", rInt),
 						Password:         fmt.Sprintf("test%dtt", rInt),
 						Username:         fmt.Sprintf("listest%d", rInt),
 						Name:             fmt.Sprintf("foo %d", rInt),
@@ -38,13 +38,13 @@ func TestAccGitlabUser_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the user to change the name
+			// Update the user to change the name, email, projects_limit and more
 			{
 				Config: testAccGitlabUserUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            "listest%d@ssss.com",
+						Email:            fmt.Sprintf("listest%d@tttt.com", rInt),
 						Password:         fmt.Sprintf("test%dtt", rInt),
 						Username:         fmt.Sprintf("listest%d", rInt),
 						Name:             fmt.Sprintf("bar %d", rInt),
@@ -52,7 +52,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:            true,
 						CanCreateGroup:   true,
 						SkipConfirmation: false,
-						External:         true,
+						External:         false,
 					}),
 				),
 			},
@@ -62,7 +62,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            "listest%d@ssss.com",
+						Email:            fmt.Sprintf("listest%d@ssss.com", rInt),
 						Password:         fmt.Sprintf("test%dtt", rInt),
 						Username:         fmt.Sprintf("listest%d", rInt),
 						Name:             fmt.Sprintf("foo %d", rInt),
@@ -151,6 +151,26 @@ func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUser
 			return fmt.Errorf("got username %q; want %q", user.Username, want.Username)
 		}
 
+		if user.Email != want.Email {
+			return fmt.Errorf("got email %q; want %q", user.Email, want.Email)
+		}
+
+		if user.CanCreateGroup != want.CanCreateGroup {
+			return fmt.Errorf("got can_create_group %t; want %t", user.CanCreateGroup, want.CanCreateGroup)
+		}
+
+		if user.External != want.External {
+			return fmt.Errorf("got is_external %t; want %t", user.External, want.External)
+		}
+
+		if user.IsAdmin != want.Admin {
+			return fmt.Errorf("got is_admin %t; want %t", user.IsAdmin, want.Admin)
+		}
+
+		if user.ProjectsLimit != want.ProjectsLimit {
+			return fmt.Errorf("got projects_limit %d; want %d", user.ProjectsLimit, want.ProjectsLimit)
+		}
+
 		return nil
 	}
 }
@@ -200,11 +220,11 @@ resource "gitlab_user" "foo" {
   name             = "bar %d"
   username         = "listest%d"
   password         = "test%dtt"
-  email            = "listest%d@ssss.com"
+  email            = "listest%d@tttt.com"
   is_admin         = true
   projects_limit   = 10
   can_create_group = true
-  is_external      = true
+  is_external      = false
 }
   `, rInt, rInt, rInt, rInt)
 }
