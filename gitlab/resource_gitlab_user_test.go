@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -96,7 +97,12 @@ func TestAccGitlabUser_password_reset(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
-			// Create a user
+			// Test that either password or reset_password is needed
+			{
+				Config:      testAccGitlabUserConfigWrong(rInt),
+				ExpectError: regexp.MustCompile(`\sAt least one of either password or reset_password must be defined`),
+			},
+			// Create a user without a password
 			{
 				Config: testAccGitlabUserConfigPasswordReset(rInt),
 				Check:  testAccCheckGitlabUserExists("gitlab_user.foo", &user),
@@ -214,13 +220,18 @@ func testAccGitlabUserConfigPasswordReset(rInt int) string {
 resource "gitlab_user" "foo" {
   name             = "foo %d"
   username         = "listest%d"
-  password         = "test%dtt"
   email            = "listest%d@ssss.com"
-  is_admin         = false
-  projects_limit   = 0
-  can_create_group = false
-  is_external      = false
   reset_password   = true
 }
-  `, rInt, rInt, rInt, rInt)
+  `, rInt, rInt, rInt)
+}
+
+func testAccGitlabUserConfigWrong(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name             = "foo %d"
+  username         = "listest%d"
+  email            = "listest%d@ssss.com"
+}
+  `, rInt, rInt, rInt)
 }
