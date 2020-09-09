@@ -93,7 +93,7 @@ func TestAccGitlabProjectPushRules_import(t *testing.T) {
 			{
 				SkipFunc:          isRunningInCE,
 				ResourceName:      "gitlab_project_push_rules.foo",
-				ImportStateId:     fmt.Sprintf("foo-%d", rInt),
+				ImportStateId:     fmt.Sprintf("root/foo-%d", rInt),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},

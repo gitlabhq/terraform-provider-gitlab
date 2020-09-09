@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -152,7 +153,7 @@ func resourceGitlabProjectPushRulesImporter(d *schema.ResourceData, meta interfa
 	d.SetId(fmt.Sprintf("%d", pushRules.ID))
 
 	// Since project is used as a primary key in the Read function, we set that too.
-	d.Set("project", project)
+	d.Set("project", strconv.Itoa(pushRules.ProjectID))
 
 	return []*schema.ResourceData{d}, nil
 }
