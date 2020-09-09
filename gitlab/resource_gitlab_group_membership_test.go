@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -19,6 +20,11 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabGroupMembershipDestroy,
 		Steps: []resource.TestStep{
+			// Ensure either username or user_id is set
+			{
+				Config:      testAccGitlabGroupMembershipConfigWrong(rInt),
+				ExpectError: regexp.MustCompile(`\sone and only one of user_id or username must be set`),
+			},
 
 			// Assign member to the group as a developer
 			{
@@ -185,6 +191,26 @@ resource "gitlab_user" "test" {
 resource "gitlab_group_membership" "foo" {
   group_id 		= "${gitlab_group.foo.id}"
   username 		= "${gitlab_user.test.username}"
+  access_level 	= "developer"
+}`, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabGroupMembershipConfigWrong(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo%d"
+  path = "foo%d"
+}
+
+resource "gitlab_user" "test" {
+  name 		= "foo%d"
+  username  = "listest%d"
+  password  = "test%dtt"
+  email 	= "listest%d@ssss.com"
+}
+
+resource "gitlab_group_membership" "foo" {
+  group_id 		= "${gitlab_group.foo.id}"
   access_level 	= "developer"
 }`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
