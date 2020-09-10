@@ -1,6 +1,8 @@
 package gitlab
 
 import (
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -16,6 +18,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabBranchProtectionCreate,
 		Read:   resourceGitlabBranchProtectionRead,
+		Update: resourceGitlabBranchProtectionUpdate,
 		Delete: resourceGitlabBranchProtectionDelete,
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -40,6 +43,11 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 			},
+			"code_owner_approval_required": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -50,11 +58,13 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 	branch := gitlab.String(d.Get("branch").(string))
 	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	options := &gitlab.ProtectRepositoryBranchesOptions{
-		Name:             branch,
-		MergeAccessLevel: &mergeAccessLevel,
-		PushAccessLevel:  &pushAccessLevel,
+		Name:                      branch,
+		MergeAccessLevel:          &mergeAccessLevel,
+		PushAccessLevel:           &pushAccessLevel,
+		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	}
 
 	log.Printf("[DEBUG] create gitlab branch protection on %v for project %s", options.Name, project)
@@ -75,7 +85,17 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 
 	d.SetId(buildTwoPartID(&project, &bp.Name))
 
-	return resourceGitlabBranchProtectionRead(d, meta)
+	if err := resourceGitlabBranchProtectionRead(d, meta); err != nil {
+		return err
+	}
+
+	// If the GitLab tier does not support the code owner approval feature, the resulting plan will be inconsistent.
+	// We return an error because otherwise Terraform would report this inconsistency as a "bug in the provider" to the user.
+	if codeOwnerApprovalRequired && !d.Get("code_owner_approval_required").(bool) {
+		return errors.New("feature unavailable: code owner approvals")
+	}
+
+	return nil
 }
 
 func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}) error {
@@ -98,10 +118,39 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	d.Set("branch", pb.Name)
 	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
 	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
+	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
 	return nil
+}
+
+func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface{}) error {
+	// NOTE: At the time of writing, the only value that does not force re-creation is code_owner_approval_required,
+	// so therefore that is the only update that needs to be handled.
+
+	client := meta.(*gitlab.Client)
+	project := d.Get("project").(string)
+	branch := d.Get("branch").(string)
+	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
+
+	log.Printf("[DEBUG] update gitlab branch protection for project %s, branch %s", project, branch)
+
+	options := &gitlab.RequireCodeOwnerApprovalsOptions{
+		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
+	}
+
+	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+		// The user might be running a version of GitLab that does not support this feature.
+		// We enhance the generic 404 error with a more informative message.
+		if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
+			return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+		}
+
+		return err
+	}
+
+	return resourceGitlabBranchProtectionRead(d, meta)
 }
 
 func resourceGitlabBranchProtectionDelete(d *schema.ResourceData, meta interface{}) error {
@@ -119,7 +168,7 @@ func projectAndBranchFromID(id string) (string, string, error) {
 	project, branch, err := parseTwoPartID(id)
 
 	if err != nil {
-		log.Printf("[WARN] cannot get group member id from input: %v", id)
+		log.Printf("[WARN] cannot get branch protection id from input: %v", id)
 	}
 	return project, branch, err
 }
