@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -46,7 +47,7 @@ func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 func resourceGitlabProjectLevelMRApprovalsCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	projectId := d.Get("project_id").(string)
+	projectId := d.Get("project_id").(int)
 
 	options := &gitlab.ChangeApprovalConfigurationOptions{
 		ResetApprovalsOnPush:                      gitlab.Bool(d.Get("reset_approvals_on_push").(bool)),
@@ -55,13 +56,13 @@ func resourceGitlabProjectLevelMRApprovalsCreate(d *schema.ResourceData, meta in
 		MergeRequestsDisableCommittersApproval:    gitlab.Bool(d.Get("merge_requests_disable_committers_approval").(bool)),
 	}
 
-	log.Printf("[DEBUG] Creating new MR approval configuration for project %s:", projectId)
+	log.Printf("[DEBUG] Creating new MR approval configuration for project %d:", projectId)
 
 	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options); err != nil {
 		return fmt.Errorf("couldn't create approval configuration: %w", err)
 	}
 
-	d.SetId(projectId)
+	d.SetId(strconv.Itoa(projectId))
 	return resourceGitlabProjectLevelMRApprovalsRead(d, meta)
 }
 
