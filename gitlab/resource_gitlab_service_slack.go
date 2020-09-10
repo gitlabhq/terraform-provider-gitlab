@@ -22,6 +22,7 @@ func resourceGitlabServiceSlack() *schema.Resource {
 			"project": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"webhook": {
 				Type:     schema.TypeString,
