@@ -4,7 +4,7 @@ FEATURES:
 * **New Data Source:** `gitlab_group_membership` [GH-264]
 * **New Resource:** `gitlab_project_level_mr_approvals` [GH-356]
 * **New Resource:** `gitlab_project_mirror` [GH-358]
-* **New Resource:** `gitlab_service_pipelines_email` [GH-358]
+* **New Resource:** `gitlab_service_pipelines_email` [GH-375]
 
 ENHANCEMENTS:
 * resource/gitlab_branch_protection: New `code_owner_approval_required` attribute [GH-380]
