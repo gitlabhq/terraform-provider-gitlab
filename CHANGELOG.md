@@ -1,4 +1,26 @@
 ## 2.12.0 (Unreleased)
+
+FEATURES:
+* **New Data Source:** `gitlab_group_membership` [GH-264]
+* **New Resource:** `gitlab_project_level_mr_approvals` [GH-356]
+* **New Resource:** `gitlab_project_mirror` [GH-358]
+* **New Resource:** `gitlab_service_pipelines_email` [GH-358]
+
+ENHANCEMENTS:
+* resource/gitlab_branch_protection: New `code_owner_approval_required` attribute [GH-380]
+* resource/gitlab_group_label: Can now be imported [GH-339]
+* resource/gitlab_project: New `import_url` attribute [GH-381]
+* resource/gitlab_project_push_rules: Can now be imported [GH-360]
+* resource/gitlab_project_variable: Better error message when a masked variable fails validation [GH-380]
+* resource/gitlab_service_jira: Automatically detect removal [GH-337]
+* resource/gitlab_user: The `email` attribute can be changed without forcing recreation [GH-261]
+
+BUG FIXES:
+* resource/gitlab_pipeline_schedule: Fix a rare error during deletion [GH-364]
+* resource/gitlab_pipeline_schedule_variable: Fix a rare error during deletion [GH-364]
+* resource/gitlab_service_jira: Fix a rare state inconsistency problem during creation [GH-363]
+* resource/gitlab_user: Fix some attributes saving incorrectly in state [GH-261]
+
 ## 2.11.0 (July 24, 2020)
 
 ENHANCEMENTS:
