@@ -78,6 +78,8 @@ The following arguments are supported:
 
 * `initialize_with_readme` - (Optional) Create master branch with first commit containing a README.md file.
 
+* `packages_enabled` - (Optional) Enable packages repository for the project.
+
 ## Attributes Reference
 
 The following additional attributes are exported:

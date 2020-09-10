@@ -156,6 +156,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"_links":                              flattenProjectLinks(project.Links),
 				"ci_config_path":                      project.CIConfigPath,
 				"custom_attributes":                   project.CustomAttributes,
+				"packages_enabled":                    project.PackagesEnabled,
 			}
 			values = append(values, v)
 		}
@@ -647,6 +648,10 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Elem: &schema.Schema{
 								Type: schema.TypeMap,
 							},
+						},
+						"packages_enabled": {
+							Type:     schema.TypeBool,
+							Computed: true,
 						},
 					},
 				},

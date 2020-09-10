@@ -40,7 +40,8 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		Archived: false, // needless, but let's make this explicit
+		Archived:        false, // needless, but let's make this explicit
+		PackagesEnabled: true,
 	}
 
 	defaultsMasterBranch = defaults
@@ -80,7 +81,8 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						Archived: true,
+						Archived:        true,
+						PackagesEnabled: false,
 					}, &received),
 				),
 			},
@@ -151,6 +153,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
+		PackagesEnabled: true,
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -249,6 +252,7 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
+		PackagesEnabled: true,
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -534,8 +538,9 @@ resource "gitlab_project" "foo" {
   snippets_enabled = false
   container_registry_enabled = false
   lfs_enabled = false
-	shared_runners_enabled = false
-	archived = true
+  shared_runners_enabled = false
+  archived = true
+  packages_enabled = false
 }
 	`, rInt, rInt)
 }
