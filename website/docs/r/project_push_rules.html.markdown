@@ -46,8 +46,6 @@ The following arguments are supported:
 
 * `max_file_size` - (Optional, int) Maximum file size (MB)
 
-* `commit_committer_check` - (Optional, bool) Users can only push commits to this repository that were committed with one of their own verified emails
-
 ## Attributes Reference
 
 The resource exports the following attributes:
