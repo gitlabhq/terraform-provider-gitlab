@@ -11,7 +11,7 @@ ENHANCEMENTS:
 * resource/gitlab_group_label: Can now be imported [GH-339]
 * resource/gitlab_project: New `import_url` attribute [GH-381]
 * resource/gitlab_project_push_rules: Can now be imported [GH-360]
-* resource/gitlab_project_variable: Better error message when a masked variable fails validation [GH-380]
+* resource/gitlab_project_variable: Better error message when a masked variable fails validation [GH-371]
 * resource/gitlab_service_jira: Automatically detect removal [GH-337]
 * resource/gitlab_user: The `email` attribute can be changed without forcing recreation [GH-261]
 
