@@ -69,8 +69,12 @@ func resourceGitlabProjectLevelMRApprovalsCreate(d *schema.ResourceData, meta in
 func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	projectId := d.Id()
-	log.Printf("[DEBUG] Reading gitlab approval configuration for project %s", projectId)
+	projectId, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return fmt.Errorf("project ID must be an integer (was %q): %w", d.Id(), err)
+	}
+
+	log.Printf("[DEBUG] Reading gitlab approval configuration for project %q", projectId)
 
 	approvalConfig, _, err := client.Projects.GetApprovalConfiguration(projectId)
 	if err != nil {
