@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -54,6 +55,46 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Update the project variable to enable "masked" for a value that does not meet masking requirements, and expect an error with no state change.
+			// ref: https://docs.gitlab.com/ce/ci/variables/README.html#masked-variable-requirements
+			{
+				Config: testAccGitlabProjectVariableUpdateConfigMaskedBad(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
+					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
+						Key:   fmt.Sprintf("key_%s", rString),
+						Value: fmt.Sprintf("value-%s", rString),
+					}),
+				),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(
+					"Invalid value for a masked variable. Check the masked variable requirements: https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements",
+				)),
+			},
+			// Update the project variable to to enable "masked" and meet masking requirements
+			// ref: https://docs.gitlab.com/ce/ci/variables/README.html#masked-variable-requirements
+			{
+				Config: testAccGitlabProjectVariableUpdateConfigMaskedGood(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
+					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
+						Key:    fmt.Sprintf("key_%s", rString),
+						Value:  fmt.Sprintf("value-%s", rString),
+						Masked: true,
+					}),
+				),
+			},
+			// Update the project variable to toggle the options back
+			{
+				Config: testAccGitlabProjectVariableConfig(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo", &projectVariable),
+					testAccCheckGitlabProjectVariableAttributes(&projectVariable, &testAccGitlabProjectVariableExpectedAttributes{
+						Key:       fmt.Sprintf("key_%s", rString),
+						Value:     fmt.Sprintf("value-%s", rString),
+						Protected: false,
+					}),
+				),
+			},
 		},
 	})
 }
@@ -88,6 +129,7 @@ type testAccGitlabProjectVariableExpectedAttributes struct {
 	Key       string
 	Value     string
 	Protected bool
+	Masked    bool
 }
 
 func testAccCheckGitlabProjectVariableAttributes(variable *gitlab.ProjectVariable, want *testAccGitlabProjectVariableExpectedAttributes) resource.TestCheckFunc {
@@ -102,6 +144,10 @@ func testAccCheckGitlabProjectVariableAttributes(variable *gitlab.ProjectVariabl
 
 		if variable.Protected != want.Protected {
 			return fmt.Errorf("got protected %t; want %t", variable.Protected, want.Protected)
+		}
+
+		if variable.Masked != want.Masked {
+			return fmt.Errorf("got masked %t; want %t", variable.Masked, want.Masked)
 		}
 
 		return nil
@@ -168,6 +214,51 @@ resource "gitlab_project_variable" "foo" {
   key = "key_%s"
   value = "value-inverse-%s"
   protected = true
+}
+	`, rString, rString, rString)
+}
+
+func testAccGitlabProjectVariableUpdateConfigMaskedBad(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%s"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_project_variable" "foo" {
+  project = "${gitlab_project.foo.id}"
+  key = "key_%s"
+  value = <<EOF
+value-%s"
+i am multiline
+EOF
+  variable_type = "env_var"
+  masked = true
+}
+	`, rString, rString, rString)
+}
+
+func testAccGitlabProjectVariableUpdateConfigMaskedGood(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%s"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_project_variable" "foo" {
+  project = "${gitlab_project.foo.id}"
+  key = "key_%s"
+  value = "value-%s"
+  variable_type = "env_var"
+  masked = true
 }
 	`, rString, rString, rString)
 }

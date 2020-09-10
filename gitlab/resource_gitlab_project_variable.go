@@ -1,7 +1,10 @@
 package gitlab
 
 import (
+	"errors"
 	"log"
+	"net/http"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -82,7 +85,7 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 
 	_, _, err := client.ProjectVariables.CreateVariable(project, &options)
 	if err != nil {
-		return err
+		return augmentProjectVariableClientError(d, err)
 	}
 
 	d.SetId(buildTwoPartID(&project, &key))
@@ -102,7 +105,7 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 
 	v, _, err := client.ProjectVariables.GetVariable(project, key)
 	if err != nil {
-		return err
+		return augmentProjectVariableClientError(d, err)
 	}
 
 	d.Set("key", v.Key)
@@ -140,7 +143,7 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 
 	_, _, err := client.ProjectVariables.UpdateVariable(project, key, options)
 	if err != nil {
-		return err
+		return augmentProjectVariableClientError(d, err)
 	}
 
 	return resourceGitlabProjectVariableRead(d, meta)
@@ -153,5 +156,24 @@ func resourceGitlabProjectVariableDelete(d *schema.ResourceData, meta interface{
 	log.Printf("[DEBUG] Delete gitlab project variable %s/%s", project, key)
 
 	_, err := client.ProjectVariables.RemoveVariable(project, key)
+	return augmentProjectVariableClientError(d, err)
+}
+
+func augmentProjectVariableClientError(d *schema.ResourceData, err error) error {
+	// Masked values will commonly error due to their strict requirements, and the error message from the GitLab API is not very informative,
+	// so we return a custom error message in this case.
+	if d.Get("masked").(bool) && isInvalidValueError(err) {
+		log.Printf("[ERROR] %v", err)
+		return errors.New("Invalid value for a masked variable. Check the masked variable requirements: https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements")
+	}
+
 	return err
+}
+
+func isInvalidValueError(err error) bool {
+	var httpErr *gitlab.ErrorResponse
+	return errors.As(err, &httpErr) &&
+		httpErr.Response.StatusCode == http.StatusBadRequest &&
+		strings.Contains(httpErr.Message, "value") &&
+		strings.Contains(httpErr.Message, "invalid")
 }
