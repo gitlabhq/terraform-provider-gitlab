@@ -100,7 +100,7 @@ func TestAccGitlabUser_password_reset(t *testing.T) {
 			// Test that either password or reset_password is needed
 			{
 				Config:      testAccGitlabUserConfigWrong(rInt),
-				ExpectError: regexp.MustCompile(`\sAt least one of either password or reset_password must be defined`),
+				ExpectError: regexp.MustCompile("At least one of either password or reset_password must be defined"),
 			},
 			// Create a user without a password
 			{
