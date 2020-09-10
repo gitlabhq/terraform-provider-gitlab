@@ -40,6 +40,8 @@ The following arguments are supported:
 
 * `default_branch` - (Optional) The default branch for the project.
 
+* `import_url` - (Optional) Git URL to a repository to be imported.
+
 * `request_access_enabled` - Allow users to request member access.
 
 * `issues_enabled` - (Optional) Enable issue tracking for the project.
