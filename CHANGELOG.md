@@ -1,8 +1,5 @@
 ## 2.12.0 (Unreleased)
 
-NOTES:
-* resource/gitlab_group: Attribute `visibility_level` now defaults to `private`, as was already documented, instead of reading the default from GitLab. This will not affect existing state. [GH-362]
-
 FEATURES:
 * **New Data Source:** `gitlab_group_membership` [GH-264]
 * **New Resource:** `gitlab_project_level_mr_approvals` [GH-356]
