@@ -11,6 +11,8 @@ description: |-
 This resource allows you to create and manage GitLab users.
 Note your provider will need to be configured with admin-level access for this resource to work.
 
+-> **Note:** You must specify either `password` or `reset_password`.
+
 ## Example Usage
 
 ```hcl
@@ -35,9 +37,9 @@ The following arguments are supported:
 
 * `username` - (Required) The username of the user.
 
-* `password` - (Required) The password of the user.
-
 * `email` - (Required) The e-mail address of the user.
+
+* `password` - (Optional) The password of the user.
 
 * `is_admin` - (Optional) Boolean, defaults to false.  Whether to enable administrative priviledges
 for the user.
