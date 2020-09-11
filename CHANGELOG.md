@@ -1,5 +1,8 @@
 ## 2.12.0 (Unreleased)
 
+NOTES:
+* resource/gitlab_group: Attribute `visibility_level` now defaults to `private`, as was already documented, instead of reading the default from GitLab. This will not affect existing state. [GH-362]
+
 FEATURES:
 * **New Data Source:** `gitlab_group_membership` [GH-264]
 * **New Resource:** `gitlab_project_level_mr_approvals` [GH-356]
@@ -8,6 +11,7 @@ FEATURES:
 
 ENHANCEMENTS:
 * resource/gitlab_branch_protection: New `code_owner_approval_required` attribute [GH-380]
+* resource/gitlab_group: New attributes `share_with_group_lock`, `project_creation_level`, `auto_devops_enabled`, `emails_disabled`, `mentions_disabled`, `subgroup_creation_level`, `require_two_factor_authentication`, and `two_factor_grace_period` [GH-362]
 * resource/gitlab_group_label: Can now be imported [GH-339]
 * resource/gitlab_project: New `import_url` attribute [GH-381]
 * resource/gitlab_project_push_rules: Can now be imported [GH-360]
