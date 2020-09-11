@@ -51,7 +51,7 @@ enable users to request access to the group.
 * `share_with_group_lock` - (Optional) Boolean, defaults to false.  Prevent sharing
 a project with another group within this group.
 
-* `project_creation_level` - (Optional), defaults to Maintainer
+* `project_creation_level` - (Optional), defaults to Maintainer.
 Determine if developers can create projects
 in the group. Can be noone (No one), maintainer (Maintainers),
 or developer (Developers + Maintainers).
