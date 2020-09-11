@@ -44,7 +44,7 @@ support for projects in this group.
 * `request_access_enabled` - (Optional) Boolean, defaults to false.  Whether to
 enable users to request access to the group.
 
-* `visibility_level` - (Optional) The visibility of the group. Can be `private`, `internal`, or `public`.
+* `visibility_level` - (Optional) The group's visibility. Can be `private`, `internal`, or `public`.
 
 * `share_with_group_lock` - (Optional) Boolean, defaults to false.  Prevent sharing
 a project with another group within this group.
