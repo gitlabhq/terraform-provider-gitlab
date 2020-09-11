@@ -14,6 +14,7 @@ ENHANCEMENTS:
 * resource/gitlab_project_variable: Better error message when a masked variable fails validation [GH-371]
 * resource/gitlab_service_jira: Automatically detect removal [GH-337]
 * resource/gitlab_user: The `email` attribute can be changed without forcing recreation [GH-261]
+* resource/gitlab_user: Require either the `password` or `reset_password` attribute to be set [GH-262]
 
 BUG FIXES:
 * resource/gitlab_pipeline_schedule: Fix a rare error during deletion [GH-364]
