@@ -45,7 +45,6 @@ support for projects in this group.
 enable users to request access to the group.
 
 * `visibility_level` - (Optional) The group’s visibility. Can be `private`, `internal`, or `public`.
-The default will be the default value configured in GitLab, usually `private`.
 
 * `share_with_group_lock` - (Optional) Boolean, defaults to false.  Prevent sharing
 a project with another group within this group.
