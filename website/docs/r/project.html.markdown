@@ -31,6 +31,8 @@ The following arguments are supported:
 
 * `path` - (Optional) The path of the repository.
 
+* `path_with_namespace` - The path of the repository with namespace.
+
 * `namespace_id` - (Optional) The namespace (group or user) of the project. Defaults to your user.
   See [`gitlab_group`](group.html) for an example.
 
