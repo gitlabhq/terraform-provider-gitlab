@@ -61,7 +61,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"visibility_level": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				Default:      "private",
+				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
 			"share_with_group_lock": {
