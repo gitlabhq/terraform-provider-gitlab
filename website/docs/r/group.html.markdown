@@ -64,7 +64,7 @@ DevOps pipeline for all projects within this group.
 * `mentions_disabled` - (Optional) Boolean, defaults to false.  Disable the capability
 of a group from getting mentioned
 
-* `subgroup_creation_level` - (Optional), defaults to Owner
+* `subgroup_creation_level` - (Optional), defaults to Owner.
  Allowed to create subgroups.
 Can be owner (Owners), or maintainer (Maintainers).
 
