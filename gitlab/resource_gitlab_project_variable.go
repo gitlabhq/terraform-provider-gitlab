@@ -87,7 +87,7 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 		EnvironmentScope: &environmentScope,
 	}
 
-	id := buildMultiPartID(project, key, environmentScope)
+	id := strings.Join([]string{project, key, environmentScope}, ":")
 
 	log.Printf("[DEBUG] create gitlab project variable %q", id)
 
@@ -108,18 +108,22 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 		project          string
 		key              string
 		environmentScope string
-		err              error
 	)
 
 	// An older version of this resource used the ID format "project:key".
 	// For backwards compatibility we still support the old format.
-	project, key, environmentScope, err = parseThreePartID(d.Id())
-	if err != nil {
-		project, key, err = parseTwoPartID(d.Id())
-		if err != nil {
-			return fmt.Errorf(`Failed to parse project variable ID %q: expected format project:key or project:key:environment_scope`, d.Id())
-		}
+	parts := strings.SplitN(d.Id(), ":", 4)
+	switch len(parts) {
+	case 2:
+		project = parts[0]
+		key = parts[1]
 		environmentScope = d.Get("environment_scope").(string)
+	case 3:
+		project = parts[0]
+		key = parts[1]
+		environmentScope = parts[2]
+	default:
+		return fmt.Errorf(`Failed to parse project variable ID %q: expected format project:key or project:key:environment_scope`, d.Id())
 	}
 
 	log.Printf("[DEBUG] read gitlab project variable %q", d.Id())

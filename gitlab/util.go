@@ -182,24 +182,9 @@ func parseTwoPartID(id string) (string, string, error) {
 	return parts[0], parts[1], nil
 }
 
-// parseThreePartID returns the pieces of id `a:b:c` as a, b, c.
-func parseThreePartID(id string) (string, string, string, error) {
-	parts := strings.SplitN(id, ":", 3)
-	if len(parts) != 3 {
-		return "", "", "", fmt.Errorf("Unexpected ID format (%q). Expected string:string:string", id)
-	}
-
-	return parts[0], parts[1], parts[2], nil
-}
-
 // format the strings into an id `a:b`
 func buildTwoPartID(a, b *string) string {
 	return fmt.Sprintf("%s:%s", *a, *b)
-}
-
-// buildMultiPartID formats the strings into an id `a:b:c`, taking any number of parts.
-func buildMultiPartID(parts ...string) string {
-	return strings.Join(parts, ":")
 }
 
 var accessLevelID = map[string]gitlab.AccessLevelValue{
@@ -234,45 +219,56 @@ func stringSetToStringSlice(stringSet *schema.Set) *[]string {
 	return &ret
 }
 
-// isGitLabVersionAtLeast checks that the version of GitLab is at least the provided wantVersion.
-// It only checks the major and minor version numbers, not the patch.
-func isGitLabVersionAtLeast(client *gitlab.Client, wantVersion string) (bool, error) {
-	wantMajor, wantMinor, err := parseVersionMajorMinor(wantVersion)
-	if err != nil {
-		return false, fmt.Errorf("failed to parse wanted version %q: %w", wantVersion, err)
+// isGitLabVersionLessThan is a SkipFunc that returns true if the provided version is lower then
+// the current version of GitLab. It only checks the major and minor version numbers, not the patch.
+func isGitLabVersionLessThan(client *gitlab.Client, version string) func() (bool, error) {
+	return func() (bool, error) {
+		isAtLeast, err := isGitLabVersionAtLeast(client, version)()
+		return !isAtLeast, err
 	}
+}
 
-	actualVersion, _, err := client.Version.GetVersion()
-	if err != nil {
-		return false, err
+// isGitLabVersionAtLeast is a SkipFunc that checks that the version of GitLab is at least the
+// provided wantVersion. It only checks the major and minor version numbers, not the patch.
+func isGitLabVersionAtLeast(client *gitlab.Client, wantVersion string) func() (bool, error) {
+	return func() (bool, error) {
+		wantMajor, wantMinor, err := parseVersionMajorMinor(wantVersion)
+		if err != nil {
+			return false, fmt.Errorf("failed to parse wanted version %q: %w", wantVersion, err)
+		}
+
+		actualVersion, _, err := client.Version.GetVersion()
+		if err != nil {
+			return false, err
+		}
+
+		actualMajor, actualMinor, err := parseVersionMajorMinor(actualVersion.Version)
+		if err != nil {
+			return false, fmt.Errorf("failed to parse actual version %q: %w", actualVersion.Version, err)
+		}
+
+		if actualMajor == wantMajor {
+			return actualMinor >= wantMinor, nil
+		}
+
+		return actualMajor > wantMajor, nil
 	}
-
-	actualMajor, actualMinor, err := parseVersionMajorMinor(actualVersion.Version)
-	if err != nil {
-		return false, fmt.Errorf("failed to parse actual version %q: %w", actualVersion.Version, err)
-	}
-
-	if actualMajor == wantMajor {
-		return actualMinor >= wantMinor, nil
-	}
-
-	return actualMajor > wantMajor, nil
 }
 
 func parseVersionMajorMinor(version string) (int, int, error) {
 	parts := strings.SplitN(version, ".", 3)
 	if len(parts) < 2 {
-		return 0, 0, fmt.Errorf("failed to parse version %q", version)
+		return 0, 0, fmt.Errorf("need at least 2 parts (was %d)", len(parts))
 	}
 
 	major, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to parse version %q: %w", version, err)
+		return 0, 0, err
 	}
 
 	minor, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to parse version %q: %w", version, err)
+		return 0, 0, err
 	}
 
 	return major, minor, nil
