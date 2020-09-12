@@ -7,7 +7,9 @@ FEATURES:
 * **New Resource:** `gitlab_service_pipelines_email` [GH-375]
 
 ENHANCEMENTS:
+* data-source/gitlab_project: New `path_with_namespace` attribute [GH-403]
 * resource/gitlab_branch_protection: New `code_owner_approval_required` attribute [GH-380]
+* resource/gitlab_project: New `path_with_namespace` attribute [GH-403]
 * resource/gitlab_group: New attributes `share_with_group_lock`, `project_creation_level`, `auto_devops_enabled`, `emails_disabled`, `mentions_disabled`, `subgroup_creation_level`, `require_two_factor_authentication`, and `two_factor_grace_period` [GH-362]
 * resource/gitlab_group_label: Can now be imported [GH-339]
 * resource/gitlab_project: New `import_url` attribute [GH-381]
