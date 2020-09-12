@@ -26,6 +26,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			return old == new
 		},
 	},
+	"path_with_namespace": {
+		Type:     schema.TypeString,
+		Computed: true,
+	},
 	"namespace_id": {
 		Type:     schema.TypeInt,
 		Optional: true,
@@ -217,6 +221,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.SetId(fmt.Sprintf("%d", project.ID))
 	d.Set("name", project.Name)
 	d.Set("path", project.Path)
+	d.Set("path_with_namespace", project.PathWithNamespace)
 	d.Set("description", project.Description)
 	d.Set("default_branch", project.DefaultBranch)
 	d.Set("request_access_enabled", project.RequestAccessEnabled)

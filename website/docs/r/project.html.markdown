@@ -89,6 +89,8 @@ The following additional attributes are exported:
 
 * `id` - Integer that uniquely identifies the project within the gitlab install.
 
+* `path_with_namespace` - The path of the repository with namespace.
+
 * `ssh_url_to_repo` - URL that can be provided to `git clone` to clone the
   repository via SSH.
 
