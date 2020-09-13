@@ -45,7 +45,7 @@ func resourceGitlabDeployToken() *schema.Resource {
 			"expires_at": {
 				Type:         schema.TypeString,
 				Optional:     true,
-				ValidateFunc: validation.ValidateRFC3339TimeString,
+				ValidateFunc: validation.IsRFC3339Time,
 				ForceNew:     true,
 			},
 			"scopes": {

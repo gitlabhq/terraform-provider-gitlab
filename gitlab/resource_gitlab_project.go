@@ -271,57 +271,28 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 	}
 
-	// need to manage partial state since project creation may require
-	// more than a single API call, and they may all fail independently;
-	// the default set of attributes is prepopulated with those used above
-	d.Partial(true)
-	setProperties := []string{
-		"name",
-		"request_access_enabled",
-		"issues_enabled",
-		"merge_requests_enabled",
-		"pipelines_enabled",
-		"approvals_before_merge",
-		"wiki_enabled",
-		"snippets_enabled",
-		"container_registry_enabled",
-		"lfs_enabled",
-		"visibility_level",
-		"merge_method",
-		"only_allow_merge_if_pipeline_succeeds",
-		"only_allow_merge_if_all_discussions_are_resolved",
-		"shared_runners_enabled",
-		"remove_source_branch_after_merge",
-	}
-
 	if v, ok := d.GetOk("path"); ok {
 		options.Path = gitlab.String(v.(string))
-		setProperties = append(setProperties, "path")
 	}
 
 	if v, ok := d.GetOk("namespace_id"); ok {
 		options.NamespaceID = gitlab.Int(v.(int))
-		setProperties = append(setProperties, "namespace_id")
 	}
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
-		setProperties = append(setProperties, "description")
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
 		options.TagList = stringSetToStringSlice(v.(*schema.Set))
-		setProperties = append(setProperties, "tags")
 	}
 
 	if v, ok := d.GetOk("initialize_with_readme"); ok {
 		options.InitializeWithReadme = gitlab.Bool(v.(bool))
-		setProperties = append(setProperties, "initialize_with_readme")
 	}
 
 	if v, ok := d.GetOk("import_url"); ok {
 		options.ImportURL = gitlab.String(v.(string))
-		setProperties = append(setProperties, "import_url")
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -329,11 +300,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	project, _, err := client.Projects.CreateProject(options)
 	if err != nil {
 		return err
-	}
-
-	for _, setProperty := range setProperties {
-		log.Printf("[DEBUG] partial gitlab project %s creation of property %q", d.Id(), setProperty)
-		d.SetPartial(setProperty)
 	}
 
 	// from this point onwards no matter how we return, resource creation
@@ -368,23 +334,15 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 				return err
 			}
 		}
-		d.SetPartial("shared_with_groups")
 	}
 
-	v := d.Get("archived")
-	if v.(bool) {
+	if d.Get("archived").(bool) {
 		// strange as it may seem, this project is created in archived state...
-		err := archiveProject(d, meta)
-		if err != nil {
-			log.Printf("[WARN] New project (%s) could not be created in archived state: error %#v", d.Id(), err)
-			return err
+		if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
+			return fmt.Errorf("new project %q could not be archived: %w", d.Id(), err)
 		}
-		d.SetPartial(("archived"))
 	}
 
-	// everything went OK, we can revert to ordinary state management
-	// and let the Gitlab server fill in the resource state via a read
-	d.Partial(false)
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -412,114 +370,88 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	options := &gitlab.EditProjectOptions{}
 	transferOptions := &gitlab.TransferProjectOptions{}
 
-	// need to manage partial state since project archiving requires
-	// a separate API call which could fail
-	d.Partial(true)
-	updatedProperties := []string{}
-
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
-		updatedProperties = append(updatedProperties, "name")
 	}
 
 	if d.HasChange("path") && (d.Get("path").(string) != "") {
 		options.Path = gitlab.String(d.Get("path").(string))
-		updatedProperties = append(updatedProperties, "path")
 	}
 
 	if d.HasChange("namespace_id") {
 		transferOptions.Namespace = gitlab.Int(d.Get("namespace_id").(int))
-		updatedProperties = append(updatedProperties, "namespace_id")
 	}
 
 	if d.HasChange("description") {
 		options.Description = gitlab.String(d.Get("description").(string))
-		updatedProperties = append(updatedProperties, "description")
 	}
 
 	if d.HasChange("default_branch") {
 		options.DefaultBranch = gitlab.String(d.Get("default_branch").(string))
-		updatedProperties = append(updatedProperties, "default_branch")
 	}
 
 	if d.HasChange("visibility_level") {
 		options.Visibility = stringToVisibilityLevel(d.Get("visibility_level").(string))
-		updatedProperties = append(updatedProperties, "visibility_level")
 	}
 
 	if d.HasChange("merge_method") {
 		options.MergeMethod = stringToMergeMethod(d.Get("merge_method").(string))
-		updatedProperties = append(updatedProperties, "merge_method")
 	}
 
 	if d.HasChange("only_allow_merge_if_pipeline_succeeds") {
 		options.OnlyAllowMergeIfPipelineSucceeds = gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool))
-		updatedProperties = append(updatedProperties, "only_allow_merge_if_pipeline_succeeds")
 	}
 
 	if d.HasChange("only_allow_merge_if_all_discussions_are_resolved") {
 		options.OnlyAllowMergeIfAllDiscussionsAreResolved = gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool))
-		updatedProperties = append(updatedProperties, "only_allow_merge_if_all_discussions_are_resolved")
 	}
 
 	if d.HasChange("request_access_enabled") {
 		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
-		updatedProperties = append(updatedProperties, "request_access_enabled")
 	}
 
 	if d.HasChange("issues_enabled") {
 		options.IssuesEnabled = gitlab.Bool(d.Get("issues_enabled").(bool))
-		updatedProperties = append(updatedProperties, "issues_enabled")
 	}
 
 	if d.HasChange("merge_requests_enabled") {
 		options.MergeRequestsEnabled = gitlab.Bool(d.Get("merge_requests_enabled").(bool))
-		updatedProperties = append(updatedProperties, "merge_requests_enabled")
 	}
 
 	if d.HasChange("pipelines_enabled") {
 		options.JobsEnabled = gitlab.Bool(d.Get("pipelines_enabled").(bool))
-		updatedProperties = append(updatedProperties, "pipelines_enabled")
 	}
 
 	if d.HasChange("approvals_before_merge") {
 		options.ApprovalsBeforeMerge = gitlab.Int(d.Get("approvals_before_merge").(int))
-		updatedProperties = append(updatedProperties, "approvals_before_merge")
 	}
 
 	if d.HasChange("wiki_enabled") {
 		options.WikiEnabled = gitlab.Bool(d.Get("wiki_enabled").(bool))
-		updatedProperties = append(updatedProperties, "wiki_enabled")
 	}
 
 	if d.HasChange("snippets_enabled") {
 		options.SnippetsEnabled = gitlab.Bool(d.Get("snippets_enabled").(bool))
-		updatedProperties = append(updatedProperties, "snippets_enabled")
 	}
 
 	if d.HasChange("shared_runners_enabled") {
 		options.SharedRunnersEnabled = gitlab.Bool(d.Get("shared_runners_enabled").(bool))
-		updatedProperties = append(updatedProperties, "shared_runners_enabled")
 	}
 
 	if d.HasChange("tags") {
 		options.TagList = stringSetToStringSlice(d.Get("tags").(*schema.Set))
-		updatedProperties = append(updatedProperties, "tags")
 	}
 
 	if d.HasChange("container_registry_enabled") {
 		options.ContainerRegistryEnabled = gitlab.Bool(d.Get("container_registry_enabled").(bool))
-		updatedProperties = append(updatedProperties, "container_registry_enabled")
 	}
 
 	if d.HasChange("lfs_enabled") {
 		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
-		updatedProperties = append(updatedProperties, "lfs_enabled")
 	}
 
 	if d.HasChange("remove_source_branch_after_merge") {
 		options.RemoveSourceBranchAfterMerge = gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool))
-		updatedProperties = append(updatedProperties, "remove_source_branch_after_merge")
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
@@ -527,10 +459,6 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		_, _, err := client.Projects.EditProject(d.Id(), options)
 		if err != nil {
 			return err
-		}
-		for _, updatedProperty := range updatedProperties {
-			log.Printf("[DEBUG] partial gitlab project %s update of property %q", d.Id(), updatedProperty)
-			d.SetPartial(updatedProperty)
 		}
 	}
 
@@ -540,38 +468,26 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		if err != nil {
 			return err
 		}
-		log.Printf("[DEBUG] partial gitlab project %s update of property namespace_id", d.Id())
-		d.SetPartial("namespace_id")
 	}
 
 	if d.HasChange("shared_with_groups") {
-		err := updateSharedWithGroups(d, meta)
-		// TODO: check if handling partial state update in this simplistic
-		// way is ok when an error in the "shared groups" API calls occurs
-		if err != nil {
-			d.SetPartial("shared_with_groups")
+		if err := updateSharedWithGroups(d, meta); err != nil {
+			return err
 		}
 	}
 
 	if d.HasChange("archived") {
-		v := d.Get("archived")
-		if v.(bool) {
-			err := archiveProject(d, meta)
-			if err != nil {
-				log.Printf("[WARN] Project (%s) could not be archived: error %#v", d.Id(), err)
-				return err
+		if d.Get("archived").(bool) {
+			if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
+				return fmt.Errorf("project %q could not be archived: %w", d.Id(), err)
 			}
 		} else {
-			err := unarchiveProject(d, meta)
-			if err != nil {
-				log.Printf("[WARN] Project (%s) could not be unarchived: error %#v", d.Id(), err)
-				return err
+			if _, _, err := client.Projects.UnarchiveProject(d.Id()); err != nil {
+				return fmt.Errorf("project %q could not be unarchived: %w", d.Id(), err)
 			}
 		}
-		d.SetPartial("archived")
 	}
 
-	d.Partial(false)
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -732,43 +648,5 @@ func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	return nil
-}
-
-// archiveProject calls the Gitlab server to archive a project; if the
-// project is already archived, the call will do nothing (the API is
-// idempotent).
-func archiveProject(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[TRACE] Project (%s) will be archived", d.Id())
-	client := meta.(*gitlab.Client)
-	out, _, err := client.Projects.ArchiveProject(d.Id())
-	if err != nil {
-		log.Printf("[ERROR] Error archiving project (%s), received %#v", d.Id(), err)
-		return err
-	}
-	if !out.Archived {
-		log.Printf("[ERROR] Project (%s) is still not archived", d.Id())
-		return fmt.Errorf("error archiving project (%s): its status on the server is still unarchived", d.Id())
-	}
-	log.Printf("[TRACE] Project (%s) archived", d.Id())
-	return nil
-}
-
-// unarchiveProject calls the Gitlab server to unarchive a project; if the
-// project is already not archived, the call will do nothing (the API is
-// idempotent).
-func unarchiveProject(d *schema.ResourceData, meta interface{}) error {
-	log.Printf("[INFO] Project (%s) will be unarchived", d.Id())
-	client := meta.(*gitlab.Client)
-	out, _, err := client.Projects.UnarchiveProject(d.Id())
-	if err != nil {
-		log.Printf("[ERROR] Error unarchiving project (%s), received %#v", d.Id(), err)
-		return err
-	}
-	if out.Archived {
-		log.Printf("[ERROR] Project (%s) is still archived", d.Id())
-		return fmt.Errorf("error unarchiving project (%s): its status on the server is still archived", d.Id())
-	}
-	log.Printf("[TRACE] Project (%s) unarchived", d.Id())
 	return nil
 }
