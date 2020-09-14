@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -51,20 +50,21 @@ func testAccCheckGitlabEnvironmentExists(n string, environment *gitlab.Environme
 		}
 
 		environmentID := rs.Primary.ID
-		repoName := rs.Primary.Attributes["project"]
-		if repoName == "" {
+		project := rs.Primary.Attributes["project"]
+		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
 
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		environments, _, err := conn.Environments.ListEnvironments(repoName, nil)
+		environments, _, err := conn.Environments.ListEnvironments(project, nil)
 		if err != nil {
 			return err
 		}
 
 		for _, gotEnvironment := range environments {
-			if strconv.Itoa(gotEnvironment.ID) == environmentID {
+			resourceID := fmt.Sprintf("%s/%d", project, gotEnvironment.ID)
+			if resourceID == environmentID {
 				*environment = *gotEnvironment
 				return nil
 			}

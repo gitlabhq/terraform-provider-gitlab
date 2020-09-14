@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -38,6 +37,10 @@ func resourceGitlabEnvironment() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"environment_id": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -55,7 +58,8 @@ func resourceGitlabEnvironmentCreate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	d.SetId(strconv.Itoa(environment.ID))
+	d.Set("environment_id", environment.ID)
+	d.SetId(fmt.Sprintf("%s/%d", project, environment.ID))
 
 	return resourceGitlabEnvironmentRead(d, meta)
 }
@@ -63,10 +67,7 @@ func resourceGitlabEnvironmentCreate(d *schema.ResourceData, meta interface{}) e
 func resourceGitlabEnvironmentRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	environmentID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
+	environmentID := d.Get("environment_id").(int)
 
 	environment, _, err := client.Environments.GetEnvironment(project, environmentID)
 	if err != nil {
@@ -89,10 +90,7 @@ func resourceGitlabEnvironmentUpdate(d *schema.ResourceData, meta interface{}) e
 		Name:        gitlab.String(d.Get("name").(string)),
 		ExternalURL: gitlab.String(d.Get("external_url").(string)),
 	}
-	environmentID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
+	environmentID := d.Get("environment_id").(int)
 
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
@@ -102,7 +100,7 @@ func resourceGitlabEnvironmentUpdate(d *schema.ResourceData, meta interface{}) e
 		options.ExternalURL = gitlab.String(d.Get("external_url").(string))
 	}
 
-	_, _, err = client.Environments.EditEnvironment(project, environmentID, options)
+	_, _, err := client.Environments.EditEnvironment(project, environmentID, options)
 	if err != nil {
 		return err
 	}
@@ -113,10 +111,7 @@ func resourceGitlabEnvironmentUpdate(d *schema.ResourceData, meta interface{}) e
 func resourceGitlabEnvironmentDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	environmentID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
+	environmentID := d.Get("environment_id").(int)
 
 	// Environment must be stopped prior to deletion or a 403 will be received
 	stopResp, err := client.Environments.StopEnvironment(project, environmentID)
