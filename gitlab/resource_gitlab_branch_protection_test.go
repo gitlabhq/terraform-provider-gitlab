@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -25,8 +24,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
@@ -40,8 +39,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchProtectionUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.MaintainerPermissions],
@@ -56,8 +55,8 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabBranchProtectionUpdateCodeOwnerApprovalRequiredConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.MaintainerPermissions],
@@ -72,19 +71,19 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabBranchProtectionUpdateGranularConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					resource.TestCheckResourceAttr("gitlab_branch_protection.BranchProtect", "allowed_to_push.0.access_level.0", "maintainer"),
-					resource.TestCheckResourceAttr("gitlab_branch_protection.BranchProtect", "allowed_to_merge.0.access_level.0", "maintainer"),
-					resource.TestCheckResourceAttr("gitlab_branch_protection.BranchProtect", "allowed_to_merge.0.access_level.1", "developer"),
-					resource.TestCheckResourceAttr("gitlab_branch_protection.BranchProtect", "allowed_to_unprotect.0.access_level.0", "developer"),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					resource.TestCheckResourceAttr("gitlab_branch_protection.branch_protect", "allowed_to_push.0.access_level.0", "maintainer"),
+					resource.TestCheckResourceAttr("gitlab_branch_protection.branch_protect", "allowed_to_merge.0.access_level.0", "maintainer"),
+					resource.TestCheckResourceAttr("gitlab_branch_protection.branch_protect", "allowed_to_merge.0.access_level.1", "developer"),
+					resource.TestCheckResourceAttr("gitlab_branch_protection.branch_protect", "allowed_to_unprotect.0.access_level.0", "developer"),
 				),
 			},
 			// Update the Branch Protection to get back to initial settings
 			{
 				Config: testAccGitlabBranchProtectionConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.BranchProtect", &pb),
-					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.BranchProtect", &pb),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
@@ -96,18 +95,6 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 			},
 		},
 	})
-}
-
-func TestAccGitlabBranchProtection_UpgradeV0(t *testing.T) {
-	expected := testAccGitlabBranchProtectionStateDataV1()
-	actual, err := resourceGitlabBranchProtectionStateUpgradeV0(testAccGitlabBranchProtectionStateDataV0(), nil)
-	if err != nil {
-		t.Fatalf("error migrating state: %s", err)
-	}
-
-	if !reflect.DeepEqual(expected, actual) {
-		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
-	}
 }
 
 func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gitlab.ProtectedBranch) resource.TestCheckFunc {
@@ -227,8 +214,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
-  project = "${gitlab_project.foo.id}"
+resource "gitlab_branch_protection" "branch_protect" {
+  project = gitlab_project.foo.id
   branch = "BranchProtect-%d"
   push_access_level = "developer"
   merge_access_level = "developer"
@@ -248,8 +235,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
-	project = "${gitlab_project.foo.id}"
+resource "gitlab_branch_protection" "branch_protect" {
+	project = gitlab_project.foo.id
 	branch = "BranchProtect-%d"
 	push_access_level = "maintainer"
 	merge_access_level = "maintainer"
@@ -269,8 +256,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
-	project = "${gitlab_project.foo.id}"
+resource "gitlab_branch_protection" "branch_protect" {
+	project = gitlab_project.foo.id
 	branch = "BranchProtect-%d"
 	push_access_level = "maintainer"
 	merge_access_level = "maintainer"
@@ -291,8 +278,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_branch_protection" "BranchProtect" {
-	project = "${gitlab_project.foo.id}"
+resource "gitlab_branch_protection" "branch_protect" {
+	project = gitlab_project.foo.id
 	branch = "BranchProtect-%d"
 	allowed_to_push {
 		access_level = ["maintainer"]
@@ -305,25 +292,4 @@ resource "gitlab_branch_protection" "BranchProtect" {
 	}
 }
 	`, rInt, rInt)
-}
-
-func testAccGitlabBranchProtectionStateDataV0() map[string]interface{} {
-	return map[string]interface{}{
-		"project":            "test",
-		"branch":             "master",
-		"merge_access_level": "maintainer",
-		"push_access_level":  "developer",
-	}
-}
-
-func testAccGitlabBranchProtectionStateDataV1() map[string]interface{} {
-	v0 := testAccGitlabBranchProtectionStateDataV0()
-	return map[string]interface{}{
-		"project":                      v0["project"],
-		"branch":                       v0["branch"],
-		"merge_access_level":           v0["merge_access_level"],
-		"push_access_level":            v0["push_access_level"],
-		"unprotect_access_level":       "maintainer",
-		"code_owner_approval_required": false,
-	}
 }

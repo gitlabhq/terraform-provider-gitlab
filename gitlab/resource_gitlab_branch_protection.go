@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -178,49 +179,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Optional: true,
 			},
 		},
-		SchemaVersion: 1,
-		StateUpgraders: []schema.StateUpgrader{
-			{
-				Type:    resourceGitlabBranchProtectionV0(acceptedAccessLevels).CoreConfigSchema().ImpliedType(),
-				Upgrade: resourceGitlabBranchProtectionStateUpgradeV0,
-				Version: 0,
-			},
-		},
 	}
-}
-
-func resourceGitlabBranchProtectionV0(acceptedAccessLevels []string) *schema.Resource {
-	return &schema.Resource{
-		Schema: map[string]*schema.Schema{
-			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"branch": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
-			},
-			"push_access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
-			},
-			"merge_access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
-			},
-		},
-	}
-}
-
-func resourceGitlabBranchProtectionStateUpgradeV0(rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
-	rawState["unprotect_access_level"] = accessLevel[gitlab.MaintainerPermissions]
-	rawState["code_owner_approval_required"] = false
-
-	return rawState, nil
 }
 
 func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface{}) error {
@@ -314,20 +273,28 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface{}) error {
+	// NOTE: At the time of writing, the only value that does not force re-creation is code_owner_approval_required,
+	// so therefore that is the only update that needs to be handled.
+
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	branch := gitlab.String(d.Get("branch").(string))
+	branch := d.Get("branch").(string)
+	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
-	if d.HasChange("code_owner_approval_required") {
-		codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
-		requireCodeOwnerApprovalsOptions := &gitlab.RequireCodeOwnerApprovalsOptions{
-			CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
+	log.Printf("[DEBUG] update gitlab branch protection for project %s, branch %s", project, branch)
+
+	options := &gitlab.RequireCodeOwnerApprovalsOptions{
+		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
+	}
+
+	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+		// The user might be running a version of GitLab that does not support this feature.
+		// We enhance the generic 404 error with a more informative message.
+		if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
+			return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
 		}
 
-		_, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, *branch, requireCodeOwnerApprovalsOptions)
-		if err != nil {
-			return err
-		}
+		return err
 	}
 
 	return resourceGitlabBranchProtectionRead(d, meta)
@@ -348,7 +315,7 @@ func projectAndBranchFromID(id string) (string, string, error) {
 	project, branch, err := parseTwoPartID(id)
 
 	if err != nil {
-		log.Printf("[WARN] cannot get group member id from input: %v", id)
+		log.Printf("[WARN] cannot get branch protection id from input: %v", id)
 	}
 	return project, branch, err
 }

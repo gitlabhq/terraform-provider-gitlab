@@ -8,7 +8,7 @@ description: |-
 
 # gitlab\_branch_protection
 
-This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch. GitLab EE features to protect by group or user are also supported.
+This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.
 
 ## Example Usage
 
@@ -51,10 +51,10 @@ The following arguments are supported:
 
 * `unprotect_access_level` - (Optional; conflicts with allowed_to_unprotect) One of five levels of access to the project.  Defaults to Maintainer.
 
-* `allowed_to_push` - (Required if not setting push_access_level) GitLab EE Only - Map of user ids, group ids, and access levels to grant access.  At least one of user_id, group_id, or access_level must be defined.
+* `allowed_to_push` - (Required if not setting push_access_level) Map of user ids, group ids, and access levels to grant access.  At least one of user_id, group_id, or access_level must be defined.  GitLab EE Only.
 
-* `allowed_to_merge` - (Required if not setting merge_access_level) GitLab EE Only - Map of user ids, group ids, and access levels to grant access.  At least one of user_id, group_id, or access_level must be defined.
+* `allowed_to_merge` - (Required if not setting merge_access_level) Map of user ids, group ids, and access levels to grant access.  At least one of user_id, group_id, or access_level must be defined.  GitLab EE Only.
 
-* `allowed_to_unprotect` - (Optional; conflicts with unprotect_access_level) GitLab EE Only - Map of user ids, group ids, and access levels to grant access.  At least one of user_id, group_id, or access_level must be defined.
+* `allowed_to_unprotect` - (Optional; conflicts with unprotect_access_level) Map of user ids, group ids, and access levels to grant access.  At least one of user_id, group_id, or access_level must be defined. GitLab EE Only.
 
-* `code_owner_approval_required` - (Optional) GitLab EE Only - True or false.  Defaults to false.
+* `code_owner_approval_required` - (Optional) Bool, defaults to false. Can be set to true to require code owner approval before merging.  GitLab EE Only.
