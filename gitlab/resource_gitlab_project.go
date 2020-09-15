@@ -208,6 +208,22 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeBool,
 		Optional: true,
 	},
+	"template_name": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"template_project_id": {
+		Type:     schema.TypeInt,
+		Optional: true,
+	},
+	"use_custom_template": {
+		Type:     schema.TypeBool,
+		Optional: true,
+	},
+	"group_with_project_templates_id": {
+		Type:     schema.TypeInt,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -299,6 +315,22 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("import_url"); ok {
 		options.ImportURL = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("template_name"); ok {
+		options.TemplateName = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("template_project_id"); ok {
+		options.TemplateProjectID = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("use_custom_template"); ok {
+		options.UseCustomTemplate = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("group_with_project_templates_id"); ok {
+		options.GroupWithProjectTemplatesID = gitlab.Int(v.(int))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
