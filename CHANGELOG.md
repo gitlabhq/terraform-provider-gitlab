@@ -1,15 +1,21 @@
-## 2.12.0 (Unreleased)
+## 3.0.0 (Unreleased)
 
 NOTES:
+
 * If you are using the `environment_scope` attribute of `gitlab_project_variable` to manage multiple variables with the same key, it is recommended to use GitLab 13.4+. See [this related GitLab issue](https://gitlab.com/gitlab-org/gitlab/-/issues/9912) for older versions.
+* The ID format of the `gitlab_project_variable` resource changed. The upgrade should be automatic.
+* The default value of the `gitlab_project_variable` resource's `environment_scope` attribute has changed from `0` to `*`.
 
 FEATURES:
+
 * **New Data Source:** `gitlab_group_membership` [GH-264]
+* **New Resource:** `gitlab_instance_cluster` [GH-367]
 * **New Resource:** `gitlab_project_level_mr_approvals` [GH-356]
 * **New Resource:** `gitlab_project_mirror` [GH-358]
 * **New Resource:** `gitlab_service_pipelines_email` [GH-375]
 
 ENHANCEMENTS:
+
 * data-source/gitlab_project: New `path_with_namespace` attribute [GH-403]
 * resource/gitlab_branch_protection: New `code_owner_approval_required` attribute [GH-380]
 * resource/gitlab_project: New `path_with_namespace` attribute [GH-403]
@@ -24,8 +30,10 @@ ENHANCEMENTS:
 * resource/gitlab_user: Require either the `password` or `reset_password` attribute to be set [GH-262]
 
 BUG FIXES:
+
 * resource/gitlab_pipeline_schedule: Fix a rare error during deletion [GH-364]
 * resource/gitlab_pipeline_schedule_variable: Fix a rare error during deletion [GH-364]
+* resource/gitlab_project: Fix the `default_branch` attribute changing to `null` after first apply [GH-343]
 * resource/gitlab_project_variable: Fix inconsistent reads for variables with non-unique keys [GH-409]
 * resource/gitlab_project_variable: Change the default `environment_scope` from `0` to `*` [GH-409]
 * resource/gitlab_service_jira: Fix a rare state inconsistency problem during creation [GH-363]
