@@ -90,6 +90,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_share_group":        resourceGitlabProjectShareGroup(),
 			"gitlab_group_cluster":              resourceGitlabGroupCluster(),
 			"gitlab_group_ldap_link":            resourceGitlabGroupLdapLink(),
+			"gitlab_instance_cluster":           resourceGitlabInstanceCluster(),
 			"gitlab_project_mirror":             resourceGitlabProjectMirror(),
 			"gitlab_project_level_mr_approvals": resourceGitlabProjectLevelMRApprovals(),
 		},

@@ -97,6 +97,7 @@ ENHANCEMENTS:
 ## 2.5.1 (April 06, 2020)
 
 BUGFIXES:
+
 * Support for soft-delete of groups and projects in Gitlab Enterprise Edition 
   ([#282](https://github.com/gitlabhq/terraform-provider-gitlab/issues/282),
    [#283](https://github.com/gitlabhq/terraform-provider-gitlab/issues/283),
