@@ -43,24 +43,30 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeString,
 		Optional: true,
 		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-			// If the old default branch is empty, it means that the project does not
-			// have a default branch. This can only happen if the project does not have
-			// branches, i.e. it is an empty project. In that case it is useless to
-			// try setting a specific default branch (because no branch exists).
-			// This code will defer the setting of a default branch to a time when the
-			// project is no longer empty.
+			// `old` is the current value on GitLab side
+			// `new` is the value that Terraform plans to set there
+
+			log.Printf("[DEBUG] default_branch DiffSuppressFunc old new")
+			log.Printf("[DEBUG]   (%T) %#v, (%T) %#v", old, old, new, new)
+
+			// If there is no current default branch, it means that the project is
+			// empty and does not have branches. Setting the default branch will fail
+			// with 400 error. The check will defer the setting of a default branch
+			// to a time when the repository is no longer empty.
 			if old == "" {
+				if new != "" {
+					log.Printf("[WARN] not setting default_branch %#v on empty repo", new)
+				}
 				return true
 			}
 
-			// Once the initialize_with_readme attribute is set to true, Gitlab creates
-			// a master branch and sets it as default. If the Gitlab project resource
-			// doesn't have default_branch attribute specified, Terraform will
-			// force "master" => "" on the next run.
-			if v, ok := d.GetOk("initialize_with_readme"); ok {
-				if new == "" && v == true {
-					return true
-				}
+			// For non-empty repositories GitLab automatically sets master as the
+			// default branch. If the project resource doesn't specify default_branch
+			// attribute, Terraform will force "master" => "" on the next run. This
+			// check makes Terraform ignore default branch value until it is set in
+			// .tf configuration. For schema.TypeString empty is equal to "".
+			if new == "" {
+				return true
 			}
 
 			return old == new
