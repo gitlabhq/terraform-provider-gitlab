@@ -27,6 +27,10 @@ func dataSourceGitlabProject() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"path_with_namespace": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -131,6 +135,7 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	d.SetId(fmt.Sprintf("%d", found.ID))
 	d.Set("name", found.Name)
 	d.Set("path", found.Path)
+	d.Set("path_with_namespace", found.PathWithNamespace)
 	d.Set("description", found.Description)
 	d.Set("default_branch", found.DefaultBranch)
 	d.Set("request_access_enabled", found.RequestAccessEnabled)

@@ -64,6 +64,48 @@ func resourceGitlabGroup() *schema.Resource {
 				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
 			},
+			"share_with_group_lock": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"project_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "maintainer",
+				ValidateFunc: validation.StringInSlice([]string{"noone", "maintainer", "developer"}, true),
+			},
+			"auto_devops_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"emails_disabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"mentions_disabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"subgroup_creation_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "owner",
+				ValidateFunc: validation.StringInSlice([]string{"owner", "maintainer"}, true),
+			},
+			"require_two_factor_authentication": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"two_factor_grace_period": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  48,
+			},
 			"parent_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
@@ -97,6 +139,38 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("share_with_group_lock"); ok {
+		options.ShareWithGroupLock = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("require_two_factor_authentication"); ok {
+		options.RequireTwoFactorAuth = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("two_factor_grace_period"); ok {
+		options.TwoFactorGracePeriod = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("project_creation_level"); ok {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("auto_devops_enabled"); ok {
+		options.AutoDevopsEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("subgroup_creation_level"); ok {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
+	}
+
+	if v, ok := d.GetOk("emails_disabled"); ok {
+		options.EmailsDisabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("mentions_disabled"); ok {
+		options.MentionsDisabled = gitlab.Bool(v.(bool))
 	}
 
 	if v, ok := d.GetOk("parent_id"); ok {
@@ -144,8 +218,16 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
+	d.Set("project_creation_level", group.ProjectCreationLevel)
+	d.Set("subgroup_creation_level", group.SubGroupCreationLevel)
+	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuth)
+	d.Set("two_factor_grace_period", group.TwoFactorGracePeriod)
+	d.Set("auto_devops_enabled", group.AutoDevopsEnabled)
+	d.Set("emails_disabled", group.EmailsDisabled)
+	d.Set("mentions_disabled", group.MentionsDisabled)
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
+	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 
 	return nil
 }
@@ -179,6 +261,38 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	// https://gitlab.com/gitlab-org/gitlab-ce/issues/38459
 	if v, ok := d.GetOk("visibility_level"); ok {
 		options.Visibility = stringToVisibilityLevel(v.(string))
+	}
+
+	if d.HasChange("project_creation_level") {
+		options.ProjectCreationLevel = stringToProjectCreationLevel(d.Get("project_creation_level").(string))
+	}
+
+	if d.HasChange("subgroup_creation_level") {
+		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(d.Get("subgroup_creation_level").(string))
+	}
+
+	if d.HasChange("require_two_factor_authentication") {
+		options.RequireTwoFactorAuth = gitlab.Bool(d.Get("require_two_factor_authentication").(bool))
+	}
+
+	if d.HasChange("two_factor_grace_period") {
+		options.TwoFactorGracePeriod = gitlab.Int(d.Get("two_factor_grace_period").(int))
+	}
+
+	if d.HasChange("auto_devops_enabled") {
+		options.AutoDevopsEnabled = gitlab.Bool(d.Get("auto_devops_enabled").(bool))
+	}
+
+	if d.HasChange("emails_disabled") {
+		options.EmailsDisabled = gitlab.Bool(d.Get("emails_disabled").(bool))
+	}
+
+	if d.HasChange("mentions_disabled") {
+		options.MentionsDisabled = gitlab.Bool(d.Get("mentions_disabled").(bool))
+	}
+
+	if d.HasChange("share_with_group_lock") {
+		options.ShareWithGroupLock = gitlab.Bool(d.Get("share_with_group_lock").(bool))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

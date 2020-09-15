@@ -20,7 +20,7 @@ resource "gitlab_project" "awesome_project" {
 }
 
 resource "gitlab_service_jira" "jira" {
-  project  = "${gitlab_project.awesome_project.id}"
+  project  = gitlab_project.awesome_project.id
   url      = "https://jira.example.com"
   username = "user"
   password = "mypass"

@@ -32,3 +32,5 @@ The following arguments are supported:
 * `push_access_level` - (Required) One of five levels of access to the project.
 
 * `merge_access_level` - (Required) One of five levels of access to the project.
+
+* `code_owner_approval_required` (Optional) Bool, defaults to false. Can be set to true to require code owner approval before merging.

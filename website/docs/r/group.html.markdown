@@ -44,9 +44,33 @@ support for projects in this group.
 * `request_access_enabled` - (Optional) Boolean, defaults to false.  Whether to
 enable users to request access to the group.
 
-* `visibility_level` - (Optional) Set to `public` to create a public group.
-  Valid values are `private`, `internal`, `public`.
-  Groups are created as private by default.
+* `visibility_level` - (Optional) The group's visibility. Can be `private`, `internal`, or `public`.
+
+* `share_with_group_lock` - (Optional) Boolean, defaults to false.  Prevent sharing
+a project with another group within this group.
+
+* `project_creation_level` - (Optional), defaults to Maintainer.
+Determine if developers can create projects
+in the group. Can be noone (No one), maintainer (Maintainers),
+or developer (Developers + Maintainers).
+
+* `auto_devops_enabled` - (Optional) Boolean, defaults to false.  Default to Auto
+DevOps pipeline for all projects within this group.
+
+* `emails_disabled` - (Optional) Boolean, defaults to false.  Disable email notifications
+
+* `mentions_disabled` - (Optional) Boolean, defaults to false.  Disable the capability
+of a group from getting mentioned
+
+* `subgroup_creation_level` - (Optional), defaults to Owner.
+ Allowed to create subgroups.
+Can be owner (Owners), or maintainer (Maintainers).
+
+* `require_two_factor_authentication` - (Optional) Boolean, defaults to false.
+equire all users in this group to setup Two-factor authentication.
+
+* `two_factor_grace_period` - (Optional) Int, defaults to 48.
+Time before Two-factor authentication is enforced (in hours).
 
 * `parent_id` - (Optional) Integer, id of the parent group (creates a nested group).
 
