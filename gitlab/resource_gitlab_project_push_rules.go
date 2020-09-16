@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -100,9 +101,29 @@ func resourceGitlabProjectPushRulesCreate(d *schema.ResourceData, meta interface
 	}
 	log.Printf("[DEBUG] create gitlab project %s push rules %#v", project, *options)
 
-	pushRules, _, err := client.Projects.AddProjectPushRule(project, options)
+	pushRules, resp, err := client.Projects.AddProjectPushRule(project, options)
 	if err != nil {
-		return err
+		if resp.StatusCode == http.StatusUnprocessableEntity {
+			options_ := &gitlab.EditProjectPushRuleOptions{
+				CommitMessageRegex: gitlab.String(d.Get("commit_message_regex").(string)),
+				BranchNameRegex:    gitlab.String(d.Get("branch_name_regex").(string)),
+				AuthorEmailRegex:   gitlab.String(d.Get("author_email_regex").(string)),
+				FileNameRegex:      gitlab.String(d.Get("file_name_regex").(string)),
+				DenyDeleteTag:      gitlab.Bool(d.Get("deny_delete_tag").(bool)),
+				MemberCheck:        gitlab.Bool(d.Get("member_check").(bool)),
+				PreventSecrets:     gitlab.Bool(d.Get("prevent_secrets").(bool)),
+				MaxFileSize:        gitlab.Int(d.Get("max_file_size").(int)),
+			}
+			log.Printf("[DEBUG] overwrite gitlab project %s push rules %#v", project, *options_)
+			pushRules_, _, err := client.Projects.EditProjectPushRule(project, options_)
+			if err != nil {
+				return err
+			}
+			d.SetId(fmt.Sprintf("%d", pushRules_.ID))
+			return resourceGitlabProjectPushRulesRead(d, meta)
+		} else {
+			return err
+		}
 	}
 	d.SetId(fmt.Sprintf("%d", pushRules.ID))
 	return resourceGitlabProjectPushRulesRead(d, meta)
