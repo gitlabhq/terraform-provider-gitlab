@@ -36,7 +36,6 @@ $ make build
 
 Using the provider
 ----------------------
-## Fill in for each provider
 
 # Developing the Provider
 
