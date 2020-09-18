@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -16,7 +15,6 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabProjectShareGroupCreate,
 		Read:   resourceGitlabProjectShareGroupRead,
-		Update: resourceGitlabProjectShareGroupUpdate,
 		Delete: resourceGitlabProjectShareGroupDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
@@ -36,6 +34,7 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 			"access_level": {
 				Type:         schema.TypeString,
 				ValidateFunc: validateValueFunc(acceptedAccessLevels),
+				ForceNew:     true,
 				Required:     true,
 			},
 		},
@@ -102,26 +101,6 @@ func projectIdAndGroupIdFromId(id string) (string, int, error) {
 	}
 
 	return projectId, groupId, nil
-}
-
-func resourceGitlabProjectShareGroupUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gitlab.Client)
-
-	groupId := d.Get("group_id").(int)
-	projectId := d.Get("project_id").(string)
-	accessLevelId := accessLevelID[strings.ToLower(d.Get("access_level").(string))]
-
-	options := gitlab.ShareWithGroupOptions{
-		GroupID:     &groupId,
-		GroupAccess: &accessLevelId,
-	}
-	log.Printf("[DEBUG] update gitlab project membership %v for %s", groupId, projectId)
-
-	_, err := client.Projects.ShareProjectWithGroup(projectId, &options)
-	if err != nil {
-		return err
-	}
-	return resourceGitlabProjectShareGroupRead(d, meta)
 }
 
 func resourceGitlabProjectShareGroupDelete(d *schema.ResourceData, meta interface{}) error {

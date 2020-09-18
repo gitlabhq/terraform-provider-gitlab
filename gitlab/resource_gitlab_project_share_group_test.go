@@ -1,8 +1,8 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -12,138 +12,109 @@ import (
 )
 
 func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
-	var membership struct {
-		GroupID          int    "json:\"group_id\""
-		GroupName        string "json:\"group_name\""
-		GroupAccessLevel int    "json:\"group_access_level\""
-	}
-	rInt := acctest.RandInt()
+	randName := acctest.RandomWithPrefix("acctest")
 
-	resource.Test(t, resource.TestCase{PreCheck: func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectShareGroupDestroy,
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
 		Steps: []resource.TestStep{
-
-			// Assign member to the project as a developer
+			// Share a new project with a new group.
 			{
-				Config: testAccGitlabProjectShareGroupConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectShareGroupExists("gitlab_project_share_group.foo", &membership), testAccCheckGitlabProjectShareGroupAttributes(&membership, &testAccGitlabProjectShareGroupExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
-				})),
+				Config: testAccGitlabProjectShareGroupConfig(randName, "guest"),
+				Check:  testAccCheckGitlabProjectSharedWithGroup("root/"+randName, randName, gitlab.GuestPermissions),
+			},
+			// Update the access level.
+			{
+				Config: testAccGitlabProjectShareGroupConfig(randName, "reporter"),
+				Check:  testAccCheckGitlabProjectSharedWithGroup("root/"+randName, randName, gitlab.ReporterPermissions),
+			},
+			// Delete the gitlab_project_share_group resource.
+			{
+				Config: testAccGitlabProjectShareGroupConfigDeleteShare(randName),
+				Check:  testAccCheckGitlabProjectIsNotShared("root/" + randName),
 			},
 		},
 	})
 }
 
-func testAccCheckGitlabProjectShareGroupExists(n string, membership *struct {
-	GroupID          int    "json:\"group_id\""
-	GroupName        string "json:\"group_name\""
-	GroupAccessLevel int    "json:\"group_access_level\""
-}) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		if !ok {
-			return fmt.Errorf("not found: %s", n)
-		}
+func testAccCheckGitlabProjectSharedWithGroup(projectName, groupName string, accessLevel gitlab.AccessLevelValue) resource.TestCheckFunc {
+	return func(_ *terraform.State) error {
+		client := testAccProvider.Meta().(*gitlab.Client)
 
-		projectID := rs.Primary.Attributes["project_id"]
-		if projectID == "" {
-			return fmt.Errorf("no project ID is set")
-		}
-
-		groupID := rs.Primary.Attributes["group_id"]
-		if groupID == "" {
-			return fmt.Errorf("no user id is set")
-		}
-
-		gotProjectShareGroup, _, err := conn.Projects.GetProject(projectID, nil)
+		project, _, err := client.Projects.GetProject(projectName, nil)
 		if err != nil {
 			return err
 		}
 
-		*membership = gotProjectShareGroup.SharedWithGroups[0]
-		return nil
-	}
-}
-
-type testAccGitlabProjectShareGroupExpectedAttributes struct {
-	access_level string
-}
-
-func testAccCheckGitlabProjectShareGroupAttributes(membership *struct {
-	GroupID          int    "json:\"group_id\""
-	GroupName        string "json:\"group_name\""
-	GroupAccessLevel int    "json:\"group_access_level\""
-}, want *testAccGitlabProjectShareGroupExpectedAttributes) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-
-		accessLevelId, ok := accessLevel[gitlab.AccessLevelValue(membership.GroupAccessLevel)]
-		if !ok {
-			return fmt.Errorf("invalid access level '%s'", accessLevelId)
-		}
-		if accessLevelId != want.access_level {
-			return fmt.Errorf("got access level %s; want %s", accessLevelId, want.access_level)
-		}
-		return nil
-	}
-}
-
-func testAccCheckGitlabProjectShareGroupDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project_share_group" {
-			continue
-		}
-
-		projectID := rs.Primary.Attributes["project_id"]
-		groupID := rs.Primary.Attributes["group_id"]
-
-		// GetProjectMember needs int type for groupID
-		groupIDI, err := strconv.Atoi(groupID)
-		gotShareGroup, _, err := conn.Projects.GetProject(projectID, nil)
+		group, _, err := client.Groups.GetGroup(groupName)
 		if err != nil {
-			return nil
+			return err
 		}
 
-		for _, v := range gotShareGroup.SharedWithGroups {
-			if groupIDI == v.GroupID {
-				if gotShareGroup != nil && fmt.Sprintf("%d", v.GroupAccessLevel) == rs.Primary.Attributes["access_level"] {
-					return fmt.Errorf("project still has a reference.")
+		for _, share := range project.SharedWithGroups {
+			if share.GroupID == group.ID {
+				if gitlab.AccessLevelValue(share.GroupAccessLevel) != accessLevel {
+					return fmt.Errorf("groupAccessLevel was %d (wanted %d)", share.GroupAccessLevel, accessLevel)
 				}
+				return nil
 			}
 		}
+
+		return errors.New("project is not shared with group")
+	}
+}
+
+func testAccCheckGitlabProjectIsNotShared(projectName string) resource.TestCheckFunc {
+	return func(_ *terraform.State) error {
+		client := testAccProvider.Meta().(*gitlab.Client)
+
+		project, _, err := client.Projects.GetProject(projectName, nil)
+		if err != nil {
+			return err
+		}
+
+		if len(project.SharedWithGroups) != 0 {
+			return fmt.Errorf("project is shared with %d groups (wanted 0)", len(project.SharedWithGroups))
+		}
+
 		return nil
 	}
-	return nil
 }
 
-func testAccGitlabProjectShareGroupConfig(rInt int) string {
+func testAccGitlabProjectShareGroupConfig(randName, accessLevel string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project_share_group" "foo" {
-  project_id = "${gitlab_project.foo.id}"
-  group_id = "${gitlab_group.test.id}"
-  access_level = "developer"
-}
+resource "gitlab_project" "test" {
+  name = "%[1]s"
 
-resource "gitlab_project" "foo" {
-  name = "foo%d"
-  description = "Terraform acceptance tests"
-  visibility_level ="public"
-
-  lifecycle {
-    ignore_changes = [
-   		shared_with_groups
-    ]
-  }
+  # So that acceptance tests can be run in a gitlab organization with no billing.
+  visibility_level = "public"
 }
 
 resource "gitlab_group" "test" {
-  name        = "foo%d"
-  path        = "foo%d"
-  description = "Description for foo%d"
+  name = "%[1]s"
+  path = "%[1]s"
 }
 
-`, rInt, rInt, rInt, rInt)
+resource "gitlab_project_share_group" "test" {
+  project_id = gitlab_project.test.id
+  group_id = gitlab_group.test.id
+  access_level = "%[2]s"
+}
+`, randName, accessLevel)
+}
+
+func testAccGitlabProjectShareGroupConfigDeleteShare(randName string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "test" {
+  name = "%[1]s"
+
+  # So that acceptance tests can be run in a gitlab organization with no billing.
+  visibility_level = "public"
+}
+
+resource "gitlab_group" "test" {
+  name = "%[1]s"
+  path = "%[1]s"
+}
+`, randName)
 }

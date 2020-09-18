@@ -92,85 +92,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckAggregateGitlabProject(&defaults, &received),
 				),
 			},
-			// Step3 Update the project to share the project with a group
-			{
-				Config: testAccGitlabProjectSharedWithGroup(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(
-						&gitlab.Project{
-							Namespace:                        &gitlab.ProjectNamespace{ID: 0},
-							Name:                             fmt.Sprintf("foo-%d", rInt),
-							Path:                             fmt.Sprintf("foo.%d", rInt),
-							Description:                      "Terraform acceptance tests",
-							RequestAccessEnabled:             true,
-							IssuesEnabled:                    true,
-							MergeRequestsEnabled:             true,
-							JobsEnabled:                      true,
-							WikiEnabled:                      true,
-							SnippetsEnabled:                  true,
-							ContainerRegistryEnabled:         true,
-							LFSEnabled:                       true,
-							SharedRunnersEnabled:             false,
-							Visibility:                       gitlab.PublicVisibility,
-							MergeMethod:                      gitlab.FastForwardMerge,
-							OnlyAllowMergeIfPipelineSucceeds: false,
-							OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-							TagList:              []string{},
-							ApprovalsBeforeMerge: 0,
-							SharedWithGroups: []struct {
-								GroupID          int    `json:"group_id"`
-								GroupName        string `json:"group_name"`
-								GroupAccessLevel int    `json:"group_access_level"`
-							}{
-								{0, fmt.Sprintf("foo-name-%d", rInt), 30},
-							},
-						},
-						&received),
-				),
-			},
-			// Step4 Update the project to share the project with more groups
-			{
-				Config: testAccGitlabProjectSharedWithGroup2(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(&gitlab.Project{
-						Namespace:                        &gitlab.ProjectNamespace{ID: 0},
-						Name:                             fmt.Sprintf("foo-%d", rInt),
-						Path:                             fmt.Sprintf("foo.%d", rInt),
-						Description:                      "Terraform acceptance tests",
-						RequestAccessEnabled:             true,
-						IssuesEnabled:                    true,
-						MergeRequestsEnabled:             true,
-						JobsEnabled:                      true,
-						WikiEnabled:                      true,
-						SnippetsEnabled:                  true,
-						ContainerRegistryEnabled:         true,
-						LFSEnabled:                       true,
-						Visibility:                       gitlab.PublicVisibility,
-						MergeMethod:                      gitlab.FastForwardMerge,
-						OnlyAllowMergeIfPipelineSucceeds: false,
-						OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-						SharedWithGroups: []struct {
-							GroupID          int    `json:"group_id"`
-							GroupName        string `json:"group_name"`
-							GroupAccessLevel int    `json:"group_access_level"`
-						}{
-							{0, fmt.Sprintf("foo-name-%d", rInt), 10},
-							{0, fmt.Sprintf("foo2-name-%d", rInt), 30},
-						},
-					}, &received),
-				),
-			},
-			// Step5 Update the project to unshare the project
-			{
-				Config: testAccGitlabProjectConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(&defaults, &received),
-				),
-			},
-			// Step6 Update the project creating the default branch
+			// Step3 Update the project creating the default branch
 			{
 				// Get the ID from the project data at the previous step
 				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "master"),
@@ -449,16 +371,9 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 	return nil
 }
 
-// testAccSkipGitLabProjectAttributes are Resource attributes that should be
-// skipped and handled another way, e.g. shared_with_groups
-var testAccSkipGitLabProjectAttributes = []string{
-	"shared_with_groups",
-}
-
 func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) resource.TestCheckFunc {
-	checks := []resource.TestCheckFunc{
-		testAccCheckGitLabProjectGroups(expected, received),
-	}
+	var checks []resource.TestCheckFunc
+
 	testResource := resourceGitlabProject()
 	expectedData := testResource.TestResourceData()
 	receivedData := testResource.TestResourceData()
@@ -466,9 +381,6 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 		attribute := a
 		attrValue := v
 		checks = append(checks, func(_ *terraform.State) error {
-			if testAccIsSkippedAttribute(attribute, testAccSkipGitLabProjectAttributes) {
-				return nil // skipping because we said so.
-			}
 			if attrValue.Computed {
 				if attrDefault, err := attrValue.DefaultValue(); err == nil {
 					if attrDefault == nil {
@@ -493,28 +405,6 @@ func testAccCheckGitlabProjectInitializeWithReadme(project *gitlab.Project, want
 			return fmt.Errorf("got description %q; want %q", project.DefaultBranch, want.DefaultBranch)
 		}
 
-		return nil
-	}
-}
-
-func testAccCheckGitLabProjectGroups(expected, received *gitlab.Project) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		groupsToCheck := expected.SharedWithGroups
-		for _, group := range received.SharedWithGroups {
-			for i, groupToCheck := range groupsToCheck {
-				if group.GroupName == groupToCheck.GroupName &&
-					group.GroupAccessLevel == groupToCheck.GroupAccessLevel {
-					groupsToCheck = append(groupsToCheck[:i], groupsToCheck[i+1:]...)
-					break
-				}
-			}
-		}
-		if len(groupsToCheck) != 0 {
-			return fmt.Errorf(
-				`attribute shared_with_groups expected "%v" received "%v"`,
-				received.SharedWithGroups,
-				expected.SharedWithGroups)
-		}
 		return nil
 	}
 }
@@ -648,69 +538,6 @@ resource "gitlab_project" "foo" {
 	archived = true
 }
 	`, rInt, rInt)
-}
-
-func testAccGitlabProjectSharedWithGroup(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name                                             = "foo-%d"
-  path                                             = "foo.%d"
-  description                                      = "Terraform acceptance tests"
-  visibility_level                                 = "public"
-  merge_method                                     = "ff"
-  only_allow_merge_if_pipeline_succeeds            = false
-  only_allow_merge_if_all_discussions_are_resolved = false
-
-  shared_with_groups {
-     group_id           = "${gitlab_group.foo.id}"
-     group_access_level = "developer"
-  }
-}
-
-resource "gitlab_group" "foo" {
-  name             = "foo-name-%d"
-  path             = "foo-path-%d"
-  description      = "Terraform acceptance tests!"
-  visibility_level = "public"
-}
-	`, rInt, rInt, rInt, rInt)
-}
-
-func testAccGitlabProjectSharedWithGroup2(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name             = "foo-%d"
-  path             = "foo.%d"
-  description      = "Terraform acceptance tests"
-  visibility_level = "public"
-  merge_method = "ff"
-  only_allow_merge_if_pipeline_succeeds = false
-  only_allow_merge_if_all_discussions_are_resolved = false
-
-  shared_with_groups {
-      group_id           = "${gitlab_group.foo.id}"
-      group_access_level = "guest"
-  }
-  shared_with_groups {
-      group_id           = "${gitlab_group.foo2.id}"
-      group_access_level = "developer"
-  }
-}
-
-resource "gitlab_group" "foo" {
-  name             = "foo-name-%d"
-  path             = "foo-path-%d"
-  description      = "Terraform acceptance tests!"
-  visibility_level = "public"
-}
-
-resource "gitlab_group" "foo2" {
-  name             = "foo2-name-%d"
-  path             = "foo2-path-%d"
-  description      = "Terraform acceptance tests!"
-  visibility_level = "public"
-}
-	`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectConfigInitializeWithReadme(rInt int) string {

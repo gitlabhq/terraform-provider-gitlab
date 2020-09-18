@@ -850,3 +850,19 @@ func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) (err
 	}
 	return err
 }
+
+func flattenSharedWithGroupsOptions(project *gitlab.Project) []interface{} {
+	var sharedWithGroupsList []interface{}
+
+	for _, option := range project.SharedWithGroups {
+		values := map[string]interface{}{
+			"group_id":           option.GroupID,
+			"group_access_level": accessLevelValueToName[gitlab.AccessLevelValue(option.GroupAccessLevel)],
+			"group_name":         option.GroupName,
+		}
+
+		sharedWithGroupsList = append(sharedWithGroupsList, values)
+	}
+
+	return sharedWithGroupsList
+}
