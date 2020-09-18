@@ -172,28 +172,6 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Elem:     &schema.Schema{Type: schema.TypeString},
 		Set:      schema.HashString,
 	},
-	"shared_with_groups": {
-		Type:     schema.TypeSet,
-		Optional: true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"group_id": {
-					Type:     schema.TypeInt,
-					Required: true,
-				},
-				"group_access_level": {
-					Type:     schema.TypeString,
-					Required: true,
-					ValidateFunc: validation.StringInSlice([]string{
-						"no one", "guest", "reporter", "developer", "maintainer"}, false),
-				},
-				"group_name": {
-					Type:     schema.TypeString,
-					Computed: true,
-				},
-			},
-		},
-	},
 	"archived": {
 		Type:        schema.TypeBool,
 		Description: "Whether the project is archived.",
@@ -249,7 +227,6 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("web_url", project.WebURL)
 	d.Set("runners_token", project.RunnersToken)
 	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
-	d.Set("shared_with_groups", flattenSharedWithGroupsOptions(project))
 	d.Set("tags", project.TagList)
 	d.Set("archived", project.Archived)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
@@ -331,14 +308,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 		if _, err := stateConf.WaitForState(); err != nil {
 			return fmt.Errorf("error while waiting for project %q import to finish: %w", *options.Name, err)
-		}
-	}
-
-	if v, ok := d.GetOk("shared_with_groups"); ok {
-		for _, option := range expandSharedWithGroupsOptions(v) {
-			if _, err := client.Projects.ShareProjectWithGroup(project.ID, option); err != nil {
-				return err
-			}
 		}
 	}
 
@@ -476,12 +445,6 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
-	if d.HasChange("shared_with_groups") {
-		if err := updateSharedWithGroups(d, meta); err != nil {
-			return err
-		}
-	}
-
 	if d.HasChange("archived") {
 		if d.Get("archived").(bool) {
 			if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
@@ -536,123 +499,5 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 	if err != nil {
 		return fmt.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
 	}
-	return nil
-}
-
-func expandSharedWithGroupsOptions(v interface{}) []*gitlab.ShareWithGroupOptions {
-	shareWithGroupOptionsList := []*gitlab.ShareWithGroupOptions{}
-
-	for _, config := range v.(*schema.Set).List() {
-		data := config.(map[string]interface{})
-
-		groupAccess := accessLevelNameToValue[data["group_access_level"].(string)]
-
-		shareWithGroupOptions := &gitlab.ShareWithGroupOptions{
-			GroupID:     gitlab.Int(data["group_id"].(int)),
-			GroupAccess: &groupAccess,
-		}
-
-		shareWithGroupOptionsList = append(shareWithGroupOptionsList,
-			shareWithGroupOptions)
-	}
-
-	return shareWithGroupOptionsList
-}
-
-func flattenSharedWithGroupsOptions(project *gitlab.Project) []interface{} {
-	sharedWithGroups := project.SharedWithGroups
-	sharedWithGroupsList := []interface{}{}
-
-	for _, option := range sharedWithGroups {
-		values := map[string]interface{}{
-			"group_id": option.GroupID,
-			"group_access_level": accessLevelValueToName[gitlab.AccessLevelValue(
-				option.GroupAccessLevel)],
-			"group_name": option.GroupName,
-		}
-
-		sharedWithGroupsList = append(sharedWithGroupsList, values)
-	}
-
-	return sharedWithGroupsList
-}
-
-func findGroupProjectSharedWith(target *gitlab.ShareWithGroupOptions,
-	groups []*gitlab.ShareWithGroupOptions) (*gitlab.ShareWithGroupOptions, int, error) {
-	for i, group := range groups {
-		if *group.GroupID == *target.GroupID {
-			return group, i, nil
-		}
-	}
-
-	return nil, 0, fmt.Errorf("group not found")
-}
-
-func getGroupsProjectSharedWith(project *gitlab.Project) []*gitlab.ShareWithGroupOptions {
-	sharedGroups := []*gitlab.ShareWithGroupOptions{}
-
-	for _, group := range project.SharedWithGroups {
-		sharedGroups = append(sharedGroups, &gitlab.ShareWithGroupOptions{
-			GroupID: gitlab.Int(group.GroupID),
-			GroupAccess: gitlab.AccessLevel(gitlab.AccessLevelValue(
-				group.GroupAccessLevel)),
-		})
-	}
-
-	return sharedGroups
-}
-
-func updateSharedWithGroups(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gitlab.Client)
-
-	var groupsToUnshare []*gitlab.ShareWithGroupOptions
-	var groupsToShare []*gitlab.ShareWithGroupOptions
-
-	// Get target groups from the TF config and current groups from Gitlab server
-	targetGroups := expandSharedWithGroupsOptions(d.Get("shared_with_groups"))
-	project, _, err := client.Projects.GetProject(d.Id(), nil)
-	if err != nil {
-		return err
-	}
-	currentGroups := getGroupsProjectSharedWith(project)
-
-	for _, targetGroup := range targetGroups {
-		currentGroup, index, err := findGroupProjectSharedWith(targetGroup, currentGroups)
-
-		// If no corresponding group is found, it must be added
-		if err != nil {
-			groupsToShare = append(groupsToShare, targetGroup)
-			continue
-		}
-
-		// If group is different it must be deleted and added again
-		if *targetGroup.GroupAccess != *currentGroup.GroupAccess {
-			groupsToShare = append(groupsToShare, targetGroup)
-			groupsToUnshare = append(groupsToUnshare, targetGroup)
-		}
-
-		// Remove currentGroup from from list
-		currentGroups = append(currentGroups[:index], currentGroups[index+1:]...)
-	}
-
-	// All groups still present in currentGroup must be deleted
-	groupsToUnshare = append(groupsToUnshare, currentGroups...)
-
-	// Unshare groups to delete and update
-	for _, group := range groupsToUnshare {
-		_, err := client.Projects.DeleteSharedProjectFromGroup(d.Id(), *group.GroupID)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Share groups to add and update
-	for _, group := range groupsToShare {
-		_, err := client.Projects.ShareProjectWithGroup(d.Id(), group)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }

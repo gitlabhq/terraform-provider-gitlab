@@ -74,11 +74,6 @@ The following arguments are supported:
 
 * `shared_runners_enabled` - (Optional) Enable shared runners for this project.
 
-* `shared_with_groups` - (Optional) Enable sharing the project with a list of groups (maps).
-  * `group_id` - (Required) Group id of the group you want to share the project with.
-  * `group_access_level` - (Required) Group's sharing permissions. See [group members permission][group_members_permissions] for more info.
-  Valid values are `guest`, `reporter`, `developer`, `maintainer`.
-
 * `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 
 * `initialize_with_readme` - (Optional) Create master branch with first commit containing a README.md file.
@@ -100,9 +95,6 @@ The following additional attributes are exported:
 * `web_url` - URL that can be used to find the project in a browser.
 
 * `runners_token` - Registration token to use during runner setup.
-
-* `shared_with_groups` - List of the groups the project is shared with.
-  * `group_name` - Group's name.
 
 * `remove_source_branch_after_merge` - Enable `Delete source branch` option by default for all new merge requests.
 
