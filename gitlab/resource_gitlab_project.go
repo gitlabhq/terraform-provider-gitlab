@@ -186,6 +186,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeBool,
 		Optional: true,
 	},
+	"packages_enabled": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -230,6 +235,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("tags", project.TagList)
 	d.Set("archived", project.Archived)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
+	d.Set("packages_enabled", project.PackagesEnabled)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -252,6 +258,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
+		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -427,6 +434,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("remove_source_branch_after_merge") {
 		options.RemoveSourceBranchAfterMerge = gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool))
+	}
+
+	if d.HasChange("packages_enabled") {
+		options.PackagesEnabled = gitlab.Bool(d.Get("packages_enabled").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
