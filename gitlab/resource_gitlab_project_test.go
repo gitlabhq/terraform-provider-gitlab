@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -52,7 +53,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
-			// Step0 Create a project with all the features on (note: "archived" is "false")
+			// Create a project with all the features on (note: "archived" is "false")
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -60,7 +61,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckAggregateGitlabProject(&defaults, &received),
 				),
 			},
-			// Step1 Update the project to turn the features off (note: "archived" is "true")
+			// Update the project to turn the features off (note: "archived" is "true")
 			{
 				Config: testAccGitlabProjectUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -86,7 +87,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					}, &received),
 				),
 			},
-			// Step2 Update the project to turn the features on again (note: "archived" is "false")
+			// Update the project to turn the features on again (note: "archived" is "false")
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -94,7 +95,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckAggregateGitlabProject(&defaults, &received),
 				),
 			},
-			// Step3 Update the project creating the default branch
+			// Update the project creating the default branch
 			{
 				// Get the ID from the project data at the previous step
 				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "master"),
@@ -103,6 +104,108 @@ func TestAccGitlabProject_basic(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
 					testAccCheckAggregateGitlabProject(&defaultsMasterBranch, &received),
 				),
+			},
+			// Test import without push rules (checks read function)
+			{
+				ResourceName:      "gitlab_project.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Add all push rules to an existing project
+			{
+				SkipFunc: isRunningInCE,
+				Config: testAccGitlabProjectConfigPushRules(rInt, `
+author_email_regex = "foo_author"
+branch_name_regex = "foo_branch"
+commit_message_regex = "foo_commit"
+commit_message_negative_regex = "foo_not_commit"
+file_name_regex = "foo_file"
+commit_committer_check = true
+deny_delete_tag = true
+member_check = true
+prevent_secrets = true
+reject_unsigned_commits = true
+max_file_size = 123
+`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					AuthorEmailRegex:           "foo_author",
+					BranchNameRegex:            "foo_branch",
+					CommitMessageRegex:         "foo_commit",
+					CommitMessageNegativeRegex: "foo_not_commit",
+					FileNameRegex:              "foo_file",
+					CommitCommitterCheck:       true,
+					DenyDeleteTag:              true,
+					MemberCheck:                true,
+					PreventSecrets:             true,
+					RejectUnsignedCommits:      true,
+					MaxFileSize:                123,
+				}),
+			},
+			// Test import with a all push rules defined (checks read function)
+			{
+				SkipFunc:          isRunningInCE,
+				ResourceName:      "gitlab_project.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Try to add push rules to an existing project in CE
+			{
+				SkipFunc:    isRunningInEE,
+				Config:      testAccGitlabProjectConfigPushRules(rInt, `author_email_regex = "foo_author"`),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Project push rules are not supported in your version of GitLab")),
+			},
+			// Update push rules
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectConfigPushRules(rInt, `author_email_regex = "foo_author"`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					AuthorEmailRegex: "foo_author",
+				}),
+			},
+			// Remove the push_rules block entirely.
+			// NOTE: The push rules will still exist upstream because the push_rules block is computed.
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					AuthorEmailRegex: "foo_author",
+				}),
+			},
+			// Add different push rules after the block was removed previously
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectConfigPushRules(rInt, `branch_name_regex = "(feature|hotfix)\\/*"`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					BranchNameRegex: `(feature|hotfix)\/*`,
+				}),
+			},
+			// Destroy the project so we can next test creating a project with push rules simultaneously
+			{
+				Config:  testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Destroy: true,
+				Check:   testAccCheckGitlabProjectDestroy,
+			},
+			// Create a new project with push rules
+			{
+				SkipFunc: isRunningInCE,
+				Config: testAccGitlabProjectConfigPushRules(rInt, `
+author_email_regex = "foo_author"
+max_file_size = 123
+`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					AuthorEmailRegex: "foo_author",
+					MaxFileSize:      123,
+				}),
+			},
+			// Try to create a new project with all push rules in CE
+			{
+				SkipFunc:    isRunningInEE,
+				Config:      testAccGitlabProjectConfigPushRules(rInt, `author_email_regex = "foo_author"`),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Project push rules are not supported in your version of GitLab")),
+			},
+			// Update to original project config
+			{
+				Config: testAccGitlabProjectConfig(rInt),
 			},
 		},
 	})
@@ -413,6 +516,81 @@ func testAccCheckGitlabProjectInitializeWithReadme(project *gitlab.Project, want
 	}
 }
 
+func testAccCheckGitlabProjectPushRules(name string, wantPushRules *gitlab.ProjectPushRules) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		client := testAccProvider.Meta().(*gitlab.Client)
+		projectResource := state.RootModule().Resources[name].Primary
+
+		gotPushRules, _, err := client.Projects.GetProjectPushRules(projectResource.ID, nil)
+		if err != nil {
+			return err
+		}
+
+		var messages []string
+
+		if gotPushRules.AuthorEmailRegex != wantPushRules.AuthorEmailRegex {
+			messages = append(messages, fmt.Sprintf("author_email_regex (got: %q, wanted: %q)",
+				gotPushRules.AuthorEmailRegex, wantPushRules.AuthorEmailRegex))
+		}
+
+		if gotPushRules.BranchNameRegex != wantPushRules.BranchNameRegex {
+			messages = append(messages, fmt.Sprintf("branch_name_regex (got: %q, wanted: %q)",
+				gotPushRules.BranchNameRegex, wantPushRules.BranchNameRegex))
+		}
+
+		if gotPushRules.CommitMessageRegex != wantPushRules.CommitMessageRegex {
+			messages = append(messages, fmt.Sprintf("commit_message_regex (got: %q, wanted: %q)",
+				gotPushRules.CommitMessageRegex, wantPushRules.CommitMessageRegex))
+		}
+
+		if gotPushRules.CommitMessageNegativeRegex != wantPushRules.CommitMessageNegativeRegex {
+			messages = append(messages, fmt.Sprintf("commit_message_negative_regex (got: %q, wanted: %q)",
+				gotPushRules.CommitMessageNegativeRegex, wantPushRules.CommitMessageNegativeRegex))
+		}
+
+		if gotPushRules.FileNameRegex != wantPushRules.FileNameRegex {
+			messages = append(messages, fmt.Sprintf("file_name_regex (got: %q, wanted: %q)",
+				gotPushRules.FileNameRegex, wantPushRules.FileNameRegex))
+		}
+
+		if gotPushRules.CommitCommitterCheck != wantPushRules.CommitCommitterCheck {
+			messages = append(messages, fmt.Sprintf("commit_committer_check (got: %t, wanted: %t)",
+				gotPushRules.CommitCommitterCheck, wantPushRules.CommitCommitterCheck))
+		}
+
+		if gotPushRules.DenyDeleteTag != wantPushRules.DenyDeleteTag {
+			messages = append(messages, fmt.Sprintf("deny_delete_tag (got: %t, wanted: %t)",
+				gotPushRules.DenyDeleteTag, wantPushRules.DenyDeleteTag))
+		}
+
+		if gotPushRules.MemberCheck != wantPushRules.MemberCheck {
+			messages = append(messages, fmt.Sprintf("member_check (got: %t, wanted: %t)",
+				gotPushRules.MemberCheck, wantPushRules.MemberCheck))
+		}
+
+		if gotPushRules.PreventSecrets != wantPushRules.PreventSecrets {
+			messages = append(messages, fmt.Sprintf("prevent_secrets (got: %t, wanted: %t)",
+				gotPushRules.PreventSecrets, wantPushRules.PreventSecrets))
+		}
+
+		if gotPushRules.RejectUnsignedCommits != wantPushRules.RejectUnsignedCommits {
+			messages = append(messages, fmt.Sprintf("reject_unsigned_commits (got: %t, wanted: %t)",
+				gotPushRules.RejectUnsignedCommits, wantPushRules.RejectUnsignedCommits))
+		}
+
+		if gotPushRules.MaxFileSize != wantPushRules.MaxFileSize {
+			messages = append(messages, fmt.Sprintf("max_file_size (got: %d, wanted: %d)",
+				gotPushRules.MaxFileSize, wantPushRules.MaxFileSize))
+		}
+
+		if len(messages) > 0 {
+			return fmt.Errorf("unexpected push_rules:\n\t- %s", strings.Join(messages, "\n\t- "))
+		}
+
+		return nil
+	}
+}
+
 func testAccGitlabProjectInGroupConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
@@ -568,4 +746,22 @@ resource "gitlab_project" "imported" {
   visibility_level = "public"
 }
 `, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigPushRules(rInt int, pushRules string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%[1]d"
+  path = "foo.%[1]d"
+  description = "Terraform acceptance tests"
+  default_branch = "master"
+
+  push_rules {
+%[2]s
+  }
+
+  # So that acceptance tests can be run in a gitlab organization with no billing.
+  visibility_level = "public"
+}
+	`, rInt, pushRules)
 }

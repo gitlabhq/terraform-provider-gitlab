@@ -1,8 +1,10 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -191,6 +193,61 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 		Default:  true,
 	},
+	"push_rules": {
+		Type:     schema.TypeList,
+		MaxItems: 1,
+		Optional: true,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"author_email_regex": {
+					Type:     schema.TypeString,
+					Optional: true,
+				},
+				"branch_name_regex": {
+					Type:     schema.TypeString,
+					Optional: true,
+				},
+				"commit_message_regex": {
+					Type:     schema.TypeString,
+					Optional: true,
+				},
+				"commit_message_negative_regex": {
+					Type:     schema.TypeString,
+					Optional: true,
+				},
+				"file_name_regex": {
+					Type:     schema.TypeString,
+					Optional: true,
+				},
+				"commit_committer_check": {
+					Type:     schema.TypeBool,
+					Optional: true,
+				},
+				"deny_delete_tag": {
+					Type:     schema.TypeBool,
+					Optional: true,
+				},
+				"member_check": {
+					Type:     schema.TypeBool,
+					Optional: true,
+				},
+				"prevent_secrets": {
+					Type:     schema.TypeBool,
+					Optional: true,
+				},
+				"reject_unsigned_commits": {
+					Type:     schema.TypeBool,
+					Optional: true,
+				},
+				"max_file_size": {
+					Type:         schema.TypeInt,
+					Optional:     true,
+					ValidateFunc: validation.IntAtLeast(0),
+				},
+			},
+		},
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -325,6 +382,18 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
+	if v, ok := d.GetOk("push_rules"); ok {
+		err := editOrAddPushRules(client, d.Id(), v.([]interface{})[0].(map[string]interface{}))
+		var httpError *gitlab.ErrorResponse
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
+			return errors.New("Project push rules are not supported in your version of GitLab")
+		}
+		if err != nil {
+			return fmt.Errorf("Failed to edit push rules for project %q: %w", d.Id(), err)
+		}
+	}
+
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -343,6 +412,19 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	resourceGitlabProjectSetToState(d, project)
+
+	log.Printf("[DEBUG] read gitlab project %q push rules", d.Id())
+
+	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id())
+	var httpError *gitlab.ErrorResponse
+	if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+		log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
+	} else if err != nil {
+		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
+	}
+
+	d.Set("push_rules", flattenProjectPushRules(pushRules))
+
 	return nil
 }
 
@@ -468,6 +550,18 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
+	if d.HasChange("push_rules") {
+		err := editOrAddPushRules(client, d.Id(), d.Get("push_rules").([]interface{})[0].(map[string]interface{}))
+		var httpError *gitlab.ErrorResponse
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
+			return errors.New("Project push rules are not supported in your version of GitLab")
+		}
+		if err != nil {
+			return fmt.Errorf("Failed to edit push rules for project %q: %w", d.Id(), err)
+		}
+	}
+
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -511,4 +605,86 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
 	}
 	return nil
+}
+
+func editOrAddPushRules(client *gitlab.Client, projectID string, m map[string]interface{}) error {
+	log.Printf("[DEBUG] Editing push rules for project %q", projectID)
+
+	editOptions := expandEditProjectPushRuleOptions(m)
+	_, _, err := client.Projects.EditProjectPushRule(projectID, editOptions)
+	if err == nil {
+		return nil
+	}
+
+	var httpErr *gitlab.ErrorResponse
+	if !errors.As(err, &httpErr) || httpErr.Response.StatusCode != http.StatusNotFound {
+		return err
+	}
+
+	// A 404 could mean that the push rules need to be re-created.
+
+	log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", projectID, err)
+	log.Printf("[DEBUG] Creating new push rules for project %q", projectID)
+
+	addOptions := expandAddProjectPushRuleOptions(m)
+	_, _, err = client.Projects.AddProjectPushRule(projectID, addOptions)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func expandEditProjectPushRuleOptions(m map[string]interface{}) *gitlab.EditProjectPushRuleOptions {
+	return &gitlab.EditProjectPushRuleOptions{
+		AuthorEmailRegex:           gitlab.String(m["author_email_regex"].(string)),
+		BranchNameRegex:            gitlab.String(m["branch_name_regex"].(string)),
+		CommitMessageRegex:         gitlab.String(m["commit_message_regex"].(string)),
+		CommitMessageNegativeRegex: gitlab.String(m["commit_message_negative_regex"].(string)),
+		FileNameRegex:              gitlab.String(m["file_name_regex"].(string)),
+		CommitCommitterCheck:       gitlab.Bool(m["commit_committer_check"].(bool)),
+		DenyDeleteTag:              gitlab.Bool(m["deny_delete_tag"].(bool)),
+		MemberCheck:                gitlab.Bool(m["member_check"].(bool)),
+		PreventSecrets:             gitlab.Bool(m["prevent_secrets"].(bool)),
+		RejectUnsignedCommits:      gitlab.Bool(m["reject_unsigned_commits"].(bool)),
+		MaxFileSize:                gitlab.Int(m["max_file_size"].(int)),
+	}
+}
+
+func expandAddProjectPushRuleOptions(m map[string]interface{}) *gitlab.AddProjectPushRuleOptions {
+	return &gitlab.AddProjectPushRuleOptions{
+		AuthorEmailRegex:           gitlab.String(m["author_email_regex"].(string)),
+		BranchNameRegex:            gitlab.String(m["branch_name_regex"].(string)),
+		CommitMessageRegex:         gitlab.String(m["commit_message_regex"].(string)),
+		CommitMessageNegativeRegex: gitlab.String(m["commit_message_negative_regex"].(string)),
+		FileNameRegex:              gitlab.String(m["file_name_regex"].(string)),
+		CommitCommitterCheck:       gitlab.Bool(m["commit_committer_check"].(bool)),
+		DenyDeleteTag:              gitlab.Bool(m["deny_delete_tag"].(bool)),
+		MemberCheck:                gitlab.Bool(m["member_check"].(bool)),
+		PreventSecrets:             gitlab.Bool(m["prevent_secrets"].(bool)),
+		RejectUnsignedCommits:      gitlab.Bool(m["reject_unsigned_commits"].(bool)),
+		MaxFileSize:                gitlab.Int(m["max_file_size"].(int)),
+	}
+}
+
+func flattenProjectPushRules(pushRules *gitlab.ProjectPushRules) (values []map[string]interface{}) {
+	if pushRules == nil {
+		return []map[string]interface{}{}
+	}
+
+	return []map[string]interface{}{
+		{
+			"author_email_regex":            pushRules.AuthorEmailRegex,
+			"branch_name_regex":             pushRules.BranchNameRegex,
+			"commit_message_regex":          pushRules.CommitMessageRegex,
+			"commit_message_negative_regex": pushRules.CommitMessageNegativeRegex,
+			"file_name_regex":               pushRules.FileNameRegex,
+			"commit_committer_check":        pushRules.CommitCommitterCheck,
+			"deny_delete_tag":               pushRules.DenyDeleteTag,
+			"member_check":                  pushRules.MemberCheck,
+			"prevent_secrets":               pushRules.PreventSecrets,
+			"reject_unsigned_commits":       pushRules.RejectUnsignedCommits,
+			"max_file_size":                 pushRules.MaxFileSize,
+		},
+	}
 }
