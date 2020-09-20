@@ -112,11 +112,10 @@ func testAccCheckGitlabProjectMirrorExists(n string, mirror *gitlab.ProjectMirro
 		for _, m := range mirrors {
 			if m.ID == mirrorID {
 				*mirror = *m
-				break
+				return nil
 			}
-			return errors.New("unable to find mirror.")
 		}
-		return nil
+		return errors.New("unable to find mirror")
 	}
 }
 
