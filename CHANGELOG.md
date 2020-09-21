@@ -1,5 +1,10 @@
 ## 3.0.0 (Unreleased)
 
+BREAKING CHANGES:
+
+* Resource `gitlab_project_push_rules` has been removed. You now instead specify project push rules using the `push_rules` attribute on the `gitlab_project` resource.
+* The `shared_with_groups` attribute has been removed from the `gitlab_project` resource (but not the data source). You may use the `gitlab_project_share_group` resource instead.
+
 NOTES:
 
 * If you are using the `environment_scope` attribute of `gitlab_project_variable` to manage multiple variables with the same key, it is recommended to use GitLab 13.4+. See [this related GitLab issue](https://gitlab.com/gitlab-org/gitlab/-/issues/9912) for older versions.
@@ -8,36 +13,39 @@ NOTES:
 
 FEATURES:
 
-* **New Data Source:** `gitlab_group_membership` [GH-264]
-* **New Resource:** `gitlab_instance_cluster` [GH-367]
-* **New Resource:** `gitlab_project_level_mr_approvals` [GH-356]
-* **New Resource:** `gitlab_project_mirror` [GH-358]
-* **New Resource:** `gitlab_service_pipelines_email` [GH-375]
+* **New Data Source:** `gitlab_group_membership` ([#264](https://github.com/gitlabhq/terraform-provider-gitlab/issues/264))
+* **New Resource:** `gitlab_instance_cluster` ([#367](https://github.com/gitlabhq/terraform-provider-gitlab/issues/367))
+* **New Resource:** `gitlab_project_level_mr_approvals` ([#356](https://github.com/gitlabhq/terraform-provider-gitlab/issues/356))
+* **New Resource:** `gitlab_project_mirror` ([#358](https://github.com/gitlabhq/terraform-provider-gitlab/issues/358))
+* **New Resource:** `gitlab_service_pipelines_email` ([#375](https://github.com/gitlabhq/terraform-provider-gitlab/issues/375))
 
 ENHANCEMENTS:
 
-* data-source/gitlab_project: New `path_with_namespace` attribute [GH-403]
-* resource/gitlab_branch_protection: New `code_owner_approval_required` attribute [GH-380]
-* resource/gitlab_project: New `path_with_namespace` attribute [GH-403]
-* resource/gitlab_group: New attributes `share_with_group_lock`, `project_creation_level`, `auto_devops_enabled`, `emails_disabled`, `mentions_disabled`, `subgroup_creation_level`, `require_two_factor_authentication`, and `two_factor_grace_period` [GH-362]
-* resource/gitlab_group_label: Can now be imported [GH-339]
-* resource/gitlab_project: New `import_url` attribute [GH-381]
-* resource/gitlab_project_push_rules: Can now be imported [GH-360]
-* resource/gitlab_project_variable: Better error message when a masked variable fails validation [GH-371]
-* resource/gitlab_project_variable: Automatically detect removal [GH-409]
-* resource/gitlab_service_jira: Automatically detect removal [GH-337]
-* resource/gitlab_user: The `email` attribute can be changed without forcing recreation [GH-261]
-* resource/gitlab_user: Require either the `password` or `reset_password` attribute to be set [GH-262]
+* data-source/gitlab_project: New attributes `packages_enabled`, `path_with_namespace` and `push_rules` ([#405](https://github.com/gitlabhq/terraform-provider-gitlab/issues/405), [#403](https://github.com/gitlabhq/terraform-provider-gitlab/issues/403), [#422](https://github.com/gitlabhq/terraform-provider-gitlab/issues/422))
+* resource/gitlab_branch_protection: New `code_owner_approval_required` attribute ([#380](https://github.com/gitlabhq/terraform-provider-gitlab/issues/380))
+* resource/gitlab_project: New attributes `packages_enabled`, `path_with_namespace`, and `push_rules` ([#405](https://github.com/gitlabhq/terraform-provider-gitlab/issues/405), [#403](https://github.com/gitlabhq/terraform-provider-gitlab/issues/403), [#422](https://github.com/gitlabhq/terraform-provider-gitlab/issues/422))
+* resource/gitlab_group: New attributes `share_with_group_lock`, `project_creation_level`, `auto_devops_enabled`, `emails_disabled`, `mentions_disabled`, `subgroup_creation_level`, `require_two_factor_authentication`, and `two_factor_grace_period` ([#362](https://github.com/gitlabhq/terraform-provider-gitlab/issues/362))
+* resource/gitlab_group: Automatically detect removal ([#267](https://github.com/gitlabhq/terraform-provider-gitlab/issues/267))
+* resource/gitlab_group_label: Can now be imported ([#339](https://github.com/gitlabhq/terraform-provider-gitlab/issues/339))
+* resource/gitlab_project: New `import_url` attribute ([#381](https://github.com/gitlabhq/terraform-provider-gitlab/issues/381))
+* resource/gitlab_project_push_rules: Can now be imported ([#360](https://github.com/gitlabhq/terraform-provider-gitlab/issues/360))
+* resource/gitlab_project_variable: Better error message when a masked variable fails validation ([#371](https://github.com/gitlabhq/terraform-provider-gitlab/issues/371))
+* resource/gitlab_project_variable: Automatically detect removal ([#409](https://github.com/gitlabhq/terraform-provider-gitlab/issues/409))
+* resource/gitlab_service_jira: Automatically detect removal ([#337](https://github.com/gitlabhq/terraform-provider-gitlab/issues/337))
+* resource/gitlab_user: The `email` attribute can be changed without forcing recreation ([#261](https://github.com/gitlabhq/terraform-provider-gitlab/issues/261))
+* resource/gitlab_user: Require either the `password` or `reset_password` attribute to be set ([#262](https://github.com/gitlabhq/terraform-provider-gitlab/issues/262))
 
 BUG FIXES:
 
-* resource/gitlab_pipeline_schedule: Fix a rare error during deletion [GH-364]
-* resource/gitlab_pipeline_schedule_variable: Fix a rare error during deletion [GH-364]
-* resource/gitlab_project: Fix the `default_branch` attribute changing to `null` after first apply [GH-343]
-* resource/gitlab_project_variable: Fix inconsistent reads for variables with non-unique keys [GH-409]
-* resource/gitlab_project_variable: Change the default `environment_scope` from `0` to `*` [GH-409]
-* resource/gitlab_service_jira: Fix a rare state inconsistency problem during creation [GH-363]
-* resource/gitlab_user: Fix some attributes saving incorrectly in state [GH-261]
+* resource/gitlab_pipeline_schedule: Fix a rare error during deletion ([#364](https://github.com/gitlabhq/terraform-provider-gitlab/issues/364))
+* resource/gitlab_pipeline_schedule_variable: Fix a rare error during deletion ([#364](https://github.com/gitlabhq/terraform-provider-gitlab/issues/364))
+* resource/gitlab_project: Fix the `default_branch` attribute changing to `null` after first apply ([#343](https://github.com/gitlabhq/terraform-provider-gitlab/issues/343))
+* resource/gitlab_project_share_group: Fix the `access_level` attribute not updating ([#421](https://github.com/gitlabhq/terraform-provider-gitlab/issues/421))
+* resource/gitlab_project_share_group: Fix the share not working if the project is also managed ([#421](https://github.com/gitlabhq/terraform-provider-gitlab/issues/421))
+* resource/gitlab_project_variable: Fix inconsistent reads for variables with non-unique keys ([#409](https://github.com/gitlabhq/terraform-provider-gitlab/issues/409))
+* resource/gitlab_project_variable: Change the default `environment_scope` from `0` to `*` ([#409](https://github.com/gitlabhq/terraform-provider-gitlab/issues/409))
+* resource/gitlab_service_jira: Fix a rare state inconsistency problem during creation ([#363](https://github.com/gitlabhq/terraform-provider-gitlab/issues/363))
+* resource/gitlab_user: Fix some attributes saving incorrectly in state ([#261](https://github.com/gitlabhq/terraform-provider-gitlab/issues/261))
 
 ## 2.11.0 (July 24, 2020)
 
