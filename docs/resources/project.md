@@ -80,6 +80,8 @@ The following arguments are supported:
 
 * `packages_enabled` - (Optional) Enable packages repository for the project.
 
+* `push_rules` (Optional) Push rules for the project (documented below).
+
 ## Attributes Reference
 
 The following additional attributes are exported:
@@ -100,6 +102,35 @@ The following additional attributes are exported:
 
 * `remove_source_branch_after_merge` - Enable `Delete source branch` option by default for all new merge requests.
 
+## Nested Blocks
+
+### push_rules
+
+For information on push rules, consult the [GitLab documentation](https://docs.gitlab.com/ce/push_rules/push_rules.html#push-rules).
+
+#### Arguments
+
+* `author_email_regex` - (Optional) All commit author emails must match this regex, e.g. `@my-company.com$`.
+
+* `branch_name_regex` - (Optional) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+
+* `commit_message_regex` - (Optional) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+
+* `commit_message_negative_regex` - (Optional) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+
+* `file_name_regex` - (Optional) All commited filenames must not match this regex, e.g. `(jar|exe)$`.
+
+* `commit_committer_check` - (Optional, bool) Users can only push commits to this repository that were committed with one of their own verified emails.
+
+* `deny_delete_tag` - (Optional, bool) Deny deleting a tag.
+
+* `member_check` - (Optional, bool) Restrict commits by author (email) to existing GitLab users.
+
+* `prevent_secrets` - (Optional, bool) GitLab will reject any files that are likely to contain secrets.
+
+* `reject_unsigned_commits` - (Optional, bool) Reject commit when it’s not signed through GPG.
+
+* `max_file_size` - (Optional, int) Maximum file size (MB).
 
 ## Importing projects
 

@@ -18,28 +18,31 @@ func TestAccDataGitlabProject_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDataGitlabProjectConfig(projectname),
-				Check: resource.ComposeTestCheckFunc(
-					testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo"),
-				),
+				Check: testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo",
+					[]string{"id", "name", "path", "visibility", "description"}),
+			},
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccDataGitlabProjectConfigPushRules(projectname),
+				Check: testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo",
+					[]string{"push_rules.0.author_email_regex"}),
 			},
 		},
 	})
 }
 
-func testAccDataSourceGitlabProject(src, n string) resource.TestCheckFunc {
+func testAccDataSourceGitlabProject(resourceName, dataSourceName string, testAttributes []string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		project := s.RootModule().Resources[src]
+		project := s.RootModule().Resources[resourceName]
 		projectResource := project.Primary.Attributes
 
-		search := s.RootModule().Resources[n]
+		search := s.RootModule().Resources[dataSourceName]
 		searchResource := search.Primary.Attributes
 
 		if searchResource["id"] == "" {
 			return fmt.Errorf("Expected to get a project ID from Gitlab")
 		}
-
-		testAttributes := []string{"id", "Name", "Path", "Visibility", "Description"}
 
 		for _, attribute := range testAttributes {
 			if searchResource[attribute] != projectResource[attribute] {
@@ -63,4 +66,22 @@ data "gitlab_project" "foo" {
 	id = "${gitlab_project.test.id}"
 }
 	`, projectname, projectname)
+}
+
+func testAccDataGitlabProjectConfigPushRules(projectName string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "test"{
+	name = "%[1]s"
+	path = "%[1]s"
+	description = "Terraform acceptance tests"
+	visibility_level = "public"
+    push_rules {
+        author_email_regex = "foo"
+    }
+}
+
+data "gitlab_project" "foo" {
+	id = gitlab_project.test.id
+}
+	`, projectName)
 }
