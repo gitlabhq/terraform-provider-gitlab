@@ -82,6 +82,14 @@ The following arguments are supported:
 
 * `push_rules` (Optional) Push rules for the project (documented below).
 
+* `template_name` - (Optional) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
+
+* `template_project_id` - (Optional)  When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`.
+
+* `use_custom_template` - (Optional) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+
+* `group_with_project_templates_id` - (Optional) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+
 ## Attributes Reference
 
 The following additional attributes are exported:
