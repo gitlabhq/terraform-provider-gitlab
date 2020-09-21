@@ -203,6 +203,74 @@ max_file_size = 123
 				Config:      testAccGitlabProjectConfigPushRules(rInt, `author_email_regex = "foo_author"`),
 				ExpectError: regexp.MustCompile(regexp.QuoteMeta("Project push rules are not supported in your version of GitLab")),
 			},
+			// Create a project using template name
+			{
+				Config: testAccGitlabProjectConfigTemplateName(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.template-name", &received),
+					testAccCheckGitlabProjectDefaultBranch(&received, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "master",
+					}),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+
+						projectID := state.RootModule().Resources["gitlab_project.template-name"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, ".ruby-version", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get '.ruby-version' file from template project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			// Create a project using custom template name
+			{
+				Config:   testAccGitlabProjectConfigTemplateNameCustom(rInt),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.template-name-custom", &received),
+					testAccCheckGitlabProjectDefaultBranch(&received, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "master",
+					}),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+
+						projectID := state.RootModule().Resources["gitlab_project.template-name-custom"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "Gemfile", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get 'Gemfile' file from template project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			// Create a project using custom template project id
+			{
+				Config:   testAccGitlabProjectConfigTemplateProjectID(rInt),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.template-id", &received),
+					testAccCheckGitlabProjectDefaultBranch(&received, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "master",
+					}),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+
+						projectID := state.RootModule().Resources["gitlab_project.template-id"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "Rakefile", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get 'Rakefile' file from template project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
 			// Update to original project config
 			{
 				Config: testAccGitlabProjectConfig(rInt),
@@ -224,7 +292,7 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Config: testAccGitlabProjectConfigInitializeWithReadme(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					testAccCheckGitlabProjectInitializeWithReadme(&project, &testAccGitlabProjectExpectedAttributes{
+					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
 						DefaultBranch: "master",
 					}),
 				),
@@ -437,6 +505,22 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjec_templateMutualExclusiveNameAndID(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testAccPreCheck(t) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccCheckMutualExclusiveNameAndID(rInt),
+				SkipFunc:    isRunningInCE,
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(`"template_project_id": conflicts with template_name`)),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		var err error
@@ -506,10 +590,10 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 	return resource.ComposeAggregateTestCheckFunc(checks...)
 }
 
-func testAccCheckGitlabProjectInitializeWithReadme(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabProjectDefaultBranch(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if project.DefaultBranch != want.DefaultBranch {
-			return fmt.Errorf("got description %q; want %q", project.DefaultBranch, want.DefaultBranch)
+			return fmt.Errorf("got default branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
 		}
 
 		return nil
@@ -764,4 +848,62 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 	`, rInt, pushRules)
+}
+
+func testAccGitlabProjectConfigTemplateName(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "template-name" {
+  name = "template-name-%d"
+  path = "template-name.%d"
+  description = "Terraform acceptance tests"
+  template_name = "rails"
+  default_branch = "master"
+}
+	`, rInt, rInt)
+}
+
+// 2020-09-07: Currently Gitlab (version 13.3.6 ) doesn't allow in admin API
+// ability to set a group as instance level templates.
+// To test resource_gitlab_project_test template features we add
+// group, project myrails and admin settings directly in scripts/start-gitlab.sh
+// Once Gitlab add admin template in API we could manage group/project/settings
+// directly in tests like TestAccGitlabProject_basic.
+func testAccGitlabProjectConfigTemplateNameCustom(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "template-name-custom" {
+  name = "template-name-custom-%d"
+  path = "template-name-custom.%d"
+  description = "Terraform acceptance tests"
+  template_name = "myrails"
+  use_custom_template = true
+  default_branch = "master"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigTemplateProjectID(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "template-id" {
+  name = "template-id-%d"
+  path = "template-id.%d"
+  description = "Terraform acceptance tests"
+  template_project_id = 999
+  use_custom_template = true
+  default_branch = "master"
+}
+	`, rInt, rInt)
+}
+
+func testAccCheckMutualExclusiveNameAndID(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "template-mutual-exclusive" {
+  name = "template-mutual-exclusive-%d"
+  path = "template-mutual-exclusive.%d"
+  description = "Terraform acceptance tests"
+  template_name = "rails"
+  template_project_id = 999
+  use_custom_template = true
+  default_branch = "master"
+}
+	`, rInt, rInt)
 }
