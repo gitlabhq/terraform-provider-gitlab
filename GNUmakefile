@@ -48,5 +48,11 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile
+gitlabproviderlint:
+	@go run ./gitlabproviderlint ./gitlab
+
+gitlabproviderlint-test:
+	@go test ./gitlabproviderlint
+
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile gitlabproviderlint gitlabproviderlint-test
 
