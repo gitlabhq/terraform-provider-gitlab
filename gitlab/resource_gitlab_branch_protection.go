@@ -116,8 +116,16 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	d.Set("project", project)
 	d.Set("branch", pb.Name)
-	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
-	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
+	for _, mergeAccessLevel := range pb.MergeAccessLevels {
+		if &mergeAccessLevel.UserID == nil && &mergeAccessLevel.GroupID == nil {
+			d.Set("merge_access_level", accessLevel[mergeAccessLevel.AccessLevel])
+		}
+	}
+	for _, pushAccessLevel := range pb.PushAccessLevels {
+		if &pushAccessLevel.UserID == nil && &pushAccessLevel.GroupID == nil {
+			d.Set("merge_access_level", accessLevel[pushAccessLevel.AccessLevel])
+		}
+	}
 	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
