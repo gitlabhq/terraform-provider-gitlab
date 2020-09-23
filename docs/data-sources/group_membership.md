@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group_membership"
-sidebar_current: "docs-gitlab-data-source-group-membership"
 description: |-
   Looks up gitlab group membership
 ---

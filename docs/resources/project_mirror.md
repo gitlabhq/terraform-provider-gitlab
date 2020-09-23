@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_mirror"
-sidebar_current: "docs-gitlab-resource-project_mirror"
 description: |-
   Adds a target to a projects remote mirrors.
 ---

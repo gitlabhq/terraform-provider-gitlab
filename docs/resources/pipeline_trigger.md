@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_pipeline_trigger"
-sidebar_current: "docs-gitlab-resource-pipeline-trigger"
 description: |-
   Creates and manages pipeline triggers for GitLab projects
 ---

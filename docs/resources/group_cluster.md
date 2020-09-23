@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group_cluster"
-sidebar_current: "docs-gitlab-resource-group_cluster"
 description: |-
   Creates and manages group clusters for GitLab groups
 ---

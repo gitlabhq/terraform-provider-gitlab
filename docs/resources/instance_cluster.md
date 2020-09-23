@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_instance_cluster"
-sidebar_current: "docs-gitlab-resource-instance_cluster"
 description: |-
   Creates and manages instance clusters for GitLab instances
 ---

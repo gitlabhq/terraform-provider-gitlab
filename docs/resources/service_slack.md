@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_service_slack"
-sidebar_current: "docs-gitlab-resource-service_slack"
 description: |-
   Manage Slack notifications integration that allows to receive event notifications in Slack
 ---

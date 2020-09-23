@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_label"
-sidebar_current: "docs-gitlab-resource-label"
 description: |-
   Creates and manages labels for GitLab projects
 ---

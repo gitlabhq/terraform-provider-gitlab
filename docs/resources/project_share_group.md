@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_share_group"
-sidebar_current: "docs-gitlab-resource-project_share_group"
 description: |-
   Shares a project with a group
 ---

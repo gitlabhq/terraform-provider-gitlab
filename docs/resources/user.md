@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_user"
-sidebar_current: "docs-gitlab-resource-user"
 description: |-
   Creates and manages GitLab users
 ---

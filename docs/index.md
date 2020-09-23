@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "Provider: GitLab"
-sidebar_current: "docs-gitlab-index"
 description: |-
   The GitLab provider is used to interact with GitLab group or user resources.
 ---

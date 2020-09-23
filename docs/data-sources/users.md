@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_users"
-sidebar_current: "docs-gitlab-data-source-users"
 description: |-
   Looks up gitlab users
 ---

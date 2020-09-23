@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group_membership"
-sidebar_current: "docs-gitlab-resource-group_membership"
 description: |-
   Adds a user to a group as a member
 ---

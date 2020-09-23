@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_deploy_key_enable"
-sidebar_current: "docs-gitlab-resource-deploy_key_enable"
 description: |-
   Enable a pre-existing deploy key in the project
 ---

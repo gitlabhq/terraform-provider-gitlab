@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_service_github"
-sidebar_current: "docs-gitlab-resource-service_github"
 description: |-
   Manage GitHub integration that updates pipeline statuses on a GitHub repo's pull requests.
 ---

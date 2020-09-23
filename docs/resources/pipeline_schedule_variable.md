@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_pipeline_schedule_variable"
-sidebar_current: "docs-gitlab-resource-pipeline-schedule-variable"
 description: |-
   Creates and manages pipeline schedule variables for GitLab projects
 ---

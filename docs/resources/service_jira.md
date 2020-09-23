@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_service_jira"
-sidebar_current: "docs-gitlab-resource-service_jira"
 description: |-
   Manage Jira integration that allows to receive event notifications in Jira
 ---

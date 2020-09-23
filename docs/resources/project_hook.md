@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_hook"
-sidebar_current: "docs-gitlab-resource-project-hook"
 description: |-
   Creates and manages hooks for GitLab projects
 ---

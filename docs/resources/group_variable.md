@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group_variable"
-sidebar_current: "docs-gitlab-resource-group-variable"
 description: |-
   Creates and manages CI/CD variables for GitLab groups
 ---

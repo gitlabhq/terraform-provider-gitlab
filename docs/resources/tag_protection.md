@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_tag_protection"
-sidebar_current: "docs-gitlab-resource-tag_protection"
 description: |-
   Protects a tag by assigning access levels to it
 ---

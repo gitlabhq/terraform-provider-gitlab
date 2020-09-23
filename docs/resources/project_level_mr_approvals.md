@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_level_mr_approvals"
-sidebar_current: "docs-gitlab-resource-project-level-mr-approvals"
 description: |-
   Configures project-level MR approvals.
 ---

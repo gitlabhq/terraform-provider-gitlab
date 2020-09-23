@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_membership"
-sidebar_current: "docs-gitlab-resource-project_membership"
 description: |-
   Adds a user to a project as a member
 ---

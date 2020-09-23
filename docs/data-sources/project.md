@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project"
-sidebar_current: "docs-gitlab-data-source-project"
 description: |-
   View information about a project
 ---

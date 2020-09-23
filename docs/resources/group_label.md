@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group_label"
-sidebar_current: "docs-gitlab-resource-group-label"
 description: |-
   Creates and manages labels for GitLab groups
 ---

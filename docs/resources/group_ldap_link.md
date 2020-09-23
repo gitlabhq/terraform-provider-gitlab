@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group_ldap_link"
-sidebar_current: "docs-gitlab-resource-group_ldap_link"
 description: |-
   Adds an LDAP link to an existing GitLab group.
 ---

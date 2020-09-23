@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_variable"
-sidebar_current: "docs-gitlab-resource-project-variable"
 description: |-
   Creates and manages CI/CD variables for GitLab projects
 ---

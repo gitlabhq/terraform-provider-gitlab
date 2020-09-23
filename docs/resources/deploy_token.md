@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_deploy_token"
-sidebar_current: "docs-gitlab-resource-deploy_token"
 description: |-
   Creates and manages deploy tokens for GitLab projects
 ---

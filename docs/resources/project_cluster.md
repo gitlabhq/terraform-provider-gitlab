@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_project_cluster"
-sidebar_current: "docs-gitlab-resource-project_cluster"
 description: |-
   Creates and manages project clusters for GitLab projects
 ---

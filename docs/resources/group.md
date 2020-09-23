@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_group"
-sidebar_current: "docs-gitlab-resource-group"
 description: |-
   Creates and manages GitLab groups
 ---

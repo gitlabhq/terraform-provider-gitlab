@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_projects"
-sidebar_current: "docs-gitlab-data-source-projects"
 description: |-
   List projects using specific filters.
 ---

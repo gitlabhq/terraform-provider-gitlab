@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_branch_protection"
-sidebar_current: "docs-gitlab-resource-branch_protection"
 description: |-
   Protects a branch by assigning access levels to it
 ---

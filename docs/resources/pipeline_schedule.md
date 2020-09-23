@@ -1,7 +1,5 @@
 ---
-layout: "gitlab"
 page_title: "GitLab: gitlab_pipeline_schedule"
-sidebar_current: "docs-gitlab-resource-pipeline-schedule"
 description: |-
   Creates and manages pipeline schedules for GitLab projects
 ---
