@@ -43,6 +43,18 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 			},
+			"users_allowed_to_merge": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
+			"users_allowed_to_push": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				ForceNew: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+			},
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -60,11 +72,27 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
 	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
+	var allowedToMerge []*gitlab.ProtectBranchPermissionOptions
+	usersAllowedToMerge := d.Get("users_allowed_to_merge")
+	for _, userAllowedToMerge := range usersAllowedToMerge.(*schema.Set).List() {
+		userID := userAllowedToMerge.(int)
+		allowedToMerge = append(allowedToMerge, &gitlab.ProtectBranchPermissionOptions{UserID: &userID})
+	}
+
+	var allowedToPush []*gitlab.ProtectBranchPermissionOptions
+	usersAllowedToPush := d.Get("users_allowed_to_push")
+	for _, userAllowedToPush := range usersAllowedToPush.(*schema.Set).List() {
+		userID := userAllowedToPush.(int)
+		allowedToMerge = append(allowedToMerge, &gitlab.ProtectBranchPermissionOptions{UserID: &userID})
+	}
+
 	options := &gitlab.ProtectRepositoryBranchesOptions{
 		Name:                      branch,
 		MergeAccessLevel:          &mergeAccessLevel,
 		PushAccessLevel:           &pushAccessLevel,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
+		AllowedToMerge:            allowedToMerge,
+		AllowedToPush:             allowedToPush,
 	}
 
 	log.Printf("[DEBUG] create gitlab branch protection on %v for project %s", options.Name, project)
@@ -116,8 +144,28 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	d.Set("project", project)
 	d.Set("branch", pb.Name)
-	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
-	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
+	var usersAllowedToMerge []int
+	for _, mergeAccessLevel := range pb.MergeAccessLevels {
+		if mergeAccessLevel.UserID == 0 && mergeAccessLevel.GroupID == 0 {
+			d.Set("merge_access_level", accessLevel[mergeAccessLevel.AccessLevel])
+			continue
+		}
+		if &mergeAccessLevel.UserID != nil {
+			usersAllowedToMerge = append(usersAllowedToMerge, mergeAccessLevel.UserID)
+		}
+	}
+	d.Set("users_allowed_to_merge", usersAllowedToMerge)
+	var usersAllowedToPush []int
+	for _, pushAccessLevel := range pb.PushAccessLevels {
+		if pushAccessLevel.UserID == 0 && pushAccessLevel.GroupID == 0 {
+			d.Set("push_access_level", accessLevel[pushAccessLevel.AccessLevel])
+			continue
+		}
+		if &pushAccessLevel.UserID != nil {
+			usersAllowedToPush = append(usersAllowedToPush, pushAccessLevel.UserID)
+		}
+	}
+	d.Set("users_allowed_to_push", usersAllowedToPush)
 	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))

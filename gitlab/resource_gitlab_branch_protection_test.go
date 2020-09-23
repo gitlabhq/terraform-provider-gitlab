@@ -108,6 +108,66 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabBranchProtection_basic_ee(t *testing.T) {
+
+	var pb gitlab.ProtectedBranch
+	var fooUser gitlab.User
+	var barUser gitlab.User
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabBranchProtectionDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and Branch Protection with default options
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabBranchProtectionConfigEE(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					parseUser("gitlab_user.foo", &fooUser),
+					parseUser("gitlab_user.bar", &barUser),
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributesEE(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:               fmt.Sprintf("BranchProtect-%d", rInt),
+						UserAllowedToMerge: barUser.ID,
+						UserAllowedToPush:  fooUser.ID,
+					}),
+				),
+			},
+			// Update the Branch Protection
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabBranchProtectionUpdateConfigEE(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributesEE(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:               fmt.Sprintf("BranchProtect-%d", rInt),
+						UserAllowedToMerge: fooUser.ID,
+						UserAllowedToPush:  barUser.ID,
+					}),
+				),
+			},
+			// Update the Branch Protection to get back to initial settings
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabBranchProtectionConfigEE(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributesEE(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:               fmt.Sprintf("BranchProtect-%d", rInt),
+						UserAllowedToMerge: barUser.ID,
+						UserAllowedToPush:  fooUser.ID,
+					}),
+				),
+			},
+		},
+	})
+}
+
 func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 	var pb gitlab.ProtectedBranch
 	rInt := acctest.RandInt()
@@ -214,11 +274,73 @@ func testAccCheckGitlabBranchProtectionExists(n string, pb *gitlab.ProtectedBran
 	}
 }
 
+func parseUser(n string, user *gitlab.User) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return fmt.Errorf("Not Found: %s", n)
+		}
+
+		userID := rs.Primary.ID
+		if userID == "" {
+			return fmt.Errorf("No user ID is set")
+		}
+		conn := testAccProvider.Meta().(*gitlab.Client)
+
+		id, _ := strconv.Atoi(userID)
+
+		gotUser, _, err := conn.Users.GetUser(id)
+		if err != nil {
+			return err
+		}
+		*user = *gotUser
+		return nil
+	}
+}
+
 type testAccGitlabBranchProtectionExpectedAttributes struct {
 	Name                      string
 	PushAccessLevel           string
 	MergeAccessLevel          string
 	CodeOwnerApprovalRequired bool
+	UserAllowedToMerge        int
+	UserAllowedToPush         int
+}
+
+func testAccCheckGitlabBranchProtectionAttributesEE(pb *gitlab.ProtectedBranch, want *testAccGitlabBranchProtectionExpectedAttributes) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if pb.Name != want.Name {
+			return fmt.Errorf("got name %q; want %q", pb.Name, want.Name)
+		}
+
+		ok := false
+		for _, pushAccessLevel := range pb.PushAccessLevels {
+			if &pushAccessLevel.UserID != nil {
+				if pushAccessLevel.UserID != want.UserAllowedToPush {
+					return fmt.Errorf("got Push access for %q; want %q", pushAccessLevel.UserID, want.UserAllowedToPush)
+				}
+				ok = true
+			}
+		}
+		if !ok {
+			return fmt.Errorf("did not get Push access for user")
+		}
+
+		ok = false
+		for _, mergeAccessLevel := range pb.MergeAccessLevels {
+			if &mergeAccessLevel.UserID != nil {
+				if mergeAccessLevel.UserID != want.UserAllowedToPush {
+					return fmt.Errorf("got Merge access for %q; want %q", mergeAccessLevel.UserID, want.UserAllowedToPush)
+				}
+				ok = true
+			}
+		}
+		if !ok {
+			return fmt.Errorf("did not get Merge access for user")
+		}
+
+		return nil
+	}
 }
 
 func testAccCheckGitlabBranchProtectionAttributes(pb *gitlab.ProtectedBranch, want *testAccGitlabBranchProtectionExpectedAttributes) resource.TestCheckFunc {
@@ -324,6 +446,74 @@ resource "gitlab_branch_protection" "branch_protect" {
   push_access_level = "developer"
   merge_access_level = "developer"
   code_owner_approval_required = true
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabBranchProtectionConfigEE(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_user" "foo" {
+  name     = "foo"
+  username = "listest"
+  email    = "listest@ssss.com"
+}
+
+resource "gitlab_user" "bar" {
+  name     = "bar"
+  username = "bar"
+  email    = "bar@ssss.com"
+}
+
+resource "gitlab_branch_protection" "branch_protect" {
+  project = gitlab_project.foo.id
+  branch = "BranchProtect-%d"
+  push_access_level = "developer"
+  merge_access_level = "developer"
+  users_allowed_to_merge = [gitlab_user.bar.id]
+  users_allowed_to_push = [gitlab_user.foo.id]
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabBranchProtectionUpdateConfigEE(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_user" "foo" {
+  name     = "foo"
+  username = "listest"
+  email    = "listest@ssss.com"
+}
+
+resource "gitlab_user" "bar" {
+	name     = "bar"
+	username = "bar"
+	email    = "bar@ssss.com"
+  }
+
+resource "gitlab_branch_protection" "branch_protect" {
+	project = gitlab_project.foo.id
+	branch = "BranchProtect-%d"
+	push_access_level = "developer"
+	merge_access_level = "developer"
+	users_allowed_to_merge = [gitlab_user.foo.id]
+	users_allowed_to_push = [gitlab_user.bar.id]
 }
 	`, rInt, rInt)
 }

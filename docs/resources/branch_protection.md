@@ -26,3 +26,7 @@ The following arguments are supported:
 * `merge_access_level` - (Required) One of five levels of access to the project.
 
 * `code_owner_approval_required` (Optional) Bool, defaults to false. Can be set to true to require code owner approval before merging.
+
+* `users_allowed_to_merge` (Optional), list of user IDs allowed to merge on the protected branch.
+
+* `users_allowed_to_push` (Optional), list of user IDs allowed to push on the protected branch.
