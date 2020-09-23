@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_service_jira"
-description: |-
-  Manage Jira integration that allows to receive event notifications in Jira
----
-
 # gitlab\_service\_jira
 
 This resource allows you to manage Jira integration.

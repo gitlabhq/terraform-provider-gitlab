@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_service_github"
-description: |-
-  Manage GitHub integration that updates pipeline statuses on a GitHub repo's pull requests.
----
-
 # gitlab\_service\_github
 
 **NOTE**: requires either EE (self-hosted) or Silver and above (GitLab.com).

@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group_variable"
-description: |-
-  Creates and manages CI/CD variables for GitLab groups
----
-
 # gitlab\_group\_variable
 
 This resource allows you to create and manage CI/CD variables for your GitLab groups.

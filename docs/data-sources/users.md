@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_users"
-description: |-
-  Looks up gitlab users
----
-
 # gitlab\_users
 
 Provides details about a list of users in the gitlab provider. The results include id, username, email, name and more about the requested users. Users can also be sorted and filtered using several options.

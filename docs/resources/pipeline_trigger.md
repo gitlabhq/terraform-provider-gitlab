@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_pipeline_trigger"
-description: |-
-  Creates and manages pipeline triggers for GitLab projects
----
-
 # gitlab\_pipeline\_trigger
 
 This resource allows you to create and manage pipeline triggers

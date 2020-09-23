@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group_label"
-description: |-
-  Creates and manages labels for GitLab groups
----
-
 # gitlab\_group\_label
 
 This resource allows you to create and manage labels for your GitLab groups.

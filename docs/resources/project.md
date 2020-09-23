@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project"
-description: |-
-  Creates and manages projects within GitLab groups or within your user
----
-
 # gitlab\_project
 
 This resource allows you to create and manage projects within your

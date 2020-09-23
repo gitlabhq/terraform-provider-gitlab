@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_label"
-description: |-
-  Creates and manages labels for GitLab projects
----
-
 # gitlab\_label
 
 This resource allows you to create and manage labels for your GitLab projects.

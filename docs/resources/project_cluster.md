@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_cluster"
-description: |-
-  Creates and manages project clusters for GitLab projects
----
-
 # gitlab\_project\_cluster
 
 This resource allows you to create and manage project clusters for your GitLab projects.

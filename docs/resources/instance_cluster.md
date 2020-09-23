@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_instance_cluster"
-description: |-
-  Creates and manages instance clusters for GitLab instances
----
-
 # gitlab\_instance\_cluster
 
 This resource allows you to create and manage instance clusters for your GitLab instances.

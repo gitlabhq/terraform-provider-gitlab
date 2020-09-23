@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_user"
-description: |-
-  Creates and manages GitLab users
----
-
 # gitlab\_user
 
 This resource allows you to create and manage GitLab users.

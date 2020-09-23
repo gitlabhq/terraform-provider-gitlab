@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group"
-description: |-
-  Looks up a gitlab group
----
-
 # gitlab\_group
 
 Provides details about a specific group in the gitlab provider.

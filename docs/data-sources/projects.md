@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_projects"
-description: |-
-  List projects using specific filters.
----
-
 # gitlab\_projects
 
 Provides details about a list of projects in the Gitlab provider. Listing all projects and group projects with [project filtering](https://docs.gitlab.com/ee/api/projects.html#list-user-projects) or [group project filtering](https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects) is supported.

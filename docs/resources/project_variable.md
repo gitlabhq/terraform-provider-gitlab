@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_variable"
-description: |-
-  Creates and manages CI/CD variables for GitLab projects
----
-
 # gitlab\_project\_variable
 
 This resource allows you to create and manage CI/CD variables for your GitLab projects.

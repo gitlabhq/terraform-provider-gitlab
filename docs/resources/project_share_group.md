@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_share_group"
-description: |-
-  Shares a project with a group
----
-
 # gitlab\_project\_share\_group
 
 This resource allows you to share a project with a group

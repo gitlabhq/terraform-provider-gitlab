@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group_membership"
-description: |-
-  Adds a user to a group as a member
----
-
 # gitlab\_group_membership
 
 This resource allows you to add a user to an existing group.

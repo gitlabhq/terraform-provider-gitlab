@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_hook"
-description: |-
-  Creates and manages hooks for GitLab projects
----
-
 # gitlab\_project\_hook
 
 This resource allows you to create and manage hooks for your GitLab projects.

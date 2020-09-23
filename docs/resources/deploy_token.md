@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_deploy_token"
-description: |-
-  Creates and manages deploy tokens for GitLab projects
----
-
 # gitlab\_deploy\_token
 
 This resource allows you to create and manage deploy token for your GitLab projects and groups.

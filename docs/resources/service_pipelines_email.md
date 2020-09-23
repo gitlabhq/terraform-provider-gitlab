@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_service_pipelines_email"
-description: |-
-  Manage Pipelines email integration that emails the pipeline status to a list of recipients.
----
-
 # gitlab\_service\_pipelines_email
 
 This resource manages a [Pipelines email integration](https://docs.gitlab.com/ee/user/project/integrations/overview.html#integrations-listing) that emails the pipeline status to a list of recipients.

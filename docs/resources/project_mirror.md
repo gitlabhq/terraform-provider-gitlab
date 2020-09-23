@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_mirror"
-description: |-
-  Adds a target to a projects remote mirrors.
----
-
 # gitlab\_project_mirror
 
 This resource allows you to add a mirror target for the repository, all changes will be synced to the remote target.

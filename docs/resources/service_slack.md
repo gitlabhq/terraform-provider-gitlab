@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_service_slack"
-description: |-
-  Manage Slack notifications integration that allows to receive event notifications in Slack
----
-
 # gitlab\_service_slack
 
 This resource allows you to manage Slack notifications integration.

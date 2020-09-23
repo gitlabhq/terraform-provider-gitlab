@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_level_mr_approvals"
-description: |-
-  Configures project-level MR approvals.
----
-
 # gitlab\_project\_level\_mr\_approvals
 
 This resource allows you to configure project-level MR approvals. for your GitLab projects.

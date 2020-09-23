@@ -1,9 +1,3 @@
----
-page_title: "Provider: GitLab"
-description: |-
-  The GitLab provider is used to interact with GitLab group or user resources.
----
-
 # GitLab Provider
 
 The GitLab provider is used to interact with GitLab group or user resources.

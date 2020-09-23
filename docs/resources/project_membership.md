@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_project_membership"
-description: |-
-  Adds a user to a project as a member
----
-
 # gitlab\_project_membership
 
 This resource allows you to add a current user to an existing project with a set access level.

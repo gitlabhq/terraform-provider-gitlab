@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_deploy_key"
-description: |-
-  Creates and manages deploy keys for GitLab projects
----
-
 # gitlab\_deploy\_key
 
 This resource allows you to create and manage deploy keys for your GitLab projects.

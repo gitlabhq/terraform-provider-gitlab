@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group_membership"
-description: |-
-  Looks up gitlab group membership
----
-
 # gitlab\_group\_membership
 
 Provides details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.

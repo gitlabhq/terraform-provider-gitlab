@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_pipeline_schedule_variable"
-description: |-
-  Creates and manages pipeline schedule variables for GitLab projects
----
-
 # gitlab\_pipeline\_schedule\_variable
 
 This resource allows you to create and manage variables for pipeline schedules.

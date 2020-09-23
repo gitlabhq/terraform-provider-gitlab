@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group"
-description: |-
-  Creates and manages GitLab groups
----
-
 # gitlab\_group
 
 This resource allows you to create and manage GitLab groups.

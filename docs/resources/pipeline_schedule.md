@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_pipeline_schedule"
-description: |-
-  Creates and manages pipeline schedules for GitLab projects
----
-
 # gitlab\_pipeline\_schedule
 
 This resource allows you to create and manage pipeline schedules.

@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_deploy_key_enable"
-description: |-
-  Enable a pre-existing deploy key in the project
----
-
 # gitlab\_deploy\_key\_enable
 
 This resource allows you to enable pre-existing deploy keys for your GitLab projects.

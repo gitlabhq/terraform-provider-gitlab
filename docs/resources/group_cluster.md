@@ -1,9 +1,3 @@
----
-page_title: "GitLab: gitlab_group_cluster"
-description: |-
-  Creates and manages group clusters for GitLab groups
----
-
 # gitlab\_group\_cluster
 
 This resource allows you to create and manage group clusters for your GitLab groups.
