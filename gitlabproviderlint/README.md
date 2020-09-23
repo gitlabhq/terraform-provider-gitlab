@@ -4,6 +4,11 @@ The `gitlabproviderlint` tool is a code linting tool, specifically tailored for 
 
 ## Checks
 
+### tfproviderlint Checks
+
+See the [tfproviderlint documentation](https://github.com/bflad/tfproviderlint#standard-lint-checks) for information about these checks.
+All of the standard checks are included in `gitlabproviderlint`.
+
 ### Documentation Checks
 
 Check | Description 
