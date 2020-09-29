@@ -802,9 +802,9 @@ resource "gitlab_project" "foo" {
   lfs_enabled = false
   shared_runners_enabled = false
   archived = true
-	packages_enabled = false
-	mirror = false
-	mirror_target_builds = false
+  packages_enabled = false
+  mirror = false
+  mirror_target_builds = false
 }
 	`, rInt, rInt)
 }
