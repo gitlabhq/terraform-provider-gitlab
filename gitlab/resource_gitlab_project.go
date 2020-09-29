@@ -268,6 +268,14 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
 	},
+	"mirror": {
+		Type:     schema.TypeBool,
+		Optional: true,
+	},
+	"mirror_trigger_builds": {
+		Type:     schema.TypeBool,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -313,6 +321,8 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("archived", project.Archived)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
+	d.Set("mirror", project.Mirror)
+	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -336,6 +346,8 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
+		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
+		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -556,6 +568,14 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("packages_enabled") {
 		options.PackagesEnabled = gitlab.Bool(d.Get("packages_enabled").(bool))
+	}
+
+	if d.HasChange("mirror") {
+		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
+	}
+
+	if d.HasChange("mirror_trigger_builds") {
+		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {

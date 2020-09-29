@@ -82,6 +82,10 @@ The following arguments are supported:
 
 * `group_with_project_templates_id` - (Optional) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
 
+* `mirror` (Optional) Enables pull mirroring in a project.
+
+* `mirror_trigger_builds` (Optional) Pull mirroring triggers builds.
+
 ## Attributes Reference
 
 The following additional attributes are exported:
