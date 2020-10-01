@@ -12,7 +12,7 @@ import (
 func Provider() terraform.ResourceProvider {
 
 	// The actual provider
-	return &schema.Provider{
+	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"token": {
 				Type:        schema.TypeString,
@@ -93,9 +93,13 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_mirror":             resourceGitlabProjectMirror(),
 			"gitlab_project_level_mr_approvals": resourceGitlabProjectLevelMRApprovals(),
 		},
-
-		ConfigureFunc: providerConfigure,
 	}
+
+	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
+		return providerConfigure(provider, d)
+	}
+
+	return provider
 }
 
 var descriptions map[string]string
@@ -116,7 +120,7 @@ func init() {
 	}
 }
 
-func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		Token:            d.Get("token").(string),
 		BaseURL:          d.Get("base_url").(string),
@@ -124,7 +128,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		Insecure:         d.Get("insecure").(bool),
 		ClientCert:       d.Get("client_cert").(string),
 		ClientKey:        d.Get("client_key").(string),
-		TerraformVersion: "TODO", // TODO: How to get Terraform version?
+		TerraformVersion: p.TerraformVersion,
 	}
 
 	return config.Client()
