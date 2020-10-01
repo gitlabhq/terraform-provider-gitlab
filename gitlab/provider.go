@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
@@ -122,13 +123,16 @@ func init() {
 
 func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		Token:            d.Get("token").(string),
-		BaseURL:          d.Get("base_url").(string),
-		CACertFile:       d.Get("cacert_file").(string),
-		Insecure:         d.Get("insecure").(bool),
-		ClientCert:       d.Get("client_cert").(string),
-		ClientKey:        d.Get("client_key").(string),
-		TerraformVersion: p.TerraformVersion,
+		Token:      d.Get("token").(string),
+		BaseURL:    d.Get("base_url").(string),
+		CACertFile: d.Get("cacert_file").(string),
+		Insecure:   d.Get("insecure").(bool),
+		ClientCert: d.Get("client_cert").(string),
+		ClientKey:  d.Get("client_key").(string),
+
+		// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
+		// After upgrading the SDK to v2 replace with p.UserAgent()
+		TerraformUserAgent: httpclient.TerraformUserAgent(p.TerraformVersion),
 	}
 
 	return config.Client()

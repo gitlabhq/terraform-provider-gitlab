@@ -3,7 +3,6 @@ package gitlab
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -13,13 +12,13 @@ import (
 
 // Config is per-provider, specifies where to connect to gitlab
 type Config struct {
-	Token            string
-	BaseURL          string
-	Insecure         bool
-	CACertFile       string
-	ClientCert       string
-	ClientKey        string
-	TerraformVersion string
+	Token              string
+	BaseURL            string
+	Insecure           bool
+	CACertFile         string
+	ClientCert         string
+	ClientKey          string
+	TerraformUserAgent string
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
@@ -64,7 +63,7 @@ func (c *Config) Client() (interface{}, error) {
 			},
 		),
 		func(client *gitlab.Client) error {
-			client.UserAgent = fmt.Sprintf("terraform-provider-gitlab/%s", c.TerraformVersion)
+			client.UserAgent = c.TerraformUserAgent
 			return nil
 		},
 	}
