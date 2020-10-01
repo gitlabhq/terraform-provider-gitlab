@@ -118,12 +118,13 @@ func init() {
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		Token:      d.Get("token").(string),
-		BaseURL:    d.Get("base_url").(string),
-		CACertFile: d.Get("cacert_file").(string),
-		Insecure:   d.Get("insecure").(bool),
-		ClientCert: d.Get("client_cert").(string),
-		ClientKey:  d.Get("client_key").(string),
+		Token:            d.Get("token").(string),
+		BaseURL:          d.Get("base_url").(string),
+		CACertFile:       d.Get("cacert_file").(string),
+		Insecure:         d.Get("insecure").(bool),
+		ClientCert:       d.Get("client_cert").(string),
+		ClientKey:        d.Get("client_key").(string),
+		TerraformVersion: "TODO", // TODO: How to get Terraform version?
 	}
 
 	return config.Client()
@@ -132,7 +133,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 func validateApiURLVersion(value interface{}, key string) (ws []string, es []error) {
 	v := value.(string)
 	if strings.HasSuffix(v, "/api/v3") || strings.HasSuffix(v, "/api/v3/") {
-		es = append(es, fmt.Errorf("terraform-gitlab-provider does not support v3 api; please upgrade to /api/v4 in %s", v))
+		es = append(es, fmt.Errorf("terraform-provider-gitlab does not support v3 api; please upgrade to /api/v4 in %s", v))
 	}
 	return
 }
