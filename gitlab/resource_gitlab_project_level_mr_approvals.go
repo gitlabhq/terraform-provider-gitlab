@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
@@ -78,14 +78,19 @@ func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta inte
 
 	approvalConfig, _, err := client.Projects.GetApprovalConfiguration(projectId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab project approval configuration not found for project %d", projectId)
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("couldn't read approval configuration: %w", err)
 	}
 
-	d.Set("project_id", projectId)
-	d.Set("reset_approvals_on_push", approvalConfig.ResetApprovalsOnPush)
-	d.Set("disable_overriding_approvers_per_merge_request", approvalConfig.DisableOverridingApproversPerMergeRequest)
-	d.Set("merge_requests_author_approval", approvalConfig.MergeRequestsAuthorApproval)
-	d.Set("merge_requests_disable_committers_approval", approvalConfig.MergeRequestsDisableCommittersApproval)
+	_ = d.Set("project_id", projectId)
+	_ = d.Set("reset_approvals_on_push", approvalConfig.ResetApprovalsOnPush)
+	_ = d.Set("disable_overriding_approvers_per_merge_request", approvalConfig.DisableOverridingApproversPerMergeRequest)
+	_ = d.Set("merge_requests_author_approval", approvalConfig.MergeRequestsAuthorApproval)
+	_ = d.Set("merge_requests_disable_committers_approval", approvalConfig.MergeRequestsDisableCommittersApproval)
 
 	return nil
 }
