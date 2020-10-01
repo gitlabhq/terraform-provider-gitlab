@@ -243,12 +243,12 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		groupID := rs.Primary.ID
 		if groupID == "" {
-			return fmt.Errorf("No group ID is set")
+			return fmt.Errorf("no group ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -359,15 +359,15 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 			continue
 		}
 
-		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
+		group, _, err := conn.Groups.GetGroup(rs.Primary.ID)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {
-					return fmt.Errorf("Group still exists")
+					return fmt.Errorf("group still exists")
 				}
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

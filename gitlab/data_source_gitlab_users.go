@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabUsers() *schema.Resource {
@@ -181,27 +181,27 @@ func dataSourceGitlabUsersRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	page := 1
-	userslen := 0
+	usersLen := 0
 	var users []*gitlab.User
-	for page == 1 || userslen != 0 {
+	for page == 1 || usersLen != 0 {
 		listUsersOptions.Page = page
 		paginatedUsers, _, err := client.Users.ListUsers(listUsersOptions)
 		if err != nil {
 			return err
 		}
 		users = append(users, paginatedUsers...)
-		userslen = len(paginatedUsers)
+		usersLen = len(paginatedUsers)
 		page = page + 1
 	}
 
-	d.Set("users", flattenGitlabUsers(users))
+	_ = d.Set("users", flattenGitlabUsers(users))
 	d.SetId(fmt.Sprintf("%d", id))
 
 	return nil
 }
 
 func flattenGitlabUsers(users []*gitlab.User) []interface{} {
-	usersList := []interface{}{}
+	var usersList []interface{}
 
 	for _, user := range users {
 		values := map[string]interface{}{

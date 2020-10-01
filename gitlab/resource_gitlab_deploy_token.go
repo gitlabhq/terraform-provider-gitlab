@@ -78,7 +78,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 	if exp, ok := d.GetOk("expires_at"); ok {
 		expiresAt, err = time.Parse(time.RFC3339, exp.(string))
 		if err != nil {
-			return fmt.Errorf("Invalid expires_at date: %v", err)
+			return fmt.Errorf("invalid expires_at date: %v", err)
 		}
 	}
 
@@ -118,8 +118,8 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 	d.SetId(fmt.Sprintf("%d", deployToken.ID))
 
 	// Token is only available on creation
-	d.Set("token", deployToken.Token)
-	d.Set("username", deployToken.Username)
+	_ = d.Set("token", deployToken.Token)
+	_ = d.Set("username", deployToken.Username)
 
 	return nil
 }
@@ -149,22 +149,24 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 
 	for _, token := range deployTokens {
 		if token.ID == deployTokenID {
-			d.Set("name", token.Name)
-			d.Set("username", token.Username)
-			d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
+			_ = d.Set("name", token.Name)
+			_ = d.Set("username", token.Username)
+			_ = d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
 
 			for _, scope := range token.Scopes {
 				if scope == "read_repository" {
-					d.Set("scopes.read_repository", true)
+					_ = d.Set("scopes.read_repository", true)
 				}
 
 				if scope == "read_registry" {
-					d.Set("scopes.read_registry", true)
+					_ = d.Set("scopes.read_registry", true)
 				}
 			}
+			return nil
 		}
 	}
-
+	log.Printf("[DEBUG] GitLab deploy token %d in group %s was not found", deployTokenID, group.(string))
+	d.SetId("")
 	return nil
 }
 
@@ -194,7 +196,7 @@ func resourceGitlabDeployTokenDelete(d *schema.ResourceData, meta interface{}) e
 	// StatusNoContent = 204
 	// Success with no body
 	if response.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("Invalid status code returned: %s", response.Status)
+		return fmt.Errorf("invalid status code returned: %s", response.Status)
 	}
 
 	return nil

@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupVariable() *schema.Resource {
@@ -95,15 +95,20 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 
 	v, _, err := client.GroupVariables.GetVariable(group, key)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab group variable not found %s/%s", group, key)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
-	d.Set("key", v.Key)
-	d.Set("value", v.Value)
-	d.Set("variable_type", v.VariableType)
-	d.Set("group", group)
-	d.Set("protected", v.Protected)
-	d.Set("masked", v.Masked)
+	_ = d.Set("key", v.Key)
+	_ = d.Set("value", v.Value)
+	_ = d.Set("variable_type", v.VariableType)
+	_ = d.Set("group", group)
+	_ = d.Set("protected", v.Protected)
+	_ = d.Set("masked", v.Masked)
 	return nil
 }
 

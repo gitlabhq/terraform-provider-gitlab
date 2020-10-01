@@ -2,11 +2,10 @@ package gitlab
 
 import (
 	"fmt"
-	"log"
-	"strconv"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
+	"log"
+	"strconv"
 )
 
 func resourceGitlabUser() *schema.Resource {
@@ -136,6 +135,11 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	user, _, err := client.Users.GetUser(id)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab user not found %d", id)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

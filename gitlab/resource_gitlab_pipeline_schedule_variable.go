@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineScheduleVariable() *schema.Resource {
@@ -79,16 +79,17 @@ func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta int
 	found := false
 	for _, pipelineVariable := range pipelineSchedule.Variables {
 		if pipelineVariable.Key == pipelineVariableKey {
-			d.Set("project", project)
-			d.Set("key", pipelineVariable.Key)
-			d.Set("value", pipelineVariable.Value)
-			d.Set("pipeline_schedule_id", scheduleID)
+			_ = d.Set("project", project)
+			_ = d.Set("key", pipelineVariable.Key)
+			_ = d.Set("value", pipelineVariable.Value)
+			_ = d.Set("pipeline_schedule_id", scheduleID)
 			found = true
 			break
 		}
 	}
 	if !found {
-		return fmt.Errorf("PipelineScheduleVariable %s can not be found", pipelineVariableKey)
+		log.Printf("[DEBUG] pipeline schedule variable not found %s/%d/%s", project, scheduleID, pipelineVariableKey)
+		d.SetId("")
 	}
 
 	return nil
@@ -122,9 +123,9 @@ func resourceGitlabPipelineScheduleVariableDelete(d *schema.ResourceData, meta i
 	variableKey := d.Get("key").(string)
 	scheduleID := d.Get("pipeline_schedule_id").(int)
 
-	if _, _, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleID, variableKey); err != nil {
-		return fmt.Errorf("failed to delete pipeline schedule variable %q: %w", d.Id(), err)
+	_, _, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleID, variableKey)
+	if err != nil {
+		return fmt.Errorf("%s failed to delete pipeline schedule variable: %s", d.Id(), err.Error())
 	}
-
-	return nil
+	return err
 }

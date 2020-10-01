@@ -24,7 +24,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+					accessLevel: fmt.Sprintf("developer"),
 				})),
 			},
 
@@ -32,7 +32,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("guest"),
+					accessLevel: fmt.Sprintf("guest"),
 				})),
 			},
 
@@ -40,7 +40,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+					accessLevel: fmt.Sprintf("developer"),
 				})),
 			},
 		},
@@ -52,18 +52,18 @@ func testAccCheckGitlabProjectMembershipExists(n string, membership *gitlab.Proj
 		rs, ok := s.RootModule().Resources[n]
 		conn := testAccProvider.Meta().(*gitlab.Client)
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		projectID := rs.Primary.Attributes["project_id"]
 		if projectID == "" {
-			return fmt.Errorf("No project ID is set")
+			return fmt.Errorf("no project ID is set")
 		}
 
 		userID := rs.Primary.Attributes["user_id"]
 		id, _ := strconv.Atoi(userID)
 		if userID == "" {
-			return fmt.Errorf("No user id is set")
+			return fmt.Errorf("no user id is set")
 		}
 
 		gotProjectMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, id)
@@ -77,18 +77,18 @@ func testAccCheckGitlabProjectMembershipExists(n string, membership *gitlab.Proj
 }
 
 type testAccGitlabProjectMembershipExpectedAttributes struct {
-	access_level string
+	accessLevel string
 }
 
 func testAccCheckGitlabProjectMembershipAttributes(membership *gitlab.ProjectMember, want *testAccGitlabProjectMembershipExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		access_level_id, ok := accessLevel[membership.AccessLevel]
+		accessLevelId, ok := accessLevel[membership.AccessLevel]
 		if !ok {
-			return fmt.Errorf("Invalid access level '%s'", access_level_id)
+			return fmt.Errorf("invalid access level '%s'", accessLevelId)
 		}
-		if access_level_id != want.access_level {
-			return fmt.Errorf("got access level %s; want %s", access_level_id, want.access_level)
+		if accessLevelId != want.accessLevel {
+			return fmt.Errorf("got access level %s; want %s", accessLevelId, want.accessLevel)
 		}
 		return nil
 	}
@@ -107,15 +107,15 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 
 		// GetProjectMember needs int type for userID
 		userIDI, err := strconv.Atoi(userID)
-		gotMembership, resp, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
+		gotMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
 		if err != nil {
 			if gotMembership != nil && fmt.Sprintf("%d", gotMembership.AccessLevel) == rs.Primary.Attributes["access_level"] {
-				return fmt.Errorf("Project still has member.")
+				return fmt.Errorf("project still has member")
 			}
 			return nil
 		}
 
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

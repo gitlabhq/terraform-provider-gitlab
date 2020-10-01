@@ -71,7 +71,7 @@ func testAccCheckGitlabProjectHookExists(n string, hook *gitlab.ProjectHook) res
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		hookID, err := strconv.Atoi(rs.Primary.ID)
@@ -80,7 +80,7 @@ func testAccCheckGitlabProjectHookExists(n string, hook *gitlab.ProjectHook) res
 		}
 		repoName := rs.Primary.Attributes["project"]
 		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
+			return fmt.Errorf("no project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -160,15 +160,15 @@ func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
+					return fmt.Errorf("repository still exists")
 				}
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

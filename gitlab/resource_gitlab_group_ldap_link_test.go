@@ -83,7 +83,7 @@ func testAccCheckGitlabGroupLdapLinkExists(resourceName string, ldapLink *gitlab
 
 		resourceState, ok := s.RootModule().Resources[resourceName]
 		if !ok {
-			return fmt.Errorf("Not found: %s", resourceName)
+			return fmt.Errorf("not found: %s", resourceName)
 		}
 
 		err := testAccGetGitlabGroupLdapLink(ldapLink, resourceState)
@@ -104,10 +104,10 @@ func testAccCheckGitlabGroupLdapLinkAttributes(ldapLink *gitlab.LDAPGroupLink, w
 
 		accessLevelId, ok := accessLevel[ldapLink.GroupAccess]
 		if !ok {
-			return fmt.Errorf("Invalid access level '%s'", accessLevelId)
+			return fmt.Errorf("invalid access level '%s'", accessLevelId)
 		}
 		if accessLevelId != want.accessLevel {
-			return fmt.Errorf("Has access level %s; want %s", accessLevelId, want.accessLevel)
+			return fmt.Errorf("has access level %s; want %s", accessLevelId, want.accessLevel)
 		}
 		return nil
 	}
@@ -122,15 +122,15 @@ func testAccCheckGitlabGroupLdapLinkDestroy(s *terraform.State) error {
 			continue
 		}
 
-		group, resp, err := conn.Groups.GetGroup(resourceState.Primary.ID)
+		group, _, err := conn.Groups.GetGroup(resourceState.Primary.ID)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == resourceState.Primary.ID {
 				if group.MarkedForDeletionOn == nil {
-					return fmt.Errorf("Group still exists")
+					return fmt.Errorf("group still exists")
 				}
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil
@@ -143,7 +143,7 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 
 	groupId := resourceState.Primary.Attributes["group_id"]
 	if groupId == "" {
-		return fmt.Errorf("No group ID is set")
+		return fmt.Errorf("no group ID is set")
 	}
 
 	// Construct our desired LDAP Link from the config values
@@ -195,8 +195,8 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 	return nil
 }
 
-func testAccLoadTestData(testdatafile string, ldapLink *gitlab.LDAPGroupLink) error {
-	testLdapLinkBytes, err := ioutil.ReadFile(testdatafile)
+func testAccLoadTestData(testDataFile string, ldapLink *gitlab.LDAPGroupLink) error {
+	testLdapLinkBytes, err := ioutil.ReadFile(testDataFile)
 	if err != nil {
 		return err
 	}

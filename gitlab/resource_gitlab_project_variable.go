@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectVariable() *schema.Resource {
@@ -138,13 +139,13 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 		return augmentProjectVariableClientError(d, err)
 	}
 
-	d.Set("key", v.Key)
-	d.Set("value", v.Value)
-	d.Set("variable_type", v.VariableType)
-	d.Set("project", project)
-	d.Set("protected", v.Protected)
-	d.Set("masked", v.Masked)
-	d.Set("environment_scope", v.EnvironmentScope)
+	_ = d.Set("key", v.Key)
+	_ = d.Set("value", v.Value)
+	_ = d.Set("variable_type", v.VariableType)
+	_ = d.Set("project", project)
+	_ = d.Set("protected", v.Protected)
+	_ = d.Set("masked", v.Masked)
+	_ = d.Set("environment_scope", v.EnvironmentScope)
 	return nil
 }
 

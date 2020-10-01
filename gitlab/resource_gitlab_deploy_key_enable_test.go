@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
@@ -43,7 +43,7 @@ func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.DeployK
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		deployKeyID, err := strconv.Atoi(strings.Split(rs.Primary.ID, ":")[1])
@@ -52,8 +52,9 @@ func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.DeployK
 		}
 		repoName := rs.Primary.Attributes["project"]
 		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
+			return fmt.Errorf("no project ID is set")
 		}
+
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(repoName, deployKeyID)
@@ -103,13 +104,13 @@ func testAccCheckGitlabDeployKeyEnableDestroy(s *terraform.State) error {
 		}
 	}
 
-	gotDeployKey, resp, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
+	gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err == nil {
 		if gotDeployKey != nil {
 			return fmt.Errorf("Deploy key still exists: %d", deployKeyID)
 		}
 	}
-	if resp.StatusCode != 404 {
+	if !is404(err) {
 		return err
 	}
 	return nil

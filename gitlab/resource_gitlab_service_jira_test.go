@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabServiceJira_basic(t *testing.T) {
@@ -93,18 +93,18 @@ func testAccCheckGitlabServiceJiraExists(n string, service *gitlab.JiraService) 
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
-			return fmt.Errorf("No project ID is set")
+			return fmt.Errorf("no project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		jiraService, _, err := conn.Services.GetJiraService(project)
 		if err != nil {
-			return fmt.Errorf("Jira service does not exist in project %s: %v", project, err)
+			return fmt.Errorf("jira service does not exist in project %s: %v", project, err)
 		}
 		*service = *jiraService
 
@@ -120,15 +120,15 @@ func testAccCheckGitlabServiceJiraDestroy(s *terraform.State) error {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
+					return fmt.Errorf("repository still exists")
 				}
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil
@@ -140,12 +140,12 @@ func getJiraProjectID(n string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return "", fmt.Errorf("Not Found: %s", n)
+			return "", fmt.Errorf("not found: %s", n)
 		}
 
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
-			return "", fmt.Errorf("No project ID is set")
+			return "", fmt.Errorf("no project ID is set")
 		}
 
 		return project, nil

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabDeployKey() *schema.Resource {
@@ -80,12 +80,17 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab deploy key not found %s/%d", project, deployKeyID)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
-	d.Set("title", deployKey.Title)
-	d.Set("key", deployKey.Key)
-	d.Set("can_push", deployKey.CanPush)
+	_ = d.Set("title", deployKey.Title)
+	_ = d.Set("key", deployKey.Key)
+	_ = d.Set("can_push", deployKey.CanPush)
 	return nil
 }
 
@@ -98,21 +103,25 @@ func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) err
 	}
 	log.Printf("[DEBUG] Delete gitlab deploy key %s", d.Id())
 
-	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID)
+	response, err := client.DeployKeys.DeleteDeployKey(project, deployKeyID)
 
+	// HTTP 204 is success with no body
+	if response != nil && response.StatusCode == 204 {
+		return nil
+	}
 	return err
 }
 
-func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 2 {
 		d.SetId("")
-		return nil, fmt.Errorf("Invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
+		return nil, fmt.Errorf("invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
 	}
 	project, id := s[0], s[1]
 
 	d.SetId(id)
-	d.Set("project", project)
+	_ = d.Set("project", project)
 
 	return []*schema.ResourceData{d}, nil
 }

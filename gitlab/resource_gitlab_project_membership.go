@@ -79,6 +79,11 @@ func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{
 
 	projectMember, _, err := client.ProjectMembers.GetProjectMember(projectId, userId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab project membership not found %s/%d", projectId, userId)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
@@ -134,9 +139,9 @@ func resourceGitlabProjectMembershipDelete(d *schema.ResourceData, meta interfac
 
 func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) {
 
-	d.Set("project_id", projectId)
-	d.Set("user_id", projectMember.ID)
-	d.Set("access_level", accessLevel[projectMember.AccessLevel])
+	_ = d.Set("project_id", projectId)
+	_ = d.Set("user_id", projectMember.ID)
+	_ = d.Set("access_level", accessLevel[projectMember.AccessLevel])
 
 	userId := strconv.Itoa(projectMember.ID)
 	d.SetId(buildTwoPartID(projectId, &userId))

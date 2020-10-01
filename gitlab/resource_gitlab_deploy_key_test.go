@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployKey_basic(t *testing.T) {
@@ -57,7 +57,7 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 	})
 }
 
-func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
+func TestAccGitlabDeployKey_suppressFunc(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -99,7 +99,7 @@ func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.DeployKey) re
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
@@ -108,7 +108,7 @@ func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.DeployKey) re
 		}
 		repoName := rs.Primary.Attributes["project"]
 		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
+			return fmt.Errorf("no project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -155,13 +155,13 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
 		project := rs.Primary.Attributes["project"]
 
-		gotDeployKey, resp, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
+		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
 		if err == nil {
 			if gotDeployKey != nil && fmt.Sprintf("%d", gotDeployKey.ID) == rs.Primary.ID {
-				return fmt.Errorf("Deploy key still exists")
+				return fmt.Errorf("deploy key still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil
@@ -173,16 +173,16 @@ func getDeployKeyImportID(n string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return "", fmt.Errorf("Not Found: %s", n)
+			return "", fmt.Errorf("not found: %s", n)
 		}
 
 		deployKeyID := rs.Primary.ID
 		if deployKeyID == "" {
-			return "", fmt.Errorf("No deploy key ID is set")
+			return "", fmt.Errorf("no deploy key ID is set")
 		}
 		projectID := rs.Primary.Attributes["project"]
 		if projectID == "" {
-			return "", fmt.Errorf("No project ID is set")
+			return "", fmt.Errorf("no project ID is set")
 		}
 
 		return fmt.Sprintf("%s:%s", projectID, deployKeyID), nil

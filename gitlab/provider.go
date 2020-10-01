@@ -132,7 +132,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 func validateApiURLVersion(value interface{}, key string) (ws []string, es []error) {
 	v := value.(string)
 	if strings.HasSuffix(v, "/api/v3") || strings.HasSuffix(v, "/api/v3/") {
-		es = append(es, fmt.Errorf("terraform-gitlab-provider does not support v3 api; please upgrade to /api/v4 in %s", v))
+		es = append(es, fmt.Errorf("%s: terraform-gitlab-provider does not support v3 api; please upgrade to /api/v4 in %s", key, v))
 	}
 	return
 }

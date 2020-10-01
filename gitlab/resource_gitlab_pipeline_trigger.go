@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineTrigger() *schema.Resource {
@@ -65,11 +65,16 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 
 	pipelineTrigger, _, err := client.PipelineTriggers.GetPipelineTrigger(project, pipelineTriggerID)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab pipeline trigger not found %s/%d", project, pipelineTriggerID)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
-	d.Set("description", pipelineTrigger.Description)
-	d.Set("token", pipelineTrigger.Token)
+	_ = d.Set("description", pipelineTrigger.Description)
+	_ = d.Set("token", pipelineTrigger.Token)
 
 	return nil
 }

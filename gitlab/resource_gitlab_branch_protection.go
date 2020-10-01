@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabBranchProtection() *schema.Resource {
@@ -76,7 +76,7 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 		if err != nil {
 			return err
 		}
-		// Reprotect branch with updated values
+		// Re-protect branch with updated values
 		bp, _, err = client.ProtectedBranches.ProtectRepositoryBranches(project, options)
 		if err != nil {
 			return err
@@ -114,10 +114,10 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 		return nil
 	}
 
-	d.Set("project", project)
-	d.Set("branch", pb.Name)
-	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
-	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
+	_ = d.Set("project", project)
+	_ = d.Set("branch", pb.Name)
+	_ = d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
+	_ = d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
 	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))

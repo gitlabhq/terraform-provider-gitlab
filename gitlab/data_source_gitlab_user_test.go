@@ -61,7 +61,7 @@ func testAccDataSourceGitlabUser(src, n string) resource.TestCheckFunc {
 
 		for _, attribute := range testAttributes {
 			if searchResource[attribute] != userResource[attribute] {
-				return fmt.Errorf("Expected user's parameter `%s` to be: %s, but got: `%s`", attribute, userResource[attribute], searchResource[attribute])
+				return fmt.Errorf("expected user's parameter `%s` to be: %s, but got: `%s`", attribute, userResource[attribute], searchResource[attribute])
 			}
 		}
 

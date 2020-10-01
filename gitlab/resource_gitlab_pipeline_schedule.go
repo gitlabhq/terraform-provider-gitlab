@@ -1,13 +1,12 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineSchedule() *schema.Resource {
@@ -90,17 +89,19 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 	found := false
 	for _, pipelineSchedule := range pipelineSchedules {
 		if pipelineSchedule.ID == pipelineScheduleID {
-			d.Set("description", pipelineSchedule.Description)
-			d.Set("ref", pipelineSchedule.Ref)
-			d.Set("cron", pipelineSchedule.Cron)
-			d.Set("cron_timezone", pipelineSchedule.CronTimezone)
-			d.Set("active", pipelineSchedule.Active)
+			_ = d.Set("description", pipelineSchedule.Description)
+			_ = d.Set("ref", pipelineSchedule.Ref)
+			_ = d.Set("cron", pipelineSchedule.Cron)
+			_ = d.Set("cron_timezone", pipelineSchedule.CronTimezone)
+			_ = d.Set("active", pipelineSchedule.Active)
 			found = true
 			break
 		}
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID))
+		log.Printf("[DEBUG] PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
+		d.SetId("")
+		return nil
 	}
 
 	return nil
@@ -164,9 +165,9 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err = client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
-		return fmt.Errorf("failed to delete pipeline schedule %q: %w", d.Id(), err)
+	_, err = client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID)
+	if err != nil {
+		return fmt.Errorf("%s failed to delete pipeline schedule: %s", d.Id(), err.Error())
 	}
-
-	return nil
+	return err
 }

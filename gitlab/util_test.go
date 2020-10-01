@@ -3,7 +3,7 @@ package gitlab
 import (
 	"testing"
 
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestGitlab_validation(t *testing.T) {
@@ -36,7 +36,7 @@ func TestGitlab_validation(t *testing.T) {
 	}
 }
 
-func TestGitlab_visbilityHelpers(t *testing.T) {
+func TestGitlab_visibilityHelpers(t *testing.T) {
 	cases := []struct {
 		String string
 		Level  gitlab.VisibilityValue

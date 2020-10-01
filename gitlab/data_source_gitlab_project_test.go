@@ -10,20 +10,20 @@ import (
 )
 
 func TestAccDataGitlabProject_basic(t *testing.T) {
-	projectname := fmt.Sprintf("tf-%s", acctest.RandString(5))
+	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataGitlabProjectConfig(projectname),
+				Config: testAccDataGitlabProjectConfig(projectName),
 				Check: testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo",
 					[]string{"id", "name", "path", "visibility", "description"}),
 			},
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccDataGitlabProjectConfigPushRules(projectname),
+				Config:   testAccDataGitlabProjectConfigPushRules(projectName),
 				Check: testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo",
 					[]string{"push_rules.0.author_email_regex"}),
 			},
@@ -41,19 +41,19 @@ func testAccDataSourceGitlabProject(resourceName, dataSourceName string, testAtt
 		searchResource := search.Primary.Attributes
 
 		if searchResource["id"] == "" {
-			return fmt.Errorf("Expected to get a project ID from Gitlab")
+			return fmt.Errorf("expected to get a project ID from Gitlab")
 		}
 
 		for _, attribute := range testAttributes {
 			if searchResource[attribute] != projectResource[attribute] {
-				return fmt.Errorf("Expected the project %s to be: %s, but got: %s", attribute, projectResource[attribute], searchResource[attribute])
+				return fmt.Errorf("expected the project %s to be: %s, but got: %s", attribute, projectResource[attribute], searchResource[attribute])
 			}
 		}
 		return nil
 	}
 }
 
-func testAccDataGitlabProjectConfig(projectname string) string {
+func testAccDataGitlabProjectConfig(projectName string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "test"{
 	name = "%s"
@@ -65,7 +65,7 @@ resource "gitlab_project" "test"{
 data "gitlab_project" "foo" {
 	id = "${gitlab_project.test.id}"
 }
-	`, projectname, projectname)
+	`, projectName, projectName)
 }
 
 func testAccDataGitlabProjectConfigPushRules(projectName string) string {

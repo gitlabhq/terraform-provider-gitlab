@@ -110,11 +110,11 @@ func testAccCheckGitlabTagProtectionExists(n string, pt *gitlab.ProtectedTag) re
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 		project, tag, err := projectAndTagFromID(rs.Primary.ID)
 		if err != nil {
-			return fmt.Errorf("Error in Splitting Project and Tag Ids")
+			return fmt.Errorf("error in splitting project and tag IDs")
 		}
 
 		conn := testAccProvider.Meta().(*gitlab.Client)
@@ -123,13 +123,13 @@ func testAccCheckGitlabTagProtectionExists(n string, pt *gitlab.ProtectedTag) re
 		if err != nil {
 			return err
 		}
-		for _, gotpt := range pts {
-			if gotpt.Name == tag {
-				*pt = *gotpt
+		for _, gotPt := range pts {
+			if gotPt.Name == tag {
+				*pt = *gotPt
 				return nil
 			}
 		}
-		return fmt.Errorf("Protected Tag does not exist")
+		return fmt.Errorf("protected tag does not exist")
 	}
 }
 
@@ -164,13 +164,13 @@ func testAccCheckGitlabTagProtectionDestroy(s *terraform.State) error {
 		}
 	}
 
-	pt, response, err := conn.ProtectedTags.GetProtectedTag(project, tag)
+	pt, _, err := conn.ProtectedTags.GetProtectedTag(project, tag)
 	if err == nil {
 		if pt != nil {
 			return fmt.Errorf("project tag protection %s still exists", tag)
 		}
 	}
-	if response.StatusCode != 404 {
+	if !is404(err) {
 		return err
 	}
 	return nil

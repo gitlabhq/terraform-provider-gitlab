@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupLdapLink() *schema.Resource {
@@ -59,18 +59,20 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
-	group_access := int(accessLevelNameToValue[d.Get("access_level").(string)])
-	ldap_provider := d.Get("ldap_provider").(string)
+	groupAccess := int(accessLevelNameToValue[d.Get("access_level").(string)])
+	ldapProvider := d.Get("ldap_provider").(string)
 	force := d.Get("force").(bool)
 
 	options := &gitlab.AddGroupLDAPLinkOptions{
 		CN:          &cn,
-		GroupAccess: &group_access,
-		Provider:    &ldap_provider,
+		GroupAccess: &groupAccess,
+		Provider:    &ldapProvider,
 	}
 
 	if force {
-		resourceGitlabGroupLdapLinkDelete(d, meta)
+		if err := resourceGitlabGroupLdapLinkDelete(d, meta); err != nil {
+			return err
+		}
 	}
 
 	log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
@@ -112,10 +114,10 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 		found := false
 		for _, ldapLink := range ldapLinks {
 			if buildTwoPartID(&ldapLink.Provider, &ldapLink.CN) == d.Id() {
-				d.Set("group_id", groupId)
-				d.Set("cn", ldapLink.CN)
-				d.Set("group_access", ldapLink.GroupAccess)
-				d.Set("ldap_provider", ldapLink.Provider)
+				_ = d.Set("group_id", groupId)
+				_ = d.Set("cn", ldapLink.CN)
+				_ = d.Set("group_access", ldapLink.GroupAccess)
+				_ = d.Set("ldap_provider", ldapLink.Provider)
 				found = true
 				break
 			}
@@ -134,15 +136,15 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	client := meta.(*gitlab.Client)
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
-	ldap_provider := d.Get("ldap_provider").(string)
+	ldapProvider := d.Get("ldap_provider").(string)
 
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
-	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn)
+	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldapProvider, cn)
 	if err != nil {
 		switch err.(type) {
 		case *gitlab.ErrorResponse:
 			// Ignore LDAP links that don't exist
-			if strings.Contains(string(err.(*gitlab.ErrorResponse).Message), "Linked LDAP group not found") {
+			if strings.Contains(err.(*gitlab.ErrorResponse).Message, "Linked LDAP group not found") {
 				log.Printf("[WARNING] %s", err)
 			} else {
 				return err

@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabTagProtection() *schema.Resource {
@@ -58,7 +58,7 @@ func resourceGitlabTagProtectionCreate(d *schema.ResourceData, meta interface{})
 		if err != nil {
 			return err
 		}
-		// Reprotect tag with updated values
+		// Re-protect tag with updated values
 		tp, _, err = client.ProtectedTags.ProtectRepositoryTags(project, options)
 		if err != nil {
 			return err
@@ -81,12 +81,17 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 
 	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab tag protection not found %s/%s", project, tag)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
-	d.Set("project", project)
-	d.Set("tag", pt.Name)
-	d.Set("create_access_level", pt.CreateAccessLevels[0].AccessLevel)
+	_ = d.Set("project", project)
+	_ = d.Set("tag", pt.Name)
+	_ = d.Set("create_access_level", pt.CreateAccessLevels[0].AccessLevel)
 
 	d.SetId(buildTwoPartID(&project, &pt.Name))
 

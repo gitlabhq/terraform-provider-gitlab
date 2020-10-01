@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 
@@ -83,10 +82,10 @@ func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{})
 		return e
 	}
 
-	groupMember, resp, err := client.GroupMembers.GetGroupMember(groupId, userId)
+	groupMember, _, err := client.GroupMembers.GetGroupMember(groupId, userId)
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] gitlab group membership for %s not found so removing from state", d.Id())
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab group member not found %s/%d", groupId, userId)
 			d.SetId("")
 			return nil
 		}
@@ -148,10 +147,10 @@ func resourceGitlabGroupMembershipDelete(d *schema.ResourceData, meta interface{
 
 func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, groupId *string) {
 
-	d.Set("group_id", groupId)
-	d.Set("user_id", groupMember.ID)
-	d.Set("access_level", accessLevel[groupMember.AccessLevel])
-	d.Set("expires_at", groupMember.ExpiresAt)
+	_ = d.Set("group_id", groupId)
+	_ = d.Set("user_id", groupMember.ID)
+	_ = d.Set("access_level", accessLevel[groupMember.AccessLevel])
+	_ = d.Set("expires_at", groupMember.ExpiresAt)
 
 	userId := strconv.Itoa(groupMember.ID)
 	d.SetId(buildTwoPartID(groupId, &userId))

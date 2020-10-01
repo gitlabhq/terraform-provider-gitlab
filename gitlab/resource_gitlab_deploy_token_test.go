@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"net/http"
 	"strconv"
 	"testing"
 
@@ -39,7 +38,7 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		deployTokenID, err := strconv.Atoi(rs.Primary.ID)
@@ -59,7 +58,7 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 		} else if groupName != "" {
 			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(groupName, nil)
 		} else {
-			return fmt.Errorf("No project or group ID is set")
+			return fmt.Errorf("no project or group ID is set")
 		}
 
 		if err != nil {
@@ -73,7 +72,7 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 			}
 		}
 
-		return fmt.Errorf("Deploy Token doesn't exist")
+		return fmt.Errorf("deploy token doesn't exist")
 	}
 }
 
@@ -114,12 +113,11 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 		group := rs.Primary.Attributes["group"]
 
 		var gotDeployTokens []*gitlab.DeployToken
-		var resp *gitlab.Response
 
 		if project != "" {
-			gotDeployTokens, resp, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
+			gotDeployTokens, _, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
 		} else if group != "" {
-			gotDeployTokens, resp, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
+			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
 		} else {
 			return fmt.Errorf("somehow neither project nor group were set")
 		}
@@ -127,12 +125,12 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 		if err == nil {
 			for _, token := range gotDeployTokens {
 				if token.ID == deployTokenID {
-					return fmt.Errorf("Deploy token still exists")
+					return fmt.Errorf("deploy token still exists")
 				}
 			}
 		}
 
-		if resp.StatusCode != http.StatusNotFound {
+		if !is404(err) {
 			return err
 		}
 	}

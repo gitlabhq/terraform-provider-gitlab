@@ -115,12 +115,12 @@ func testAccCheckGitlabUserExists(n string, user *gitlab.User) resource.TestChec
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		userID := rs.Primary.ID
 		if userID == "" {
-			return fmt.Errorf("No user ID is set")
+			return fmt.Errorf("no user ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -191,13 +191,13 @@ func testAccCheckGitlabUserDestroy(s *terraform.State) error {
 
 		id, _ := strconv.Atoi(rs.Primary.ID)
 
-		user, resp, err := conn.Users.GetUser(id)
+		user, _, err := conn.Users.GetUser(id)
 		if err == nil {
 			if user != nil && fmt.Sprintf("%d", user.ID) == rs.Primary.ID {
 				return fmt.Errorf("User still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

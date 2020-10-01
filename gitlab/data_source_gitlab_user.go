@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabUser() *schema.Resource {
@@ -184,30 +184,30 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("one and only one of user_id, username or email must be set")
 	}
 
-	d.Set("user_id", user.ID)
-	d.Set("username", user.Username)
-	d.Set("email", user.Email)
-	d.Set("name", user.Name)
-	d.Set("is_admin", user.IsAdmin)
-	d.Set("can_create_group", user.CanCreateGroup)
-	d.Set("can_create_project", user.CanCreateProject)
-	d.Set("projects_limit", user.ProjectsLimit)
-	d.Set("state", user.State)
-	d.Set("external", user.External)
-	d.Set("extern_uid", user.ExternUID)
-	d.Set("created_at", user.CreatedAt)
-	d.Set("organization", user.Organization)
-	d.Set("two_factor_enabled", user.TwoFactorEnabled)
-	d.Set("provider", user.Provider)
-	d.Set("avatar_url", user.AvatarURL)
-	d.Set("bio", user.Bio)
-	d.Set("location", user.Location)
-	d.Set("skype", user.Skype)
-	d.Set("linkedin", user.Linkedin)
-	d.Set("twitter", user.Twitter)
-	d.Set("website_url", user.WebsiteURL)
-	d.Set("theme_id", user.ThemeID)
-	d.Set("color_scheme_id", user.ColorSchemeID)
+	_ = d.Set("user_id", user.ID)
+	_ = d.Set("username", user.Username)
+	_ = d.Set("email", user.Email)
+	_ = d.Set("name", user.Name)
+	_ = d.Set("is_admin", user.IsAdmin)
+	_ = d.Set("can_create_group", user.CanCreateGroup)
+	_ = d.Set("can_create_project", user.CanCreateProject)
+	_ = d.Set("projects_limit", user.ProjectsLimit)
+	_ = d.Set("state", user.State)
+	_ = d.Set("external", user.External)
+	_ = d.Set("extern_uid", user.ExternUID)
+	_ = d.Set("created_at", user.CreatedAt)
+	_ = d.Set("organization", user.Organization)
+	_ = d.Set("two_factor_enabled", user.TwoFactorEnabled)
+	_ = d.Set("provider", user.Provider)
+	_ = d.Set("avatar_url", user.AvatarURL)
+	_ = d.Set("bio", user.Bio)
+	_ = d.Set("location", user.Location)
+	_ = d.Set("skype", user.Skype)
+	_ = d.Set("linkedin", user.Linkedin)
+	_ = d.Set("twitter", user.Twitter)
+	_ = d.Set("website_url", user.WebsiteURL)
+	_ = d.Set("theme_id", user.ThemeID)
+	_ = d.Set("color_scheme_id", user.ColorSchemeID)
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
 

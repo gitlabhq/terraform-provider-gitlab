@@ -157,26 +157,31 @@ func resourceGitlabGroupClusterRead(d *schema.ResourceData, meta interface{}) er
 
 	cluster, _, err := client.GroupCluster.GetCluster(group, clusterId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab group cluster not found %s/%d", group, clusterId)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
-	d.Set("group", group)
-	d.Set("name", cluster.Name)
-	d.Set("domain", cluster.Domain)
-	d.Set("created_at", cluster.CreatedAt.String())
-	d.Set("provider_type", cluster.ProviderType)
-	d.Set("platform_type", cluster.PlatformType)
-	d.Set("environment_scope", cluster.EnvironmentScope)
-	d.Set("cluster_type", cluster.ClusterType)
+	_ = d.Set("group", group)
+	_ = d.Set("name", cluster.Name)
+	_ = d.Set("domain", cluster.Domain)
+	_ = d.Set("created_at", cluster.CreatedAt.String())
+	_ = d.Set("provider_type", cluster.ProviderType)
+	_ = d.Set("platform_type", cluster.PlatformType)
+	_ = d.Set("environment_scope", cluster.EnvironmentScope)
+	_ = d.Set("cluster_type", cluster.ClusterType)
 
-	d.Set("kubernetes_api_url", cluster.PlatformKubernetes.APIURL)
-	d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
-	d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
+	_ = d.Set("kubernetes_api_url", cluster.PlatformKubernetes.APIURL)
+	_ = d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
+	_ = d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
 
 	if cluster.ManagementProject == nil {
-		d.Set("management_project_id", "")
+		_ = d.Set("management_project_id", "")
 	} else {
-		d.Set("management_project_id", strconv.Itoa(cluster.ManagementProject.ID))
+		_ = d.Set("management_project_id", strconv.Itoa(cluster.ManagementProject.ID))
 	}
 
 	return nil
