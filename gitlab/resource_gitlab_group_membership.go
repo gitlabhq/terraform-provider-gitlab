@@ -66,7 +66,13 @@ func resourceGitlabGroupMembershipCreate(d *schema.ResourceData, meta interface{
 
 	_, resp, err := client.GroupMembers.AddGroupMember(groupId, options)
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusConflict {
+		user, _, err := client.Users.CurrentUser()
+		if err != nil {
+			return err
+		}
+
+		// The user that creates the group is always added automatically as member
+		if resp != nil && resp.StatusCode == http.StatusConflict && user.ID == userId {
 			options := gitlab.EditGroupMemberOptions{
 				AccessLevel: &accessLevelId,
 				ExpiresAt:   &expiresAt,
