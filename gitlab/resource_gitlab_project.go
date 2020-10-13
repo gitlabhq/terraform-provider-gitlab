@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -268,6 +269,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
 	},
+	"forked_from_project": {
+		Type:     schema.TypeInt,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -313,101 +318,129 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("archived", project.Archived)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
+	d.Set("forked_from_project", project.ForkedFromProject)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	options := &gitlab.CreateProjectOptions{
-		Name:                             gitlab.String(d.Get("name").(string)),
-		RequestAccessEnabled:             gitlab.Bool(d.Get("request_access_enabled").(bool)),
-		IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
-		MergeRequestsEnabled:             gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
-		JobsEnabled:                      gitlab.Bool(d.Get("pipelines_enabled").(bool)),
-		ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
-		WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
-		SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
-		ContainerRegistryEnabled:         gitlab.Bool(d.Get("container_registry_enabled").(bool)),
-		LFSEnabled:                       gitlab.Bool(d.Get("lfs_enabled").(bool)),
-		Visibility:                       stringToVisibilityLevel(d.Get("visibility_level").(string)),
-		MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
-		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
-		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
-		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
-		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
-		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
-	}
-
-	if v, ok := d.GetOk("path"); ok {
-		options.Path = gitlab.String(v.(string))
-	}
-
-	if v, ok := d.GetOk("namespace_id"); ok {
-		options.NamespaceID = gitlab.Int(v.(int))
-	}
-
-	if v, ok := d.GetOk("description"); ok {
-		options.Description = gitlab.String(v.(string))
-	}
-
-	if v, ok := d.GetOk("tags"); ok {
-		options.TagList = stringSetToStringSlice(v.(*schema.Set))
-	}
-
-	if v, ok := d.GetOk("initialize_with_readme"); ok {
-		options.InitializeWithReadme = gitlab.Bool(v.(bool))
-	}
-
-	if v, ok := d.GetOk("import_url"); ok {
-		options.ImportURL = gitlab.String(v.(string))
-	}
-
-	if v, ok := d.GetOk("template_name"); ok {
-		options.TemplateName = gitlab.String(v.(string))
-	}
-
-	if v, ok := d.GetOk("template_project_id"); ok {
-		options.TemplateProjectID = gitlab.Int(v.(int))
-	}
-
-	if v, ok := d.GetOk("use_custom_template"); ok {
-		options.UseCustomTemplate = gitlab.Bool(v.(bool))
-	}
-
-	if v, ok := d.GetOk("group_with_project_templates_id"); ok {
-		options.GroupWithProjectTemplatesID = gitlab.Int(v.(int))
-	}
-
-	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
-
-	project, _, err := client.Projects.CreateProject(options)
-	if err != nil {
-		return err
-	}
-
-	// from this point onwards no matter how we return, resource creation
-	// is committed to state since we set its ID
-	d.SetId(fmt.Sprintf("%d", project.ID))
-
-	if _, ok := d.GetOk("import_url"); ok {
-		log.Printf("[DEBUG] waiting for project %q import to finish", *options.Name)
-
-		stateConf := &resource.StateChangeConf{
-			Pending: []string{"scheduled", "started"},
-			Target:  []string{"finished"},
-			Timeout: time.Minute,
-			Refresh: func() (interface{}, string, error) {
-				status, _, err := client.ProjectImportExport.ImportStatus(d.Id())
-				if err != nil {
-					return nil, "", err
-				}
-
-				return status, status.ImportStatus, nil
-			},
+	if forked_from_project, ok := d.GetOk("forked_from_project"); ok {
+		fork_options := &gitlab.ForkProjectOptions{
+			Name: gitlab.String(d.Get("name").(string)),
+		}
+		if v, ok := d.GetOk("path"); ok {
+			fork_options.Path = gitlab.String(v.(string))
 		}
 
-		if _, err := stateConf.WaitForState(); err != nil {
-			return fmt.Errorf("error while waiting for project %q import to finish: %w", *options.Name, err)
+		if v, ok := d.GetOk("namespace_id"); ok {
+			fork_options.Namespace = gitlab.String(v.(string)) // TODO change this to use NamespaceID or NamespacePath when the gitlab api library is updated
+		}
+
+		log.Printf("[DEBUG] create gitlab project %q by forking it from the project with id %q", *fork_options.Name, forked_from_project)
+
+		project, _, err := client.Projects.ForkProject(forked_from_project, fork_options)
+		if err != nil {
+			return err
+		}
+
+		// from this point onwards no matter how we return, resource creation
+		// is committed to state since we set its ID
+		d.SetId(fmt.Sprintf("%d", project.ID))
+
+		// TODO: update other values?
+	} else {
+		options := &gitlab.CreateProjectOptions{
+			Name:                             gitlab.String(d.Get("name").(string)),
+			RequestAccessEnabled:             gitlab.Bool(d.Get("request_access_enabled").(bool)),
+			IssuesEnabled:                    gitlab.Bool(d.Get("issues_enabled").(bool)),
+			MergeRequestsEnabled:             gitlab.Bool(d.Get("merge_requests_enabled").(bool)),
+			JobsEnabled:                      gitlab.Bool(d.Get("pipelines_enabled").(bool)),
+			ApprovalsBeforeMerge:             gitlab.Int(d.Get("approvals_before_merge").(int)),
+			WikiEnabled:                      gitlab.Bool(d.Get("wiki_enabled").(bool)),
+			SnippetsEnabled:                  gitlab.Bool(d.Get("snippets_enabled").(bool)),
+			ContainerRegistryEnabled:         gitlab.Bool(d.Get("container_registry_enabled").(bool)),
+			LFSEnabled:                       gitlab.Bool(d.Get("lfs_enabled").(bool)),
+			Visibility:                       stringToVisibilityLevel(d.Get("visibility_level").(string)),
+			MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
+			OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
+			OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
+			SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
+			RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
+			PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
+		}
+
+		if v, ok := d.GetOk("path"); ok {
+			options.Path = gitlab.String(v.(string))
+		}
+
+		if v, ok := d.GetOk("namespace_id"); ok {
+			options.NamespaceID = gitlab.Int(v.(int))
+		}
+
+		if v, ok := d.GetOk("description"); ok {
+			options.Description = gitlab.String(v.(string))
+		}
+
+		if v, ok := d.GetOk("tags"); ok {
+			options.TagList = stringSetToStringSlice(v.(*schema.Set))
+		}
+
+		if v, ok := d.GetOk("initialize_with_readme"); ok {
+			options.InitializeWithReadme = gitlab.Bool(v.(bool))
+		}
+
+		if v, ok := d.GetOk("import_url"); ok {
+			options.ImportURL = gitlab.String(v.(string))
+		}
+
+		if v, ok := d.GetOk("template_name"); ok {
+			options.TemplateName = gitlab.String(v.(string))
+		}
+
+		if v, ok := d.GetOk("template_project_id"); ok {
+			options.TemplateProjectID = gitlab.Int(v.(int))
+		}
+
+		if v, ok := d.GetOk("use_custom_template"); ok {
+			options.UseCustomTemplate = gitlab.Bool(v.(bool))
+		}
+
+		if v, ok := d.GetOk("group_with_project_templates_id"); ok {
+			options.GroupWithProjectTemplatesID = gitlab.Int(v.(int))
+		}
+
+		log.Printf("[DEBUG] create gitlab project %q", *options.Name)
+
+		project, _, err := client.Projects.CreateProject(options)
+		if err != nil {
+			return err
+		}
+
+		// from this point onwards no matter how we return, resource creation
+		// is committed to state since we set its ID
+		d.SetId(fmt.Sprintf("%d", project.ID))
+
+		// TODO: can't be combined with fork_project_id ?
+		if _, ok := d.GetOk("import_url"); ok {
+			log.Printf("[DEBUG] waiting for project %q import to finish", *options.Name)
+
+			stateConf := &resource.StateChangeConf{
+				Pending: []string{"scheduled", "started"},
+				Target:  []string{"finished"},
+				Timeout: time.Minute,
+				Refresh: func() (interface{}, string, error) {
+					status, _, err := client.ProjectImportExport.ImportStatus(d.Id())
+					if err != nil {
+						return nil, "", err
+					}
+
+					return status, status.ImportStatus, nil
+				},
+			}
+
+			if _, err := stateConf.WaitForState(); err != nil {
+				return fmt.Errorf("error while waiting for project %q import to finish: %w", *options.Name, err)
+			}
 		}
 	}
 
@@ -595,6 +628,19 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		}
 		if err != nil {
 			return fmt.Errorf("Failed to edit push rules for project %q: %w", d.Id(), err)
+		}
+	}
+
+	if d.HasChange("forked_from_project") {
+		project_id, _ := strconv.Atoi(d.Id())
+		if forked_from_project, ok := d.GetOk("forked_from_project"); ok {
+			if _, _, err := client.Projects.CreateProjectForkRelation(project_id, forked_from_project.(int)); err != nil {
+				return fmt.Errorf("project %q could not be set as fork of project %q: %w", forked_from_project, d.Id(), err)
+			}
+		} else {
+			if _, err := client.Projects.DeleteProjectForkRelation(project_id); err != nil {
+				return fmt.Errorf("project %q could not be unforked: %w", d.Id(), err)
+			}
 		}
 	}
 
