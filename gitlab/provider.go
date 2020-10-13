@@ -129,13 +129,18 @@ func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{},
 		Insecure:   d.Get("insecure").(bool),
 		ClientCert: d.Get("client_cert").(string),
 		ClientKey:  d.Get("client_key").(string),
-
-		// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
-		// After upgrading the SDK to v2 replace with p.UserAgent()
-		TerraformUserAgent: httpclient.TerraformUserAgent(p.TerraformVersion),
 	}
 
-	return config.Client()
+	client, err := config.Client()
+	if err != nil {
+		return nil, err
+	}
+
+	// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
+	// After upgrading the SDK to v2 replace with p.UserAgent("terraform-provider-gitlab")
+	client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab"
+
+	return client, err
 }
 
 func validateApiURLVersion(value interface{}, key string) (ws []string, es []error) {

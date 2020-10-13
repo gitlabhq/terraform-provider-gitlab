@@ -12,17 +12,16 @@ import (
 
 // Config is per-provider, specifies where to connect to gitlab
 type Config struct {
-	Token              string
-	BaseURL            string
-	Insecure           bool
-	CACertFile         string
-	ClientCert         string
-	ClientKey          string
-	TerraformUserAgent string
+	Token      string
+	BaseURL    string
+	Insecure   bool
+	CACertFile string
+	ClientCert string
+	ClientKey  string
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
-func (c *Config) Client() (interface{}, error) {
+func (c *Config) Client() (*gitlab.Client, error) {
 	// Configure TLS/SSL
 	tlsConfig := &tls.Config{}
 
@@ -62,10 +61,6 @@ func (c *Config) Client() (interface{}, error) {
 				Transport: logging.NewTransport("GitLab", t),
 			},
 		),
-		func(client *gitlab.Client) error {
-			client.UserAgent = c.TerraformUserAgent
-			return nil
-		},
 	}
 
 	if c.BaseURL != "" {
