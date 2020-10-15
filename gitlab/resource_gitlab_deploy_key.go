@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabDeployKey() *schema.Resource {
@@ -88,9 +88,9 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	_ = d.Set("title", deployKey.Title)
-	_ = d.Set("key", deployKey.Key)
-	_ = d.Set("can_push", deployKey.CanPush)
+	d.Set("title", deployKey.Title)
+	d.Set("key", deployKey.Key)
+	d.Set("can_push", deployKey.CanPush)
 	return nil
 }
 
@@ -112,16 +112,16 @@ func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) err
 	return err
 }
 
-func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 2 {
 		d.SetId("")
-		return nil, fmt.Errorf("invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
+		return nil, fmt.Errorf("Invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
 	}
 	project, id := s[0], s[1]
 
 	d.SetId(id)
-	_ = d.Set("project", project)
+	d.Set("project", project)
 
 	return []*schema.ResourceData{d}, nil
 }

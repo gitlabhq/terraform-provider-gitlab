@@ -2,9 +2,10 @@ package gitlab
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
 	"log"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceSlack() *schema.Resource {
@@ -142,31 +143,31 @@ func resourceGitlabServiceSlack() *schema.Resource {
 
 func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitlab.SlackService) {
 	d.SetId(fmt.Sprintf("%d", service.ID))
-	_ = d.Set("webhook", service.Properties.WebHook)
-	_ = d.Set("username", service.Properties.Username)
-	_ = d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON)
-	_ = d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)
-	_ = d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
-	_ = d.Set("push_events", service.PushEvents)
-	_ = d.Set("push_channel", service.Properties.PushChannel)
-	_ = d.Set("issues_events", service.IssuesEvents)
-	_ = d.Set("issue_channel", service.Properties.IssueChannel)
-	_ = d.Set("confidential_issues_events", service.ConfidentialIssuesEvents)
-	_ = d.Set("confidential_issue_channel", service.Properties.ConfidentialIssueChannel)
-	_ = d.Set("merge_requests_events", service.MergeRequestsEvents)
-	_ = d.Set("merge_request_channel", service.Properties.MergeRequestChannel)
-	_ = d.Set("tag_push_events", service.TagPushEvents)
-	_ = d.Set("tag_push_channel", service.Properties.TagPushChannel)
-	_ = d.Set("note_events", service.NoteEvents)
-	_ = d.Set("note_channel", service.Properties.NoteChannel)
-	_ = d.Set("confidential_note_events", service.ConfidentialNoteEvents)
+	d.Set("webhook", service.Properties.WebHook)
+	d.Set("username", service.Properties.Username)
+	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON)
+	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)
+	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
+	d.Set("push_events", service.PushEvents)
+	d.Set("push_channel", service.Properties.PushChannel)
+	d.Set("issues_events", service.IssuesEvents)
+	d.Set("issue_channel", service.Properties.IssueChannel)
+	d.Set("confidential_issues_events", service.ConfidentialIssuesEvents)
+	d.Set("confidential_issue_channel", service.Properties.ConfidentialIssueChannel)
+	d.Set("merge_requests_events", service.MergeRequestsEvents)
+	d.Set("merge_request_channel", service.Properties.MergeRequestChannel)
+	d.Set("tag_push_events", service.TagPushEvents)
+	d.Set("tag_push_channel", service.Properties.TagPushChannel)
+	d.Set("note_events", service.NoteEvents)
+	d.Set("note_channel", service.Properties.NoteChannel)
+	d.Set("confidential_note_events", service.ConfidentialNoteEvents)
 	// See comment to "confidential_note_channel" in resourceGitlabServiceSlack()
-	//_ = d.Set("confidential_note_channel", service.Properties.ConfidentialNoteChannel)
-	_ = d.Set("pipeline_events", service.PipelineEvents)
-	_ = d.Set("pipeline_channel", service.Properties.PipelineChannel)
-	_ = d.Set("wiki_page_events", service.WikiPageEvents)
-	_ = d.Set("wiki_page_channel", service.Properties.WikiPageChannel)
-	_ = d.Set("job_events", service.JobEvents)
+	//d.Set("confidential_note_channel", service.Properties.ConfidentialNoteChannel)
+	d.Set("pipeline_events", service.PipelineEvents)
+	d.Set("pipeline_channel", service.Properties.PipelineChannel)
+	d.Set("wiki_page_events", service.WikiPageEvents)
+	d.Set("wiki_page_channel", service.Properties.WikiPageChannel)
+	d.Set("job_events", service.JobEvents)
 }
 
 func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) error {
@@ -244,8 +245,8 @@ func resourceGitlabServiceSlackDelete(d *schema.ResourceData, meta interface{}) 
 	return err
 }
 
-func resourceGitlabServiceSlackImportState(d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	_ = d.Set("project", d.Id())
+func resourceGitlabServiceSlackImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	d.Set("project", d.Id())
 
 	return []*schema.ResourceData{d}, nil
 }

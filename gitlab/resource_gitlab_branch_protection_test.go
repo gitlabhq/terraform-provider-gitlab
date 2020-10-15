@@ -168,7 +168,7 @@ func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gi
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		if rs.Primary.Attributes["merge_access_level"] != accessLevel[pb.MergeAccessLevels[0].AccessLevel] {
@@ -191,11 +191,11 @@ func testAccCheckGitlabBranchProtectionExists(n string, pb *gitlab.ProtectedBran
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 		project, branch, err := projectAndBranchFromID(rs.Primary.ID)
 		if err != nil {
-			return fmt.Errorf("error in splitting project and branch ids")
+			return fmt.Errorf("Error in Splitting Project and Branch Ids")
 		}
 
 		conn := testAccProvider.Meta().(*gitlab.Client)
@@ -204,13 +204,13 @@ func testAccCheckGitlabBranchProtectionExists(n string, pb *gitlab.ProtectedBran
 		if err != nil {
 			return err
 		}
-		for _, gotPb := range pbs {
-			if gotPb.Name == branch {
-				*pb = *gotPb
+		for _, gotpb := range pbs {
+			if gotpb.Name == branch {
+				*pb = *gotpb
 				return nil
 			}
 		}
-		return fmt.Errorf("protected branch does not exist")
+		return fmt.Errorf("Protected Branch does not exist")
 	}
 }
 

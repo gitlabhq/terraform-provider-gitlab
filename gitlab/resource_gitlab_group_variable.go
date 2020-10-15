@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupVariable() *schema.Resource {
@@ -103,12 +103,12 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	_ = d.Set("key", v.Key)
-	_ = d.Set("value", v.Value)
-	_ = d.Set("variable_type", v.VariableType)
-	_ = d.Set("group", group)
-	_ = d.Set("protected", v.Protected)
-	_ = d.Set("masked", v.Masked)
+	d.Set("key", v.Key)
+	d.Set("value", v.Value)
+	d.Set("variable_type", v.VariableType)
+	d.Set("group", group)
+	d.Set("protected", v.Protected)
+	d.Set("masked", v.Masked)
 	return nil
 }
 

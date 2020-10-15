@@ -30,7 +30,7 @@ func TestProvider(t *testing.T) {
 }
 
 func TestProvider_impl(t *testing.T) {
-	var _ = Provider()
+	var _ terraform.ResourceProvider = Provider()
 }
 
 func testAccPreCheck(t *testing.T) {

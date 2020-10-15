@@ -83,7 +83,7 @@ func testAccCheckGitlabGroupLdapLinkExists(resourceName string, ldapLink *gitlab
 
 		resourceState, ok := s.RootModule().Resources[resourceName]
 		if !ok {
-			return fmt.Errorf("not found: %s", resourceName)
+			return fmt.Errorf("Not found: %s", resourceName)
 		}
 
 		err := testAccGetGitlabGroupLdapLink(ldapLink, resourceState)
@@ -104,10 +104,10 @@ func testAccCheckGitlabGroupLdapLinkAttributes(ldapLink *gitlab.LDAPGroupLink, w
 
 		accessLevelId, ok := accessLevel[ldapLink.GroupAccess]
 		if !ok {
-			return fmt.Errorf("invalid access level '%s'", accessLevelId)
+			return fmt.Errorf("Invalid access level '%s'", accessLevelId)
 		}
 		if accessLevelId != want.accessLevel {
-			return fmt.Errorf("has access level %s; want %s", accessLevelId, want.accessLevel)
+			return fmt.Errorf("Has access level %s; want %s", accessLevelId, want.accessLevel)
 		}
 		return nil
 	}
@@ -126,7 +126,7 @@ func testAccCheckGitlabGroupLdapLinkDestroy(s *terraform.State) error {
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == resourceState.Primary.ID {
 				if group.MarkedForDeletionOn == nil {
-					return fmt.Errorf("group still exists")
+					return fmt.Errorf("Group still exists")
 				}
 			}
 		}
@@ -143,7 +143,7 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 
 	groupId := resourceState.Primary.Attributes["group_id"]
 	if groupId == "" {
-		return fmt.Errorf("no group ID is set")
+		return fmt.Errorf("No group ID is set")
 	}
 
 	// Construct our desired LDAP Link from the config values
@@ -195,8 +195,8 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 	return nil
 }
 
-func testAccLoadTestData(testDataFile string, ldapLink *gitlab.LDAPGroupLink) error {
-	testLdapLinkBytes, err := ioutil.ReadFile(testDataFile)
+func testAccLoadTestData(testdatafile string, ldapLink *gitlab.LDAPGroupLink) error {
+	testLdapLinkBytes, err := ioutil.ReadFile(testdatafile)
 	if err != nil {
 		return err
 	}

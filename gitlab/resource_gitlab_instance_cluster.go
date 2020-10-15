@@ -163,23 +163,23 @@ func resourceGitlabInstanceClusterRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	_ = d.Set("name", cluster.Name)
-	_ = d.Set("domain", cluster.Domain)
-	_ = d.Set("created_at", cluster.CreatedAt.String())
-	_ = d.Set("provider_type", cluster.ProviderType)
-	_ = d.Set("platform_type", cluster.PlatformType)
-	_ = d.Set("environment_scope", cluster.EnvironmentScope)
-	_ = d.Set("cluster_type", cluster.ClusterType)
+	d.Set("name", cluster.Name)
+	d.Set("domain", cluster.Domain)
+	d.Set("created_at", cluster.CreatedAt.String())
+	d.Set("provider_type", cluster.ProviderType)
+	d.Set("platform_type", cluster.PlatformType)
+	d.Set("environment_scope", cluster.EnvironmentScope)
+	d.Set("cluster_type", cluster.ClusterType)
 
-	_ = d.Set("kubernetes_api_url", cluster.PlatformKubernetes.APIURL)
-	_ = d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
-	_ = d.Set("kubernetes_namespace", cluster.PlatformKubernetes.Namespace)
-	_ = d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
+	d.Set("kubernetes_api_url", cluster.PlatformKubernetes.APIURL)
+	d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
+	d.Set("kubernetes_namespace", cluster.PlatformKubernetes.Namespace)
+	d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
 
 	if cluster.ManagementProject == nil {
-		_ = d.Set("management_project_id", "")
+		d.Set("management_project_id", "")
 	} else {
-		_ = d.Set("management_project_id", strconv.Itoa(cluster.ManagementProject.ID))
+		d.Set("management_project_id", strconv.Itoa(cluster.ManagementProject.ID))
 	}
 
 	return nil

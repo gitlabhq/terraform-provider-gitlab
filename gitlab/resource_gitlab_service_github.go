@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceGithub() *schema.Resource {
@@ -62,13 +62,13 @@ func resourceGitlabServiceGithub() *schema.Resource {
 
 func resourceGitlabServiceGithubSetToState(d *schema.ResourceData, service *gitlab.GithubService) {
 	d.SetId(fmt.Sprintf("%d", service.ID))
-	_ = d.Set("repository_url", service.Properties.RepositoryURL)
-	_ = d.Set("static_context", service.Properties.StaticContext)
+	d.Set("repository_url", service.Properties.RepositoryURL)
+	d.Set("static_context", service.Properties.StaticContext)
 
-	_ = d.Set("title", service.Title)
-	_ = d.Set("created_at", service.CreatedAt.String())
-	_ = d.Set("updated_at", service.UpdatedAt.String())
-	_ = d.Set("active", service.Active)
+	d.Set("title", service.Title)
+	d.Set("created_at", service.CreatedAt.String())
+	d.Set("updated_at", service.UpdatedAt.String())
+	d.Set("active", service.Active)
 }
 
 func resourceGitlabServiceGithubCreate(d *schema.ResourceData, meta interface{}) error {
@@ -129,8 +129,8 @@ func resourceGitlabServiceGithubDelete(d *schema.ResourceData, meta interface{})
 	return err
 }
 
-func resourceGitlabServiceGithubImportState(d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	_ = d.Set("project", d.Id())
+func resourceGitlabServiceGithubImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	d.Set("project", d.Id())
 
 	return []*schema.ResourceData{d}, nil
 }

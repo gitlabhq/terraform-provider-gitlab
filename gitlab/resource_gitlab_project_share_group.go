@@ -95,12 +95,12 @@ func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{
 func projectIdAndGroupIdFromId(id string) (string, int, error) {
 	projectId, groupIdString, err := parseTwoPartID(id)
 	if err != nil {
-		return "", 0, fmt.Errorf("error parsing ID: %s", id)
+		return "", 0, fmt.Errorf("Error parsing ID: %s", id)
 	}
 
 	groupId, err := strconv.Atoi(groupIdString)
 	if err != nil {
-		return "", 0, fmt.Errorf("can not determine group id: %v", id)
+		return "", 0, fmt.Errorf("Can not determine group id: %v", id)
 	}
 
 	return projectId, groupId, nil
@@ -131,9 +131,9 @@ func resourceGitlabProjectShareGroupSetToState(d *schema.ResourceData, group str
 	//GroupAccessLevel is returned as an int but the map we lookup is sorted by the int alias AccessLevelValue
 	convertedAccessLevel := gitlab.AccessLevelValue(group.GroupAccessLevel)
 
-	_ = d.Set("project_id", projectId)
-	_ = d.Set("group_id", group.GroupID)
-	_ = d.Set("access_level", accessLevel[convertedAccessLevel])
+	d.Set("project_id", projectId)
+	d.Set("group_id", group.GroupID)
+	d.Set("access_level", accessLevel[convertedAccessLevel])
 
 	groupId := strconv.Itoa(group.GroupID)
 	d.SetId(buildTwoPartID(projectId, &groupId))

@@ -169,8 +169,8 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	d.SetId(fmt.Sprintf("%d", found.ID))
-	_ = d.Set("name", found.Name)
-	_ = d.Set("path", found.Path)
+	d.Set("name", found.Name)
+	d.Set("path", found.Path)
 	d.Set("path_with_namespace", found.PathWithNamespace)
 	d.Set("description", found.Description)
 	d.Set("default_branch", found.DefaultBranch)

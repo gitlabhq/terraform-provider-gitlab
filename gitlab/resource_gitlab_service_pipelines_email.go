@@ -6,7 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServicePipelinesEmail() *schema.Resource {
@@ -46,9 +46,9 @@ func resourceGitlabServicePipelinesEmail() *schema.Resource {
 }
 
 func resourceGitlabServicePipelinesEmailSetToState(d *schema.ResourceData, service *gitlab.PipelinesEmailService) {
-	_ = d.Set("recipients", strings.Split(service.Properties.Recipients, ","))
-	_ = d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines)
-	_ = d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
+	d.Set("recipients", strings.Split(service.Properties.Recipients, ","))
+	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines)
+	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
 }
 
 func resourceGitlabServicePipelinesEmailCreate(d *schema.ResourceData, meta interface{}) error {
@@ -87,7 +87,7 @@ func resourceGitlabServicePipelinesEmailRead(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	_ = d.Set("project", project)
+	d.Set("project", project)
 	resourceGitlabServicePipelinesEmailSetToState(d, service)
 	return nil
 }

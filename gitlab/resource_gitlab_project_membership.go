@@ -139,9 +139,9 @@ func resourceGitlabProjectMembershipDelete(d *schema.ResourceData, meta interfac
 
 func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) {
 
-	_ = d.Set("project_id", projectId)
-	_ = d.Set("user_id", projectMember.ID)
-	_ = d.Set("access_level", accessLevel[projectMember.AccessLevel])
+	d.Set("project_id", projectId)
+	d.Set("user_id", projectMember.ID)
+	d.Set("access_level", accessLevel[projectMember.AccessLevel])
 
 	userId := strconv.Itoa(projectMember.ID)
 	d.SetId(buildTwoPartID(projectId, &userId))

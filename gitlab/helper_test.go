@@ -40,7 +40,7 @@ func isRunningInEE() (bool, error) {
 			return true, nil
 		}
 	} else {
-		return false, errors.New("provider not initialized, unable to get GitLab connection")
+		return false, errors.New("Provider not initialized, unable to get GitLab connection")
 	}
 	return false, nil
 }

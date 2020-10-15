@@ -2,10 +2,11 @@ package gitlab
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
 	"log"
 	"strconv"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectHook() *schema.Resource {
@@ -129,16 +130,16 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	_ = d.Set("url", hook.URL)
-	_ = d.Set("push_events", hook.PushEvents)
-	_ = d.Set("issues_events", hook.IssuesEvents)
-	_ = d.Set("merge_requests_events", hook.MergeRequestsEvents)
-	_ = d.Set("tag_push_events", hook.TagPushEvents)
-	_ = d.Set("note_events", hook.NoteEvents)
-	_ = d.Set("job_events", hook.JobEvents)
-	_ = d.Set("pipeline_events", hook.PipelineEvents)
-	_ = d.Set("wiki_page_events", hook.WikiPageEvents)
-	_ = d.Set("enable_ssl_verification", hook.EnableSSLVerification)
+	d.Set("url", hook.URL)
+	d.Set("push_events", hook.PushEvents)
+	d.Set("issues_events", hook.IssuesEvents)
+	d.Set("merge_requests_events", hook.MergeRequestsEvents)
+	d.Set("tag_push_events", hook.TagPushEvents)
+	d.Set("note_events", hook.NoteEvents)
+	d.Set("job_events", hook.JobEvents)
+	d.Set("pipeline_events", hook.PipelineEvents)
+	d.Set("wiki_page_events", hook.WikiPageEvents)
+	d.Set("enable_ssl_verification", hook.EnableSSLVerification)
 	return nil
 }
 

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineTrigger() *schema.Resource {
@@ -73,8 +73,8 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	_ = d.Set("description", pipelineTrigger.Description)
-	_ = d.Set("token", pipelineTrigger.Token)
+	d.Set("description", pipelineTrigger.Description)
+	d.Set("token", pipelineTrigger.Token)
 
 	return nil
 }

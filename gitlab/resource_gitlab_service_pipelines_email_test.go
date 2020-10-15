@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
@@ -81,12 +81,12 @@ func testAccCheckGitlabServicePipelinesEmailExists(n string, service *gitlab.Pip
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
-			return fmt.Errorf("no project ID is set")
+			return fmt.Errorf("No project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -102,8 +102,8 @@ func testAccCheckGitlabServicePipelinesEmailExists(n string, service *gitlab.Pip
 
 func testRecipients(service *gitlab.PipelinesEmailService, expected []string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		resString := service.Properties.Recipients
-		res := strings.Split(resString, ",")
+		res_string := service.Properties.Recipients
+		res := strings.Split(res_string, ",")
 		if len(res) != len(expected) {
 			return fmt.Errorf("'recipients' field does not have the correct size expected: %d, found: %d", len(expected), len(res))
 		}
@@ -132,7 +132,7 @@ func testAccCheckGitlabServicePipelinesEmailDestroy(s *terraform.State) error {
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("repository still exists")
+					return fmt.Errorf("Repository still exists")
 				}
 			}
 		}

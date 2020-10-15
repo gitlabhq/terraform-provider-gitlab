@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
@@ -43,7 +43,7 @@ func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.DeployK
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		deployKeyID, err := strconv.Atoi(strings.Split(rs.Primary.ID, ":")[1])
@@ -52,9 +52,8 @@ func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.DeployK
 		}
 		repoName := rs.Primary.Attributes["project"]
 		if repoName == "" {
-			return fmt.Errorf("no project ID is set")
+			return fmt.Errorf("No project ID is set")
 		}
-
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(repoName, deployKeyID)

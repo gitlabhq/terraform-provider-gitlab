@@ -38,7 +38,7 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		deployTokenID, err := strconv.Atoi(rs.Primary.ID)
@@ -58,7 +58,7 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 		} else if groupName != "" {
 			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(groupName, nil)
 		} else {
-			return fmt.Errorf("no project or group ID is set")
+			return fmt.Errorf("No project or group ID is set")
 		}
 
 		if err != nil {
@@ -72,7 +72,7 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 			}
 		}
 
-		return fmt.Errorf("deploy token doesn't exist")
+		return fmt.Errorf("Deploy Token doesn't exist")
 	}
 }
 
@@ -125,7 +125,7 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 		if err == nil {
 			for _, token := range gotDeployTokens {
 				if token.ID == deployTokenID {
-					return fmt.Errorf("deploy token still exists")
+					return fmt.Errorf("Deploy token still exists")
 				}
 			}
 		}

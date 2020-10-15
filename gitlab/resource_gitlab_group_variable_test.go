@@ -62,16 +62,16 @@ func testAccCheckGitlabGroupVariableExists(n string, groupVariable *gitlab.Group
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		repoName := rs.Primary.Attributes["group"]
 		if repoName == "" {
-			return fmt.Errorf("no group ID is set")
+			return fmt.Errorf("No group ID is set")
 		}
 		key := rs.Primary.Attributes["key"]
 		if key == "" {
-			return fmt.Errorf("no variable key is set")
+			return fmt.Errorf("No variable key is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -125,7 +125,7 @@ func testAccCheckGitlabGroupVariableDestroy(s *terraform.State) error {
 		if err == nil {
 			//if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 			//	if gotRepo.MarkedForDeletionAt == nil {
-			//		return fmt.Errorf("repository still exists")
+			//		return fmt.Errorf("Repository still exists")
 			//	}
 			//}
 		}

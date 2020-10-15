@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupLabel() *schema.Resource {
@@ -81,9 +81,9 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 		}
 		for _, label := range labels {
 			if label.Name == labelName {
-				_ = d.Set("description", label.Description)
-				_ = d.Set("color", label.Color)
-				_ = d.Set("name", label.Name)
+				d.Set("description", label.Description)
+				d.Set("color", label.Color)
+				d.Set("name", label.Name)
 				return nil
 			}
 		}

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceJira() *schema.Resource {
@@ -132,31 +132,31 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if v := jiraService.Properties.URL; v != "" {
-		_ = d.Set("url", v)
+		d.Set("url", v)
 	}
 	if v := jiraService.Properties.Username; v != "" {
-		_ = d.Set("username", v)
+		d.Set("username", v)
 	}
 	if v := jiraService.Properties.ProjectKey; v != "" {
-		_ = d.Set("project_key", v)
+		d.Set("project_key", v)
 	}
 	if v := jiraService.Properties.JiraIssueTransitionID; v != "" {
-		_ = d.Set("jira_issue_transition_id", v)
+		d.Set("jira_issue_transition_id", v)
 	}
 
-	_ = d.Set("title", jiraService.Title)
-	_ = d.Set("created_at", jiraService.CreatedAt.String())
-	_ = d.Set("updated_at", jiraService.UpdatedAt.String())
-	_ = d.Set("active", jiraService.Active)
-	_ = d.Set("push_events", jiraService.PushEvents)
-	_ = d.Set("issues_events", jiraService.IssuesEvents)
-	_ = d.Set("commit_events", jiraService.CommitEvents)
-	_ = d.Set("merge_requests_events", jiraService.MergeRequestsEvents)
-	_ = d.Set("comment_on_event_enabled", jiraService.CommentOnEventEnabled)
-	_ = d.Set("tag_push_events", jiraService.TagPushEvents)
-	_ = d.Set("note_events", jiraService.NoteEvents)
-	_ = d.Set("pipeline_events", jiraService.PipelineEvents)
-	_ = d.Set("job_events", jiraService.JobEvents)
+	d.Set("title", jiraService.Title)
+	d.Set("created_at", jiraService.CreatedAt.String())
+	d.Set("updated_at", jiraService.UpdatedAt.String())
+	d.Set("active", jiraService.Active)
+	d.Set("push_events", jiraService.PushEvents)
+	d.Set("issues_events", jiraService.IssuesEvents)
+	d.Set("commit_events", jiraService.CommitEvents)
+	d.Set("merge_requests_events", jiraService.MergeRequestsEvents)
+	d.Set("comment_on_event_enabled", jiraService.CommentOnEventEnabled)
+	d.Set("tag_push_events", jiraService.TagPushEvents)
+	d.Set("note_events", jiraService.NoteEvents)
+	d.Set("pipeline_events", jiraService.PipelineEvents)
+	d.Set("job_events", jiraService.JobEvents)
 
 	return nil
 }
@@ -197,8 +197,8 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 	return &setJiraServiceOptions, nil
 }
 
-func resourceGitlabServiceJiraImportState(d *schema.ResourceData, _ interface{}) ([]*schema.ResourceData, error) {
-	_ = d.Set("project", d.Id())
+func resourceGitlabServiceJiraImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	d.Set("project", d.Id())
 
 	return []*schema.ResourceData{d}, nil
 }

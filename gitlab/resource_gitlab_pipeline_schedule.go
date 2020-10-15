@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineSchedule() *schema.Resource {
@@ -89,11 +89,11 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 	found := false
 	for _, pipelineSchedule := range pipelineSchedules {
 		if pipelineSchedule.ID == pipelineScheduleID {
-			_ = d.Set("description", pipelineSchedule.Description)
-			_ = d.Set("ref", pipelineSchedule.Ref)
-			_ = d.Set("cron", pipelineSchedule.Cron)
-			_ = d.Set("cron_timezone", pipelineSchedule.CronTimezone)
-			_ = d.Set("active", pipelineSchedule.Active)
+			d.Set("description", pipelineSchedule.Description)
+			d.Set("ref", pipelineSchedule.Ref)
+			d.Set("cron", pipelineSchedule.Cron)
+			d.Set("cron_timezone", pipelineSchedule.CronTimezone)
+			d.Set("active", pipelineSchedule.Active)
 			found = true
 			break
 		}

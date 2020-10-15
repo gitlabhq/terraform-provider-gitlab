@@ -53,7 +53,7 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 		rs, ok := s.RootModule().Resources[n]
 		conn := testAccProvider.Meta().(*gitlab.Client)
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not found: %s", n)
 		}
 
 		groupId := rs.Primary.Attributes["group_id"]
@@ -64,7 +64,7 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 		userIdString := rs.Primary.Attributes["user_id"]
 		userId, _ := strconv.Atoi(userIdString)
 		if userIdString == "" {
-			return fmt.Errorf("no user userId is set")
+			return fmt.Errorf("No user userId is set")
 		}
 
 		gotGroupMembership, _, err := conn.GroupMembers.GetGroupMember(groupId, userId)
@@ -87,7 +87,7 @@ func testAccCheckGitlabGroupMembershipAttributes(membership *gitlab.GroupMember,
 
 		accessLevelId, ok := accessLevel[membership.AccessLevel]
 		if !ok {
-			return fmt.Errorf("invalid access level '%s'", accessLevelId)
+			return fmt.Errorf("Invalid access level '%s'", accessLevelId)
 		}
 		if accessLevelId != want.accessLevel {
 			return fmt.Errorf("got access level %s; want %s", accessLevelId, want.accessLevel)
@@ -111,8 +111,8 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 		userId, err := strconv.Atoi(userIdString)
 		groupMember, _, err := conn.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
-			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["accessLevel"] {
-				return fmt.Errorf("group still has member")
+			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["access_level"] {
+				return fmt.Errorf("Group still has member.")
 			}
 			return nil
 		}

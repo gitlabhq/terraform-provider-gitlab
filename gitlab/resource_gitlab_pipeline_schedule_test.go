@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabPipelineSchedule_basic(t *testing.T) {
@@ -70,13 +70,13 @@ func testAccCheckGitlabPipelineScheduleExists(n string, schedule *gitlab.Pipelin
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		scheduleID := rs.Primary.ID
 		repoName := rs.Primary.Attributes["project"]
 		if repoName == "" {
-			return fmt.Errorf("no project ID is set")
+			return fmt.Errorf("No project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -90,7 +90,7 @@ func testAccCheckGitlabPipelineScheduleExists(n string, schedule *gitlab.Pipelin
 				return nil
 			}
 		}
-		return fmt.Errorf("pipeline schedule does not exist")
+		return fmt.Errorf("Pipeline Schedule does not exist")
 	}
 }
 
@@ -139,7 +139,7 @@ func testAccCheckGitlabPipelineScheduleDestroy(s *terraform.State) error {
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("repository still exists")
+					return fmt.Errorf("Repository still exists")
 				}
 			}
 		}

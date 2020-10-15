@@ -2,10 +2,11 @@ package gitlab
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
 	"log"
 	"strconv"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabUser() *schema.Resource {

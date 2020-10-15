@@ -130,13 +130,13 @@ func testAccCheckGitlabGroupLabelExists(n string, label *gitlab.GroupLabel) reso
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		labelName := rs.Primary.ID
 		groupName := rs.Primary.Attributes["group"]
 		if groupName == "" {
-			return fmt.Errorf("no group ID is set")
+			return fmt.Errorf("No group ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
@@ -150,7 +150,7 @@ func testAccCheckGitlabGroupLabelExists(n string, label *gitlab.GroupLabel) reso
 				return nil
 			}
 		}
-		return fmt.Errorf("label does not exist")
+		return fmt.Errorf("Label does not exist")
 	}
 }
 
@@ -190,7 +190,7 @@ func testAccCheckGitlabGroupLabelDestroy(s *terraform.State) error {
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {
-					return fmt.Errorf("group still exists")
+					return fmt.Errorf("Group still exists")
 				}
 			}
 		}

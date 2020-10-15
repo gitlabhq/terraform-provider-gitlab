@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/xanzy/go-gitlab"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabServiceSlack_basic(t *testing.T) {
@@ -104,18 +104,18 @@ func testAccCheckGitlabServiceExists(n string, service *gitlab.SlackService) res
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("not found: %s", n)
+			return fmt.Errorf("Not Found: %s", n)
 		}
 
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
-			return fmt.Errorf("no project ID is set")
+			return fmt.Errorf("No project ID is set")
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		slackService, _, err := conn.Services.GetSlackService(project)
 		if err != nil {
-			return fmt.Errorf("slack service does not exist in project %s: %v", project, err)
+			return fmt.Errorf("Slack service does not exist in project %s: %v", project, err)
 		}
 		*service = *slackService
 
@@ -135,7 +135,7 @@ func testAccCheckGitlabServiceSlackDestroy(s *terraform.State) error {
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("repository still exists")
+					return fmt.Errorf("Repository still exists")
 				}
 			}
 		}
@@ -151,12 +151,12 @@ func getSlackProjectID(n string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return "", fmt.Errorf("not found: %s", n)
+			return "", fmt.Errorf("Not Found: %s", n)
 		}
 
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
-			return "", fmt.Errorf("no project ID is set")
+			return "", fmt.Errorf("No project ID is set")
 		}
 
 		return project, nil
