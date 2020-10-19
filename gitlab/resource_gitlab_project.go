@@ -34,9 +34,16 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Computed: true,
 	},
 	"namespace_id": {
-		Type:     schema.TypeInt,
-		Optional: true,
-		Computed: true,
+		Type:          schema.TypeInt,
+		Optional:      true,
+		ConflictsWith: []string{"namespace"},
+		Computed:      true,
+	},
+	"namespace": { // TODO: remove again? Only used for forked version
+		Type:          schema.TypeString,
+		Optional:      true,
+		ConflictsWith: []string{"namespace_id"},
+		Computed:      true,
 	},
 	"description": {
 		Type:     schema.TypeString,
@@ -333,6 +340,9 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		}
 
 		if v, ok := d.GetOk("namespace_id"); ok {
+			fork_options.Namespace = gitlab.String(string(v.(int))) // TODO change this to use NamespaceID or NamespacePath when the gitlab api library is updated
+		}
+		if v, ok := d.GetOk("namespace"); ok {
 			fork_options.Namespace = gitlab.String(v.(string)) // TODO change this to use NamespaceID or NamespacePath when the gitlab api library is updated
 		}
 
