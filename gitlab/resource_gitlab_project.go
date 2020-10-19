@@ -340,7 +340,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		}
 
 		if v, ok := d.GetOk("namespace_id"); ok {
-			fork_options.Namespace = gitlab.String(string(v.(int))) // TODO change this to use NamespaceID or NamespacePath when the gitlab api library is updated
+			fork_options.Namespace = gitlab.String(fmt.Sprint(v.(int))) // TODO change this to use NamespaceID or NamespacePath when the gitlab api library is updated
 		}
 		if v, ok := d.GetOk("namespace"); ok {
 			fork_options.Namespace = gitlab.String(v.(string)) // TODO change this to use NamespaceID or NamespacePath when the gitlab api library is updated
