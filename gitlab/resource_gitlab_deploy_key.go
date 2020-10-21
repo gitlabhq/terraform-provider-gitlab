@@ -103,12 +103,7 @@ func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) err
 	}
 	log.Printf("[DEBUG] Delete gitlab deploy key %s", d.Id())
 
-	response, err := client.DeployKeys.DeleteDeployKey(project, deployKeyID)
-
-	// HTTP 204 is success with no body
-	if response != nil && response.StatusCode == 204 {
-		return nil
-	}
+	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID)
 	return err
 }
 

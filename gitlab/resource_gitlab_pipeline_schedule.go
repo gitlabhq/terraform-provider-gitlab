@@ -165,8 +165,7 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	_, err = client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID)
-	if err != nil {
+	if _, err := client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
 		return fmt.Errorf("%s failed to delete pipeline schedule: %s", d.Id(), err.Error())
 	}
 	return err

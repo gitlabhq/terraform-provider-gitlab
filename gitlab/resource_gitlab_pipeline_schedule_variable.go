@@ -123,9 +123,8 @@ func resourceGitlabPipelineScheduleVariableDelete(d *schema.ResourceData, meta i
 	variableKey := d.Get("key").(string)
 	scheduleID := d.Get("pipeline_schedule_id").(int)
 
-	_, _, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleID, variableKey)
-	if err != nil {
+	if _, _, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleID, variableKey); err != nil {
 		return fmt.Errorf("%s failed to delete pipeline schedule variable: %s", d.Id(), err.Error())
 	}
-	return err
+	return nil
 }
