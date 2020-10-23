@@ -1,7 +1,9 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -17,6 +19,10 @@ func resourceGitlabTagProtection() *schema.Resource {
 		Create: resourceGitlabTagProtectionCreate,
 		Read:   resourceGitlabTagProtectionRead,
 		Delete: resourceGitlabTagProtectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabTagProtectionImporter,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -116,4 +122,19 @@ func projectAndTagFromID(id string) (string, string, error) {
 		log.Printf("[WARN] cannot get group member id from input: %v", id)
 	}
 	return project, tag, err
+}
+
+func resourceGitlabTagProtectionImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 2 {
+		d.SetId("")
+		return nil, fmt.Errorf("invalid tag protection import format; expected '{project_id}:{tag_name}'")
+	}
+	project, tag := s[0], s[1]
+
+	d.SetId(buildTwoPartID(&project, &tag))
+	d.Set("project", project)
+	d.Set("tag", tag)
+
+	return []*schema.ResourceData{d}, nil
 }

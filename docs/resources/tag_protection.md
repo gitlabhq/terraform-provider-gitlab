@@ -21,3 +21,9 @@ The following arguments are supported:
 * `tag` - (Required) Name of the tag or wildcard.
 
 * `create_access_level` - (Required) One of five levels of access to the project.
+
+## Importing tag protections
+
+You can import a tag protection state using `terraform import <resource> <project_id>:<tag_name>`.
+
+    terraform import gitlab_tag_protection.example 123456789:v1.0.0

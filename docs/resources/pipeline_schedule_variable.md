@@ -31,3 +31,9 @@ The following arguments are supported:
 * `key` - (Required, string) Name of the variable.
 
 * `value` - (Required, string) 	Value of the variable.
+
+## Importing pipeline schedule variables
+
+You can import a pipeline schedule variable state using `terraform import <resource> <project_id>:<pipeline_schedule_id>:<id>`.
+
+    terraform import gitlab_pipeline_schedule_variable.example 123456789:13:mykey

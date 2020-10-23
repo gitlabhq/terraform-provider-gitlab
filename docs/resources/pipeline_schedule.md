@@ -30,3 +30,9 @@ The following arguments are supported:
 * `cron_timezone` - (Optional, string) The timezone.
 
 * `active` - (Optional, bool) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
+
+## Importing pipeline schedules
+
+You can import a pipeline schedule state using `terraform import <resource> <project_id>:<pipeline_schedule_id>`.
+
+    terraform import gitlab_pipeline_schedule.example 123456789:13

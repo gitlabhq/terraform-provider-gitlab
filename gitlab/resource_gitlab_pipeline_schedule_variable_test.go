@@ -54,6 +54,26 @@ func TestAccGitlabPipelineScheduleVariable_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabPipelineScheduleVariable_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabPipelineScheduleVariableDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabPipelineScheduleVariableConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_pipeline_schedule_variable.schedule_var",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabPipelineScheduleVariableExists(n string, variable *gitlab.PipelineVariable) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -150,4 +170,30 @@ resource "gitlab_pipeline_schedule_variable" "schedule_var" {
 	value = "test_updated"
 }
 	`, rInt)
+}
+
+func testAccCheckGitlabPipelineScheduleVariableDestroy(s *terraform.State) error {
+	conn := testAccProvider.Meta().(*gitlab.Client)
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gitlab_pipeline_schedule_variable" {
+			continue
+		}
+
+		psidString := rs.Primary.Attributes["pipeline_schedule_id"]
+		psid, err := strconv.Atoi(psidString)
+		if err != nil {
+			return fmt.Errorf("could not convert pipeline schedule id to integer: %s", err)
+		}
+
+		gotPS, _, err := conn.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], psid)
+		if err == nil {
+			for _, v := range gotPS.Variables {
+				if buildTwoPartID(&psidString, &v.Key) == rs.Primary.ID {
+					return fmt.Errorf("pipeline schedule variable still exists")
+				}
+			}
+		}
+	}
+	return nil
 }

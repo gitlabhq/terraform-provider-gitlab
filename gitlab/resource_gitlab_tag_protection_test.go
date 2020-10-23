@@ -106,6 +106,26 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 	})
 }
 
+func TestAccGitlabTagProtection_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabTagProtectionDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabTagProtectionConfig(rInt, ""),
+			},
+			{
+				ResourceName:      "gitlab_tag_protection.TagProtect",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabTagProtectionExists(n string, pt *gitlab.ProtectedTag) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

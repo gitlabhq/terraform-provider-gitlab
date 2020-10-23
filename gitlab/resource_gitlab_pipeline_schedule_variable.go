@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -15,6 +16,9 @@ func resourceGitlabPipelineScheduleVariable() *schema.Resource {
 		Read:   resourceGitlabPipelineScheduleVariableRead,
 		Update: resourceGitlabPipelineScheduleVariableUpdate,
 		Delete: resourceGitlabPipelineScheduleVariableDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabPipelineScheduleVariableImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -127,4 +131,20 @@ func resourceGitlabPipelineScheduleVariableDelete(d *schema.ResourceData, meta i
 		return fmt.Errorf("%s failed to delete pipeline schedule variable: %s", d.Id(), err.Error())
 	}
 	return nil
+}
+
+func resourceGitlabPipelineScheduleVariableImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 3 {
+		d.SetId("")
+		return nil, fmt.Errorf("invalid pipeline schedule variable import format; expected '{project_id}:{pipeline_schedule_id}:{key}'")
+	}
+	project, pipelineScheduleId, key := s[0], s[1], s[2]
+
+	d.SetId(buildTwoPartID(&pipelineScheduleId, &key))
+	d.Set("project", project)
+	d.Set("pipeline_schedule_id", pipelineScheduleId)
+	d.Set("key", key)
+
+	return []*schema.ResourceData{d}, nil
 }
