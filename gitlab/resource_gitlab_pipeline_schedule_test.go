@@ -68,6 +68,7 @@ func TestAccGitlabPipelineSchedule_basic(t *testing.T) {
 
 func TestAccGitlabPipelineSchedule_import(t *testing.T) {
 	rInt := acctest.RandInt()
+	resourceName := "gitlab_pipeline_schedule.schedule"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -78,12 +79,32 @@ func TestAccGitlabPipelineSchedule_import(t *testing.T) {
 				Config: testAccGitlabPipelineScheduleConfig(rInt),
 			},
 			{
-				ResourceName:      "gitlab_pipeline_schedule.schedule",
+				ResourceName:      resourceName,
 				ImportState:       true,
+				ImportStateIdFunc: getPipelineScheduleID(resourceName),
 				ImportStateVerify: true,
 			},
 		},
 	})
+}
+
+func getPipelineScheduleID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("not found: %s", n)
+		}
+
+		pipelineScheduleID := rs.Primary.ID
+		if pipelineScheduleID == "" {
+			return "", fmt.Errorf("no pipeline schedule ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("no project ID is set")
+		}
+		return fmt.Sprintf("%s:%s", projectID, pipelineScheduleID), nil
+	}
 }
 
 func testAccCheckGitlabPipelineScheduleExists(n string, schedule *gitlab.PipelineSchedule) resource.TestCheckFunc {

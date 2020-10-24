@@ -184,7 +184,10 @@ func resourceGitlabPipelineScheduleImporter(d *schema.ResourceData, meta interfa
 	project, id := s[0], s[1]
 
 	d.SetId(id)
-	d.Set("project", project)
+	err := d.Set("project", project)
+	if err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

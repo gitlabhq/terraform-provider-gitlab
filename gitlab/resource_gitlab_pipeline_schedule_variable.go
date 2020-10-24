@@ -140,11 +140,19 @@ func resourceGitlabPipelineScheduleVariableImporter(d *schema.ResourceData, meta
 		return nil, fmt.Errorf("invalid pipeline schedule variable import format; expected '{project_id}:{pipeline_schedule_id}:{key}'")
 	}
 	project, pipelineScheduleId, key := s[0], s[1], s[2]
-
+	psid, err := strconv.Atoi(pipelineScheduleId)
+	if err != nil {
+		return nil, err
+	}
 	d.SetId(buildTwoPartID(&pipelineScheduleId, &key))
-	d.Set("project", project)
-	d.Set("pipeline_schedule_id", pipelineScheduleId)
-	d.Set("key", key)
-
+	if err := d.Set("project", project); err != nil {
+		return nil, err
+	}
+	if err := d.Set("pipeline_schedule_id", psid); err != nil {
+		return nil, err
+	}
+	if err := d.Set("key", key); err != nil {
+		return nil, err
+	}
 	return []*schema.ResourceData{d}, nil
 }

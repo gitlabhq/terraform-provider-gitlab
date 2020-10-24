@@ -95,9 +95,19 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	d.Set("project", project)
-	d.Set("tag", pt.Name)
-	d.Set("create_access_level", pt.CreateAccessLevels[0].AccessLevel)
+	if err := d.Set("project", project); err != nil {
+		return err
+	}
+	if err := d.Set("tag", pt.Name); err != nil {
+		return err
+	}
+	if v, ok := accessLevelValueToName[pt.CreateAccessLevels[0].AccessLevel]; ok {
+		if err := d.Set("create_access_level", v); err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("unknown access level: %d", pt.CreateAccessLevels[0].AccessLevel)
+	}
 
 	d.SetId(buildTwoPartID(&project, &pt.Name))
 
@@ -133,8 +143,11 @@ func resourceGitlabTagProtectionImporter(d *schema.ResourceData, meta interface{
 	project, tag := s[0], s[1]
 
 	d.SetId(buildTwoPartID(&project, &tag))
-	d.Set("project", project)
-	d.Set("tag", tag)
-
+	if err := d.Set("project", project); err != nil {
+		return nil, err
+	}
+	if err := d.Set("tag", tag); err != nil {
+		return nil, err
+	}
 	return []*schema.ResourceData{d}, nil
 }
