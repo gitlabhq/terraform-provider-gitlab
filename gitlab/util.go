@@ -142,6 +142,21 @@ func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
 	return &value
 }
 
+func stringToAccessControlValue(s string) *gitlab.AccessControlValue {
+	lookup := map[string]gitlab.AccessControlValue{
+		"disabled": gitlab.DisabledAccessControl,
+		"enabled":  gitlab.EnabledAccessControl,
+		"private":  gitlab.PrivateAccessControl,
+		"public":   gitlab.PublicAccessControl,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
 var StringIsGitlabVariableName = func(v interface{}, k string) (s []string, es []error) {
 	value, ok := v.(string)
 	if !ok {
