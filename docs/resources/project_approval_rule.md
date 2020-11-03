@@ -1,14 +1,6 @@
----
-layout: "gitlab"
-page_title: "GitLab: gitlab_project_approval_rule"
-sidebar_current: "docs-gitlab-resource-project-approval-rule"
-description: |-
-  Creates and manages project-level approval rules for GitLab projects
----
-
 # gitlab\_project\_approval\_rule
 
-This resource allows you to create and manage approval rules for your GitLab 
+This resource allows you to create and manage approval rules for your GitLab
 projects. For further information on approval rules, consult the [gitlab
 documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
 

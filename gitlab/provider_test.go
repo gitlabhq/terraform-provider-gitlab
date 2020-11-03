@@ -38,9 +38,3 @@ func testAccPreCheck(t *testing.T) {
 		t.Fatal("GITLAB_TOKEN must be set for acceptance tests")
 	}
 }
-
-func testGitLabLicensePreCheck(t *testing.T) {
-	if v := os.Getenv("GITLAB_LICENSE_FILE"); v == "" {
-		t.Skipf("GITLAB_LICENSE_FILE must be set to run EE tests.")
-	}
-}
