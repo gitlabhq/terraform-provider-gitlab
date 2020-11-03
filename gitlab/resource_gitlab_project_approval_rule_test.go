@@ -24,7 +24,8 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 		CheckDestroy: testAccCheckGitlabProjectApprovalRuleDestroy,
 		Steps: []resource.TestStep{
 			{ // Create Rule
-				Config: testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 3, "", "gitlab_group.foo.id"),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 3, "", "gitlab_group.foo.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -57,7 +58,8 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 					}),
 				),
 				*/
-				Config: testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 2, "", "gitlab_group.foo.id, gitlab_group.bar.id"),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 2, "", "gitlab_group.foo.id, gitlab_group.bar.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -76,7 +78,8 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 				),
 			},
 			{ // Reset Rule
-				Config: testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 3, "", "gitlab_group.foo.id"),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 3, "", "gitlab_group.foo.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -101,9 +104,11 @@ func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 		CheckDestroy: testAccCheckGitlabProjectApprovalRuleDestroy,
 		Steps: []resource.TestStep{
 			{ // Create Rule
-				Config: testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 1, "", "gitlab_group.foo.id"),
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 1, "", "gitlab_group.foo.id"),
 			},
 			{ // Verify Import
+				SkipFunc:          isRunningInCE,
 				ResourceName:      "gitlab_project_approval_rule.foo",
 				ImportState:       true,
 				ImportStateVerify: true,
