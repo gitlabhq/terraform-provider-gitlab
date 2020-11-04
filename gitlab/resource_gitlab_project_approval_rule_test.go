@@ -37,9 +37,9 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 					}),
 				),
 			},
-			{ // Update Rule
-				/*  ---- user_ids not currently working ----
-				Config: testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 2, "gitlab_user.baz.id", "gitlab_group.foo.id, gitlab_group.bar.id"),
+			{ // Add group and user
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 2, "gitlab_user.baz.id", "gitlab_group.foo.id, gitlab_group.bar.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -53,39 +53,23 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 							fmt.Sprintf("bar-group-%d", randomInt),
 							fmt.Sprintf("foo-group-%d", randomInt),
 						},
-						Name: fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt: randomInt,
-					}),
-				),
-				*/
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 2, "", "gitlab_group.foo.id, gitlab_group.bar.id"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
-					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
-						ApproverUsernames: []string{
-							fmt.Sprintf("bar-user-%d", randomInt),
-							fmt.Sprintf("foo-user-%d", randomInt),
-						},
-						ApprovalsRequired: 2,
-						GroupPaths: []string{
-							fmt.Sprintf("bar-group-%d", randomInt),
-							fmt.Sprintf("foo-group-%d", randomInt),
-						},
 						Name:      fmt.Sprintf("foo rule %d", randomInt),
 						RandomInt: randomInt,
 					}),
 				),
 			},
-			{ // Reset Rule
+			{ // Remove group and user
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 3, "", "gitlab_group.foo.id"),
+				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 1, "gitlab_user.qux.id", "gitlab_group.bar.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
-						ApproverUsernames: []string{fmt.Sprintf("foo-user-%d", randomInt)},
-						ApprovalsRequired: 3,
-						GroupPaths:        []string{fmt.Sprintf("foo-group-%d", randomInt)},
+						ApproverUsernames: []string{
+							fmt.Sprintf("bar-user-%d", randomInt),
+							fmt.Sprintf("qux-user-%d", randomInt),
+						},
+						ApprovalsRequired: 1,
+						GroupPaths:        []string{fmt.Sprintf("bar-group-%d", randomInt)},
 						Name:              fmt.Sprintf("foo rule %d", randomInt),
 						RandomInt:         randomInt,
 					}),
@@ -187,6 +171,18 @@ resource "gitlab_project" "foo" {
 	visibility_level  = "public"
 }
 
+resource "gitlab_project_membership" "baz" {
+  project_id     = gitlab_project.foo.id
+  user_id        = gitlab_user.baz.id
+  access_level   = "developer"
+}
+
+resource "gitlab_project_membership" "qux" {
+  project_id     = gitlab_project.foo.id
+  user_id        = gitlab_user.qux.id
+  access_level   = "developer"
+}
+
 resource "gitlab_group" "foo" {
 	name             = "foo-group"
 	path             = "foo-group-%d"
@@ -222,6 +218,13 @@ resource "gitlab_user" "baz" {
 	email            = "baz-user@ssss.com"
 }
 
+resource "gitlab_user" "qux" {
+	name             = "qux user"
+	username         = "qux-user-%d"
+	password         = "qux12345"
+	email            = "qux-user@ssss.com"
+}
+
 resource "gitlab_group_membership" "foo" {
   group_id         = gitlab_group.foo.id
   user_id          = gitlab_user.foo.id
@@ -244,6 +247,7 @@ resource "gitlab_group_membership" "bar" {
 		randomInt, // foo-user-%d
 		randomInt, // bar-user-%d
 		randomInt, // baz-user-%d
+		randomInt, // qux-user-%d
 	)
 }
 
