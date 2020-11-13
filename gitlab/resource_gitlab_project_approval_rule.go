@@ -1,7 +1,7 @@
 package gitlab
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"strconv"
 
@@ -10,6 +10,7 @@ import (
 )
 
 // https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-project-level-rule
+var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 func resourceGitlabProjectApprovalRule() *schema.Resource {
 	return &schema.Resource{
@@ -85,8 +86,11 @@ func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interfac
 
 	rule, err := getApprovalRuleByID(meta.(*gitlab.Client), d.Id())
 	if err != nil {
-		d.SetId("")
-		return nil
+		if errors.Is(err, errApprovalRuleNotFound) {
+			d.SetId("")
+			return nil
+		}
+		return err
 	}
 
 	d.Set("name", rule.Name)
@@ -182,7 +186,7 @@ func getApprovalRuleByID(client *gitlab.Client, id string) (*gitlab.ProjectAppro
 		}
 	}
 
-	return nil, fmt.Errorf("unable to find GitLab approval rule %d", ruleIDInt)
+	return nil, errApprovalRuleNotFound
 }
 
 // flattenApprovalRuleUserIDs flattens a list of approval user ids into a list
