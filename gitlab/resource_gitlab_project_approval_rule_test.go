@@ -158,15 +158,15 @@ func testAccGitLabProjectApprovalRuleCreateConfig(
 	return fmt.Sprintf(`
 resource "gitlab_project_approval_rule" "foo" {
 	project            = gitlab_project.foo.id
-	name               = "foo rule %d"
+	name               = "foo rule %[1]d"
 	approvals_required = %d
 	user_ids           = [%s]
 	group_ids          = [%s]
 }
 
 resource "gitlab_project" "foo" {
-	name              = "foo project"
-	path              = "foo-project-%d"
+	name              = "foo project %[1]d"
+	path              = "foo-project-%[1]d"
 	description       = "Terraform acceptance test - Approval Rule"
 	visibility_level  = "public"
 }
@@ -184,45 +184,17 @@ resource "gitlab_project_membership" "qux" {
 }
 
 resource "gitlab_group" "foo" {
-	name             = "foo-group"
-	path             = "foo-group-%d"
+	name             = "foo-group %[1]d"
+	path             = "foo-group-%[1]d"
 	description      = "Terraform acceptance tests - Approval Rule"
 	visibility_level = "public"
 }
 
 resource "gitlab_group" "bar" {
-	name             = "bar-group"
-	path             = "bar-group-%d"
+	name             = "bar-group %[1]d"
+	path             = "bar-group-%[1]d"
 	description      = "Terraform acceptance tests - Approval Rule"
 	visibility_level = "public"
-}
-
-resource "gitlab_user" "foo" {
-	name             = "foo user"
-	username         = "foo-user-%d"
-	password         = "foo12345"
-	email            = "foo-user@ssss.com"
-}
-
-resource "gitlab_user" "bar" {
-	name             = "bar user"
-	username         = "bar-user-%d"
-	password         = "bar12345"
-	email            = "bar-user@ssss.com"
-}
-
-resource "gitlab_user" "baz" {
-	name             = "baz user"
-	username         = "baz-user-%d"
-	password         = "baz12345"
-	email            = "baz-user@ssss.com"
-}
-
-resource "gitlab_user" "qux" {
-	name             = "qux user"
-	username         = "qux-user-%d"
-	password         = "qux12345"
-	email            = "qux-user@ssss.com"
 }
 
 resource "gitlab_group_membership" "foo" {
@@ -236,18 +208,39 @@ resource "gitlab_group_membership" "bar" {
   user_id         = gitlab_user.bar.id
   access_level    = "developer"
 }
+
+resource "gitlab_user" "foo" {
+	name             = "foo user"
+	username         = "foo-user-%[1]d"
+	password         = "foo12345"
+	email            = "foo-user%[1]d@ssss.com"
+}
+
+resource "gitlab_user" "bar" {
+	name             = "bar user"
+	username         = "bar-user-%[1]d"
+	password         = "bar12345"
+	email            = "bar-user%[1]d@ssss.com"
+}
+
+resource "gitlab_user" "baz" {
+	name             = "baz user"
+	username         = "baz-user-%[1]d"
+	password         = "baz12345"
+	email            = "baz-user%[1]d@ssss.com"
+}
+
+resource "gitlab_user" "qux" {
+	name             = "qux user"
+	username         = "qux-user-%[1]d"
+	password         = "qux12345"
+	email            = "qux-user%[1]d@ssss.com"
+}
 	`,
-		randomInt, // "foo rule %d"
+		randomInt,
 		approvals,
 		userIDs,
 		groupIDs,
-		randomInt, // foo-project-%d
-		randomInt, // foo-group-%d
-		randomInt, // bar-group-%d
-		randomInt, // foo-user-%d
-		randomInt, // bar-user-%d
-		randomInt, // baz-user-%d
-		randomInt, // qux-user-%d
 	)
 }
 
