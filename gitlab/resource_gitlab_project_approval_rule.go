@@ -28,7 +28,6 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 			},
 			"name": {
 				Type:     schema.TypeString,
-				ForceNew: true,
 				Required: true,
 			},
 			"approvals_required": {
@@ -36,22 +35,14 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 				Required: true,
 			},
 			"user_ids": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
-				Set:      schema.HashInt,
 			},
 			"group_ids": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
-				Set:      schema.HashInt,
-			},
-			"eligible_approvers": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeInt},
-				Set:      schema.HashInt,
 			},
 		},
 	}
@@ -64,6 +55,7 @@ func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interf
 		UserIDs:           expandApproverIds(d.GetOk("user_ids")),
 		GroupIDs:          expandApproverIds(d.GetOk("group_ids")),
 	}
+
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] Project %s create gitlab project-level rule %+v", project, options)
@@ -75,7 +67,9 @@ func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	d.SetId(createApprovalRuleID(rule.ID, project))
+	ruleIDString := strconv.Itoa(rule.ID)
+
+	d.SetId(buildTwoPartID(&project, &ruleIDString))
 
 	return resourceGitlabProjectApprovalRuleRead(d, meta)
 }
@@ -83,48 +77,34 @@ func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interf
 func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] read gitlab project-level rule %s", d.Id())
 
-	d.Partial(true)
-
-	projectID, _, err := splitApprovalRuleID(d.Id())
+	projectID, _, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return err
 	}
 	d.Set("project", projectID)
-	d.SetPartial("project")
 
 	rule, err := getApprovalRuleByID(meta.(*gitlab.Client), d.Id())
 	if err != nil {
-		return err
+		d.SetId("")
+		return nil
 	}
 
 	d.Set("name", rule.Name)
-	d.SetPartial("name")
-
 	d.Set("approvals_required", rule.ApprovalsRequired)
-	d.SetPartial("approvals_required")
 
 	if err := d.Set("group_ids", flattenApprovalRuleGroupIDs(rule.Groups)); err != nil {
 		return err
 	}
-	d.SetPartial("group_ids")
-
-	if err := d.Set("eligible_approvers", flattenApprovalRuleUserIDs(rule.EligibleApprovers)); err != nil {
-		return err
-	}
-	d.SetPartial("eligible_approvers")
 
 	if err := d.Set("user_ids", flattenApprovalRuleUserIDs(rule.Users)); err != nil {
 		return err
 	}
-	d.SetPartial("user_ids")
-
-	d.Partial(false)
 
 	return nil
 }
 
 func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interface{}) error {
-	projectID, ruleID, err := splitApprovalRuleID(d.Id())
+	projectID, ruleID, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return err
 	}
@@ -154,7 +134,7 @@ func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interf
 }
 
 func resourceGitlabProjectApprovalRuleDelete(d *schema.ResourceData, meta interface{}) error {
-	project, ruleID, err := splitApprovalRuleID(d.Id())
+	project, ruleID, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return err
 	}
@@ -178,7 +158,7 @@ func resourceGitlabProjectApprovalRuleDelete(d *schema.ResourceData, meta interf
 
 // getApprovalRuleByID checks the list of rules and finds the one that matches our rule ID.
 func getApprovalRuleByID(client *gitlab.Client, id string) (*gitlab.ProjectApprovalRule, error) {
-	projectID, ruleID, err := splitApprovalRuleID(id)
+	projectID, ruleID, err := parseTwoPartID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -203,17 +183,6 @@ func getApprovalRuleByID(client *gitlab.Client, id string) (*gitlab.ProjectAppro
 	}
 
 	return nil, fmt.Errorf("unable to find GitLab approval rule %d", ruleIDInt)
-}
-
-// createApprovalRuleID creates an ID of two parts: projectID:ruleID
-func createApprovalRuleID(ruleID int, projectID string) string {
-	return buildTwoPartID(gitlab.String(projectID), gitlab.String(strconv.Itoa(ruleID)))
-}
-
-// splitApprovalRuleID splits an approval rule into two parts, projectID:ruleID.
-// An error is returned if one occurs.
-func splitApprovalRuleID(ruleID string) (string, string, error) {
-	return parseTwoPartID(ruleID)
 }
 
 // flattenApprovalRuleUserIDs flattens a list of approval user ids into a list
@@ -245,7 +214,7 @@ func expandApproverIds(ids interface{}, hasItems bool) []int {
 	var approverIDs []int
 
 	if hasItems {
-		for _, id := range ids.(*schema.Set).List() {
+		for _, id := range ids.([]interface{}) {
 			approverIDs = append(approverIDs, id.(int))
 		}
 	}

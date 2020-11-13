@@ -1,20 +1,28 @@
 # gitlab\_project\_approval\_rule
 
-This resource allows you to create and manage approval rules for your GitLab
+This resource allows you to create and manage multiple approval rules for your GitLab
 projects. For further information on approval rules, consult the [gitlab
 documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
 
-*Note*: This feature requires a GitLab Starter account or above.
+-> This feature requires a GitLab Starter account or above.
 
 ## Example Usage
 
 ```hcl
-resource "gitlab_project_approval_rule" "example" {
+resource "gitlab_project_approval_rule" "example-one" {
   project            = 5
-  name               = "Example"
+  name               = "Example Rule 1"
   approvals_required = 3
   user_ids           = [50, 500]
   group_ids          = [51]
+}
+
+resource "gitlab_project_approval_rule" "example-two" {
+  project            = 5
+  name               = "Example Rule 2"
+  approvals_required = 1
+  user_ids           = []
+  group_ids          = [52]
 }
 ```
 
@@ -31,12 +39,6 @@ The following arguments are supported:
 * `user_ids` - (Optional)  A list of specific User IDs to add to the list of approvers.
 
 * `group_ids` - (Optional) A list of group IDs who's members can approve of the merge request
-
-## Attributes Reference
-
-The resource exports the following additional attributes:
-
-* `eligible_approvers` - A list of approvers from the `user_ids` parameter, groups, and the project that are included in the approval rule.
 
 ## Import
 
