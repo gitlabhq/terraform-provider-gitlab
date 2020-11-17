@@ -25,7 +25,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{ // Create Rule
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 3, "", "gitlab_group.foo.id"),
+				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 3, "", "gitlab_group.foo.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -39,7 +39,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 			},
 			{ // Add group and user
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 2, "gitlab_user.baz.id", "gitlab_group.foo.id, gitlab_group.bar.id"),
+				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 2, "gitlab_user.baz.id", "gitlab_group.bar.id, gitlab_group.foo.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -60,7 +60,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 			},
 			{ // Remove group and user
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 1, "gitlab_user.qux.id", "gitlab_group.bar.id"),
+				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 1, "gitlab_user.qux.id", "gitlab_group.bar.id"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
@@ -89,7 +89,7 @@ func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 		Steps: []resource.TestStep{
 			{ // Create Rule
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleCreateConfig(randomInt, 1, "", "gitlab_group.foo.id"),
+				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 1, "", "gitlab_group.foo.id"),
 			},
 			{ // Verify Import
 				SkipFunc:          isRunningInCE,
@@ -149,19 +149,55 @@ func testAccCheckGitlabProjectApprovalRuleAttributes(projectApprovalRule *gitlab
 	}
 }
 
-func testAccGitLabProjectApprovalRuleCreateConfig(
+func testAccGitLabProjectApprovalRuleConfig(
 	randomInt int,
 	approvals int,
 	userIDs string,
 	groupIDs string,
 ) string {
 	return fmt.Sprintf(`
-resource "gitlab_project_approval_rule" "foo" {
-	project            = gitlab_project.foo.id
-	name               = "foo rule %[1]d"
-	approvals_required = %d
-	user_ids           = [%s]
-	group_ids          = [%s]
+resource "gitlab_user" "foo" {
+	name             = "foo user"
+	username         = "foo-user-%[1]d"
+	password         = "foo12345"
+	email            = "foo-user%[1]d@ssss.com"
+	is_admin         = false
+  projects_limit   = 2
+  can_create_group = false
+  is_external      = false
+}
+
+resource "gitlab_user" "bar" {
+	name             = "bar user"
+	username         = "bar-user-%[1]d"
+	password         = "bar12345"
+	email            = "bar-user%[1]d@ssss.com"
+	is_admin         = false
+  projects_limit   = 2
+  can_create_group = false
+  is_external      = false
+}
+
+resource "gitlab_user" "baz" {
+	name             = "baz user"
+	username         = "baz-user-%[1]d"
+	password         = "baz12345"
+	email            = "baz-user%[1]d@ssss.com"
+	is_admin         = false
+  projects_limit   = 2
+  can_create_group = false
+  is_external      = false
+}
+
+resource "gitlab_user" "qux" {
+	name             = "qux user"
+	username         = "qux-user-%[1]d"
+	password         = "qux12345"
+	email            = "qux-user%[1]d@ssss.com"
+	is_admin         = false
+  projects_limit   = 2
+  can_create_group = false
+  is_external      = false
 }
 
 resource "gitlab_project" "foo" {
@@ -209,32 +245,12 @@ resource "gitlab_group_membership" "bar" {
   access_level    = "developer"
 }
 
-resource "gitlab_user" "foo" {
-	name             = "foo user"
-	username         = "foo-user-%[1]d"
-	password         = "foo12345"
-	email            = "foo-user%[1]d@ssss.com"
-}
-
-resource "gitlab_user" "bar" {
-	name             = "bar user"
-	username         = "bar-user-%[1]d"
-	password         = "bar12345"
-	email            = "bar-user%[1]d@ssss.com"
-}
-
-resource "gitlab_user" "baz" {
-	name             = "baz user"
-	username         = "baz-user-%[1]d"
-	password         = "baz12345"
-	email            = "baz-user%[1]d@ssss.com"
-}
-
-resource "gitlab_user" "qux" {
-	name             = "qux user"
-	username         = "qux-user-%[1]d"
-	password         = "qux12345"
-	email            = "qux-user%[1]d@ssss.com"
+resource "gitlab_project_approval_rule" "foo" {
+	project            = gitlab_project.foo.id
+	name               = "foo rule %[1]d"
+	approvals_required = %d
+	user_ids           = [%s]
+	group_ids          = [%s]
 }
 	`,
 		randomInt,

@@ -36,14 +36,16 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 				Required: true,
 			},
 			"user_ids": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
+				Set:      schema.HashInt,
 			},
 			"group_ids": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeInt},
+				Set:      schema.HashInt,
 			},
 		},
 	}
@@ -217,7 +219,7 @@ func flattenApprovalRuleGroupIDs(groups []*gitlab.Group) []int {
 func expandApproverIds(ids interface{}) []int {
 	var approverIDs []int
 
-	for _, id := range ids.([]interface{}) {
+	for _, id := range ids.(*schema.Set).List() {
 		approverIDs = append(approverIDs, id.(int))
 	}
 
