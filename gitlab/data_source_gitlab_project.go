@@ -152,6 +152,10 @@ func dataSourceGitlabProject() *schema.Resource {
 					},
 				},
 			},
+			"forked_from_project": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -188,6 +192,7 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	d.Set("runners_token", found.RunnersToken)
 	d.Set("archived", found.Archived)
 	d.Set("remove_source_branch_after_merge", found.RemoveSourceBranchAfterMerge)
+	d.Set("forked_from_project", found.ForkedFromProject)
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 
