@@ -41,8 +41,9 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		Archived:        false, // needless, but let's make this explicit
-		PackagesEnabled: true,
+		Archived:         false, // needless, but let's make this explicit
+		PackagesEnabled:  true,
+		PagesAccessLevel: gitlab.PublicAccessControl,
 	}
 
 	defaultsMasterBranch = defaults
@@ -82,8 +83,9 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						Archived:        true,
-						PackagesEnabled: false,
+						Archived:         true,
+						PackagesEnabled:  false,
+						PagesAccessLevel: gitlab.DisabledAccessControl,
 					}, &received),
 				),
 			},
@@ -324,7 +326,8 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		PackagesEnabled: true,
+		PackagesEnabled:  true,
+		PagesAccessLevel: gitlab.PublicAccessControl,
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -423,7 +426,8 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-		PackagesEnabled: true,
+		PackagesEnabled:  true,
+		PagesAccessLevel: gitlab.PrivateAccessControl,
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -746,6 +750,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  pages_access_level = "public"
 }
 	`, rInt, rInt, defaultBranchStatement)
 }
@@ -803,6 +808,7 @@ resource "gitlab_project" "foo" {
   shared_runners_enabled = false
   archived = true
   packages_enabled = false
+  pages_access_level = "disabled"
 }
 	`, rInt, rInt)
 }
