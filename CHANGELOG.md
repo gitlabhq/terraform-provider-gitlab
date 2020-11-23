@@ -1,3 +1,15 @@
+## 3.1.0 (Oct 16, 2020)
+
+ENHANCEMENTS:
+
+* Enable custom UserAgent ([#451](https://github.com/gitlabhq/terraform-provider-gitlab/pull/451))
+* gitlab_project_mirror: Mark URL as sensitive ([#458](https://github.com/gitlabhq/terraform-provider-gitlab/pull/458))
+* Remove old-style variable interpolation ([#456](https://github.com/gitlabhq/terraform-provider-gitlab/pull/456))
+
+BUG FIXES:
+
+* add pagination for ListPipelineSchedules ([#454](https://github.com/gitlabhq/terraform-provider-gitlab/pull/454))
+
 ## 3.0.0 (Sept 23, 2020)
 
 BREAKING CHANGES:

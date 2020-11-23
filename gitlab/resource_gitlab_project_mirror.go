@@ -30,9 +30,10 @@ func resourceGitlabProjectMirror() *schema.Resource {
 				Computed: true,
 			},
 			"url": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Type:      schema.TypeString,
+				ForceNew:  true,
+				Required:  true,
+				Sensitive: true, // Username and password must be provided in the URL for https.
 			},
 			"enabled": {
 				Type:     schema.TypeBool,

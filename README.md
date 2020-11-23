@@ -72,6 +72,6 @@ This module supports both Gitlab CE and Gitlab EE. We run tests on Gitlab EE,
 but can't run them on pull requests from forks.
 
 Features that only work on one flavour can use the following helpers as
-SkipFunc: `isRunningInEE` and `isRunningInCE`. You can see an exemple of this
+SkipFunc: `isRunningInEE` and `isRunningInCE`. You can see an example of this
 for [gitlab_project_push_rules](gitlab/resource_gitlab_project_push_rules_test.go)
 tests.

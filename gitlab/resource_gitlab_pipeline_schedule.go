@@ -86,21 +86,34 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d", project, pipelineScheduleID)
 
-	pipelineSchedules, _, err := client.PipelineSchedules.ListPipelineSchedules(project, nil)
-	if err != nil {
-		return err
+	opt := &gitlab.ListPipelineSchedulesOptions{
+		Page:    1,
+		PerPage: 20,
 	}
+
 	found := false
-	for _, pipelineSchedule := range pipelineSchedules {
-		if pipelineSchedule.ID == pipelineScheduleID {
-			d.Set("description", pipelineSchedule.Description)
-			d.Set("ref", pipelineSchedule.Ref)
-			d.Set("cron", pipelineSchedule.Cron)
-			d.Set("cron_timezone", pipelineSchedule.CronTimezone)
-			d.Set("active", pipelineSchedule.Active)
-			found = true
+	for {
+		pipelineSchedules, resp, err := client.PipelineSchedules.ListPipelineSchedules(project, opt)
+		if err != nil {
+			return err
+		}
+		for _, pipelineSchedule := range pipelineSchedules {
+			if pipelineSchedule.ID == pipelineScheduleID {
+				d.Set("description", pipelineSchedule.Description)
+				d.Set("ref", pipelineSchedule.Ref)
+				d.Set("cron", pipelineSchedule.Cron)
+				d.Set("cron_timezone", pipelineSchedule.CronTimezone)
+				d.Set("active", pipelineSchedule.Active)
+				found = true
+				break
+			}
+		}
+
+		if found || resp.CurrentPage >= resp.TotalPages {
 			break
 		}
+
+		opt.Page = resp.NextPage
 	}
 	if !found {
 		log.Printf("[DEBUG] PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
