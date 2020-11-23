@@ -81,7 +81,6 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
-					"skip_confirmation",
 				},
 			},
 		},

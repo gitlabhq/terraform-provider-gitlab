@@ -16,23 +16,7 @@ func resourceGitlabUser() *schema.Resource {
 		Update: resourceGitlabUserUpdate,
 		Delete: resourceGitlabUserDelete,
 		Importer: &schema.ResourceImporter{
-			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-				client := meta.(*gitlab.Client)
-				log.Printf("[DEBUG] read gitlab user %s", d.Id())
-
-				id, _ := strconv.Atoi(d.Id())
-
-				user, _, err := client.Users.GetUser(id)
-				if err != nil {
-					return nil, err
-				}
-
-				resourceGitlabUserSetToState(d, user)
-				d.Set("email", user.Email)
-				d.Set("is_admin", user.IsAdmin)
-				d.Set("is_external", user.External)
-				return []*schema.ResourceData{d}, nil
-			},
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -94,7 +78,7 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("email", user.Email)
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
-	d.Set("skip_confirmation", !user.ConfirmedAt.IsZero())
+	d.Set("skip_confirmation", user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero())
 }
 
 func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
