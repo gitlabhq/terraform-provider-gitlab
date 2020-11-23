@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -84,8 +85,13 @@ func resourceGitlabInstanceVariableRead(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] read gitlab instance level CI variable %s", key)
 
-	v, _, err := client.InstanceVariables.GetVariable(key)
+	v, resp, err := client.InstanceVariables.GetVariable(key)
 	if err != nil {
+		if resp.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] gitlab instance level CI variable for %s not found so removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
