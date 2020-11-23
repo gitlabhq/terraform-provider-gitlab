@@ -545,7 +545,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabProjectConfigImportURL(rInt, baseProject.HTTPURLToRepo),
+				Config: testAccGitlabProjectConfigImportURLMirrored(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					resource.TestCheckResourceAttr("gitlab_project.mirrored", "mirrored", "true"),
