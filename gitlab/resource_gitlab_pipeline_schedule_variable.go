@@ -136,7 +136,6 @@ func resourceGitlabPipelineScheduleVariableDelete(d *schema.ResourceData, meta i
 func resourceGitlabPipelineScheduleVariableImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 3 {
-		d.SetId("")
 		return nil, fmt.Errorf("invalid pipeline schedule variable import format; expected '{project_id}:{pipeline_schedule_id}:{key}'")
 	}
 	project, pipelineScheduleId, key := s[0], s[1], s[2]

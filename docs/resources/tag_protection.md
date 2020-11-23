@@ -22,8 +22,8 @@ The following arguments are supported:
 
 * `create_access_level` - (Required) One of five levels of access to the project.
 
-## Importing tag protections
+## Import
 
-You can import a tag protection state using `terraform import <resource> <project_id>:<tag_name>`.
+Tag protections can be imported using an id made up of `project_id:tag_name`, e.g.
 
     terraform import gitlab_tag_protection.example 123456789:v1.0.0

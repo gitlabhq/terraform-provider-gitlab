@@ -20,7 +20,7 @@ func resourceGitlabTagProtection() *schema.Resource {
 		Read:   resourceGitlabTagProtectionRead,
 		Delete: resourceGitlabTagProtectionDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabTagProtectionImporter,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -95,16 +95,10 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	if err := d.Set("project", project); err != nil {
-		return err
-	}
-	if err := d.Set("tag", pt.Name); err != nil {
-		return err
-	}
+	d.Set("project", project)
+	d.Set("tag", pt.Name)
 	if v, ok := accessLevelValueToName[pt.CreateAccessLevels[0].AccessLevel]; ok {
-		if err := d.Set("create_access_level", v); err != nil {
-			return err
-		}
+		d.Set("create_access_level", v)
 	} else {
 		return fmt.Errorf("unknown access level: %d", pt.CreateAccessLevels[0].AccessLevel)
 	}
@@ -132,22 +126,4 @@ func projectAndTagFromID(id string) (string, string, error) {
 		log.Printf("[WARN] cannot get group member id from input: %v", id)
 	}
 	return project, tag, err
-}
-
-func resourceGitlabTagProtectionImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	s := strings.Split(d.Id(), ":")
-	if len(s) != 2 {
-		d.SetId("")
-		return nil, fmt.Errorf("invalid tag protection import format; expected '{project_id}:{tag_name}'")
-	}
-	project, tag := s[0], s[1]
-
-	d.SetId(buildTwoPartID(&project, &tag))
-	if err := d.Set("project", project); err != nil {
-		return nil, err
-	}
-	if err := d.Set("tag", tag); err != nil {
-		return nil, err
-	}
-	return []*schema.ResourceData{d}, nil
 }

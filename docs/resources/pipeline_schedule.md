@@ -31,8 +31,8 @@ The following arguments are supported:
 
 * `active` - (Optional, bool) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
 
-## Importing pipeline schedules
+## Import
 
-You can import a pipeline schedule state using `terraform import <resource> <project_id>:<pipeline_schedule_id>`.
+Pipeline schedules can be imported using an id made up of `project_id:pipeline_schedule_id`, e.g.
 
     terraform import gitlab_pipeline_schedule.example 123456789:13
