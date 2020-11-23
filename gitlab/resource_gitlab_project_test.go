@@ -809,8 +809,6 @@ resource "gitlab_project" "foo" {
   archived = true
   packages_enabled = false
   pages_access_level = "disabled"
-  mirror = false
-  mirror_target_builds = false
 }
 	`, rInt, rInt)
 }
