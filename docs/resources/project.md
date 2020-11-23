@@ -34,6 +34,11 @@ The following arguments are supported:
 
 * `import_url` - (Optional) Git URL to a repository to be imported.
 
+* `mirror` (Optional) Enables pull mirroring in a project. For further information on mirroring, consult the 
+[gitlab documentation](https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring).
+
+* `mirror_trigger_builds` (Optional) Pull mirroring triggers builds.
+
 * `request_access_enabled` - Allow users to request member access.
 
 * `issues_enabled` - (Optional) Enable issue tracking for the project.
@@ -85,10 +90,6 @@ The following arguments are supported:
 * `pages_access_level` - (Optional) Enable pages access control
   Valid values are `disabled`, `private`, `enabled`, `public`.
   `private` is the default.
-
-* `mirror` (Optional) Enables pull mirroring in a project.
-
-* `mirror_trigger_builds` (Optional) Pull mirroring triggers builds.
 
 ## Attributes Reference
 
