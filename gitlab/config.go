@@ -21,7 +21,7 @@ type Config struct {
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
-func (c *Config) Client() (interface{}, error) {
+func (c *Config) Client() (*gitlab.Client, error) {
 	// Configure TLS/SSL
 	tlsConfig := &tls.Config{}
 

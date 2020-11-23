@@ -268,6 +268,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeInt,
 		Optional: true,
 	},
+	"pages_access_level": {
+		Type:         schema.TypeString,
+		Optional:     true,
+		Default:      "private",
+		ValidateFunc: validation.StringInSlice([]string{"public", "private", "enabled", "disabled"}, true),
+	},
 	"mirror": {
 		Type:     schema.TypeBool,
 		Optional: true,
@@ -321,8 +327,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("archived", project.Archived)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
-	d.Set("mirror", project.Mirror)
-	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
+	d.Set("pages_access_level", string(project.PagesAccessLevel))
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -388,6 +393,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("group_with_project_templates_id"); ok {
 		options.GroupWithProjectTemplatesID = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("pages_access_level"); ok {
+		options.PagesAccessLevel = stringToAccessControlValue(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -570,12 +579,8 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		options.PackagesEnabled = gitlab.Bool(d.Get("packages_enabled").(bool))
 	}
 
-	if d.HasChange("mirror") {
-		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
-	}
-
-	if d.HasChange("mirror_trigger_builds") {
-		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
+	if d.HasChange("pages_access_level") {
+		options.PagesAccessLevel = stringToAccessControlValue(d.Get("pages_access_level").(string))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {

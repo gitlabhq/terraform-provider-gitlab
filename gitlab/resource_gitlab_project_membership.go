@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -77,8 +78,13 @@ func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{
 		return e
 	}
 
-	projectMember, _, err := client.ProjectMembers.GetProjectMember(projectId, userId)
+	projectMember, resp, err := client.ProjectMembers.GetProjectMember(projectId, userId)
 	if err != nil {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] gitlab project membership for %s not found so removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

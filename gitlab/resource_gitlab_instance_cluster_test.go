@@ -217,7 +217,6 @@ func testAccCheckGitlabInstanceClusterAttributes(cluster *gitlab.InstanceCluster
 
 func testAccGitlabInstanceClusterConfig(rInt int, managed bool) string {
 	m := fmt.Sprintf("%t", managed)
-	fmt.Println(m)
 
 	return fmt.Sprintf(`
 variable "cert" {

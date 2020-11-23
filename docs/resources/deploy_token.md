@@ -41,6 +41,8 @@ The following arguments are supported:
 
 * `username` - (Optional, string) A username for the deploy token. Default is `gitlab+deploy-token-{n}`.
 
+* `expires_at` - (Optional, string) Time the token will expire it, RFC3339 format.
+
 * `scopes` - (Required, set of strings) Valid values: `read_repository`, `read_registry`.
 
 ## Attributes Reference
