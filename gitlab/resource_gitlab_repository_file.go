@@ -20,7 +20,7 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"file": {
+			"file_path": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
@@ -53,7 +53,7 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 func resourceGitlabRepositoryFileCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	file := d.Get("file").(string)
+	filePath := d.Get("file_path").(string)
 
 	options := &gitlab.CreateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
@@ -64,7 +64,7 @@ func resourceGitlabRepositoryFileCreate(d *schema.ResourceData, meta interface{}
 		Encoding:      gitlab.String("base64"),
 	}
 
-	repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, file, options)
+	repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, filePath, options)
 	if err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func resourceGitlabRepositoryFileRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	d.Set("project", project)
-	d.Set("file", repositoryFile.FileName)
+	d.Set("file_path", repositoryFile.FileName)
 	d.Set("content", repositoryFile.Content)
 	d.Set("branch", repositoryFile.Ref)
 
@@ -98,7 +98,7 @@ func resourceGitlabRepositoryFileRead(d *schema.ResourceData, meta interface{}) 
 func resourceGitlabRepositoryFileUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	file := d.Get("file").(string)
+	filePath := d.Get("file_path").(string)
 	options := &gitlab.UpdateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
@@ -128,7 +128,7 @@ func resourceGitlabRepositoryFileUpdate(d *schema.ResourceData, meta interface{}
 	if d.HasChange("commit_message") {
 		options.CommitMessage = gitlab.String(d.Get("commit_message").(string))
 	}
-	_, _, err := client.RepositoryFiles.UpdateFile(project, file, options)
+	_, _, err := client.RepositoryFiles.UpdateFile(project, filePath, options)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func resourceGitlabRepositoryFileUpdate(d *schema.ResourceData, meta interface{}
 func resourceGitlabRepositoryFileDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	file := d.Get("file").(string)
+	filePath := d.Get("file_path").(string)
 	options := &gitlab.DeleteFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
@@ -148,7 +148,7 @@ func resourceGitlabRepositoryFileDelete(d *schema.ResourceData, meta interface{}
 		//TODO: add LastCommitID
 	}
 
-	resp, err := client.RepositoryFiles.DeleteFile(project, file, options)
+	resp, err := client.RepositoryFiles.DeleteFile(project, filePath, options)
 	if err != nil {
 		return fmt.Errorf("%s failed to delete repository file: (%s) %v", d.Id(), resp.Status, err)
 	}
