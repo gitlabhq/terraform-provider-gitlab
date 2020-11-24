@@ -59,7 +59,7 @@ func resourceGitlabEnvironmentCreate(d *schema.ResourceData, meta interface{}) e
 	}
 
 	d.Set("environment_id", environment.ID)
-	d.SetId(fmt.Sprintf("%s/%d", project, environment.ID))
+	d.SetId(fmt.Sprintf("%s:%d", project, environment.ID))
 
 	return resourceGitlabEnvironmentRead(d, meta)
 }
@@ -116,12 +116,12 @@ func resourceGitlabEnvironmentDelete(d *schema.ResourceData, meta interface{}) e
 	// Environment must be stopped prior to deletion or a 403 will be received
 	stopResp, err := client.Environments.StopEnvironment(project, environmentID)
 	if err != nil {
-		return fmt.Errorf("%s failed to stop environment prior to delete: %s", d.Id(), stopResp.Status)
+		return fmt.Errorf("%s failed to stop environment prior to delete: (%s) %v", d.Id(), stopResp.Status, err)
 	}
 
 	resp, err := client.Environments.DeleteEnvironment(project, environmentID)
 	if err != nil {
-		return fmt.Errorf("%s failed to delete environment: %s", d.Id(), resp.Status)
+		return fmt.Errorf("%s failed to delete environment: (%s) %v", d.Id(), resp.Status, err)
 	}
 	return err
 }

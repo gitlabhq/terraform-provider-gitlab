@@ -147,7 +147,7 @@ func resourceGitlabRepositoryFileDelete(d *schema.ResourceData, meta interface{}
 
 	resp, err := client.RepositoryFiles.DeleteFile(project, file, options)
 	if err != nil {
-		return fmt.Errorf("%s failed to delete repository file: %s", d.Id(), resp.Status)
+		return fmt.Errorf("%s failed to delete repository file: (%s) %v", d.Id(), resp.Status, err)
 	}
 	return err
 }
