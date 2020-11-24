@@ -159,8 +159,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Computed: true,
 	},
 	"runners_token": {
-		Type:     schema.TypeString,
-		Computed: true,
+		Type:      schema.TypeString,
+		Computed:  true,
+		Sensitive: true,
 	},
 	"shared_runners_enabled": {
 		Type:     schema.TypeBool,
