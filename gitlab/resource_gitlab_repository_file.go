@@ -18,10 +18,12 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 			"project": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"file": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"content": {
 				Type:     schema.TypeString,
@@ -30,6 +32,7 @@ func resourceGitlabRepositoryFile() *schema.Resource {
 			"branch": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"author_name": {
 				Type:     schema.TypeString,
