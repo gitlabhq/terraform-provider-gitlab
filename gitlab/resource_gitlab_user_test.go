@@ -192,8 +192,8 @@ func testAccCheckGitlabUserDestroy(s *terraform.State) error {
 
 		user, resp, err := conn.Users.GetUser(id)
 		if err == nil {
-			if user != nil && fmt.Sprintf("%d", user.ID) == rs.Primary.ID {
-				return fmt.Errorf("User still exists")
+			if user != nil && fmt.Sprintf("%d", user.ID) != rs.Primary.ID {
+				return fmt.Errorf("User still exists: %d", user.ID)
 			}
 		}
 		if resp.StatusCode != 404 {
