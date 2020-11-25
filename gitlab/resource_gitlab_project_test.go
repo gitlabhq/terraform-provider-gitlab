@@ -548,8 +548,8 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 				Config: testAccGitlabProjectConfigImportURLMirrored(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
-					resource.TestCheckResourceAttr("gitlab_project.mirrored", "mirrored", "true"),
-					resource.TestCheckResourceAttr("gitlab_project.mirror_target_builds", "mirror_target_builds", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "mirrored", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_target_builds", "true"),
 
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
