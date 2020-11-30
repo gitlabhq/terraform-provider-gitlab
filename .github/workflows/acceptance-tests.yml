@@ -18,11 +18,11 @@ jobs:
     # https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
     - name: Set build variables
       run: |
-        echo "MAKE_TARGET=testacc >> $GITHUB_ENV"
-        echo "GO_FLAGS=-mod=vendor >> $GITHUB_ENV"
-        echo "GO111MODULE=on >> $GITHUB_ENV"
-        echo "GITLAB_TOKEN=20char-testing-token >> $GITHUB_ENV"
-        echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 >> $GITHUB_ENV"
+        echo "MAKE_TARGET=testacc" >> $GITHUB_ENV
+        echo "GO_FLAGS=-mod=vendor" >> $GITHUB_ENV
+        echo "GO111MODULE=on" >> $GITHUB_ENV
+        echo "GITLAB_TOKEN=20char-testing-token" >> $GITHUB_ENV
+        echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4" >> $GITHUB_ENV
 
     - name: Start Gitlab and run acceptance tests
       run: |
@@ -50,17 +50,17 @@ jobs:
         [[ -n "${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}" ]] && echo decrypt
         [[ -n "${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}" ]] && openssl enc  -d -aes-256-cbc -pbkdf2 -iter 20000 -in Gitlab-license.encrypted -out license/Gitlab-license.txt -pass "pass:${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}"
         chmod 666 license/Gitlab-license.txt || true
-        echo "GITLAB_LICENSE_FILE=Gitlab-license.txt >> $GITHUB_ENV"
+        echo "GITLAB_LICENSE_FILE=Gitlab-license.txt" >> $GITHUB_ENV
 
     # https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
     - name: Set build variables
       run: |
-        echo "MAKE_TARGET=testacc >> $GITHUB_ENV"
-        echo "GO_FLAGS=-mod=vendor >> $GITHUB_ENV"
-        echo "GO111MODULE=on >> $GITHUB_ENV"
-        echo "GITLAB_TOKEN=20char-testing-token >> $GITHUB_ENV"
-        echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4 >> $GITHUB_ENV"
-        echo "TF_LOG=DEBUG"
+        echo "MAKE_TARGET=testacc" >> $GITHUB_ENV
+        echo "GO_FLAGS=-mod=vendor" >> $GITHUB_ENV
+        echo "GO111MODULE=on" >> $GITHUB_ENV
+        echo "GITLAB_TOKEN=20char-testing-token" >> $GITHUB_ENV
+        echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4" >> $GITHUB_ENV
+        echo "TF_LOG=DEBUG" >> $GITHUB_ENV
 
     - name: Start Gitlab and run acceptance tests
       run: |
