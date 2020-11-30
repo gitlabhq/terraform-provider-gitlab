@@ -570,7 +570,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
-						Mirror: true, 
+						Mirror:              true,
 						MirrorTriggerBuilds: true,
 					}),
 
@@ -593,7 +593,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
-						Mirror: false, 
+						Mirror:              false,
 						MirrorTriggerBuilds: false,
 					}),
 
