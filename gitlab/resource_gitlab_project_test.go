@@ -546,7 +546,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				// First, import, as mirrored
-				Config: testAccGitlabProjectConfigImportURLMirrored(rInt, baseProject.HTTPURLToRepo),
+				Config: testAccGitlabProjectConfigImportURLMirror(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "true"),
@@ -566,7 +566,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 			},
 			{
 				// Second, disable mirroring, using the original ImportURL acceptance test
-				Config: testAccGitlabProjectConfigImportURL(rInt, baseProject.HTTPURLToRepo),
+				Config: testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "false"),
@@ -918,7 +918,7 @@ resource "gitlab_project" "imported" {
 `, rInt, importURL)
 }
 
-func testAccGitlabProjectConfigImportURLMirrored(rInt int, importURL string) string {
+func testAccGitlabProjectConfigImportURLMirror(rInt int, importURL string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "imported" {
   name = "imported-%d"
@@ -926,6 +926,22 @@ resource "gitlab_project" "imported" {
   import_url = "%s"
   mirror = true
   mirror_trigger_builds = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirrorDisabled(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "master"
+  import_url = "%s"
+  mirror = false
+  mirror_trigger_builds = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
