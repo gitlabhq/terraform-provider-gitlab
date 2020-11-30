@@ -509,6 +509,24 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 	})
 }
 
+type testAccGitlabProjectMirroredExpectedAttributes struct {
+	Mirror              bool
+	MirrorTriggerBuilds bool
+}
+
+func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *testAccGitlabProjectMirroredExpectedAttributes) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if project.Mirror != want.Mirror {
+			return fmt.Errorf("got mirror %t; want %t", project.Mirror, want.Mirror)
+		}
+
+		if project.MirrorTriggerBuilds != want.MirrorTriggerBuilds {
+			return fmt.Errorf("got mirror %t; want %t", project.MirrorTriggerBuilds, want.MirrorTriggerBuilds)
+		}
+		return nil
+	}
+}
+
 func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
 	if os.Getenv(resource.TestEnvVar) == "" {
@@ -516,6 +534,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	}
 
 	client := testAccProvider.Meta().(*gitlab.Client)
+	var mirror gitlab.Project
 	rInt := acctest.RandInt()
 
 	// Create a base project for importing.
@@ -548,9 +567,12 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 				// First, import, as mirrored
 				Config: testAccGitlabProjectConfigImportURLMirror(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
-					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "true"),
-					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_trigger_builds", "true"),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror: true, 
+						MirrorTriggerBuilds: true,
+					}),
 
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
@@ -568,9 +590,12 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 				// Second, disable mirroring, using the original ImportURL acceptance test
 				Config: testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
-					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "false"),
-					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_trigger_builds", "false"),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror: false, 
+						MirrorTriggerBuilds: false,
+					}),
 
 					// Ensure the test file still is as expected
 					func(state *terraform.State) error {
