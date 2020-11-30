@@ -94,6 +94,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_mirror":             resourceGitlabProjectMirror(),
 			"gitlab_project_level_mr_approvals": resourceGitlabProjectLevelMRApprovals(),
 			"gitlab_project_approval_rule":      resourceGitlabProjectApprovalRule(),
+			"gitlab_instance_variable":          resourceGitlabInstanceVariable(),
 		},
 	}
 
