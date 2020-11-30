@@ -34,10 +34,10 @@ The following arguments are supported:
 
 * `import_url` - (Optional) Git URL to a repository to be imported.
 
-* `mirror` (Optional) Enables pull mirroring in a project. For further information on mirroring, consult the 
-[gitlab documentation](https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring).
+* `mirror` (Optional) Enables pull mirroring in a project. Default is `false`. For further information on mirroring,
+consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring).
 
-* `mirror_trigger_builds` (Optional) Pull mirroring triggers builds.
+* `mirror_trigger_builds` (Optional) Pull mirroring triggers builds. Default is `false`.
 
 * `request_access_enabled` - Allow users to request member access.
 
