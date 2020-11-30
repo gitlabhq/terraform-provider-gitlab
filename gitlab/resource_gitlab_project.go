@@ -278,12 +278,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"mirror": {
 		Type:     schema.TypeBool,
 		Optional: true,
-		Default: false,
+		Default:  false,
 	},
 	"mirror_trigger_builds": {
 		Type:     schema.TypeBool,
 		Optional: true,
-		Default: false,
+		Default:  false,
 	},
 }
 
