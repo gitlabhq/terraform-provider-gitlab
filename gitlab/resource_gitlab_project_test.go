@@ -548,7 +548,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 				Config: testAccGitlabProjectConfigImportURLMirrored(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
-					resource.TestCheckResourceAttr("gitlab_project.imported", "mirrored", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "true"),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_target_builds", "true"),
 
 					func(state *terraform.State) error {
@@ -902,7 +902,7 @@ resource "gitlab_project" "imported" {
   name = "imported-%d"
   default_branch = "master"
   import_url = "%s"
-  mirrored = true
+  mirror = true
   mirror_target_builds = true
 
   # So that acceptance tests can be run in a gitlab organization
