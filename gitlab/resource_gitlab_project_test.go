@@ -545,12 +545,34 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
+				// First, import, as mirrored
 				Config: testAccGitlabProjectConfigImportURLMirrored(rInt, baseProject.HTTPURLToRepo),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "true"),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_trigger_builds", "true"),
 
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			{
+				// Second, disable mirroring, using the original ImportURL acceptance test
+				Config: testAccGitlabProjectConfigImportURL(rInt, baseProject.HTTPURLToRepo),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "false"),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_trigger_builds", "false"),
+
+					// Ensure the test file still is as expected
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 

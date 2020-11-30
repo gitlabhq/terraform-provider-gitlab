@@ -329,6 +329,8 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
+	d.Set("mirror", project.Mirror)
+	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -582,6 +584,14 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("pages_access_level") {
 		options.PagesAccessLevel = stringToAccessControlValue(d.Get("pages_access_level").(string))
+	}
+
+	if d.HasChange("mirror") {
+		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
+	}
+
+	if d.HasChange("mirror_trigger_builds") {
+		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
