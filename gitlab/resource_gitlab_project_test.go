@@ -549,7 +549,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror", "true"),
-					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_target_builds", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "mirror_trigger_builds", "true"),
 
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
@@ -903,7 +903,7 @@ resource "gitlab_project" "imported" {
   default_branch = "master"
   import_url = "%s"
   mirror = true
-  mirror_target_builds = true
+  mirror_trigger_builds = true
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
