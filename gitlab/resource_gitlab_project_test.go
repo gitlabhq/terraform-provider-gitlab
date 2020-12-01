@@ -764,7 +764,7 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 		options := &gitlab.CreateCommitOptions{
 			Branch:        &defaultBranch,
 			CommitMessage: &commitMessage,
-			Actions:       []*gitlab.CommitAction{},
+			Actions:       []*gitlab.CommitActionOptions{},
 		}
 
 		_, _, err := conn.Commits.CreateCommit(project.ID, options)
