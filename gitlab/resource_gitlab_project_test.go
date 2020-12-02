@@ -759,13 +759,26 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 	return func() (bool, error) {
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		commitMessage := "Initial Commit"
+		var (
+			// Commit data
+			commitMessage    = "Initial Commit"
+			commitFile       = "file.txt"
+			commitFileAction = gitlab.FileCreate
+			commitActions    = []*gitlab.CommitActionOptions{
+				{
+					Action:   &commitFileAction,
+					FilePath: &commitFile,
+					Content:  &commitMessage,
+				},
+			}
 
-		options := &gitlab.CreateCommitOptions{
-			Branch:        &defaultBranch,
-			CommitMessage: &commitMessage,
-			Actions:       []*gitlab.CommitActionOptions{},
-		}
+			// Commit create options
+			options = &gitlab.CreateCommitOptions{
+				Branch:        &defaultBranch,
+				CommitMessage: &commitMessage,
+				Actions:       commitActions,
+			}
+		)
 
 		_, _, err := conn.Commits.CreateCommit(project.ID, options)
 
