@@ -21,6 +21,12 @@ func Provider() terraform.ResourceProvider {
 				DefaultFunc: schema.EnvDefaultFunc("GITLAB_TOKEN", nil),
 				Description: descriptions["token"],
 			},
+			"private_token": {
+				Type:        schema.TypeString,
+				Required:    false,
+				DefaultFunc: schema.EnvDefaultFunc("GITLAB_PRIVATE_TOKEN", nil),
+				Description: descriptions["private token"],
+			},
 			"base_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -125,12 +131,13 @@ func init() {
 
 func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		Token:      d.Get("token").(string),
-		BaseURL:    d.Get("base_url").(string),
-		CACertFile: d.Get("cacert_file").(string),
-		Insecure:   d.Get("insecure").(bool),
-		ClientCert: d.Get("client_cert").(string),
-		ClientKey:  d.Get("client_key").(string),
+		Token:        d.Get("token").(string),
+		PrivateToken: d.Get("private_token").(string),
+		BaseURL:      d.Get("base_url").(string),
+		CACertFile:   d.Get("cacert_file").(string),
+		Insecure:     d.Get("insecure").(bool),
+		ClientCert:   d.Get("client_cert").(string),
+		ClientKey:    d.Get("client_key").(string),
 	}
 
 	client, err := config.Client()

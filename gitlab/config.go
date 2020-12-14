@@ -12,12 +12,13 @@ import (
 
 // Config is per-provider, specifies where to connect to gitlab
 type Config struct {
-	Token      string
-	BaseURL    string
-	Insecure   bool
-	CACertFile string
-	ClientCert string
-	ClientKey  string
+	Token        string
+	PrivateToken string
+	BaseURL      string
+	Insecure     bool
+	CACertFile   string
+	ClientCert   string
+	ClientKey    string
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
@@ -67,7 +68,17 @@ func (c *Config) Client() (*gitlab.Client, error) {
 		opts = append(opts, gitlab.WithBaseURL(c.BaseURL))
 	}
 
-	client, err := gitlab.NewClient(c.Token, opts...)
+	var (
+		client *gitlab.Client
+		err    error
+	)
+
+	if c.Token != "" && c.PrivateToken != "" {
+		client, err = gitlab.NewMultipleAuthClient(c.Token, c.PrivateToken, opts...)
+	} else {
+		client, err = gitlab.NewClient(c.Token, opts...)
+	}
+
 	if err != nil {
 		return nil, err
 	}
