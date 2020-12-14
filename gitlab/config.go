@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/logging"
-	"github.com/xanzy/go-gitlab"
 )
 
 // Config is per-provider, specifies where to connect to gitlab

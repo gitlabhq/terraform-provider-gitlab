@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	gitlab "github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroup() *schema.Resource {

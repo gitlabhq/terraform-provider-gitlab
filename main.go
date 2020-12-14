@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gitlabhq/terraform-provider-gitlab/gitlab"
+	"github.com/Fourcast/terraform-provider-gitlab/gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
 )
 

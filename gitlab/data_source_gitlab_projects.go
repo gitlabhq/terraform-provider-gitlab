@@ -2,10 +2,10 @@ package gitlab
 
 import (
 	"fmt"
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/mitchellh/hashstructure"
-	"github.com/xanzy/go-gitlab"
 	"log"
 )
 

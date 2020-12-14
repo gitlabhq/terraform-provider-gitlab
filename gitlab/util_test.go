@@ -3,7 +3,7 @@ package gitlab
 import (
 	"testing"
 
-	gitlab "github.com/xanzy/go-gitlab"
+	gitlab "github.com/Fourcast/go-gitlab"
 )
 
 func TestGitlab_validation(t *testing.T) {

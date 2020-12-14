@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/xanzy/go-gitlab"
 )
 
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an

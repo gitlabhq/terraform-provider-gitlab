@@ -8,9 +8,9 @@ import (
 	"net/url"
 	"strings"
 
+	gitlab "github.com/Fourcast/go-gitlab"
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectVariable() *schema.Resource {

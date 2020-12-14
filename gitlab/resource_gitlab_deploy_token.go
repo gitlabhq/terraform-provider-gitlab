@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabDeployToken() *schema.Resource {

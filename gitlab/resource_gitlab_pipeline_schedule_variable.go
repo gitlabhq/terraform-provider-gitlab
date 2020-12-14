@@ -5,8 +5,8 @@ import (
 	"log"
 	"strconv"
 
+	gitlab "github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineScheduleVariable() *schema.Resource {

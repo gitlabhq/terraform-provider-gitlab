@@ -7,9 +7,9 @@ Terraform Provider for Gitlab
 - [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
 - Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
 - Build status:
-  - ![Unit Tests](https://github.com/gitlabhq/terraform-provider-gitlab/workflows/Unit%20Tests/badge.svg?branch=master)
-  - ![Acceptance Tests](https://github.com/gitlabhq/terraform-provider-gitlab/workflows/Acceptance%20Tests/badge.svg?branch=master)
-  - ![Website Build](https://github.com/gitlabhq/terraform-provider-gitlab/workflows/Website%20Build/badge.svg?branch=master)
+  - ![Unit Tests](https://github.com/Fourcast/terraform-provider-gitlab/workflows/Unit%20Tests/badge.svg?branch=master)
+  - ![Acceptance Tests](https://github.com/Fourcast/terraform-provider-gitlab/workflows/Acceptance%20Tests/badge.svg?branch=master)
+  - ![Website Build](https://github.com/Fourcast/terraform-provider-gitlab/workflows/Website%20Build/badge.svg?branch=master)
 
 Requirements
 ------------
@@ -20,17 +20,17 @@ Requirements
 Building The Provider
 ---------------------
 
-Clone repository to: `$GOPATH/src/github.com/gitlabhq/terraform-provider-gitlab`
+Clone repository to: `$GOPATH/src/github.com/Fourcast/terraform-provider-gitlab`
 
 ```sh
 $ mkdir -p $GOPATH/src/github.com/gitlabhq; cd $GOPATH/src/github.com/gitlabhq
-$ git clone git@github.com:gitlabhq/terraform-provider-gitlab
+$ git clone git@github.com:Fourcast/terraform-provider-gitlab
 ```
 
 Enter the provider directory and build the provider
 
 ```sh
-$ cd $GOPATH/src/github.com/gitlabhq/terraform-provider-gitlab
+$ cd $GOPATH/src/github.com/Fourcast/terraform-provider-gitlab
 $ make build
 ```
 

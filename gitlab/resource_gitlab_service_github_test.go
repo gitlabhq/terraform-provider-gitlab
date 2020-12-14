@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	gitlab "github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabServiceGithub_basic(t *testing.T) {
@@ -26,7 +26,7 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 				Config:   testAccGitlabServiceGithubConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceGithubExists(githubResourceName, &githubService),
-					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/gitlabhq/terraform-provider-gitlab"),
+					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/Fourcast/terraform-provider-gitlab"),
 					resource.TestCheckResourceAttr(githubResourceName, "static_context", "true"),
 				),
 			},
@@ -46,7 +46,7 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 				Config:   testAccGitlabServiceGithubConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceGithubExists(githubResourceName, &githubService),
-					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/gitlabhq/terraform-provider-gitlab"),
+					resource.TestCheckResourceAttr(githubResourceName, "repository_url", "https://github.com/Fourcast/terraform-provider-gitlab"),
 					resource.TestCheckResourceAttr(githubResourceName, "static_context", "true"),
 				),
 			},
@@ -155,7 +155,7 @@ resource "gitlab_project" "foo" {
 resource "gitlab_service_github" "github" {
 	project        = "${gitlab_project.foo.id}"
 	token          = "test"
-  repository_url = "https://github.com/gitlabhq/terraform-provider-gitlab"
+  repository_url = "https://github.com/Fourcast/terraform-provider-gitlab"
 }
 `, rInt)
 }

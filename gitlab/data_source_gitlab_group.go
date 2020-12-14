@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabGroup() *schema.Resource {

@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabGroupLdapLink_basic(t *testing.T) {

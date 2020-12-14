@@ -5,8 +5,8 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectShareGroup() *schema.Resource {

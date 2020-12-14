@@ -16,7 +16,7 @@ resource "gitlab_project" "awesome_project" {
 resource "gitlab_service_github" "github" {
   project        = gitlab_project.awesome_project.id
   token          = "REDACTED"
-  repository_url = "https://github.com/gitlabhq/terraform-provider-gitlab"
+  repository_url = "https://github.com/Fourcast/terraform-provider-gitlab"
 }
 ```
 
@@ -26,7 +26,7 @@ The following arguments are supported:
 
 * `project` - (Required) ID of the project you want to activate integration on.
 
-* `repository_url` - (Required) The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.
+* `repository_url` - (Required) The URL of the GitHub repo to integrate with, e,g, https://github.com/Fourcast/terraform-provider-gitlab.
 
 * `token` - (Required) A GitHub personal access token with at least `repo:status` scope.
 

@@ -406,7 +406,7 @@ type BoolValue bool
 // Needed for:
 // https://gitlab.com/gitlab-org/gitlab-ce/issues/50122
 // https://gitlab.com/gitlab-org/gitlab/-/issues/233941
-// https://github.com/gitlabhq/terraform-provider-gitlab/issues/348
+// https://github.com/Fourcast/terraform-provider-gitlab/issues/348
 func (t *BoolValue) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case `"1"`:

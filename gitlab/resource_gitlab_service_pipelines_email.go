@@ -4,9 +4,9 @@ import (
 	"log"
 	"strings"
 
+	gitlab "github.com/Fourcast/go-gitlab"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServicePipelinesEmail() *schema.Resource {
