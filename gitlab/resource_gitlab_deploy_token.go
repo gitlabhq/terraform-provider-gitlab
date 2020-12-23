@@ -72,11 +72,12 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 	project, isProject := d.GetOk("project")
 	group, isGroup := d.GetOk("group")
 
-	var expiresAt time.Time
+	var expiresAt *time.Time
 	var err error
 
 	if exp, ok := d.GetOk("expires_at"); ok {
-		expiresAt, err = time.Parse(time.RFC3339, exp.(string))
+		parsedExpiresAt, err := time.Parse(time.RFC3339, exp.(string))
+		expiresAt = &parsedExpiresAt
 		if err != nil {
 			return fmt.Errorf("Invalid expires_at date: %v", err)
 		}
@@ -90,7 +91,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 		options := &gitlab.CreateProjectDeployTokenOptions{
 			Name:      gitlab.String(d.Get("name").(string)),
 			Username:  gitlab.String(d.Get("username").(string)),
-			ExpiresAt: gitlab.Time(expiresAt),
+			ExpiresAt: expiresAt,
 			Scopes:    *scopes,
 		}
 
@@ -102,7 +103,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 		options := &gitlab.CreateGroupDeployTokenOptions{
 			Name:      gitlab.String(d.Get("name").(string)),
 			Username:  gitlab.String(d.Get("username").(string)),
-			ExpiresAt: gitlab.Time(expiresAt),
+			ExpiresAt: expiresAt,
 			Scopes:    *scopes,
 		}
 
@@ -151,7 +152,10 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 		if token.ID == deployTokenID {
 			d.Set("name", token.Name)
 			d.Set("username", token.Username)
-			d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
+
+			if token.ExpiresAt != nil {
+				d.Set("expires_at", token.ExpiresAt)
+			}
 
 			for _, scope := range token.Scopes {
 				if scope == "read_repository" {
