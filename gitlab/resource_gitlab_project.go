@@ -589,10 +589,16 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if d.HasChange("mirror") {
+		// It appears that GitLab API requires that import_url is also set when `mirror` is updated/changed
+		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
+		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
 	}
 
 	if d.HasChange("mirror_trigger_builds") {
+		// It appears that GitLab API requires that import_url is also set when `mirror_trigger_builds` is updated/changed
+		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
+		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
 	}
 
