@@ -521,7 +521,7 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 		}
 
 		if project.MirrorTriggerBuilds != want.MirrorTriggerBuilds {
-			return fmt.Errorf("got mirror %t; want %t", project.MirrorTriggerBuilds, want.MirrorTriggerBuilds)
+			return fmt.Errorf("got mirror_trigger_builds %t; want %t", project.MirrorTriggerBuilds, want.MirrorTriggerBuilds)
 		}
 		return nil
 	}
