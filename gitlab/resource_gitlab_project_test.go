@@ -565,7 +565,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				// First, import, as mirrored
-				Config: testAccGitlabProjectConfigImportURLMirror(rInt, baseProject.HTTPURLToRepo),
+				Config:   testAccGitlabProjectConfigImportURLMirror(rInt, baseProject.HTTPURLToRepo),
 				SkipFunc: isRunningInCE,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
@@ -589,7 +589,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 			},
 			{
 				// Second, disable mirroring, using the original ImportURL acceptance test
-				Config: testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
+				Config:   testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
 				SkipFunc: isRunningInCE,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
