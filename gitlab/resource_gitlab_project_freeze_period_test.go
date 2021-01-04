@@ -68,7 +68,7 @@ func testAccCheckGitlabFreezePeriodExists(n string, freezePeriod *gitlab.FreezeP
 		}
 
 		scheduleID := rs.Primary.ID
-		repoName := rs.Primary.Attributes["project"]
+		repoName := rs.Primary.Attributes["project_id"]
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
@@ -147,7 +147,7 @@ resource "gitlab_project" "foo" {
 }
 
 resource "gitlab_project_freeze_period" "schedule" {
-	project = "${gitlab_project.foo.id}"
+	project_id = gitlab_project.foo.id
 	freeze_start = "0 23 * * 5"
 	freeze_end =  "0 7 * * 1"
 	cron_timezone = "UTC"
@@ -167,7 +167,7 @@ resource "gitlab_project" "foo" {
 }
 
 resource "gitlab_project_freeze_period" "schedule" {
-  project = "${gitlab_project.foo.id}"
+  project_id = gitlab_project.foo.id
   freeze_start = "0 23 * * 5"
   freeze_end =  "0 7 * * 3"
   cron_timezone = "UTC"

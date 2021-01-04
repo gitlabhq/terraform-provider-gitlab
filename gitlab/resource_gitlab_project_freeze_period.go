@@ -12,15 +12,15 @@ import (
 func resourceGitlabProjectFreezePeriod() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabProjectFreezePeriodCreate,
-		Read:   resourceGitlabProjectApprovalRuleRead,
-		Update: resourceGitlabProjectApprovalRuleUpdate,
-		Delete: resourceGitlabProjectApprovalRuleDelete,
+		Read:   resourceGitlabProjectFreezePeriodRead,
+		Update: resourceGitlabProjectFreezePeriodUpdate,
+		Delete: resourceGitlabProjectFreezePeriodDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
-			"project": {
-				Type:     schema.TypeString,
+			"project_id": {
+				Type:     schema.TypeInt,
 				Required: true,
 			},
 			"freeze_start": {
@@ -41,7 +41,7 @@ func resourceGitlabProjectFreezePeriod() *schema.Resource {
 }
 
 func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interface{}) error {
-	project := d.Get("project").(string)
+	projectID := d.Get("project_id").(int)
 
 	options := gitlab.CreateFreezePeriodOptions{
 		FreezeStart:  gitlab.String(d.Get("freeze_start").(string)),
@@ -49,10 +49,10 @@ func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interf
 		CronTimezone: gitlab.String(d.Get("cron_timezone").(string)),
 	}
 
-	log.Printf("[DEBUG] Project %s create gitlab project-level freeze period %+v", project, options)
+	log.Printf("[DEBUG] Project %d create gitlab project-level freeze period %+v", projectID, options)
 
 	client := meta.(*gitlab.Client)
-	FreezePeriod, _, err := client.FreezePeriods.CreateFreezePeriodOptions(project, &options)
+	FreezePeriod, _, err := client.FreezePeriods.CreateFreezePeriodOptions(projectID, &options)
 	if err != nil {
 		return err
 	}
@@ -64,14 +64,14 @@ func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interf
 
 func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
+	projectID := d.Get("project_id").(int)
 	freezePeriodID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	log.Printf("[DEBUG] read gitlab FreezePeriod %s/%d", project, freezePeriodID)
+	log.Printf("[DEBUG] read gitlab FreezePeriod %d/%d", projectID, freezePeriodID)
 
 	opt := &gitlab.ListFreezePeriodsOptions{
 		Page:    1,
@@ -80,7 +80,7 @@ func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interfac
 
 	found := false
 	for {
-		freezePeriods, resp, err := client.FreezePeriods.ListFreezePeriods(project, opt)
+		freezePeriods, resp, err := client.FreezePeriods.ListFreezePeriods(projectID, opt)
 		if err != nil {
 			return err
 		}
@@ -110,7 +110,7 @@ func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interfac
 
 func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
+	projectID := d.Get("project_id").(int)
 	options := &gitlab.UpdateFreezePeriodOptions{
 		FreezeStart:  gitlab.String(d.Get("freeze_start").(string)),
 		FreezeEnd:    gitlab.String(d.Get("freeze_end").(string)),
@@ -137,7 +137,7 @@ func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interf
 
 	log.Printf("[DEBUG] update gitlab FreezePeriod %s", d.Id())
 
-	_, _, err = client.FreezePeriods.UpdateFreezePeriodOptions(project, freezePeriodID, options)
+	_, _, err = client.FreezePeriods.UpdateFreezePeriodOptions(projectID, freezePeriodID, options)
 	if err != nil {
 		return err
 	}
@@ -147,7 +147,7 @@ func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interf
 
 func resourceGitlabProjectFreezePeriodDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
+	projectID := d.Get("project_id").(int)
 	log.Printf("[DEBUG] Delete gitlab FreezePeriod %s", d.Id())
 
 	FreezePeriodID, err := strconv.Atoi(d.Id())
@@ -156,7 +156,7 @@ func resourceGitlabProjectFreezePeriodDelete(d *schema.ResourceData, meta interf
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err = client.FreezePeriods.DeleteFreezePeriod(project, FreezePeriodID); err != nil {
+	if _, err = client.FreezePeriods.DeleteFreezePeriod(projectID, FreezePeriodID); err != nil {
 		return fmt.Errorf("failed to delete pipeline schedule %q: %w", d.Id(), err)
 	}
 
