@@ -52,7 +52,7 @@ func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interf
 	log.Printf("[DEBUG] Project %s create gitlab project-level freeze period %+v", project, options)
 
 	client := meta.(*gitlab.Client)
-	FreezePeriod, _, err := client.FreezePeriod.CreateFreezePeriodOptions(project, &options)
+	FreezePeriod, _, err := client.FreezePeriods.CreateFreezePeriodOptions(project, &options)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interfac
 
 	found := false
 	for {
-		freezePeriods, resp, err := client.FreezePeriod.ListFreezePeriods(project, opt)
+		freezePeriods, resp, err := client.FreezePeriods.ListFreezePeriods(project, opt)
 		if err != nil {
 			return err
 		}
@@ -137,7 +137,7 @@ func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interf
 
 	log.Printf("[DEBUG] update gitlab FreezePeriod %s", d.Id())
 
-	_, _, err = client.FreezePeriod.UpdateFreezePeriodOptions(project, freezePeriodID, options)
+	_, _, err = client.FreezePeriods.UpdateFreezePeriodOptions(project, freezePeriodID, options)
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func resourceGitlabProjectFreezePeriodDelete(d *schema.ResourceData, meta interf
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err = client.FreezePeriod.DeleteFreezePeriod(project, FreezePeriodID); err != nil {
+	if _, err = client.FreezePeriods.DeleteFreezePeriod(project, FreezePeriodID); err != nil {
 		return fmt.Errorf("failed to delete pipeline schedule %q: %w", d.Id(), err)
 	}
 

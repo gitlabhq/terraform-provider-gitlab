@@ -74,7 +74,7 @@ func testAccCheckGitlabFreezePeriodExists(n string, freezePeriod *gitlab.FreezeP
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		freezePeriods, _, err := conn.FreezePeriod.ListFreezePeriods(repoName, nil)
+		freezePeriods, _, err := conn.FreezePeriods.ListFreezePeriods(repoName, nil)
 		if err != nil {
 			return err
 		}
