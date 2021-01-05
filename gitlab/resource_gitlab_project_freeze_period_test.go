@@ -11,21 +11,21 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func TestAccGitlabFreezePeriod_basic(t *testing.T) {
+func TestAccGitlabProjectFreezePeriod_basic(t *testing.T) {
 	var schedule gitlab.FreezePeriod
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabFreezePeriodDestroy,
+		CheckDestroy: testAccCheckGitlabProjectFreezePeriodDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and freeze period with default options
 			{
-				Config: testAccGitlabFreezePeriodConfig(rInt),
+				Config: testAccGitlabProjectFreezePeriodConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
-					testAccCheckGitlabFreezePeriodAttributes(&schedule, &testAccGitlabFreezePeriodExpectedAttributes{
+					testAccCheckGitlabProjectFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
+					testAccCheckGitlabProjectFreezePeriodAttributes(&schedule, &testAccGitlabProjectFreezePeriodExpectedAttributes{
 						FreezeStart:  "0 23 * * 5",
 						FreezeEnd:    "0 7 * * 1",
 						CronTimezone: "UTC",
@@ -34,10 +34,10 @@ func TestAccGitlabFreezePeriod_basic(t *testing.T) {
 			},
 			// Update the freeze period to change the parameters
 			{
-				Config: testAccGitlabFreezePeriodUpdateConfig(rInt),
+				Config: testAccGitlabProjectFreezePeriodUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
-					testAccCheckGitlabFreezePeriodAttributes(&schedule, &testAccGitlabFreezePeriodExpectedAttributes{
+					testAccCheckGitlabProjectFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
+					testAccCheckGitlabProjectFreezePeriodAttributes(&schedule, &testAccGitlabProjectFreezePeriodExpectedAttributes{
 						FreezeStart:  "0 23 * * 5",
 						FreezeEnd:    "0 7 * * 3",
 						CronTimezone: "UTC",
@@ -46,10 +46,10 @@ func TestAccGitlabFreezePeriod_basic(t *testing.T) {
 			},
 			// Update the freeze period to get back to initial settings
 			{
-				Config: testAccGitlabFreezePeriodConfig(rInt),
+				Config: testAccGitlabProjectFreezePeriodConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
-					testAccCheckGitlabFreezePeriodAttributes(&schedule, &testAccGitlabFreezePeriodExpectedAttributes{
+					testAccCheckGitlabProjectFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
+					testAccCheckGitlabProjectFreezePeriodAttributes(&schedule, &testAccGitlabProjectFreezePeriodExpectedAttributes{
 						FreezeStart:  "0 23 * * 5",
 						FreezeEnd:    "0 7 * * 1",
 						CronTimezone: "UTC",
@@ -60,7 +60,7 @@ func TestAccGitlabFreezePeriod_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabFreezePeriodExists(n string, freezePeriod *gitlab.FreezePeriod) resource.TestCheckFunc {
+func testAccCheckGitlabProjectFreezePeriodExists(n string, freezePeriod *gitlab.FreezePeriod) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -88,13 +88,13 @@ func testAccCheckGitlabFreezePeriodExists(n string, freezePeriod *gitlab.FreezeP
 	}
 }
 
-type testAccGitlabFreezePeriodExpectedAttributes struct {
+type testAccGitlabProjectFreezePeriodExpectedAttributes struct {
 	FreezeStart  string
 	FreezeEnd    string
 	CronTimezone string
 }
 
-func testAccCheckGitlabFreezePeriodAttributes(freezePeriod *gitlab.FreezePeriod, want *testAccGitlabFreezePeriodExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabProjectFreezePeriodAttributes(freezePeriod *gitlab.FreezePeriod, want *testAccGitlabProjectFreezePeriodExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if freezePeriod.FreezeStart != want.FreezeStart {
 			return fmt.Errorf("got freeze_start %q; want %q", freezePeriod.FreezeStart, want.FreezeStart)
@@ -111,7 +111,7 @@ func testAccCheckGitlabFreezePeriodAttributes(freezePeriod *gitlab.FreezePeriod,
 	}
 }
 
-func testAccCheckGitlabFreezePeriodDestroy(s *terraform.State) error {
+func testAccCheckGitlabProjectFreezePeriodDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
@@ -135,7 +135,7 @@ func testAccCheckGitlabFreezePeriodDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabFreezePeriodConfig(rInt int) string {
+func testAccGitlabProjectFreezePeriodConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
@@ -155,7 +155,7 @@ resource "gitlab_project_freeze_period" "schedule" {
 	`, rInt)
 }
 
-func testAccGitlabFreezePeriodUpdateConfig(rInt int) string {
+func testAccGitlabProjectFreezePeriodUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "foo" {
   name = "foo-%d"
