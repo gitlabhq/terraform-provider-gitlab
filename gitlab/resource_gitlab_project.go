@@ -275,6 +275,16 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Default:      "private",
 		ValidateFunc: validation.StringInSlice([]string{"public", "private", "enabled", "disabled"}, true),
 	},
+	"mirror": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"mirror_trigger_builds": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -321,6 +331,8 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
+	d.Set("mirror", project.Mirror)
+	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -344,6 +356,8 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
+		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
+		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -572,6 +586,20 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("pages_access_level") {
 		options.PagesAccessLevel = stringToAccessControlValue(d.Get("pages_access_level").(string))
+	}
+
+	if d.HasChange("mirror") {
+		// It appears that GitLab API requires that import_url is also set when `mirror` is updated/changed
+		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
+		options.ImportURL = gitlab.String(d.Get("import_url").(string))
+		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
+	}
+
+	if d.HasChange("mirror_trigger_builds") {
+		// It appears that GitLab API requires that import_url is also set when `mirror_trigger_builds` is updated/changed
+		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
+		options.ImportURL = gitlab.String(d.Get("import_url").(string))
+		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
