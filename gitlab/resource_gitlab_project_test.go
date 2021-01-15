@@ -509,6 +509,113 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 	})
 }
 
+type testAccGitlabProjectMirroredExpectedAttributes struct {
+	Mirror              bool
+	MirrorTriggerBuilds bool
+}
+
+func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *testAccGitlabProjectMirroredExpectedAttributes) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if project.Mirror != want.Mirror {
+			return fmt.Errorf("got mirror %t; want %t", project.Mirror, want.Mirror)
+		}
+
+		if project.MirrorTriggerBuilds != want.MirrorTriggerBuilds {
+			return fmt.Errorf("got mirror_trigger_builds %t; want %t", project.MirrorTriggerBuilds, want.MirrorTriggerBuilds)
+		}
+		return nil
+	}
+}
+
+func TestAccGitlabProject_importURLMirrored(t *testing.T) {
+	// Since we do some manual setup in this test, we need to handle the test skip first.
+	if os.Getenv(resource.TestEnvVar) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	}
+
+	client := testAccProvider.Meta().(*gitlab.Client)
+	var mirror gitlab.Project
+	rInt := acctest.RandInt()
+
+	// Create a base project for importing.
+	baseProject, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+		Name:       gitlab.String(fmt.Sprintf("base-%d", rInt)),
+		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
+	})
+	if err != nil {
+		t.Fatalf("failed to create base project: %v", err)
+	}
+
+	defer client.Projects.DeleteProject(baseProject.ID)
+
+	// Add a file to the base project, for later verifying the import.
+	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
+		Branch:        gitlab.String("master"),
+		CommitMessage: gitlab.String("add file"),
+		Content:       gitlab.String(""),
+	})
+	if err != nil {
+		t.Fatalf("failed to commit file to base project: %v", err)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				// First, import, as mirrored
+				Config:   testAccGitlabProjectConfigImportURLMirror(rInt, baseProject.HTTPURLToRepo),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror:              true,
+						MirrorTriggerBuilds: true,
+					}),
+
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			{
+				// Second, disable mirroring, using the original ImportURL acceptance test
+				Config:   testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror:              false,
+						MirrorTriggerBuilds: false,
+					}),
+
+					// Ensure the test file still is as expected
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProjec_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
@@ -840,6 +947,38 @@ resource "gitlab_project" "imported" {
   name = "imported-%d"
   default_branch = "master"
   import_url = "%s"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirror(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "master"
+  import_url = "%s"
+  mirror = true
+  mirror_trigger_builds = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirrorDisabled(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "master"
+  import_url = "%s"
+  mirror = false
+  mirror_trigger_builds = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
