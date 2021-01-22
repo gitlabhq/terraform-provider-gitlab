@@ -48,5 +48,20 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile
+# TODO: Fix analyzer issues in code and re-enable disabled analyzers.
+gitlabproviderlint:
+	@go run ./gitlabproviderlint \
+	-AT001=false \
+	-AT002=false \
+	-AT003=false \
+	-R004=false \
+	-S006=false \
+	-S024=false \
+	-S031=false \
+	./gitlab
+
+gitlabproviderlint-test:
+	@go test ./gitlabproviderlint
+
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile gitlabproviderlint gitlabproviderlint-test
 

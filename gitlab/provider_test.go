@@ -15,6 +15,7 @@ func init() {
 	if os.Getenv(resource.TestEnvVar) != "" {
 		testAccProvider = Provider().(*schema.Provider)
 		if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
+			//lintignore:R009
 			panic(err)
 		}
 		testAccProviders = map[string]terraform.ResourceProvider{
