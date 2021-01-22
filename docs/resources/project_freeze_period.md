@@ -24,3 +24,12 @@ The following arguments are supported:
 * `freeze_end` - (Required, string) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
 
 * `cron_timezone` - (Optional, string) The timezone.
+
+## Import
+
+GitLab project freeze periods can be imported using an id made up of `project_id:freeze_period_id`, e.g.
+
+
+```
+$ terraform import gitlab_project_freeze_period.schedule "12345:1337"
+```
