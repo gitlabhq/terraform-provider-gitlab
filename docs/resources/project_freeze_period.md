@@ -6,7 +6,7 @@ This resource allows you to create and manage freeze periods. For further inform
 
 ```hcl
 resource "gitlab_project_freeze_period" "schedule" {
-	project = gitlab_project.foo.id
+	project_id = gitlab_project.foo.id
 	freeze_start = "0 23 * * 5"
 	freeze_end =  "0 7 * * 1"
 	cron_timezone = "UTC"
@@ -17,7 +17,7 @@ resource "gitlab_project_freeze_period" "schedule" {
 
 The following arguments are supported:
 
-* `project` - (Required, string) The name or id of the project to add the schedule to.
+* `project_id` - (Required, string) The id of the project to add the schedule to.
 
 * `freeze_start` - (Required,string) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
 
