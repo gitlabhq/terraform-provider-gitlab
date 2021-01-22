@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -18,7 +17,7 @@ func TestAccGitlabProjectFreezePeriod_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectFreezePeriodDestroy,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and freeze period with default options
 			{
@@ -60,6 +59,26 @@ func TestAccGitlabProjectFreezePeriod_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectFreezePeriod_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectFreezePeriodConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_project_freeze_period.schedule",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectFreezePeriodExists(n string, freezePeriod *gitlab.FreezePeriod) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -67,24 +86,20 @@ func testAccCheckGitlabProjectFreezePeriodExists(n string, freezePeriod *gitlab.
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		scheduleID := rs.Primary.ID
-		repoName := rs.Primary.Attributes["project_id"]
-		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
-		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		freezePeriods, _, err := conn.FreezePeriods.ListFreezePeriods(repoName, nil)
+		projectID, freezePeriodID, err := projectIDAndFreezePeriodIDFromID(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
-		for _, gotFreezePeriod := range freezePeriods {
-			if strconv.Itoa(gotFreezePeriod.ID) == scheduleID {
-				*freezePeriod = *gotFreezePeriod
-				return nil
-			}
+
+		conn := testAccProvider.Meta().(*gitlab.Client)
+		gotFreezePeriod, _, err := conn.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID)
+		if err != nil {
+			return err
 		}
-		return fmt.Errorf("Freeze Period does not exist")
+
+		*freezePeriod = *gotFreezePeriod
+
+		return nil
 	}
 }
 
@@ -109,30 +124,6 @@ func testAccCheckGitlabProjectFreezePeriodAttributes(freezePeriod *gitlab.Freeze
 
 		return nil
 	}
-}
-
-func testAccCheckGitlabProjectFreezePeriodDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
-			continue
-		}
-
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
-		if err == nil {
-			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
-				}
-			}
-		}
-		if resp.StatusCode != 404 {
-			return err
-		}
-		return nil
-	}
-	return nil
 }
 
 func testAccGitlabProjectFreezePeriodConfig(rInt int) string {

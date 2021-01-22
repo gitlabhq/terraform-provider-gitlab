@@ -20,7 +20,7 @@ func resourceGitlabProjectFreezePeriod() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"freeze_start": {
@@ -41,7 +41,7 @@ func resourceGitlabProjectFreezePeriod() *schema.Resource {
 }
 
 func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interface{}) error {
-	projectID := d.Get("project_id").(int)
+	projectID := d.Get("project_id").(string)
 
 	options := gitlab.CreateFreezePeriodOptions{
 		FreezeStart:  gitlab.String(d.Get("freeze_start").(string)),
@@ -49,7 +49,7 @@ func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interf
 		CronTimezone: gitlab.String(d.Get("cron_timezone").(string)),
 	}
 
-	log.Printf("[DEBUG] Project %d create gitlab project-level freeze period %+v", projectID, options)
+	log.Printf("[DEBUG] Project %s create gitlab project-level freeze period %+v", projectID, options)
 
 	client := meta.(*gitlab.Client)
 	FreezePeriod, _, err := client.FreezePeriods.CreateFreezePeriodOptions(projectID, &options)
@@ -57,52 +57,30 @@ func resourceGitlabProjectFreezePeriodCreate(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	d.SetId(strconv.Itoa(FreezePeriod.ID))
+	FreezePeriodIDString := fmt.Sprintf("%d", FreezePeriod.ID)
+	d.SetId(buildTwoPartID(&projectID, &FreezePeriodIDString))
 
 	return resourceGitlabProjectFreezePeriodRead(d, meta)
 }
 
 func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	projectID := d.Get("project_id").(int)
-	freezePeriodID, err := strconv.Atoi(d.Id())
+	projectID, freezePeriodID, err := projectIDAndFreezePeriodIDFromID(d.Id())
+	if err != nil {
+		return err
+	}
+
+	log.Printf("[DEBUG] read gitlab FreezePeriod %s/%d", projectID, freezePeriodID)
+
+	freezePeriod, _, err := client.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID)
+	d.Set("id", freezePeriod.ID)
+	d.Set("freeze_start", freezePeriod.FreezeStart)
+	d.Set("freeze_end", freezePeriod.FreezeEnd)
+	d.Set("cron_timezone", freezePeriod.CronTimezone)
+	d.Set("project_id", projectID)
 
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
-	}
-
-	log.Printf("[DEBUG] read gitlab FreezePeriod %d/%d", projectID, freezePeriodID)
-
-	opt := &gitlab.ListFreezePeriodsOptions{
-		Page:    1,
-		PerPage: 20,
-	}
-
-	found := false
-	for {
-		freezePeriods, resp, err := client.FreezePeriods.ListFreezePeriods(projectID, opt)
-		if err != nil {
-			return err
-		}
-		for _, freezePeriod := range freezePeriods {
-			if freezePeriod.ID == freezePeriodID {
-				d.Set("id", freezePeriod.ID)
-				d.Set("freeze_start", freezePeriod.FreezeStart)
-				d.Set("freeze_end", freezePeriod.FreezeEnd)
-				d.Set("cron_timezone", freezePeriod.CronTimezone)
-				found = true
-				break
-			}
-		}
-
-		if found || resp.CurrentPage >= resp.TotalPages {
-			break
-		}
-
-		opt.Page = resp.NextPage
-	}
-	if !found {
-		return fmt.Errorf("FreezePeriod %d no longer exists in gitlab", freezePeriodID)
+		return err
 	}
 
 	return nil
@@ -110,14 +88,8 @@ func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interfac
 
 func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	projectID := d.Get("project_id").(int)
-	options := &gitlab.UpdateFreezePeriodOptions{
-		FreezeStart:  gitlab.String(d.Get("freeze_start").(string)),
-		FreezeEnd:    gitlab.String(d.Get("freeze_end").(string)),
-		CronTimezone: gitlab.String(d.Get("cron_timezone").(string)),
-	}
-
-	freezePeriodID, err := strconv.Atoi(d.Id())
+	projectID, freezePeriodID, err := projectIDAndFreezePeriodIDFromID(d.Id())
+	options := &gitlab.UpdateFreezePeriodOptions{}
 
 	if err != nil {
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
@@ -147,18 +119,30 @@ func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interf
 
 func resourceGitlabProjectFreezePeriodDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	projectID := d.Get("project_id").(int)
+	projectID, freezePeriodID, err := projectIDAndFreezePeriodIDFromID(d.Id())
 	log.Printf("[DEBUG] Delete gitlab FreezePeriod %s", d.Id())
-
-	FreezePeriodID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err = client.FreezePeriods.DeleteFreezePeriod(projectID, FreezePeriodID); err != nil {
+	if _, err = client.FreezePeriods.DeleteFreezePeriod(projectID, freezePeriodID); err != nil {
 		return fmt.Errorf("failed to delete pipeline schedule %q: %w", d.Id(), err)
 	}
 
 	return nil
+}
+
+func projectIDAndFreezePeriodIDFromID(id string) (string, int, error) {
+	project, freezePeriodIDString, err := parseTwoPartID(id)
+	if err != nil {
+		return "", 0, err
+	}
+
+	freezePeriodID, err := strconv.Atoi(freezePeriodIDString)
+	if err != nil {
+		return "", 0, fmt.Errorf("failed to get freezePeriodId: %v", err)
+	}
+
+	return project, freezePeriodID, nil
 }
