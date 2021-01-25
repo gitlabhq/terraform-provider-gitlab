@@ -38,16 +38,19 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectHookExists("gitlab_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
-						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
-						PushEvents:            false,
-						IssuesEvents:          true,
-						MergeRequestsEvents:   true,
-						TagPushEvents:         true,
-						NoteEvents:            true,
-						JobEvents:             true,
-						PipelineEvents:        true,
-						WikiPageEvents:        true,
-						EnableSSLVerification: false,
+						URL:                      fmt.Sprintf("https://example.com/hook-%d", rInt),
+						PushEvents:               true,
+						PushEventsBranchFilter:   "devel",
+						IssuesEvents:             false,
+						ConfidentialIssuesEvents: false,
+						MergeRequestsEvents:      true,
+						TagPushEvents:            true,
+						NoteEvents:               true,
+						ConfidentialNoteEvents:   true,
+						JobEvents:                true,
+						PipelineEvents:           true,
+						WikiPageEvents:           true,
+						EnableSSLVerification:    false,
 					}),
 				),
 			},
@@ -94,16 +97,19 @@ func testAccCheckGitlabProjectHookExists(n string, hook *gitlab.ProjectHook) res
 }
 
 type testAccGitlabProjectHookExpectedAttributes struct {
-	URL                   string
-	PushEvents            bool
-	IssuesEvents          bool
-	MergeRequestsEvents   bool
-	TagPushEvents         bool
-	NoteEvents            bool
-	JobEvents             bool
-	PipelineEvents        bool
-	WikiPageEvents        bool
-	EnableSSLVerification bool
+	URL                      string
+	PushEvents               bool
+	PushEventsBranchFilter   string
+	IssuesEvents             bool
+	ConfidentialIssuesEvents bool
+	MergeRequestsEvents      bool
+	TagPushEvents            bool
+	NoteEvents               bool
+	ConfidentialNoteEvents   bool
+	JobEvents                bool
+	PipelineEvents           bool
+	WikiPageEvents           bool
+	EnableSSLVerification    bool
 }
 
 func testAccCheckGitlabProjectHookAttributes(hook *gitlab.ProjectHook, want *testAccGitlabProjectHookExpectedAttributes) resource.TestCheckFunc {
@@ -120,8 +126,16 @@ func testAccCheckGitlabProjectHookAttributes(hook *gitlab.ProjectHook, want *tes
 			return fmt.Errorf("got push_events %t; want %t", hook.PushEvents, want.PushEvents)
 		}
 
+		if hook.PushEventsBranchFilter != want.PushEventsBranchFilter {
+			return fmt.Errorf("got push_events_branch_filter %q; want %q", hook.PushEventsBranchFilter, want.PushEventsBranchFilter)
+		}
+
 		if hook.IssuesEvents != want.IssuesEvents {
 			return fmt.Errorf("got issues_events %t; want %t", hook.IssuesEvents, want.IssuesEvents)
+		}
+
+		if hook.ConfidentialIssuesEvents != want.ConfidentialIssuesEvents {
+			return fmt.Errorf("got confidential_issues_events %t; want %t", hook.ConfidentialIssuesEvents, want.ConfidentialIssuesEvents)
 		}
 
 		if hook.MergeRequestsEvents != want.MergeRequestsEvents {
@@ -134,6 +148,10 @@ func testAccCheckGitlabProjectHookAttributes(hook *gitlab.ProjectHook, want *tes
 
 		if hook.NoteEvents != want.NoteEvents {
 			return fmt.Errorf("got note_events %t; want %t", hook.NoteEvents, want.NoteEvents)
+		}
+
+		if hook.ConfidentialNoteEvents != want.ConfidentialNoteEvents {
+			return fmt.Errorf("got confidential_note_events %t; want %t", hook.ConfidentialNoteEvents, want.ConfidentialNoteEvents)
 		}
 
 		if hook.JobEvents != want.JobEvents {
@@ -209,11 +227,14 @@ resource "gitlab_project_hook" "foo" {
   project = "${gitlab_project.foo.id}"
   url = "https://example.com/hook-%d"
   enable_ssl_verification = false
-  push_events = false
-  issues_events = true
+  push_events = true
+  push_events_branch_filter = "devel"
+  issues_events = false
+  confidential_issues_events = false
   merge_requests_events = true
   tag_push_events = true
   note_events = true
+  confidential_note_events = true
   job_events = true
   pipeline_events = true
   wiki_page_events = true
