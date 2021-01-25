@@ -1,3 +1,35 @@
+## 3.4.0 (Jan 14, 2021)
+
+FEATURES:
+
+* Support sharing a group with another group #511 
+* Support Project Mirroring #512
+
+## 3.3.0 (Nov 30, 2020)
+
+FEATURES:
+
+* Support instance level CI variables #389
+
+ENHANCEMENTS
+
+*  Add the pages_access_level parameter #472
+*  Do not fail when project member does not exist #473
+* Make the runners_token on the project secret #474
+*  Fix nil pointer dereference importing gitlab_user #490
+* Fix unit and acceptance tests not running #495
+
+## 3.2.0 (Nov 20, 2020)
+
+FEATURES:
+
+* Project Approval Rules ([#250](https://github.com/gitlabhq/terraform-provider-gitlab/pull/250))
+
+ENHANCEMENTS
+
+* Documentation for expires_at ([#482](https://github.com/gitlabhq/terraform-provider-gitlab/pull/482))
+* Update set-env github action command ([484](https://github.com/gitlabhq/terraform-provider-gitlab/pull/484))
+
 ## 3.1.0 (Oct 16, 2020)
 
 ENHANCEMENTS:

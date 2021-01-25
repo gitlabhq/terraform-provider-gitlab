@@ -877,7 +877,6 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 				Content:  &commitMessage,
 			},
 		}
-		// Commit create options
 		options := &gitlab.CreateCommitOptions{
 			Branch:        &defaultBranch,
 			CommitMessage: &commitMessage,
