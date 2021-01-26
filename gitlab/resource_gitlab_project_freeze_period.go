@@ -74,14 +74,14 @@ func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interfac
 	log.Printf("[DEBUG] read gitlab FreezePeriod %s/%d", projectID, freezePeriodID)
 
 	freezePeriod, _, err := client.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID)
+	if err != nil {
+		return err
+	}
+
 	d.Set("freeze_start", freezePeriod.FreezeStart)
 	d.Set("freeze_end", freezePeriod.FreezeEnd)
 	d.Set("cron_timezone", freezePeriod.CronTimezone)
 	d.Set("project_id", projectID)
-
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
