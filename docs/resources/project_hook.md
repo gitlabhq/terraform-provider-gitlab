@@ -48,6 +48,8 @@ The following arguments are supported:
 * `pipeline_events` - (Optional) Invoke the hook for pipeline events.
 
 * `wiki_page_events` - (Optional) Invoke the hook for wiki page events.
+  
+* `deployment_events` - (Optional) Invoke the hook for deployment events.
 
 ## Attributes Reference
 

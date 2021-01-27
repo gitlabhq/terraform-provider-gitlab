@@ -84,6 +84,11 @@ func resourceGitlabProjectHook() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"deployment_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"enable_ssl_verification": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -109,6 +114,7 @@ func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) e
 		JobEvents:                gitlab.Bool(d.Get("job_events").(bool)),
 		PipelineEvents:           gitlab.Bool(d.Get("pipeline_events").(bool)),
 		WikiPageEvents:           gitlab.Bool(d.Get("wiki_page_events").(bool)),
+		DeploymentEvents:         gitlab.Bool(d.Get("deployment_events").(bool)),
 		EnableSSLVerification:    gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
 	}
 
@@ -154,6 +160,7 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 	d.Set("job_events", hook.JobEvents)
 	d.Set("pipeline_events", hook.PipelineEvents)
 	d.Set("wiki_page_events", hook.WikiPageEvents)
+	d.Set("deployment_events", hook.DeploymentEvents)
 	d.Set("enable_ssl_verification", hook.EnableSSLVerification)
 	return nil
 }
@@ -178,6 +185,7 @@ func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) e
 		JobEvents:                gitlab.Bool(d.Get("job_events").(bool)),
 		PipelineEvents:           gitlab.Bool(d.Get("pipeline_events").(bool)),
 		WikiPageEvents:           gitlab.Bool(d.Get("wiki_page_events").(bool)),
+		DeploymentEvents:         gitlab.Bool(d.Get("deployment_events").(bool)),
 		EnableSSLVerification:    gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
 	}
 
