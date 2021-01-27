@@ -37,9 +37,9 @@ func TestAccGitlabProjectFreezePeriod_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectFreezePeriodExists("gitlab_project_freeze_period.schedule", &schedule),
 					testAccCheckGitlabProjectFreezePeriodAttributes(&schedule, &testAccGitlabProjectFreezePeriodExpectedAttributes{
-						FreezeStart:  "0 23 * * 5",
+						FreezeStart:  "0 20 * * 6",
 						FreezeEnd:    "0 7 * * 3",
-						CronTimezone: "UTC",
+						CronTimezone: "EST",
 					}),
 				),
 			},
@@ -159,9 +159,9 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_project_freeze_period" "schedule" {
   project_id = gitlab_project.foo.id
-  freeze_start = "0 23 * * 5"
+  freeze_start = "0 20 * * 6"
   freeze_end =  "0 7 * * 3"
-  cron_timezone = "UTC"
+  cron_timezone = "EST"
 }
 	`, rInt)
 }
