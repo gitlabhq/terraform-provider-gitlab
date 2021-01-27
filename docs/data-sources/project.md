@@ -10,11 +10,17 @@ data "gitlab_project" "example" {
 }
 ```
 
+```hcl
+data "gitlab_project" "example" {
+	id = "foo/bar/baz"
+}
+```
+
 ## Argument Reference
 
 The following arguments are supported:
 
-* `id` - (Required) The integer that uniquely identifies the project within the gitlab install.
+* `id` - (Required) The integer or path with namespace that uniquely identifies the project within the gitlab install.
 
 ## Attributes Reference
 
