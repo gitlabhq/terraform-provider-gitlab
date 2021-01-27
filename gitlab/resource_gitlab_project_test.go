@@ -150,6 +150,36 @@ max_file_size = 123
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Update some push rules but not others
+			{
+				SkipFunc: isRunningInCE,
+				Config: testAccGitlabProjectConfigPushRules(rInt, `
+author_email_regex = "foo_author"
+branch_name_regex = "foo_branch"
+commit_message_regex = "foo_commit"
+commit_message_negative_regex = "foo_not_commit"
+file_name_regex = "foo_file_2"
+commit_committer_check = true
+deny_delete_tag = true
+member_check = false
+prevent_secrets = true
+reject_unsigned_commits = true
+max_file_size = 1234
+`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					AuthorEmailRegex:           "foo_author",
+					BranchNameRegex:            "foo_branch",
+					CommitMessageRegex:         "foo_commit",
+					CommitMessageNegativeRegex: "foo_not_commit",
+					FileNameRegex:              "foo_file_2",
+					CommitCommitterCheck:       true,
+					DenyDeleteTag:              true,
+					MemberCheck:                false,
+					PreventSecrets:             true,
+					RejectUnsignedCommits:      true,
+					MaxFileSize:                1234,
+				}),
+			},
 			// Try to add push rules to an existing project in CE
 			{
 				SkipFunc:    isRunningInEE,
