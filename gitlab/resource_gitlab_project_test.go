@@ -866,6 +866,7 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 	return func() (bool, error) {
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
+		// Commit data
 		commitMessage := "Initial Commit"
 		commitFile := "file.txt"
 		commitFileAction := gitlab.FileCreate
@@ -876,7 +877,6 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 				Content:  &commitMessage,
 			},
 		}
-
 		options := &gitlab.CreateCommitOptions{
 			Branch:        &defaultBranch,
 			CommitMessage: &commitMessage,

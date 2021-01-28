@@ -95,6 +95,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_level_mr_approvals": resourceGitlabProjectLevelMRApprovals(),
 			"gitlab_project_approval_rule":      resourceGitlabProjectApprovalRule(),
 			"gitlab_instance_variable":          resourceGitlabInstanceVariable(),
+			"gitlab_project_freeze_period":      resourceGitlabProjectFreezePeriod(),
 			"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
 		},
 	}
