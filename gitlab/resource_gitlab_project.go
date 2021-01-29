@@ -249,6 +249,33 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			},
 		},
 	},
+	"protected_branch": {
+		Type:     schema.TypeList,
+		Optional: true,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"id": {
+					Type:     schema.TypeInt,
+					Computed: true,
+				},
+				"name": {
+					Type:     schema.TypeString,
+					Required: true,
+				},
+				"push_access_levels":      schemaAllowedAccessLevels(),
+				"merge_access_levels":     schemaAllowedAccessLevels(),
+				"unprotect_access_levels": schemaAllowedAccessLevels(),
+				"allowed_to_push":         schemaAllowedTo(),
+				"allowed_to_merge":        schemaAllowedTo(),
+				"allowed_to_unprotect":    schemaAllowedTo(),
+				"code_owner_approval_required": {
+					Type:     schema.TypeBool,
+					Optional: true,
+				},
+			},
+		},
+	},
 	"template_name": {
 		Type:          schema.TypeString,
 		Optional:      true,
@@ -289,6 +316,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 
 func resourceGitlabProject() *schema.Resource {
 	return &schema.Resource{
+
 		Create: resourceGitlabProjectCreate,
 		Read:   resourceGitlabProjectRead,
 		Update: resourceGitlabProjectUpdate,
@@ -456,6 +484,18 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
+	if vs, ok := d.GetOk("protected_branch"); ok {
+		err := editProtectedBranches(client, d.Id(), vs.([]interface{}))
+		var httpError *gitlab.ErrorResponse
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to edit protected branches for project %q: %v", d.Id(), err)
+			return errors.New("Project protected branches are not supported in your version of GitLab")
+		}
+		if err != nil {
+			return fmt.Errorf("Failed to edit protected branches for project %q: %w", d.Id(), err)
+		}
+	}
+
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -486,6 +526,24 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.Set("push_rules", flattenProjectPushRules(pushRules))
+
+	var allProtectedBranches []*gitlab.ProtectedBranch
+	totalPages := -1
+	for page := 0; page != totalPages; page++ {
+		protectedBranches, resp, err := client.ProtectedBranches.ListProtectedBranches(d.Id(), &gitlab.ListProtectedBranchesOptions{
+			Page: page + 1,
+		})
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to get protected branches for project %q: %v", d.Id(), err)
+		} else if err != nil {
+			return fmt.Errorf("Failed to get protected branches for project %q: %w", d.Id(), err)
+		}
+		totalPages = resp.TotalPages
+		allProtectedBranches = append(allProtectedBranches, protectedBranches...)
+	}
+	if err := d.Set("protected_branch", flattenProtectedBranches(allProtectedBranches)); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -642,6 +700,18 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
+	if d.HasChange("protected_branch") {
+		err := editProtectedBranches(client, d.Id(), d.Get("protected_branch").([]interface{}))
+		var httpError *gitlab.ErrorResponse
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to edit protected branches for project %q: %v", d.Id(), err)
+			return errors.New("Project protected branches are not supported in your version of GitLab")
+		}
+		if err != nil {
+			return fmt.Errorf("Failed to edit protected branches for project %q: %w", d.Id(), err)
+		}
+	}
+
 	return resourceGitlabProjectRead(d, meta)
 }
 
@@ -747,6 +817,154 @@ func expandAddProjectPushRuleOptions(m map[string]interface{}) *gitlab.AddProjec
 	}
 }
 
+func editProtectedBranches(client *gitlab.Client, projectID string, vs []interface{}) error {
+	log.Printf("[DEBUG] Editing protected branches for project %q", projectID)
+
+	var httpError *gitlab.ErrorResponse
+	var allCurrentProtectedBranches []*gitlab.ProtectedBranch
+	totalPages := -1
+	for page := 0; page != totalPages; page++ {
+		protectedBranches, resp, err := client.ProtectedBranches.ListProtectedBranches(projectID, &gitlab.ListProtectedBranchesOptions{
+			Page: page + 1,
+		})
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to get protected branches for project %q: %v", projectID, err)
+		} else if err != nil {
+			return fmt.Errorf("Failed to get protected branches for project %q: %w", projectID, err)
+		}
+		totalPages = resp.TotalPages
+		allCurrentProtectedBranches = append(allCurrentProtectedBranches, protectedBranches...)
+	}
+
+	currentProtectedBranchesByName := map[string]*gitlab.ProtectedBranch{}
+	for _, protectedBranch := range allCurrentProtectedBranches {
+		currentProtectedBranchesByName[protectedBranch.Name] = protectedBranch
+	}
+
+	branchNameConfigured := map[string]struct{}{}
+	for _, v := range vs {
+		configuredProtectedBranch := expandProtectedBranch(v.(map[string]interface{}))
+		branchNameConfigured[configuredProtectedBranch.Name] = struct{}{}
+		currentProtectedBranch, exists := currentProtectedBranchesByName[configuredProtectedBranch.Name]
+		if exists {
+			if protectedBranchesEqual(configuredProtectedBranch, currentProtectedBranch) {
+				// If only "code owner approval required" is different, update it; otherwise the protected branch is as configured, and we will skip it
+				if configuredProtectedBranch.CodeOwnerApprovalRequired != currentProtectedBranch.CodeOwnerApprovalRequired {
+					if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(projectID, configuredProtectedBranch.Name, &gitlab.RequireCodeOwnerApprovalsOptions{
+						CodeOwnerApprovalRequired: &configuredProtectedBranch.CodeOwnerApprovalRequired,
+					}); err != nil {
+						return err
+					}
+				}
+				continue
+			}
+
+			// Unprotect first, in order to protect with new configuration
+			if _, err := client.ProtectedBranches.UnprotectRepositoryBranches(projectID, currentProtectedBranch.Name); err != nil {
+				return fmt.Errorf("Failed to unprotect protected branch %q for project %q: %w", currentProtectedBranch.Name, projectID, err)
+			}
+		}
+
+		// Protect with updated configuration - if previously protected, it was just unprotected above; otherwise, it will be newly protected
+		pushAccessLevel := gitlab.MaintainerPermissions
+		for _, level := range configuredProtectedBranch.PushAccessLevels {
+			if level.UserID == 0 && level.GroupID == 0 {
+				pushAccessLevel = level.AccessLevel
+				break
+			}
+		}
+		mergeAccessLevel := gitlab.DeveloperPermissions
+		for _, level := range configuredProtectedBranch.MergeAccessLevels {
+			if level.UserID == 0 && level.GroupID == 0 {
+				mergeAccessLevel = level.AccessLevel
+				break
+			}
+		}
+		unprotectAccessLevel := gitlab.NoPermissions
+		for _, level := range configuredProtectedBranch.UnprotectAccessLevels {
+			if level.UserID == 0 && level.GroupID == 0 {
+				unprotectAccessLevel = level.AccessLevel
+				break
+			}
+		}
+		allowedToPush := expandProtectedBranchAllowedTo(configuredProtectedBranch.PushAccessLevels)
+		allowedToMerge := expandProtectedBranchAllowedTo(configuredProtectedBranch.MergeAccessLevels)
+		allowedToUnprotect := expandProtectedBranchAllowedTo(configuredProtectedBranch.UnprotectAccessLevels)
+		if _, _, err := client.ProtectedBranches.ProtectRepositoryBranches(projectID, &gitlab.ProtectRepositoryBranchesOptions{
+			Name:                      &configuredProtectedBranch.Name,
+			PushAccessLevel:           &pushAccessLevel,
+			MergeAccessLevel:          &mergeAccessLevel,
+			UnprotectAccessLevel:      &unprotectAccessLevel,
+			AllowedToPush:             allowedToPush,
+			AllowedToMerge:            allowedToMerge,
+			AllowedToUnprotect:        allowedToUnprotect,
+			CodeOwnerApprovalRequired: &configuredProtectedBranch.CodeOwnerApprovalRequired,
+		}); err != nil {
+			return err
+		}
+	}
+
+	for _, currentProtectedBranch := range allCurrentProtectedBranches {
+		if _, exists := branchNameConfigured[currentProtectedBranch.Name]; !exists {
+			if _, err := client.ProtectedBranches.UnprotectRepositoryBranches(projectID, currentProtectedBranch.Name); err != nil {
+				return fmt.Errorf("Failed to unprotect protected branch %q for project %q: %w", currentProtectedBranch.Name, projectID, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func expandProtectedBranch(v map[string]interface{}) *gitlab.ProtectedBranch {
+	return &gitlab.ProtectedBranch{
+		ID:                        v["id"].(int),
+		Name:                      v["name"].(string),
+		PushAccessLevels:          expandBranchAccessDescriptions(v["push_access_levels"].([]interface{}), v["allowed_to_push"].([]interface{})),
+		MergeAccessLevels:         expandBranchAccessDescriptions(v["merge_access_levels"].([]interface{}), v["allowed_to_merge"].([]interface{})),
+		UnprotectAccessLevels:     expandBranchAccessDescriptions(v["unprotect_access_levels"].([]interface{}), v["allowed_to_unprotect"].([]interface{})),
+		CodeOwnerApprovalRequired: v["code_owner_approval_required"].(bool),
+	}
+}
+
+func expandBranchAccessDescriptions(accessLevels []interface{}, allowedTo []interface{}) []*gitlab.BranchAccessDescription {
+	result := make([]*gitlab.BranchAccessDescription, 0)
+	for _, v := range accessLevels {
+		result = append(result, &gitlab.BranchAccessDescription{
+			AccessLevel: accessLevelID[v.(map[string]interface{})["access_level"].(string)],
+		})
+	}
+	for _, v := range allowedTo {
+		desc := &gitlab.BranchAccessDescription{}
+		if userID, ok := v.(map[string]interface{})["user_id"]; ok {
+			desc.UserID = userID.(int)
+		}
+		if groupID, ok := v.(map[string]interface{})["group_id"]; ok {
+			desc.GroupID = groupID.(int)
+		}
+		result = append(result, desc)
+	}
+	return result
+}
+
+func expandProtectedBranchAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []*gitlab.ProtectBranchPermissionOptions {
+	result := make([]*gitlab.ProtectBranchPermissionOptions, 0)
+	for _, branchAccessDescription := range branchAccessDescriptions {
+		if branchAccessDescription.UserID != 0 || branchAccessDescription.GroupID != 0 {
+			opts := &gitlab.ProtectBranchPermissionOptions{
+				AccessLevel: &branchAccessDescription.AccessLevel,
+			}
+			if branchAccessDescription.UserID != 0 {
+				opts.UserID = gitlab.Int(branchAccessDescription.UserID)
+			}
+			if branchAccessDescription.GroupID != 0 {
+				opts.GroupID = gitlab.Int(branchAccessDescription.GroupID)
+			}
+			result = append(result, opts)
+		}
+	}
+	return result
+}
+
 func flattenProjectPushRules(pushRules *gitlab.ProjectPushRules) (values []map[string]interface{}) {
 	if pushRules == nil {
 		return []map[string]interface{}{}
@@ -765,6 +983,140 @@ func flattenProjectPushRules(pushRules *gitlab.ProjectPushRules) (values []map[s
 			"prevent_secrets":               pushRules.PreventSecrets,
 			"reject_unsigned_commits":       pushRules.RejectUnsignedCommits,
 			"max_file_size":                 pushRules.MaxFileSize,
+		},
+	}
+}
+
+func flattenProtectedBranches(protectedBranches []*gitlab.ProtectedBranch) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+
+	for _, protectedBranch := range protectedBranches {
+		result = append(result, map[string]interface{}{
+			"id":                           protectedBranch.ID,
+			"name":                         protectedBranch.Name,
+			"push_access_levels":           flattenBranchAccessDescriptionsAccessLevels(protectedBranch.PushAccessLevels),
+			"merge_access_levels":          flattenBranchAccessDescriptionsAccessLevels(protectedBranch.MergeAccessLevels),
+			"unprotect_access_levels":      flattenBranchAccessDescriptionsAccessLevels(protectedBranch.UnprotectAccessLevels),
+			"allowed_to_push":              flattenBranchAccessDescriptionsAllowedTo(protectedBranch.PushAccessLevels),
+			"allowed_to_merge":             flattenBranchAccessDescriptionsAllowedTo(protectedBranch.MergeAccessLevels),
+			"allowed_to_unprotect":         flattenBranchAccessDescriptionsAllowedTo(protectedBranch.UnprotectAccessLevels),
+			"code_owner_approval_required": protectedBranch.CodeOwnerApprovalRequired,
+		})
+	}
+
+	return result
+}
+
+func flattenBranchAccessDescriptionsAccessLevels(branchAccessDescriptions []*gitlab.BranchAccessDescription) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+	for _, branchAccessDescription := range branchAccessDescriptions {
+		if branchAccessDescription.UserID != 0 || branchAccessDescription.GroupID != 0 {
+			continue
+		}
+		result = append(result, map[string]interface{}{
+			"access_level":             accessLevel[branchAccessDescription.AccessLevel],
+			"access_level_description": branchAccessDescription.AccessLevelDescription,
+		})
+	}
+	return result
+}
+
+func flattenBranchAccessDescriptionsAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+	for _, branchAccessDescription := range branchAccessDescriptions {
+		if branchAccessDescription.UserID == 0 && branchAccessDescription.GroupID == 0 {
+			continue
+		}
+		result = append(result, map[string]interface{}{
+			"access_level":             accessLevel[branchAccessDescription.AccessLevel],
+			"access_level_description": branchAccessDescription.AccessLevelDescription,
+			"user_id":                  branchAccessDescription.UserID,
+			"group_id":                 branchAccessDescription.GroupID,
+		})
+	}
+	return result
+}
+
+func protectedBranchesEqual(a *gitlab.ProtectedBranch, b *gitlab.ProtectedBranch) bool {
+	if a.Name != b.Name || a.ID != b.ID || !branchAccessDescriptionsEqual(a.PushAccessLevels, b.PushAccessLevels) || !branchAccessDescriptionsEqual(a.MergeAccessLevels, b.MergeAccessLevels) || !branchAccessDescriptionsEqual(a.UnprotectAccessLevels, b.UnprotectAccessLevels) {
+		return false
+	}
+	return true
+}
+
+func branchAccessDescriptionsEqual(a []*gitlab.BranchAccessDescription, b []*gitlab.BranchAccessDescription) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	aBranchAccessDescriptionsByAccessLevel := make(map[gitlab.AccessLevelValue]*gitlab.BranchAccessDescription, 0)
+	aBranchAccessDescriptionsByUserID := make(map[int]*gitlab.BranchAccessDescription, 0)
+	aBranchAccessDescriptionsByGroupID := make(map[int]*gitlab.BranchAccessDescription, 0)
+	for _, branchAccessDescription := range a {
+		aBranchAccessDescriptionsByAccessLevel[branchAccessDescription.AccessLevel] = branchAccessDescription
+		aBranchAccessDescriptionsByUserID[branchAccessDescription.UserID] = branchAccessDescription
+		aBranchAccessDescriptionsByGroupID[branchAccessDescription.GroupID] = branchAccessDescription
+	}
+
+	for _, branchAccessDescription := range b {
+		if _, exists := aBranchAccessDescriptionsByAccessLevel[branchAccessDescription.AccessLevel]; !exists {
+			return false
+		}
+		if _, exists := aBranchAccessDescriptionsByUserID[branchAccessDescription.UserID]; !exists {
+			return false
+		}
+		if _, exists := aBranchAccessDescriptionsByGroupID[branchAccessDescription.GroupID]; !exists {
+			return false
+		}
+	}
+
+	return true
+}
+
+func schemaAllowedAccessLevels() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Optional: true,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"access_level": {
+					Type:     schema.TypeString,
+					Optional: true,
+				},
+				"access_level_description": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+			},
+		},
+	}
+}
+
+func schemaAllowedTo() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Optional: true,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"access_level": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"access_level_description": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"user_id": {
+					Type:     schema.TypeInt,
+					Optional: true,
+				},
+				"group_id": {
+					Type:     schema.TypeInt,
+					Optional: true,
+				},
+			},
 		},
 	}
 }

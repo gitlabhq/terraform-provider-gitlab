@@ -152,6 +152,32 @@ func dataSourceGitlabProject() *schema.Resource {
 					},
 				},
 			},
+			"protected_branches": {
+				Type:     schema.TypeList,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": {
+							Type:     schema.TypeInt,
+							Computed: true,
+						},
+						"name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"push_access_levels":      schemaDataAllowedAccessLevels(),
+						"merge_access_levels":     schemaDataAllowedAccessLevels(),
+						"unprotect_access_levels": schemaDataAllowedAccessLevels(),
+						"allowed_to_push":         schemaDataAllowedTo(),
+						"allowed_to_merge":        schemaDataAllowedTo(),
+						"allowed_to_unprotect":    schemaDataAllowedTo(),
+						"code_owner_approval_required": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -201,5 +227,71 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 
 	d.Set("push_rules", flattenProjectPushRules(pushRules))
 
+	var allProtectedBranches []*gitlab.ProtectedBranch
+	totalPages := -1
+	for page := 0; page != totalPages; page++ {
+		protectedBranches, resp, err := client.ProtectedBranches.ListProtectedBranches(d.Id(), &gitlab.ListProtectedBranchesOptions{
+			Page: page + 1,
+		})
+		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] Failed to get protected branches for project %q: %v", d.Id(), err)
+		} else if err != nil {
+			return fmt.Errorf("Failed to get protected branches for project %q: %w", d.Id(), err)
+		}
+		totalPages = resp.TotalPages
+		allProtectedBranches = append(allProtectedBranches, protectedBranches...)
+	}
+
+	flattenedProtectedBranches := flattenProtectedBranches(allProtectedBranches)
+	if err := d.Set("protected_branches", flattenedProtectedBranches); err != nil {
+		return fmt.Errorf("error setting protected_branches to %+v: %v", flattenedProtectedBranches, err)
+	}
+
 	return nil
+}
+
+func schemaDataAllowedAccessLevels() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"access_level": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"access_level_description": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+			},
+		},
+	}
+}
+
+func schemaDataAllowedTo() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"access_level": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"access_level_description": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"user_id": {
+					Type:     schema.TypeInt,
+					Computed: true,
+				},
+				"group_id": {
+					Type:     schema.TypeInt,
+					Computed: true,
+				},
+			},
+		},
+	}
 }
