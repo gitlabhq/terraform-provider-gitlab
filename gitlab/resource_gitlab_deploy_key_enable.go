@@ -36,9 +36,10 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 				Computed: true,
 			},
 			"key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
 			},
 			"can_push": {
 				Type:     schema.TypeBool,

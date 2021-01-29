@@ -31,9 +31,10 @@ func resourceGitlabDeployKey() *schema.Resource {
 				ForceNew: true,
 			},
 			"key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:      schema.TypeString,
+				Required:  true,
+				ForceNew:  true,
+				Sensitive: true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					return old == strings.TrimSpace(new)
 				},
