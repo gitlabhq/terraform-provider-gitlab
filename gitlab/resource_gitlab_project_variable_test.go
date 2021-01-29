@@ -2,67 +2,14 @@ package gitlab
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
 )
-
-// testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
-// acceptance test.
-type testAccGitlabProjectContext struct {
-	t       *testing.T
-	client  *gitlab.Client
-	project *gitlab.Project
-}
-
-// finish deletes the test project. Call this when the test is finished, usually in a defer.
-func (c testAccGitlabProjectContext) finish() {
-	if _, err := c.client.Projects.DeleteProject(c.project.ID); err != nil {
-		c.t.Fatalf("could not delete test project: %v", err)
-	}
-}
-
-// testAccGitlabProjectStart initializes the GitLab client and creates a test project. Remember to
-// call testAccGitlabProjectContext.finish() when finished with the testAccGitlabProjectContext.
-func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
-	if os.Getenv(resource.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
-		return testAccGitlabProjectContext{}
-	}
-
-	var options []gitlab.ClientOptionFunc
-	baseURL := os.Getenv("GITLAB_BASE_URL")
-	if baseURL != "" {
-		options = append(options, gitlab.WithBaseURL(baseURL))
-	}
-
-	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"), options...)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	project, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
-		Name:        gitlab.String(acctest.RandomWithPrefix("acctest")),
-		Description: gitlab.String("Terraform acceptance tests"),
-		// So that acceptance tests can be run in a gitlab organization with no billing
-		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
-	})
-	if err != nil {
-		t.Fatalf("could not create test project: %v", err)
-	}
-
-	return testAccGitlabProjectContext{
-		t:       t,
-		client:  client,
-		project: project,
-	}
-}
 
 func testAccCheckGitlabProjectVariableExists(client *gitlab.Client, name string) resource.TestCheckFunc {
 	var (
