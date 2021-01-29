@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -179,8 +181,28 @@ func resourceGitlabUserDelete(d *schema.ResourceData, meta interface{}) error {
 
 	id, _ := strconv.Atoi(d.Id())
 
-	_, err := client.Users.DeleteUser(id)
-	// Ignoring error due to some bug in library
-	log.Printf("[DEBUG] Delete gitlab user %s", err)
+	if _, err := client.Users.DeleteUser(id); err != nil {
+		return err
+	}
+
+	stateConf := &resource.StateChangeConf{
+		Timeout: 5 * time.Minute,
+		Target:  []string{"Deleted"},
+		Refresh: func() (interface{}, string, error) {
+			user, resp, err := client.Users.GetUser(id)
+			if resp != nil && resp.StatusCode == 404 {
+				return user, "Deleted", nil
+			}
+			if err != nil {
+				return user, "Error", err
+			}
+			return user, "Deleting", nil
+		},
+	}
+
+	if _, err := stateConf.WaitForState(); err != nil {
+		return fmt.Errorf("Could not finish deleting user %d: %w", id, err)
+	}
+
 	return nil
 }
