@@ -421,7 +421,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		stateConf := &resource.StateChangeConf{
 			Pending: []string{"scheduled", "started"},
 			Target:  []string{"finished"},
-			Timeout: time.Minute,
+			Timeout: 10 * time.Minute,
 			Refresh: func() (interface{}, string, error) {
 				status, _, err := client.ProjectImportExport.ImportStatus(d.Id())
 				if err != nil {
