@@ -32,3 +32,4 @@ website/vendor
 !command/test-fixtures/**/.terraform/
 
 license/*
+Gitlab-license.txt
