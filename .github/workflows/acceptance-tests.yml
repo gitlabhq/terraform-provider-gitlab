@@ -15,18 +15,11 @@ jobs:
     - name: Check out code repository source code
       uses: actions/checkout@v2
 
-    # https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
-    - name: Set build variables
-      run: |
-        echo "MAKE_TARGET=testacc" >> $GITHUB_ENV
-        echo "GO111MODULE=on" >> $GITHUB_ENV
-        echo "GITLAB_TOKEN=20char-testing-token" >> $GITHUB_ENV
-        echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4" >> $GITHUB_ENV
+    - name: Start Gitlab
+      run: make testacc-up
 
-    - name: Start Gitlab and run acceptance tests
-      run: |
-        bash scripts/start-gitlab.sh
-        make $MAKE_TARGET
+    - name: Run acceptance tests
+      run: make testacc
 
   acceptance-ee:
     timeout-minutes: 60
@@ -47,20 +40,11 @@ jobs:
         openssl version
         mkdir license
         [[ -n "${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}" ]] && echo decrypt
-        [[ -n "${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}" ]] && openssl enc  -d -aes-256-cbc -pbkdf2 -iter 20000 -in Gitlab-license.encrypted -out license/Gitlab-license.txt -pass "pass:${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}"
-        chmod 666 license/Gitlab-license.txt || true
-        echo "GITLAB_LICENSE_FILE=Gitlab-license.txt" >> $GITHUB_ENV
+        [[ -n "${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}" ]] && openssl enc  -d -aes-256-cbc -pbkdf2 -iter 20000 -in Gitlab-license.encrypted -out Gitlab-license.txt -pass "pass:${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}"
+        chmod 666 Gitlab-license.txt || true
 
-    # https://help.github.com/en/actions/reference/workflow-commands-for-github-actions
-    - name: Set build variables
-      run: |
-        echo "MAKE_TARGET=testacc" >> $GITHUB_ENV
-        echo "GO111MODULE=on" >> $GITHUB_ENV
-        echo "GITLAB_TOKEN=20char-testing-token" >> $GITHUB_ENV
-        echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4" >> $GITHUB_ENV
-        echo "TF_LOG=DEBUG" >> $GITHUB_ENV
+    - name: Start Gitlab
+      run: make testacc-up
 
-    - name: Start Gitlab and run acceptance tests
-      run: |
-        bash scripts/start-gitlab.sh
-        make $MAKE_TARGET
+    - name: Run acceptance tests
+      run: make testacc

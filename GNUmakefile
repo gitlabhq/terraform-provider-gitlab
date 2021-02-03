@@ -1,6 +1,12 @@
 TEST?=./gitlab
+SERVICE?=gitlab-ce
+GITLAB_TOKEN?=ACCTEST
+GITLAB_BASE_URL?=http://127.0.0.1:8080/api/v4
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
-PKG_NAME=gitlab
+
+ifdef RUN
+TESTARGS += -test.run $(RUN)
+endif
 
 default: build
 
@@ -12,14 +18,15 @@ test: fmtcheck
 	echo $(TEST) | \
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
-testacc-prepareenv:
-	MAKE_TARGET=testacc GITLAB_TOKEN=ACCTEST LC_ALL=en_US sh -c "'$(CURDIR)/scripts/start-gitlab.sh'"
+testacc-up:
+	docker-compose up -d $(SERVICE)
+	./scripts/await-healthy.sh
 
-testacc-cleanenv:
-	docker stop gitlab
+testacc-down:
+	docker-compose down
 
 testacc: fmtcheck
-	TF_ACC=1 go test -v $(TEST) $(TESTARGS) -timeout 40m
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(TEST) $(TESTARGS) -timeout 40m
 
 vet:
 	@echo "go vet ."
@@ -39,14 +46,4 @@ fmtcheck:
 errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
-
-test-compile:
-	@if [ "$(TEST)" = "./..." ]; then \
-		echo "ERROR: Set TEST to a specific package. For example,"; \
-		echo "  make test-compile TEST=./$(PKG_NAME)"; \
-		exit 1; \
-	fi
-	go test -c $(TEST) $(TESTARGS)
-
-.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile
-
+.PHONY: default build test testacc-up testacc-down testacc vet fmt fmtcheck errcheck
