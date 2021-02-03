@@ -48,5 +48,8 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile
+vendor-check:
+	@sh -c "'$(CURDIR)/scripts/vendor-check.sh'"
+
+.PHONY: build test testacc vet fmt fmtcheck errcheck test-compile vendor-check
 
