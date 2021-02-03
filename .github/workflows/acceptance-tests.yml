@@ -19,7 +19,6 @@ jobs:
     - name: Set build variables
       run: |
         echo "MAKE_TARGET=testacc" >> $GITHUB_ENV
-        echo "GO_FLAGS=-mod=vendor" >> $GITHUB_ENV
         echo "GO111MODULE=on" >> $GITHUB_ENV
         echo "GITLAB_TOKEN=20char-testing-token" >> $GITHUB_ENV
         echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4" >> $GITHUB_ENV
@@ -56,7 +55,6 @@ jobs:
     - name: Set build variables
       run: |
         echo "MAKE_TARGET=testacc" >> $GITHUB_ENV
-        echo "GO_FLAGS=-mod=vendor" >> $GITHUB_ENV
         echo "GO111MODULE=on" >> $GITHUB_ENV
         echo "GITLAB_TOKEN=20char-testing-token" >> $GITHUB_ENV
         echo "GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4" >> $GITHUB_ENV
