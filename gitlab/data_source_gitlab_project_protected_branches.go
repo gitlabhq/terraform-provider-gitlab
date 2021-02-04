@@ -1,54 +1,43 @@
 package gitlab
 
 import (
-	"context"
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/mitchellh/hashstructure"
 	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabProjectProtectedBranches() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provides details about all protected branches in a given project.",
-
-		ReadContext: dataSourceGitlabProjectProtectedBranchesRead,
+		Read: dataSourceGitlabProjectProtectedBranchesRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Description: "The integer or path with namespace that uniquely identifies the project.",
 				Type:        schema.TypeString,
+				Description: "ID or URL encoded name of project",
 				Required:    true,
 			},
 			"protected_branches": {
-				Description: "A list of protected branches, as defined below.",
-				Type:        schema.TypeList,
-				Computed:    true,
+				Type:     schema.TypeList,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Description: "The name of the protected branch.",
 							Type:        schema.TypeString,
+							Description: "Name of the protected branch",
 							Computed:    true,
 						},
 						"id": {
-							Description: "The ID of the protected branch.",
-							Type:        schema.TypeInt,
-							Computed:    true,
+							Type:     schema.TypeInt,
+							Computed: true,
 						},
-						"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
-						"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
-						"allow_force_push": {
-							Description: "Whether force push is allowed.",
-							Type:        schema.TypeBool,
-							Computed:    true,
-						},
+						"push_access_levels":      dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+						"merge_access_levels":     dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+						"unprotect_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 						"code_owner_approval_required": {
-							Description: "Reject code pushes that change files listed in the CODEOWNERS file.",
-							Type:        schema.TypeBool,
-							Computed:    true,
+							Type:     schema.TypeBool,
+							Computed: true,
 						},
 					},
 				},
@@ -62,30 +51,31 @@ type stateProtectedBranch struct {
 	Name                      string                         `json:"name,omitempty" mapstructure:"name,omitempty"`
 	PushAccessLevels          []stateBranchAccessDescription `json:"push_access_levels,omitempty" mapstructure:"push_access_levels,omitempty"`
 	MergeAccessLevels         []stateBranchAccessDescription `json:"merge_access_levels,omitempty" mapstructure:"merge_access_levels,omitempty"`
-	AllowForcePush            bool                           `json:"allow_force_push,omitempty" mapstructure:"allow_force_push,omitempty"`
+	UnprotectAccessLevels     []stateBranchAccessDescription `json:"unprotect_access_levels,omitempty" mapstructure:"unprotect_access_levels,omitempty"`
 	CodeOwnerApprovalRequired bool                           `json:"code_owner_approval_required,omitempty" mapstructure:"code_owner_approval_required,omitempty"`
 }
 
-func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	log.Printf("[INFO] Reading Gitlab protected branch")
 
 	project := d.Get("project_id")
 
-	projectObject, _, err := client.Projects.GetProject(project, &gitlab.GetProjectOptions{}, gitlab.WithContext(ctx))
+	projectObject, _, err := client.Projects.GetProject(project, &gitlab.GetProjectOptions{})
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	allProtectedBranches := make([]stateProtectedBranch, 0)
 	totalPages := -1
-	opts := &gitlab.ListProtectedBranchesOptions{}
-	for opts.Page = 0; opts.Page != totalPages; opts.Page++ {
+	for page := 0; page != totalPages; page++ {
 		// Get protected branch by project ID/path and branch name
-		pbs, resp, err := client.ProtectedBranches.ListProtectedBranches(project, opts, gitlab.WithContext(ctx))
+		pbs, resp, err := client.ProtectedBranches.ListProtectedBranches(project, &gitlab.ListProtectedBranchesOptions{
+			Page: page + 1,
+		})
 		if err != nil {
-			return diag.FromErr(err)
+			return err
 		}
 		totalPages = resp.TotalPages
 		for _, pb := range pbs {
@@ -94,20 +84,19 @@ func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema
 				Name:                      pb.Name,
 				PushAccessLevels:          convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels),
 				MergeAccessLevels:         convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.MergeAccessLevels),
-				AllowForcePush:            pb.AllowForcePush,
+				UnprotectAccessLevels:     convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.UnprotectAccessLevels),
 				CodeOwnerApprovalRequired: pb.CodeOwnerApprovalRequired,
 			})
 		}
 	}
 
-	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("protected_branches", allProtectedBranches); err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
-	h, err := hashstructure.Hash(*opts, nil)
+	h, err := hashstructure.Hash(project, nil)
 	if err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	d.SetId(fmt.Sprintf("%d-%d", projectObject.ID, h))
