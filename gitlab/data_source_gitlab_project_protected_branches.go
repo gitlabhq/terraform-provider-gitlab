@@ -69,11 +69,10 @@ func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta i
 
 	allProtectedBranches := make([]stateProtectedBranch, 0)
 	totalPages := -1
-	for page := 0; page != totalPages; page++ {
+	opts := &gitlab.ListProtectedBranchesOptions{}
+	for opts.Page = 0; opts.Page != totalPages; opts.Page++ {
 		// Get protected branch by project ID/path and branch name
-		pbs, resp, err := client.ProtectedBranches.ListProtectedBranches(project, &gitlab.ListProtectedBranchesOptions{
-			Page: page + 1,
-		})
+		pbs, resp, err := client.ProtectedBranches.ListProtectedBranches(project, opts)
 		if err != nil {
 			return err
 		}
@@ -94,7 +93,7 @@ func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta i
 		return err
 	}
 
-	h, err := hashstructure.Hash(project, nil)
+	h, err := hashstructure.Hash(*opts, nil)
 	if err != nil {
 		return err
 	}
