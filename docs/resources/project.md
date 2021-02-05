@@ -39,6 +39,10 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
 
 * `mirror_trigger_builds` (Optional) Pull mirroring triggers builds. Default is `false`.
 
+* `mirror_overwrites_diverged_branches` (Optional) Pull mirror overwrites diverged branches.
+
+* `only_mirror_protected_branches` (Optional) Only mirror protected branches.
+
 * `request_access_enabled` - Allow users to request member access.
 
 * `issues_enabled` - (Optional) Enable issue tracking for the project.

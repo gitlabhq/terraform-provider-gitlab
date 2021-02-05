@@ -540,8 +540,10 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 }
 
 type testAccGitlabProjectMirroredExpectedAttributes struct {
-	Mirror              bool
-	MirrorTriggerBuilds bool
+	Mirror                           bool
+	MirrorTriggerBuilds              bool
+	MirrorOverwritesDivergedBranches bool
+	OnlyMirrorProtectedBranches      bool
 }
 
 func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *testAccGitlabProjectMirroredExpectedAttributes) resource.TestCheckFunc {
@@ -552,6 +554,14 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 
 		if project.MirrorTriggerBuilds != want.MirrorTriggerBuilds {
 			return fmt.Errorf("got mirror_trigger_builds %t; want %t", project.MirrorTriggerBuilds, want.MirrorTriggerBuilds)
+		}
+
+		if project.MirrorOverwritesDivergedBranches != want.MirrorOverwritesDivergedBranches {
+			return fmt.Errorf("got mirror_overwrites_diverged_branches %t; want %t", project.MirrorOverwritesDivergedBranches, want.MirrorOverwritesDivergedBranches)
+		}
+
+		if project.OnlyMirrorProtectedBranches != want.OnlyMirrorProtectedBranches {
+			return fmt.Errorf("got only_mirror_protected_branches %t; want %t", project.OnlyMirrorProtectedBranches, want.OnlyMirrorProtectedBranches)
 		}
 		return nil
 	}
@@ -601,8 +611,10 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
-						Mirror:              true,
-						MirrorTriggerBuilds: true,
+						Mirror:                           true,
+						MirrorTriggerBuilds:              true,
+						MirrorOverwritesDivergedBranches: true,
+						OnlyMirrorProtectedBranches:      true,
 					}),
 
 					func(state *terraform.State) error {
@@ -618,15 +630,44 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 				),
 			},
 			{
-				// Second, disable mirroring, using the original ImportURL acceptance test
+				// Second, disable all optional mirroring options
+				Config:   testAccGitlabProjectConfigImportURLMirrorDisabledOptionals(rInt, baseProject.HTTPURLToRepo),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror:                           true,
+						MirrorTriggerBuilds:              false,
+						MirrorOverwritesDivergedBranches: false,
+						OnlyMirrorProtectedBranches:      false,
+					}),
+
+					// Ensure the test file still is as expected
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			{
+				// Third, disable mirroring, using the original ImportURL acceptance test
 				Config:   testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
 				SkipFunc: isRunningInCE,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
 					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
 					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
-						Mirror:              false,
-						MirrorTriggerBuilds: false,
+						Mirror:                           false,
+						MirrorTriggerBuilds:              false,
+						MirrorOverwritesDivergedBranches: false,
+						OnlyMirrorProtectedBranches:      false,
 					}),
 
 					// Ensure the test file still is as expected
@@ -992,6 +1033,26 @@ resource "gitlab_project" "imported" {
   import_url = "%s"
   mirror = true
   mirror_trigger_builds = true
+  mirror_overwrites_diverged_branches = true
+  only_mirror_protected_branches = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirrorDisabledOptionals(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "master"
+  import_url = "%s"
+  mirror = true
+  mirror_trigger_builds = false
+  mirror_overwrites_diverged_branches = false
+  only_mirror_protected_branches = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
@@ -1008,6 +1069,8 @@ resource "gitlab_project" "imported" {
   import_url = "%s"
   mirror = false
   mirror_trigger_builds = false
+  mirror_overwrites_diverged_branches = false
+  only_mirror_protected_branches = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
