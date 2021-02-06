@@ -285,6 +285,16 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 		Default:  false,
 	},
+	"mirror_overwrites_diverged_branches": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
+	"only_mirror_protected_branches": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -333,6 +343,8 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
 	d.Set("mirror", project.Mirror)
 	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
+	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
+	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -455,6 +467,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 			return fmt.Errorf("Failed to edit push rules for project %q: %w", d.Id(), err)
 		}
 	}
+
+	// Some project settings can't be set in the Project Create API and have to
+	// set in a second call after project creation.
+	resourceGitlabProjectUpdate(d, meta)
 
 	return resourceGitlabProjectRead(d, meta)
 }
@@ -600,6 +616,20 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
+	}
+
+	if d.HasChange("only_mirror_protected_branches") {
+		// It appears that GitLab API requires that import_url is also set when `only_mirror_protected_branches` is updated/changed
+		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
+		options.ImportURL = gitlab.String(d.Get("import_url").(string))
+		options.OnlyMirrorProtectedBranches = gitlab.Bool(d.Get("only_mirror_protected_branches").(bool))
+	}
+
+	if d.HasChange("mirror_overwrites_diverged_branches") {
+		// It appears that GitLab API requires that import_url is also set when `mirror_overwrites_diverged_branches` is updated/changed
+		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
+		options.ImportURL = gitlab.String(d.Get("import_url").(string))
+		options.MirrorOverwritesDivergedBranches = gitlab.Bool(d.Get("mirror_overwrites_diverged_branches").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
