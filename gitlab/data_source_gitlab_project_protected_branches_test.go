@@ -26,7 +26,7 @@ func TestAccDataGitlabProjectProtectedBranchesSearch(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"data.gitlab_project_protected_branches.test",
 						"protected_branches.0.push_access_levels.0.access_level",
-						"40",
+						"maintainer",
 					),
 				),
 			},
@@ -44,13 +44,13 @@ resource "gitlab_project" "test" {
 
 resource "gitlab_branch_protection" "test" {
   project            = gitlab_project.test.id
-  branch             = gitlab_project.test.default_branch
+  branch             = "master"
   push_access_level  = "maintainer"
   merge_access_level = "developer"
 }
 
 data "gitlab_project_protected_branches" "test" {
-  project_id = gitlab_project.test.id
+  project_id = gitlab_branch_protection.test.project # This expresses the dependency of the data source on the protected branch having first been configured
 }
 `, projectName, projectName)
 }
