@@ -19,14 +19,14 @@ func TestAccDataGitlabProjectProtectedBranchSearch(t *testing.T) {
 				Config: testAccDataGitlabProjectProtectedBranchConfigGetProjectSearch(projectName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"data.gitlab_project_protected_branches.test",
+						"data.gitlab_project_protected_branch.test",
 						"name",
 						"master",
 					),
 					resource.TestCheckResourceAttr(
 						"data.gitlab_project_protected_branch.test",
 						"push_access_levels.0.access_level",
-						"40",
+						"maintainer",
 					),
 				),
 			},
@@ -42,16 +42,23 @@ resource "gitlab_project" "test" {
   default_branch = "master"
 }
 
+resource "gitlab_branch_protection" "master" {
+  project            = gitlab_project.test.id
+  branch             = "master"
+  push_access_level  = "maintainer"
+  merge_access_level = "developer"
+}
+
 resource "gitlab_branch_protection" "test" {
   project            = gitlab_project.test.id
-  branch             = gitlab_project.test.default_branch
+  branch             = "master"
   push_access_level  = "maintainer"
   merge_access_level = "developer"
 }
 
 data "gitlab_project_protected_branch" "test" {
   project_id = gitlab_project.test.id
-  name       = gitlab_project.test.default_branch
+  name       = gitlab_branch_protection.master.branch
 }
 `, projectName, projectName)
 }

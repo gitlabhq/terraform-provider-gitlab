@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -13,14 +14,16 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 		Read: dataSourceGitlabProjectProtectedBranchRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Type:        schema.TypeString,
-				Description: "ID or URL encoded name of project",
-				Required:    true,
+				Type:         schema.TypeString,
+				Description:  "ID or URL encoded name of project",
+				Required:     true,
+				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"name": {
-				Type:        schema.TypeString,
-				Description: "Name of the protected branch",
-				Required:    true,
+				Type:         schema.TypeString,
+				Description:  "Name of the protected branch",
+				Required:     true,
+				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"id": {
 				Type:     schema.TypeInt,
@@ -75,7 +78,7 @@ func dataSourceGitlabProjectProtectedBranchRead(d *schema.ResourceData, meta int
 	// Get protected branch by project ID/path and branch name
 	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, name)
 	if err != nil {
-		return err
+		return fmt.Errorf("error getting protected branch (Project: %v / Name %v): %v", project, name, err)
 	}
 
 	if err := d.Set("push_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
