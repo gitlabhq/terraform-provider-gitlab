@@ -59,6 +59,7 @@ func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 					expires_at     = "2099-03-03"
 					`,
 				),
+				Check: testAccCheckGitlabGroupSharedWithGroup(randName, "2099-03-03", gitlab.GuestPermissions),
 			},
 			{
 				// Verify Import
