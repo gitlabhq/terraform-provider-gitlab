@@ -26,20 +26,12 @@ func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
 					expires_at     = "2099-01-01"
 					`,
 				),
-				Check: testAccCheckGitlabGroupSharedWithGroup(
-					randName,
-					gitlab.String("2099-01-01"),
-					gitlab.GuestPermissions,
-				),
+				Check: testAccCheckGitlabGroupSharedWithGroup(randName, "2099-01-01", gitlab.GuestPermissions),
 			},
 			// Update the share group
 			{
 				Config: testAccGitlabGroupShareGroupConfig(randName, `group_access = "reporter"`),
-				Check: testAccCheckGitlabGroupSharedWithGroup(
-					randName,
-					nil,
-					gitlab.ReporterPermissions,
-				),
+				Check:  testAccCheckGitlabGroupSharedWithGroup(randName, "", gitlab.ReporterPermissions),
 			},
 			// Delete the gitlab_group_share_group resource
 			{
@@ -80,7 +72,7 @@ func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 
 func testAccCheckGitlabGroupSharedWithGroup(
 	groupName string,
-	expireTime *string,
+	expireTime string,
 	accessLevel gitlab.AccessLevelValue,
 ) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
@@ -106,10 +98,10 @@ func testAccCheckGitlabGroupSharedWithGroup(
 			return fmt.Errorf("groupAccessLevel was %d (wanted %d)", sharedGroup.GroupAccessLevel, accessLevel)
 		}
 
-		if sharedGroup.ExpiresAt == nil && expireTime != nil {
-			return fmt.Errorf("expire time was nil (wanted %s)", *expireTime)
-		} else if sharedGroup.ExpiresAt != nil && sharedGroup.ExpiresAt.String() != *expireTime {
-			return fmt.Errorf("expire time was %s (wanted %s)", sharedGroup.ExpiresAt.String(), *expireTime)
+		if sharedGroup.ExpiresAt == nil && expireTime != "" {
+			return fmt.Errorf("expire time was nil (wanted %s)", expireTime)
+		} else if sharedGroup.ExpiresAt != nil && sharedGroup.ExpiresAt.String() != expireTime {
+			return fmt.Errorf("expire time was %s (wanted %s)", sharedGroup.ExpiresAt.String(), expireTime)
 		}
 
 		return nil

@@ -106,7 +106,9 @@ func resourceGitlabGroupShareGroupRead(d *schema.ResourceData, meta interface{})
 			d.Set("share_group_id", sharedGroup.GroupID)
 			d.Set("group_access", accessLevel[convertedAccessLevel])
 
-			if sharedGroup.ExpiresAt != nil {
+			if sharedGroup.ExpiresAt == nil {
+				d.Set("expires_at", "")
+			} else {
 				d.Set("expires_at", sharedGroup.ExpiresAt.String())
 			}
 
