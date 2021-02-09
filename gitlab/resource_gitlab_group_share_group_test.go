@@ -19,13 +19,27 @@ func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Share a new group with another group
 			{
-				Config: testAccGitlabGroupShareGroupConfig(randName, "guest", "2099-01-01"),
-				Check:  testAccCheckGitlabGroupSharedWithGroup(randName, "2099-01-01", gitlab.GuestPermissions),
+				Config: testAccGitlabGroupShareGroupConfig(
+					randName,
+					`
+					group_access 	 = "guest"
+					expires_at     = "2099-01-01"
+					`,
+				),
+				Check: testAccCheckGitlabGroupSharedWithGroup(
+					randName,
+					gitlab.String("2099-01-01"),
+					gitlab.GuestPermissions,
+				),
 			},
 			// Update the share group
 			{
-				Config: testAccGitlabGroupShareGroupConfig(randName, "reporter", "2099-02-02"),
-				Check:  testAccCheckGitlabGroupSharedWithGroup(randName, "2099-02-02", gitlab.ReporterPermissions),
+				Config: testAccGitlabGroupShareGroupConfig(randName, `group_access = "reporter"`),
+				Check: testAccCheckGitlabGroupSharedWithGroup(
+					randName,
+					nil,
+					gitlab.ReporterPermissions,
+				),
 			},
 			// Delete the gitlab_group_share_group resource
 			{
@@ -46,8 +60,13 @@ func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				// create shared groups
-				Config: testAccGitlabGroupShareGroupConfig(randName, "guest", "2099-03-03"),
-				Check:  testAccCheckGitlabGroupSharedWithGroup(randName, "2099-03-03", gitlab.GuestPermissions),
+				Config: testAccGitlabGroupShareGroupConfig(
+					randName,
+					`
+					group_access 	 = "guest"
+					expires_at     = "2099-03-03"
+					`,
+				),
 			},
 			{
 				// Verify Import
@@ -61,7 +80,7 @@ func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 
 func testAccCheckGitlabGroupSharedWithGroup(
 	groupName string,
-	expireTime string,
+	expireTime *string,
 	accessLevel gitlab.AccessLevelValue,
 ) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
@@ -87,8 +106,10 @@ func testAccCheckGitlabGroupSharedWithGroup(
 			return fmt.Errorf("groupAccessLevel was %d (wanted %d)", sharedGroup.GroupAccessLevel, accessLevel)
 		}
 
-		if sharedGroup.ExpiresAt.String() != expireTime {
-			return fmt.Errorf("expired time was %s (wanted %s)", sharedGroup.ExpiresAt.String(), expireTime)
+		if sharedGroup.ExpiresAt == nil && expireTime != nil {
+			return fmt.Errorf("expire time was nil (wanted %s)", *expireTime)
+		} else if sharedGroup.ExpiresAt != nil && sharedGroup.ExpiresAt.String() != *expireTime {
+			return fmt.Errorf("expire time was %s (wanted %s)", sharedGroup.ExpiresAt.String(), *expireTime)
 		}
 
 		return nil
@@ -115,8 +136,7 @@ func testAccCheckGitlabGroupIsNotShared(groupName string) resource.TestCheckFunc
 
 func testAccGitlabGroupShareGroupConfig(
 	randName string,
-	accessLevel string,
-	expireTime string,
+	shareGroupSettings string,
 ) string {
 	return fmt.Sprintf(
 		`
@@ -133,13 +153,11 @@ func testAccGitlabGroupShareGroupConfig(
 		resource "gitlab_group_share_group" "test" {
 		  group_id       = gitlab_group.test_main.id
 			share_group_id = gitlab_group.test_share.id
-			group_access 	 = "%[2]s"
-			expires_at     = "%[3]s"
+			%[2]s
 		}
 		`,
 		randName,
-		accessLevel,
-		expireTime,
+		shareGroupSettings,
 	)
 }
 
