@@ -1,9 +1,9 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -20,6 +20,9 @@ func resourceGitlabBranchProtection() *schema.Resource {
 		Read:   resourceGitlabBranchProtectionRead,
 		Update: resourceGitlabBranchProtectionUpdate,
 		Delete: resourceGitlabBranchProtectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -34,15 +37,21 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			"merge_access_level": {
 				Type:         schema.TypeString,
 				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
+				Optional:     true,
 				ForceNew:     true,
+				ExactlyOneOf: []string{"merge_access_level", "merge_access_levels"},
 			},
 			"push_access_level": {
 				Type:         schema.TypeString,
 				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
+				Optional:     true,
 				ForceNew:     true,
+				ExactlyOneOf: []string{"push_access_level", "push_access_levels"},
 			},
+			"push_access_levels":  schemaAllowedAccessLevels([]string{"push_access_level", "push_access_levels"}),
+			"merge_access_levels": schemaAllowedAccessLevels([]string{"merge_access_level", "merge_access_levels"}),
+			"allowed_to_push":     schemaAllowedTo(),
+			"allowed_to_merge":    schemaAllowedTo(),
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -55,47 +64,56 @@ func resourceGitlabBranchProtection() *schema.Resource {
 func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	branch := gitlab.String(d.Get("branch").(string))
-	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
-	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
-	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
+	branch := d.Get("branch").(string)
 
-	options := &gitlab.ProtectRepositoryBranchesOptions{
-		Name:                      branch,
-		MergeAccessLevel:          &mergeAccessLevel,
+	log.Printf("[DEBUG] create gitlab branch protection on branch %q for project %s", branch, project)
+
+	if d.IsNewResource() {
+		existing, resp, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
+		if err != nil && resp.StatusCode != http.StatusNotFound {
+			return fmt.Errorf("error looking up protected branch %q on project %q: %v", branch, project, err)
+		}
+		if resp.StatusCode != http.StatusNotFound {
+			return fmt.Errorf("protected branch %q on project %q already exists: %+v", branch, project, *existing)
+		}
+	}
+
+	configuredProtectedBranch := expandProtectedBranch(d)
+	pushAccessLevel := gitlab.MaintainerPermissions
+	for _, level := range configuredProtectedBranch.PushAccessLevels {
+		if level.UserID == 0 && level.GroupID == 0 {
+			pushAccessLevel = level.AccessLevel
+			break
+		}
+	}
+	mergeAccessLevel := gitlab.DeveloperPermissions
+	for _, level := range configuredProtectedBranch.MergeAccessLevels {
+		if level.UserID == 0 && level.GroupID == 0 {
+			mergeAccessLevel = level.AccessLevel
+			break
+		}
+	}
+	allowedToPush := expandProtectedBranchAllowedTo(configuredProtectedBranch.PushAccessLevels)
+	allowedToMerge := expandProtectedBranchAllowedTo(configuredProtectedBranch.MergeAccessLevels)
+	pb, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, &gitlab.ProtectRepositoryBranchesOptions{
+		Name:                      &configuredProtectedBranch.Name,
 		PushAccessLevel:           &pushAccessLevel,
-		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
-	}
-
-	log.Printf("[DEBUG] create gitlab branch protection on %v for project %s", options.Name, project)
-
-	bp, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, options)
+		MergeAccessLevel:          &mergeAccessLevel,
+		AllowedToPush:             allowedToPush,
+		AllowedToMerge:            allowedToMerge,
+		CodeOwnerApprovalRequired: &configuredProtectedBranch.CodeOwnerApprovalRequired,
+	})
 	if err != nil {
-		// Remove existing branch protection
-		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project, *branch)
-		if err != nil {
-			return err
-		}
-		// Reprotect branch with updated values
-		bp, _, err = client.ProtectedBranches.ProtectRepositoryBranches(project, options)
-		if err != nil {
-			return err
-		}
+		return fmt.Errorf("error protecting branch %q on project %q: %v", branch, project, err)
 	}
 
-	d.SetId(buildTwoPartID(&project, &bp.Name))
-
-	if err := resourceGitlabBranchProtectionRead(d, meta); err != nil {
-		return err
+	if !pb.CodeOwnerApprovalRequired && configuredProtectedBranch.CodeOwnerApprovalRequired {
+		return fmt.Errorf("feature unavailable: code owner approvals")
 	}
 
-	// If the GitLab tier does not support the code owner approval feature, the resulting plan will be inconsistent.
-	// We return an error because otherwise Terraform would report this inconsistency as a "bug in the provider" to the user.
-	if codeOwnerApprovalRequired && !d.Get("code_owner_approval_required").(bool) {
-		return errors.New("feature unavailable: code owner approvals")
-	}
+	d.SetId(buildTwoPartID(&project, &pb.Name))
 
-	return nil
+	return resourceGitlabBranchProtectionRead(d, meta)
 }
 
 func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}) error {
@@ -107,6 +125,7 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] read gitlab branch protection for project %s, branch %s", project, branch)
 
+	// Get protected branch by project ID/path and branch name
 	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
 	if err != nil {
 		log.Printf("[DEBUG] failed to read gitlab branch protection for project %s, branch %s: %s", project, branch, err)
@@ -116,9 +135,37 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 
 	d.Set("project", project)
 	d.Set("branch", pb.Name)
-	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
-	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
-	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
+
+	pushAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.PushAccessLevels)
+	if len(pushAccessLevels) > 0 {
+		if err := d.Set("push_access_level", pushAccessLevels[0].AccessLevel); err != nil {
+			return fmt.Errorf("error setting push_access_level: %v", err)
+		}
+	}
+	if err := d.Set("push_access_levels", pushAccessLevels); err != nil {
+		return fmt.Errorf("error setting push_access_levels: %v", err)
+	}
+
+	mergeAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.MergeAccessLevels)
+	if len(mergeAccessLevels) > 0 {
+		if err := d.Set("merge_access_level", mergeAccessLevels[0].AccessLevel); err != nil {
+			return fmt.Errorf("error setting merge_access_level: %v", err)
+		}
+	}
+	if err := d.Set("merge_access_levels", mergeAccessLevels); err != nil {
+		return fmt.Errorf("error setting merge_access_levels: %v", err)
+	}
+
+	if err := d.Set("allowed_to_push", convertAllowedToToBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
+		return fmt.Errorf("error setting allowed_to_push: %v", err)
+	}
+	if err := d.Set("allowed_to_merge", convertAllowedToToBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
+		return fmt.Errorf("error setting allowed_to_merge: %v", err)
+	}
+
+	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
+		return fmt.Errorf("error setting code_owner_approval_required: %v", err)
+	}
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
@@ -171,4 +218,237 @@ func projectAndBranchFromID(id string) (string, string, error) {
 		log.Printf("[WARN] cannot get branch protection id from input: %v", id)
 	}
 	return project, branch, err
+}
+
+func expandProtectedBranch(d *schema.ResourceData) *gitlab.ProtectedBranch {
+	pushAccessLevels, ok := d.GetOk("push_access_levels")
+	if !ok {
+		pushAccessLevels = []interface{}{map[string]interface{}{"access_level": d.Get("push_access_level")}}
+	}
+	mergeAccessLevels, ok := d.GetOk("merge_access_levels")
+	if !ok {
+		mergeAccessLevels = []interface{}{map[string]interface{}{"access_level": d.Get("merge_access_level")}}
+	}
+	return &gitlab.ProtectedBranch{
+		Name:                      d.Get("branch").(string),
+		PushAccessLevels:          expandBranchAccessDescriptions(pushAccessLevels.([]interface{}), d.Get("allowed_to_push").([]interface{})),
+		MergeAccessLevels:         expandBranchAccessDescriptions(mergeAccessLevels.([]interface{}), d.Get("allowed_to_merge").([]interface{})),
+		CodeOwnerApprovalRequired: d.Get("code_owner_approval_required").(bool),
+	}
+}
+
+func expandBranchAccessDescriptions(accessLevels []interface{}, allowedTo []interface{}) []*gitlab.BranchAccessDescription {
+	result := make([]*gitlab.BranchAccessDescription, 0)
+	for _, v := range accessLevels {
+		result = append(result, &gitlab.BranchAccessDescription{
+			AccessLevel: accessLevelID[v.(map[string]interface{})["access_level"].(string)],
+		})
+	}
+	for _, v := range allowedTo {
+		desc := &gitlab.BranchAccessDescription{}
+		if userID, ok := v.(map[string]interface{})["user_id"]; ok {
+			desc.UserID = userID.(int)
+		}
+		if groupID, ok := v.(map[string]interface{})["group_id"]; ok {
+			desc.GroupID = groupID.(int)
+		}
+		result = append(result, desc)
+	}
+	return result
+}
+
+func expandProtectedBranchAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []*gitlab.ProtectBranchPermissionOptions {
+	result := make([]*gitlab.ProtectBranchPermissionOptions, 0)
+	for _, branchAccessDescription := range branchAccessDescriptions {
+		if branchAccessDescription.UserID != 0 || branchAccessDescription.GroupID != 0 {
+			opts := &gitlab.ProtectBranchPermissionOptions{
+				AccessLevel: &branchAccessDescription.AccessLevel,
+			}
+			if branchAccessDescription.UserID != 0 {
+				opts.UserID = gitlab.Int(branchAccessDescription.UserID)
+			}
+			if branchAccessDescription.GroupID != 0 {
+				opts.GroupID = gitlab.Int(branchAccessDescription.GroupID)
+			}
+			result = append(result, opts)
+		}
+	}
+	return result
+}
+
+func flattenProtectedBranches(protectedBranches []*gitlab.ProtectedBranch) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+
+	for _, protectedBranch := range protectedBranches {
+		result = append(result, map[string]interface{}{
+			"project":                      protectedBranch.ID,
+			"branch":                       protectedBranch.Name,
+			"push_access_levels":           flattenBranchAccessDescriptionsAccessLevels(protectedBranch.PushAccessLevels),
+			"merge_access_levels":          flattenBranchAccessDescriptionsAccessLevels(protectedBranch.MergeAccessLevels),
+			"allowed_to_push":              flattenBranchAccessDescriptionsAllowedTo(protectedBranch.PushAccessLevels),
+			"allowed_to_merge":             flattenBranchAccessDescriptionsAllowedTo(protectedBranch.MergeAccessLevels),
+			"code_owner_approval_required": protectedBranch.CodeOwnerApprovalRequired,
+		})
+	}
+
+	return result
+}
+
+func flattenBranchAccessDescriptionsAccessLevels(branchAccessDescriptions []*gitlab.BranchAccessDescription) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+	for _, branchAccessDescription := range branchAccessDescriptions {
+		if branchAccessDescription.UserID != 0 || branchAccessDescription.GroupID != 0 {
+			continue
+		}
+		result = append(result, map[string]interface{}{
+			"access_level":             accessLevel[branchAccessDescription.AccessLevel],
+			"access_level_description": branchAccessDescription.AccessLevelDescription,
+		})
+	}
+	return result
+}
+
+func flattenBranchAccessDescriptionsAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+	for _, branchAccessDescription := range branchAccessDescriptions {
+		if branchAccessDescription.UserID == 0 && branchAccessDescription.GroupID == 0 {
+			continue
+		}
+		result = append(result, map[string]interface{}{
+			"access_level":             accessLevel[branchAccessDescription.AccessLevel],
+			"access_level_description": branchAccessDescription.AccessLevelDescription,
+			"user_id":                  branchAccessDescription.UserID,
+			"group_id":                 branchAccessDescription.GroupID,
+		})
+	}
+	return result
+}
+
+func protectedBranchesEqual(a *gitlab.ProtectedBranch, b *gitlab.ProtectedBranch) bool {
+	if a == nil && b != nil || a != nil && b == nil {
+		return false
+	}
+	if a.Name != b.Name || a.ID != b.ID || !branchAccessDescriptionsEqual(a.PushAccessLevels, b.PushAccessLevels) || !branchAccessDescriptionsEqual(a.MergeAccessLevels, b.MergeAccessLevels) {
+		return false
+	}
+	return true
+}
+
+func branchAccessDescriptionsEqual(a []*gitlab.BranchAccessDescription, b []*gitlab.BranchAccessDescription) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	aBranchAccessDescriptionsByAccessLevel := make(map[gitlab.AccessLevelValue]*gitlab.BranchAccessDescription, 0)
+	aBranchAccessDescriptionsByUserID := make(map[int]*gitlab.BranchAccessDescription, 0)
+	aBranchAccessDescriptionsByGroupID := make(map[int]*gitlab.BranchAccessDescription, 0)
+	for _, branchAccessDescription := range a {
+		aBranchAccessDescriptionsByAccessLevel[branchAccessDescription.AccessLevel] = branchAccessDescription
+		aBranchAccessDescriptionsByUserID[branchAccessDescription.UserID] = branchAccessDescription
+		aBranchAccessDescriptionsByGroupID[branchAccessDescription.GroupID] = branchAccessDescription
+	}
+
+	for _, branchAccessDescription := range b {
+		if _, exists := aBranchAccessDescriptionsByAccessLevel[branchAccessDescription.AccessLevel]; !exists {
+			return false
+		}
+		if _, exists := aBranchAccessDescriptionsByUserID[branchAccessDescription.UserID]; !exists {
+			return false
+		}
+		if _, exists := aBranchAccessDescriptionsByGroupID[branchAccessDescription.GroupID]; !exists {
+			return false
+		}
+	}
+
+	return true
+}
+
+func schemaAllowedAccessLevels(exactlyOneOf []string) *schema.Schema {
+	return &schema.Schema{
+		Type:         schema.TypeList,
+		Optional:     true,
+		Computed:     true,
+		ExactlyOneOf: exactlyOneOf,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"access_level": {
+					Type:     schema.TypeString,
+					Required: true,
+				},
+				"access_level_description": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+			},
+		},
+	}
+}
+
+func schemaAllowedTo() *schema.Schema {
+	return &schema.Schema{
+		Type:     schema.TypeList,
+		Optional: true,
+		Computed: true,
+		Elem: &schema.Resource{
+			Schema: map[string]*schema.Schema{
+				"access_level": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"access_level_description": {
+					Type:     schema.TypeString,
+					Computed: true,
+				},
+				"user_id": {
+					Type:     schema.TypeInt,
+					Optional: true,
+				},
+				"group_id": {
+					Type:     schema.TypeInt,
+					Optional: true,
+				},
+			},
+		},
+	}
+}
+
+type stateBranchAccessDescription struct {
+	AccessLevel            string `mapstructure:"access_level"`
+	AccessLevelDescription string `mapstructure:"access_level_description"`
+	GroupID                int    `mapstructure:"group_id,omitempty"`
+	UserID                 int    `mapstructure:"user_id,omitempty"`
+}
+
+func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
+	result := make([]stateBranchAccessDescription, 0)
+
+	for _, description := range descriptions {
+		if description.UserID != 0 || description.GroupID != 0 {
+			continue
+		}
+		result = append(result, stateBranchAccessDescription{
+			AccessLevel:            accessLevel[description.AccessLevel],
+			AccessLevelDescription: description.AccessLevelDescription,
+		})
+	}
+
+	return result
+}
+
+func convertAllowedToToBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
+	result := make([]stateBranchAccessDescription, 0)
+
+	for _, description := range descriptions {
+		if description.UserID == 0 || description.GroupID == 0 {
+			continue
+		}
+		result = append(result, stateBranchAccessDescription{
+			AccessLevel:            accessLevel[description.AccessLevel],
+			AccessLevelDescription: description.AccessLevelDescription,
+			UserID:                 description.UserID,
+			GroupID:                description.GroupID,
+		})
+	}
+
+	return result
 }
