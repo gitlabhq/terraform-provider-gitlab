@@ -44,7 +44,7 @@ jobs:
         chmod 666 Gitlab-license.txt || true
 
     - name: Start Gitlab
-      run: make testacc-up
+      run: make testacc-up SERVICE=gitlab-ee
 
     - name: Run acceptance tests
       run: make testacc
