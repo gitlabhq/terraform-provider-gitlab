@@ -12,9 +12,15 @@ import (
 )
 
 func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
-
-	var env gitlab.Environment
 	rInt := acctest.RandInt()
+
+	var env gitlab.Environment = gitlab.Environment{
+		Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
+	}
+	var env2 gitlab.Environment = gitlab.Environment{
+		Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
+		ExternalURL: "https://example.com",
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -36,7 +42,7 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 				Config: testAccGitlabProjectEnvironmentUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
+					testAccCheckGitlabProjectEnvironmentAttributes(&env2, &testAccGitlabProjectEnvironmentExpectedAttributes{
 						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
 						ExternalURL: "https://example.com",
 					}),
@@ -57,9 +63,16 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 }
 
 func TestAccGitlabProjectEnvironment_wildcard(t *testing.T) {
-
-	var env gitlab.Environment
 	rInt := acctest.RandInt()
+
+	var env gitlab.Environment = gitlab.Environment{
+		Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
+	}
+
+	var env2 gitlab.Environment = gitlab.Environment{
+		Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
+		ExternalURL: "https://example.com",
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -72,8 +85,7 @@ func TestAccGitlabProjectEnvironment_wildcard(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
 					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
-						ExternalURL: accessLevel[gitlab.DeveloperPermissions],
+						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
 					}),
 				),
 			},
@@ -82,9 +94,9 @@ func TestAccGitlabProjectEnvironment_wildcard(t *testing.T) {
 				Config: testAccGitlabProjectEnvironmentUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
+					testAccCheckGitlabProjectEnvironmentAttributes(&env2, &testAccGitlabProjectEnvironmentExpectedAttributes{
 						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
-						ExternalURL: accessLevel[gitlab.MasterPermissions],
+						ExternalURL: "https://example.com",
 					}),
 				),
 			},
@@ -94,8 +106,7 @@ func TestAccGitlabProjectEnvironment_wildcard(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
 					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
-						ExternalURL: accessLevel[gitlab.DeveloperPermissions],
+						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
 					}),
 				),
 			},
@@ -140,7 +151,7 @@ func testAccCheckGitlabProjectEnvironmentAttributes(env *gitlab.Environment, wan
 		}
 
 		if env.ExternalURL != want.ExternalURL {
-			return fmt.Errorf("got Create access levels %q; want %q", env.ExternalURL, want.ExternalURL)
+			return fmt.Errorf("got external URL %q; want %q", env.ExternalURL, want.ExternalURL)
 		}
 
 		return nil
