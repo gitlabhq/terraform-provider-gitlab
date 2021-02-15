@@ -183,14 +183,6 @@ func TestAccGitlabBranchProtection_createWithMultipleAccessLevels(t *testing.T) 
 	var pb gitlab.ProtectedBranch
 	rInt := acctest.RandInt()
 
-	isCE, err := isRunningInCE()
-	if err != nil {
-		t.Fatalf("error detecting if running in GitLab Free")
-	}
-	if isCE {
-		t.Skipf("the features tested in this test are not available in GitLab Free")
-	}
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
