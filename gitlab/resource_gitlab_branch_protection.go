@@ -97,21 +97,10 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 		}
 	}
 
+	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
+	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+
 	configuredProtectedBranch := expandProtectedBranch(d)
-	pushAccessLevel := gitlab.MaintainerPermissions
-	for _, level := range configuredProtectedBranch.PushAccessLevels {
-		if level.UserID == 0 && level.GroupID == 0 {
-			pushAccessLevel = level.AccessLevel
-			break
-		}
-	}
-	mergeAccessLevel := gitlab.DeveloperPermissions
-	for _, level := range configuredProtectedBranch.MergeAccessLevels {
-		if level.UserID == 0 && level.GroupID == 0 {
-			mergeAccessLevel = level.AccessLevel
-			break
-		}
-	}
 	allowedToPush := expandProtectedBranchAllowedTo(configuredProtectedBranch.PushAccessLevels)
 	allowedToMerge := expandProtectedBranchAllowedTo(configuredProtectedBranch.MergeAccessLevels)
 	pb, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, &gitlab.ProtectRepositoryBranchesOptions{
