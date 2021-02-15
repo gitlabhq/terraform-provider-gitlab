@@ -235,11 +235,25 @@ func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gi
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		if rs.Primary.Attributes["merge_access_level"] != accessLevelValueToName[flattenBranchAccessDescriptionsToAccessLevel(pb.MergeAccessLevels)] {
+		var mergeAccessLevel gitlab.AccessLevelValue
+		for _, v := range pb.MergeAccessLevels {
+			if v.UserID == 0 && v.GroupID == 0 {
+				mergeAccessLevel = v.AccessLevel
+				break
+			}
+		}
+		if rs.Primary.Attributes["merge_access_level"] != accessLevelValueToName[mergeAccessLevel] {
 			return fmt.Errorf("merge access level not persisted in state correctly")
 		}
 
-		if rs.Primary.Attributes["push_access_level"] != accessLevelValueToName[flattenBranchAccessDescriptionsToAccessLevel(pb.PushAccessLevels)] {
+		var pushAccessLevel gitlab.AccessLevelValue
+		for _, v := range pb.PushAccessLevels {
+			if v.UserID == 0 && v.GroupID == 0 {
+				pushAccessLevel = v.AccessLevel
+				break
+			}
+		}
+		if rs.Primary.Attributes["push_access_level"] != accessLevelValueToName[pushAccessLevel] {
 			return fmt.Errorf("push access level not persisted in state correctly")
 		}
 
@@ -295,12 +309,24 @@ func testAccCheckGitlabBranchProtectionAttributes(pb *gitlab.ProtectedBranch, wa
 			return fmt.Errorf("got name %q; want %q", pb.Name, want.Name)
 		}
 
-		pushAccessLevel := flattenBranchAccessDescriptionsToAccessLevel(pb.PushAccessLevels)
+		var pushAccessLevel gitlab.AccessLevelValue
+		for _, v := range pb.PushAccessLevels {
+			if v.UserID == 0 && v.GroupID == 0 {
+				pushAccessLevel = v.AccessLevel
+				break
+			}
+		}
 		if pushAccessLevel != accessLevelID[want.PushAccessLevel] {
 			return fmt.Errorf("got Push access level %v; want %v", pushAccessLevel, accessLevelID[want.PushAccessLevel])
 		}
 
-		mergeAccessLevel := flattenBranchAccessDescriptionsToAccessLevel(pb.MergeAccessLevels)
+		var mergeAccessLevel gitlab.AccessLevelValue
+		for _, v := range pb.MergeAccessLevels {
+			if v.UserID == 0 && v.GroupID == 0 {
+				mergeAccessLevel = v.AccessLevel
+				break
+			}
+		}
 		if mergeAccessLevel != accessLevelID[want.MergeAccessLevel] {
 			return fmt.Errorf("got Merge access level %v; want %v", mergeAccessLevel, accessLevelID[want.MergeAccessLevel])
 		}
