@@ -9,6 +9,29 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+var (
+	allowedToElem = &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"access_level": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"access_level_description": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"user_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"group_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+		},
+	}
+)
+
 func resourceGitlabBranchProtection() *schema.Resource {
 	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
 
@@ -37,21 +60,17 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			"merge_access_level": {
 				Type:         schema.TypeString,
 				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Optional:     true,
+				Required:     true,
 				ForceNew:     true,
-				ExactlyOneOf: []string{"merge_access_level", "merge_access_levels"},
 			},
 			"push_access_level": {
 				Type:         schema.TypeString,
 				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Optional:     true,
+				Required:     true,
 				ForceNew:     true,
-				ExactlyOneOf: []string{"push_access_level", "push_access_levels"},
 			},
-			"push_access_levels":  schemaAllowedAccessLevels([]string{"push_access_level", "push_access_levels"}),
-			"merge_access_levels": schemaAllowedAccessLevels([]string{"merge_access_level", "merge_access_levels"}),
-			"allowed_to_push":     schemaAllowedTo(),
-			"allowed_to_merge":    schemaAllowedTo(),
+			"allowed_to_push":  schemaAllowedTo(),
+			"allowed_to_merge": schemaAllowedTo(),
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -142,18 +161,12 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 			return fmt.Errorf("error setting push_access_level: %v", err)
 		}
 	}
-	if err := d.Set("push_access_levels", pushAccessLevels); err != nil {
-		return fmt.Errorf("error setting push_access_levels: %v", err)
-	}
 
 	mergeAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.MergeAccessLevels)
 	if len(mergeAccessLevels) > 0 {
 		if err := d.Set("merge_access_level", mergeAccessLevels[0].AccessLevel); err != nil {
 			return fmt.Errorf("error setting merge_access_level: %v", err)
 		}
-	}
-	if err := d.Set("merge_access_levels", mergeAccessLevels); err != nil {
-		return fmt.Errorf("error setting merge_access_levels: %v", err)
 	}
 
 	if err := d.Set("allowed_to_push", convertAllowedToToBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
@@ -221,29 +234,21 @@ func projectAndBranchFromID(id string) (string, string, error) {
 }
 
 func expandProtectedBranch(d *schema.ResourceData) *gitlab.ProtectedBranch {
-	pushAccessLevels, ok := d.GetOk("push_access_levels")
-	if !ok {
-		pushAccessLevels = []interface{}{map[string]interface{}{"access_level": d.Get("push_access_level")}}
-	}
-	mergeAccessLevels, ok := d.GetOk("merge_access_levels")
-	if !ok {
-		mergeAccessLevels = []interface{}{map[string]interface{}{"access_level": d.Get("merge_access_level")}}
-	}
+	pushAccessLevel := d.Get("push_access_level").(string)
+	mergeAccessLevel := d.Get("merge_access_level").(string)
 	return &gitlab.ProtectedBranch{
 		Name:                      d.Get("branch").(string),
-		PushAccessLevels:          expandBranchAccessDescriptions(pushAccessLevels.([]interface{}), d.Get("allowed_to_push").([]interface{})),
-		MergeAccessLevels:         expandBranchAccessDescriptions(mergeAccessLevels.([]interface{}), d.Get("allowed_to_merge").([]interface{})),
+		PushAccessLevels:          expandBranchAccessDescriptions(pushAccessLevel, d.Get("allowed_to_push").(*schema.Set).List()),
+		MergeAccessLevels:         expandBranchAccessDescriptions(mergeAccessLevel, d.Get("allowed_to_merge").(*schema.Set).List()),
 		CodeOwnerApprovalRequired: d.Get("code_owner_approval_required").(bool),
 	}
 }
 
-func expandBranchAccessDescriptions(accessLevels []interface{}, allowedTo []interface{}) []*gitlab.BranchAccessDescription {
+func expandBranchAccessDescriptions(accessLevel string, allowedTo []interface{}) []*gitlab.BranchAccessDescription {
 	result := make([]*gitlab.BranchAccessDescription, 0)
-	for _, v := range accessLevels {
-		result = append(result, &gitlab.BranchAccessDescription{
-			AccessLevel: accessLevelID[v.(map[string]interface{})["access_level"].(string)],
-		})
-	}
+	result = append(result, &gitlab.BranchAccessDescription{
+		AccessLevel: accessLevelID[accessLevel],
+	})
 	for _, v := range allowedTo {
 		desc := &gitlab.BranchAccessDescription{}
 		if userID, ok := v.(map[string]interface{})["user_id"]; ok {
@@ -283,8 +288,8 @@ func flattenProtectedBranches(protectedBranches []*gitlab.ProtectedBranch) []map
 		result = append(result, map[string]interface{}{
 			"project":                      protectedBranch.ID,
 			"branch":                       protectedBranch.Name,
-			"push_access_levels":           flattenBranchAccessDescriptionsAccessLevels(protectedBranch.PushAccessLevels),
-			"merge_access_levels":          flattenBranchAccessDescriptionsAccessLevels(protectedBranch.MergeAccessLevels),
+			"push_access_level":            flattenBranchAccessDescriptionsToAccessLevel(protectedBranch.PushAccessLevels),
+			"merge_access_level":           flattenBranchAccessDescriptionsToAccessLevel(protectedBranch.MergeAccessLevels),
 			"allowed_to_push":              flattenBranchAccessDescriptionsAllowedTo(protectedBranch.PushAccessLevels),
 			"allowed_to_merge":             flattenBranchAccessDescriptionsAllowedTo(protectedBranch.MergeAccessLevels),
 			"code_owner_approval_required": protectedBranch.CodeOwnerApprovalRequired,
@@ -294,22 +299,18 @@ func flattenProtectedBranches(protectedBranches []*gitlab.ProtectedBranch) []map
 	return result
 }
 
-func flattenBranchAccessDescriptionsAccessLevels(branchAccessDescriptions []*gitlab.BranchAccessDescription) []map[string]interface{} {
-	result := make([]map[string]interface{}, 0)
+func flattenBranchAccessDescriptionsToAccessLevel(branchAccessDescriptions []*gitlab.BranchAccessDescription) gitlab.AccessLevelValue {
 	for _, branchAccessDescription := range branchAccessDescriptions {
 		if branchAccessDescription.UserID != 0 || branchAccessDescription.GroupID != 0 {
 			continue
 		}
-		result = append(result, map[string]interface{}{
-			"access_level":             accessLevel[branchAccessDescription.AccessLevel],
-			"access_level_description": branchAccessDescription.AccessLevelDescription,
-		})
+		return branchAccessDescription.AccessLevel
 	}
-	return result
+	return gitlab.NoPermissions
 }
 
-func flattenBranchAccessDescriptionsAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []map[string]interface{} {
-	result := make([]map[string]interface{}, 0)
+func flattenBranchAccessDescriptionsAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) *schema.Set {
+	result := make([]interface{}, 0)
 	for _, branchAccessDescription := range branchAccessDescriptions {
 		if branchAccessDescription.UserID == 0 && branchAccessDescription.GroupID == 0 {
 			continue
@@ -321,7 +322,7 @@ func flattenBranchAccessDescriptionsAllowedTo(branchAccessDescriptions []*gitlab
 			"group_id":                 branchAccessDescription.GroupID,
 		})
 	}
-	return result
+	return schema.NewSet(schema.HashResource(allowedToElem), result)
 }
 
 func protectedBranchesEqual(a *gitlab.ProtectedBranch, b *gitlab.ProtectedBranch) bool {
@@ -363,52 +364,12 @@ func branchAccessDescriptionsEqual(a []*gitlab.BranchAccessDescription, b []*git
 	return true
 }
 
-func schemaAllowedAccessLevels(exactlyOneOf []string) *schema.Schema {
-	return &schema.Schema{
-		Type:         schema.TypeList,
-		Optional:     true,
-		Computed:     true,
-		ExactlyOneOf: exactlyOneOf,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"access_level": {
-					Type:     schema.TypeString,
-					Required: true,
-				},
-				"access_level_description": {
-					Type:     schema.TypeString,
-					Computed: true,
-				},
-			},
-		},
-	}
-}
-
 func schemaAllowedTo() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeList,
+		Type:     schema.TypeSet,
 		Optional: true,
-		Computed: true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"access_level": {
-					Type:     schema.TypeString,
-					Computed: true,
-				},
-				"access_level_description": {
-					Type:     schema.TypeString,
-					Computed: true,
-				},
-				"user_id": {
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"group_id": {
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-			},
-		},
+		ForceNew: true,
+		Elem:     allowedToElem,
 	}
 }
 
@@ -439,7 +400,7 @@ func convertAllowedToToBranchAccessDescriptions(descriptions []*gitlab.BranchAcc
 	result := make([]stateBranchAccessDescription, 0)
 
 	for _, description := range descriptions {
-		if description.UserID == 0 || description.GroupID == 0 {
+		if description.UserID == 0 && description.GroupID == 0 {
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
