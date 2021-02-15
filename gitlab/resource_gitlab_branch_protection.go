@@ -262,11 +262,11 @@ func expandBranchAccessDescriptions(accessLevel string, allowedTo []interface{})
 	return result
 }
 
-func expandProtectedBranchAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []*gitlab.ProtectBranchPermissionOptions {
-	result := make([]*gitlab.ProtectBranchPermissionOptions, 0)
+func expandProtectedBranchAllowedTo(branchAccessDescriptions []*gitlab.BranchAccessDescription) []*gitlab.BranchPermissionOptions {
+	result := make([]*gitlab.BranchPermissionOptions, 0)
 	for _, branchAccessDescription := range branchAccessDescriptions {
 		if branchAccessDescription.UserID != 0 || branchAccessDescription.GroupID != 0 {
-			opts := &gitlab.ProtectBranchPermissionOptions{
+			opts := &gitlab.BranchPermissionOptions{
 				AccessLevel: &branchAccessDescription.AccessLevel,
 			}
 			if branchAccessDescription.UserID != 0 {
