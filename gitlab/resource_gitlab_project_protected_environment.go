@@ -147,12 +147,12 @@ func resourceGitlabProjectProtectedEnvironmentDelete(d *schema.ResourceData, met
 	return nil
 }
 
-func expandDeployAccessLevels(vs []interface{}) ([]*gitlab.EnvironmentAccessOption, error) {
-	result := make([]*gitlab.EnvironmentAccessOption, 0)
+func expandDeployAccessLevels(vs []interface{}) ([]*gitlab.EnvironmentAccessOptions, error) {
+	result := make([]*gitlab.EnvironmentAccessOptions, 0)
 
 	for _, v := range vs {
 		opts := v.(map[string]interface{})
-		option := &gitlab.EnvironmentAccessOption{}
+		option := &gitlab.EnvironmentAccessOptions{}
 		if accessLevel, exists := opts["access_level"]; exists {
 			accessLevelValue, err := accessLevelStringToValue(accessLevel.(string))
 			if err != nil {
@@ -177,10 +177,10 @@ func flattenDeployAccessLevels(vs []*gitlab.EnvironmentAccessDescription) []map[
 		v := make(map[string]interface{})
 		v["access_level"] = accessLevelValueToName[accessDescription.AccessLevel]
 		v["access_level_description"] = accessDescription.AccessLevelDescription
-		if accessDescription.UserID != nil {
+		if accessDescription.UserID != 0 {
 			v["user_id"] = accessDescription.UserID
 		}
-		if accessDescription.GroupID != nil {
+		if accessDescription.GroupID != 0 {
 			v["group_id"] = accessDescription.GroupID
 		}
 		result = append(result, v)
