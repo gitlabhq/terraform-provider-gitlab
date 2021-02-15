@@ -99,23 +99,24 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 
 	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
-	configuredProtectedBranch := expandProtectedBranch(d)
-	allowedToPush := expandProtectedBranchAllowedTo(configuredProtectedBranch.PushAccessLevels)
-	allowedToMerge := expandProtectedBranchAllowedTo(configuredProtectedBranch.MergeAccessLevels)
+	allowedToPush := expandBranchPermissionOptions(d.Get("allowed_to_push").(*schema.Set).List())
+	allowedToMerge := expandBranchPermissionOptions(d.Get("allowed_to_merge").(*schema.Set).List())
+
 	pb, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, &gitlab.ProtectRepositoryBranchesOptions{
-		Name:                      &configuredProtectedBranch.Name,
+		Name:                      &branch,
 		PushAccessLevel:           &pushAccessLevel,
 		MergeAccessLevel:          &mergeAccessLevel,
 		AllowedToPush:             allowedToPush,
 		AllowedToMerge:            allowedToMerge,
-		CodeOwnerApprovalRequired: &configuredProtectedBranch.CodeOwnerApprovalRequired,
+		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	})
 	if err != nil {
 		return fmt.Errorf("error protecting branch %q on project %q: %v", branch, project, err)
 	}
 
-	if !pb.CodeOwnerApprovalRequired && configuredProtectedBranch.CodeOwnerApprovalRequired {
+	if !pb.CodeOwnerApprovalRequired && codeOwnerApprovalRequired {
 		return fmt.Errorf("feature unavailable: code owner approvals")
 	}
 
@@ -222,31 +223,17 @@ func projectAndBranchFromID(id string) (string, string, error) {
 	return project, branch, err
 }
 
-func expandProtectedBranch(d *schema.ResourceData) *gitlab.ProtectedBranch {
-	pushAccessLevel := d.Get("push_access_level").(string)
-	mergeAccessLevel := d.Get("merge_access_level").(string)
-	return &gitlab.ProtectedBranch{
-		Name:                      d.Get("branch").(string),
-		PushAccessLevels:          expandBranchAccessDescriptions(pushAccessLevel, d.Get("allowed_to_push").(*schema.Set).List()),
-		MergeAccessLevels:         expandBranchAccessDescriptions(mergeAccessLevel, d.Get("allowed_to_merge").(*schema.Set).List()),
-		CodeOwnerApprovalRequired: d.Get("code_owner_approval_required").(bool),
-	}
-}
-
-func expandBranchAccessDescriptions(accessLevel string, allowedTo []interface{}) []*gitlab.BranchAccessDescription {
-	result := make([]*gitlab.BranchAccessDescription, 0)
-	result = append(result, &gitlab.BranchAccessDescription{
-		AccessLevel: accessLevelID[accessLevel],
-	})
+func expandBranchPermissionOptions(allowedTo []interface{}) []*gitlab.BranchPermissionOptions {
+	result := make([]*gitlab.BranchPermissionOptions, 0)
 	for _, v := range allowedTo {
-		desc := &gitlab.BranchAccessDescription{}
-		if userID, ok := v.(map[string]interface{})["user_id"]; ok {
-			desc.UserID = userID.(int)
+		opt := &gitlab.BranchPermissionOptions{}
+		if userID, ok := v.(map[string]interface{})["user_id"]; ok && userID != 0 {
+			opt.UserID = gitlab.Int(userID.(int))
 		}
-		if groupID, ok := v.(map[string]interface{})["group_id"]; ok {
-			desc.GroupID = groupID.(int)
+		if groupID, ok := v.(map[string]interface{})["group_id"]; ok && groupID != 0 {
+			opt.GroupID = gitlab.Int(groupID.(int))
 		}
-		result = append(result, desc)
+		result = append(result, opt)
 	}
 	return result
 }
@@ -304,12 +291,17 @@ func flattenBranchAccessDescriptionsAllowedTo(branchAccessDescriptions []*gitlab
 		if branchAccessDescription.UserID == 0 && branchAccessDescription.GroupID == 0 {
 			continue
 		}
-		result = append(result, map[string]interface{}{
+		v := map[string]interface{}{
 			"access_level":             accessLevel[branchAccessDescription.AccessLevel],
 			"access_level_description": branchAccessDescription.AccessLevelDescription,
-			"user_id":                  branchAccessDescription.UserID,
-			"group_id":                 branchAccessDescription.GroupID,
-		})
+		}
+		if branchAccessDescription.UserID != 0 {
+			v["user_id"] = branchAccessDescription.UserID
+		}
+		if branchAccessDescription.GroupID != 0 {
+			v["group_id"] = branchAccessDescription.GroupID
+		}
+		result = append(result, v)
 	}
 	return schema.NewSet(schema.HashResource(allowedToElem), result)
 }
