@@ -84,6 +84,10 @@ func dataSourceGitlabUser() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			"note": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 			"user_provider": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -198,6 +202,7 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("created_at", user.CreatedAt)
 	d.Set("organization", user.Organization)
 	d.Set("two_factor_enabled", user.TwoFactorEnabled)
+	d.Set("note", user.Note)
 	d.Set("provider", user.Provider)
 	d.Set("avatar_url", user.AvatarURL)
 	d.Set("bio", user.Bio)

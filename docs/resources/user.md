@@ -44,6 +44,8 @@ for the user.
 
 * `is_external` - (Optional) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
 
+* `note` - (Optional) The note associated to the user.
+
 * `reset_password` - (Optional) Boolean, defaults to false. Send user password reset link.
 
 ## Attributes Reference

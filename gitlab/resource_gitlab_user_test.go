@@ -54,6 +54,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						CanCreateGroup:   true,
 						SkipConfirmation: false,
 						External:         false,
+						Note:             fmt.Sprintf("note%d", rInt),
 					}),
 				),
 			},
@@ -144,6 +145,7 @@ type testAccGitlabUserExpectedAttributes struct {
 	CanCreateGroup   bool
 	SkipConfirmation bool
 	External         bool
+	Note             string
 }
 
 func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUserExpectedAttributes) resource.TestCheckFunc {
@@ -166,6 +168,10 @@ func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUser
 
 		if user.External != want.External {
 			return fmt.Errorf("got is_external %t; want %t", user.External, want.External)
+		}
+
+		if user.Note != want.Note {
+			return fmt.Errorf("got note %q; want %q", user.Note, want.Note)
 		}
 
 		if user.IsAdmin != want.Admin {
@@ -230,8 +236,9 @@ resource "gitlab_user" "foo" {
   projects_limit   = 10
   can_create_group = true
   is_external      = false
+  note             = "note%d"
 }
-  `, rInt, rInt, rInt, rInt)
+  `, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabUserConfigPasswordReset(rInt int) string {

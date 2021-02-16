@@ -57,6 +57,7 @@ The following attributes are exported:
   * `provider` - The UID provider of the user.
   * `organization` - The organization of the user.
   * `two_factor_enabled` - Whether user's two factor auth is enabled.
+  * `note` - The note associated to the user.
   * `avatar_url` - The avatar URL of the user.
   * `bio` - The bio of the user.
   * `location` - The location of the user.

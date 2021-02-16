@@ -68,6 +68,10 @@ func resourceGitlabUser() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"note": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -80,6 +84,7 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("email", user.Email)
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
+	d.Set("note", user.Note)
 	d.Set("skip_confirmation", user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero())
 }
 
@@ -96,6 +101,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		SkipConfirmation: gitlab.Bool(d.Get("skip_confirmation").(bool)),
 		External:         gitlab.Bool(d.Get("is_external").(bool)),
 		ResetPassword:    gitlab.Bool(d.Get("reset_password").(bool)),
+		Note:             gitlab.String(d.Get("note").(string)),
 	}
 
 	if *options.Password == "" && !*options.ResetPassword {
@@ -161,6 +167,10 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("is_external") {
 		options.External = gitlab.Bool(d.Get("is_external").(bool))
+	}
+
+	if d.HasChange("note") {
+		options.Note = gitlab.String(d.Get("note").(string))
 	}
 
 	log.Printf("[DEBUG] update gitlab user %s", d.Id())
