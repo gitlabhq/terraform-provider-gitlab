@@ -2,55 +2,55 @@
 
 FEATURES:
 
-* Add resource for project freeze periods #516 
+* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#516 ))  
 
 ENHANCEMENTS:
 
-* Update go version and go-gitlab version #523 
-* Support additional attributes in `gitlab_project_hook` #525 
-* Link badges in README to proper workflows #527 
-* gitlab_project: Check each push rule individually #531
-* Allow `full_path` in addition to `id` in gitlab_project data source #532 
-* Update test fixtures for better usability #535 
-* Check for state change on user delete #539 
-* Increase gitlab_project import timeout #536
-* Add optional mirror options #554 
-* Remove vendor folder #546 
-* Add dependabot config #558 
-* Fix EE tests actually running against CE #564 
-* Fix EE test mounting license as a directory #568 
+* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#523)) 
+* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#525)) 
+* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#527)) 
+* gitlab_project: Check each push rule individually ([#531](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#531))
+* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#532)) 
+* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#535)) 
+* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#539)) 
+* Increase gitlab_project import timeout ([#536](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#536))
+* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#554)) 
+* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#546)) 
+* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#558)) 
+* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#564)) 
+* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#568)) 
 
 BUG FIXES:
 
-* fix deploy_token expiration #510 
-* Fix group_share_group nil pointer reference #555 
+* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#510)) 
+* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#555)) 
 
 ## 3.4.0 (Jan 14, 2021)
 
 FEATURES:
 
-* Support sharing a group with another group #511 
-* Support Project Mirroring #512
+* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#511)) 
+* Support Project Mirroring ([#512](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#512))
 
 ## 3.3.0 (Nov 30, 2020)
 
 FEATURES:
 
-* Support instance level CI variables #389
+* Support instance level CI variables ([#389](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#389))
 
 ENHANCEMENTS
 
-*  Add the pages_access_level parameter #472
-*  Do not fail when project member does not exist #473
-* Make the runners_token on the project secret #474
-*  Fix nil pointer dereference importing gitlab_user #490
-* Fix unit and acceptance tests not running #495
+*  Add the pages_access_level parameter ([#472](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#472))
+*  Do not fail when project member does not exist ([#473](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#473))
+* Make the runners_token on the project secret ([#474](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#474))
+*  Fix nil pointer dereference importing gitlab_user ([#490](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#490))
+* Fix unit and acceptance tests not running ([#495](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#495))
 
 ## 3.2.0 (Nov 20, 2020)
 
 FEATURES:
 
-* Project Approval Rules ([#250](https://github.com/gitlabhq/terraform-provider-gitlab/pull/250))
+* Project Approval Rules ([#250](https://github.com/gitlabhq/terraform-provider-gitlab/pull/https://github.com/gitlabhq/terraform-provider-gitlab/pull/250))
 
 ENHANCEMENTS
 
