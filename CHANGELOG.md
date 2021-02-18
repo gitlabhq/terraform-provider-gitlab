@@ -1,3 +1,30 @@
+## 3.5.0 (Feb 18, 2021)
+
+FEATURES:
+
+* Add resource for project freeze periods #516 
+
+ENHANCEMENTS:
+
+* Update go version and go-gitlab version #523 
+* Support additional attributes in `gitlab_project_hook` #525 
+* Link badges in README to proper workflows #527 
+* gitlab_project: Check each push rule individually #531
+* Allow `full_path` in addition to `id` in gitlab_project data source #532 
+* Update test fixtures for better usability #535 
+* Check for state change on user delete #539 
+* Increase gitlab_project import timeout #536
+* Add optional mirror options #554 
+* Remove vendor folder #546 
+* Add dependabot config #558 
+* Fix EE tests actually running against CE #564 
+* Fix EE test mounting license as a directory #568 
+
+BUG FIXES:
+
+* fix deploy_token expiration #510 
+* Fix group_share_group nil pointer reference #555 
+
 ## 3.4.0 (Jan 14, 2021)
 
 FEATURES:
