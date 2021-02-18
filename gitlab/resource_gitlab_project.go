@@ -44,6 +44,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"default_branch": {
 		Type:     schema.TypeString,
 		Optional: true,
+		Computed: true,
 		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 			// `old` is the current value on GitLab side
 			// `new` is the value that Terraform plans to set there
