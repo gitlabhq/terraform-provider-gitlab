@@ -27,17 +27,23 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            fmt.Sprintf("listest%d@ssss.com", rInt),
-						Password:         fmt.Sprintf("test%dtt", rInt),
-						Username:         fmt.Sprintf("listest%d", rInt),
-						Name:             fmt.Sprintf("foo %d", rInt),
-						ProjectsLimit:    0,
-						Admin:            false,
-						CanCreateGroup:   false,
-						SkipConfirmation: true,
-						External:         false,
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
 					}),
 				),
+			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+				},
 			},
 			// Update the user to change the name, email, projects_limit and more
 			{
@@ -45,17 +51,23 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            fmt.Sprintf("listest%d@tttt.com", rInt),
-						Password:         fmt.Sprintf("test%dtt", rInt),
-						Username:         fmt.Sprintf("listest%d", rInt),
-						Name:             fmt.Sprintf("bar %d", rInt),
-						ProjectsLimit:    10,
-						Admin:            true,
-						CanCreateGroup:   true,
-						SkipConfirmation: false,
-						External:         false,
+						Email:          fmt.Sprintf("listest%d@tttt.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("bar %d", rInt),
+						ProjectsLimit:  10,
+						Admin:          true,
+						CanCreateGroup: true,
+						External:       false,
 					}),
 				),
+			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+				},
 			},
 			// Update the user to put the name back
 			{
@@ -63,15 +75,61 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
-						Email:            fmt.Sprintf("listest%d@ssss.com", rInt),
-						Password:         fmt.Sprintf("test%dtt", rInt),
-						Username:         fmt.Sprintf("listest%d", rInt),
-						Name:             fmt.Sprintf("foo %d", rInt),
-						ProjectsLimit:    0,
-						Admin:            false,
-						CanCreateGroup:   false,
-						SkipConfirmation: false,
-						External:         false,
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+					}),
+				),
+			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+				},
+			},
+			// Update the user to disable skip confirmation
+			{
+				Config: testAccGitlabUserUpdateConfigNoSkipConfirmation(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+					}),
+				),
+			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+				},
+			},
+			// Update the user to initial config
+			{
+				Config: testAccGitlabUserConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
 					}),
 				),
 			},
@@ -106,6 +164,14 @@ func TestAccGitlabUser_password_reset(t *testing.T) {
 				Config: testAccGitlabUserConfigPasswordReset(rInt),
 				Check:  testAccCheckGitlabUserExists("gitlab_user.foo", &user),
 			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+				},
+			},
 		},
 	})
 }
@@ -135,15 +201,13 @@ func testAccCheckGitlabUserExists(n string, user *gitlab.User) resource.TestChec
 }
 
 type testAccGitlabUserExpectedAttributes struct {
-	Email            string
-	Password         string
-	Username         string
-	Name             string
-	ProjectsLimit    int
-	Admin            bool
-	CanCreateGroup   bool
-	SkipConfirmation bool
-	External         bool
+	Email          string
+	Username       string
+	Name           string
+	ProjectsLimit  int
+	Admin          bool
+	CanCreateGroup bool
+	External       bool
 }
 
 func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUserExpectedAttributes) resource.TestCheckFunc {
@@ -230,6 +294,22 @@ resource "gitlab_user" "foo" {
   projects_limit   = 10
   can_create_group = true
   is_external      = false
+}
+  `, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabUserUpdateConfigNoSkipConfirmation(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name              = "foo %d"
+  username          = "listest%d"
+  password          = "test%dtt"
+  email             = "listest%d@ssss.com"
+  is_admin          = false
+  projects_limit    = 0
+  can_create_group  = false
+  is_external       = false
+  skip_confirmation = false
 }
   `, rInt, rInt, rInt, rInt)
 }

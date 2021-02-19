@@ -30,6 +30,7 @@ func resourceGitlabUser() *schema.Resource {
 				Type:      schema.TypeString,
 				Optional:  true,
 				Sensitive: true,
+				ForceNew:  true,
 			},
 			"email": {
 				Type:     schema.TypeString,
@@ -53,6 +54,7 @@ func resourceGitlabUser() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
+				ForceNew: true,
 			},
 			"projects_limit": {
 				Type:     schema.TypeInt,
@@ -67,6 +69,7 @@ func resourceGitlabUser() *schema.Resource {
 			"reset_password": {
 				Type:     schema.TypeBool,
 				Optional: true,
+				ForceNew: true,
 			},
 		},
 	}
@@ -80,7 +83,6 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("email", user.Email)
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
-	d.Set("skip_confirmation", user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero())
 }
 
 func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
