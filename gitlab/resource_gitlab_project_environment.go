@@ -121,8 +121,8 @@ func resourceGitlabProjectEnvironmentUpdate(d *schema.ResourceData, meta interfa
 	options := gitlab.EditEnvironmentOptions{
 		Name: &name,
 	}
-	if externalURL, ok := d.GetOk("external_url"); ok {
-		options.ExternalURL = gitlab.String(externalURL.(string))
+	if d.HasChange("external_url") {
+		options.ExternalURL = gitlab.String(d.Get("external_url").(string))
 	}
 
 	log.Printf("[DEBUG] Project %s update gitlab environment %d", project, environmentIDInt)
