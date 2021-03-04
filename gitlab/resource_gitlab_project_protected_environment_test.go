@@ -227,12 +227,31 @@ resource "gitlab_project_environment" "env" {
   name    = "ProjectProtectedEnvironment-%[1]d-this-suffix-matches-wildcard"
 }
 
+resource "gitlab_user" "test" {
+  name           = "test-%[1]d"
+  username       = "test-%[1]d"
+  password       = "superPassword-%[1]d"
+  email          = "test-%[1]d@example.com"
+  reset_password = false
+}
+
+resource "gitlab_group" "test" {
+  name = "test-%[1]d"
+  path = "test-%[1]d"
+}
+
 resource "gitlab_project_protected_environment" "ProjectProtectedEnvironment" {
   depends_on  = [gitlab_project_environment.env]
   project     = gitlab_project.foo.id
   environment = "ProjectProtectedEnvironment-%[1]d%[2]s"
   deploy_access_levels {
     access_level = "maintainer"
+  }
+  deploy_access_levels {
+    user_id = gitlab_user.test.id
+  }
+  deploy_access_levels {
+    group_id = gitlab_group.test.id
   }
 }
 	`, rInt, postfix)
