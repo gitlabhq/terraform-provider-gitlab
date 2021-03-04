@@ -63,7 +63,7 @@ func resourceGitlabProjectEnvironmentCreate(d *schema.ResourceData, meta interfa
 
 	environment, resp, err := client.Environments.CreateEnvironment(project, &options)
 	if err != nil {
-		if resp.StatusCode == http.StatusNotFound {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			return fmt.Errorf("feature Environments is not available")
 		}
 		return err
