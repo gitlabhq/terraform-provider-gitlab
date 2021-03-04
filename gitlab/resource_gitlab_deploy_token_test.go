@@ -199,10 +199,12 @@ func TestExpiresAtSuppressFunc(t *testing.T) {
 	}
 
 	for _, test := range testcases {
-		actual := expiresAtSuppressFunc("", test.old, test.new, nil)
-		if actual != test.expected {
-			t.Fatalf("FAIL %s - expiresAtSuppressFunc\n\told: %s, new: %s\n\texpected: %t\n\tactual: %t",
-				test.description, test.old, test.new, test.expected, actual)
-		}
+		t.Run(test.description, func(t *testing.T) {
+			actual := expiresAtSuppressFunc("", test.old, test.new, nil)
+			if actual != test.expected {
+				t.Fatalf("FAIL\n\told: %s, new: %s\n\texpected: %t\n\tactual: %t",
+					test.old, test.new, test.expected, actual)
+			}
+		})
 	}
 }
