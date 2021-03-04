@@ -25,6 +25,14 @@ The following arguments are supported:
 
 * `external_url` - (Optional) External URL for this project environment.
 
+## Attributes Reference
+
+---
+
+The following attributes are exported:
+
+* `state` - The state of the environment (e.g. `available`).
+
 ## Import
 
 GitLab project environments can be imported using an id consisting of `project-id:environment-id`, e.g.
