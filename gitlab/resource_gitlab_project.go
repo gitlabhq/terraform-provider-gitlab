@@ -44,35 +44,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"default_branch": {
 		Type:     schema.TypeString,
 		Optional: true,
-		DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-			// `old` is the current value on GitLab side
-			// `new` is the value that Terraform plans to set there
-
-			log.Printf("[DEBUG] default_branch DiffSuppressFunc old new")
-			log.Printf("[DEBUG]   (%T) %#v, (%T) %#v", old, old, new, new)
-
-			// If there is no current default branch, it means that the project is
-			// empty and does not have branches. Setting the default branch will fail
-			// with 400 error. The check will defer the setting of a default branch
-			// to a time when the repository is no longer empty.
-			if old == "" {
-				if new != "" {
-					log.Printf("[WARN] not setting default_branch %#v on empty repo", new)
-				}
-				return true
-			}
-
-			// For non-empty repositories GitLab automatically sets master as the
-			// default branch. If the project resource doesn't specify default_branch
-			// attribute, Terraform will force "master" => "" on the next run. This
-			// check makes Terraform ignore default branch value until it is set in
-			// .tf configuration. For schema.TypeString empty is equal to "".
-			if new == "" {
-				return true
-			}
-
-			return old == new
-		},
+		Computed: true,
 	},
 	"import_url": {
 		Type:     schema.TypeString,
@@ -275,25 +247,31 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Default:      "private",
 		ValidateFunc: validation.StringInSlice([]string{"public", "private", "enabled", "disabled"}, true),
 	},
+	// The GitLab API requires that import_url is also set when mirror options are used
+	// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 	"mirror": {
-		Type:     schema.TypeBool,
-		Optional: true,
-		Default:  false,
+		Type:         schema.TypeBool,
+		Optional:     true,
+		Default:      false,
+		RequiredWith: []string{"import_url"},
 	},
 	"mirror_trigger_builds": {
-		Type:     schema.TypeBool,
-		Optional: true,
-		Default:  false,
+		Type:         schema.TypeBool,
+		Optional:     true,
+		Default:      false,
+		RequiredWith: []string{"import_url"},
 	},
 	"mirror_overwrites_diverged_branches": {
-		Type:     schema.TypeBool,
-		Optional: true,
-		Default:  false,
+		Type:         schema.TypeBool,
+		Optional:     true,
+		Default:      false,
+		RequiredWith: []string{"import_url"},
 	},
 	"only_mirror_protected_branches": {
-		Type:     schema.TypeBool,
-		Optional: true,
-		Default:  false,
+		Type:         schema.TypeBool,
+		Optional:     true,
+		Default:      false,
+		RequiredWith: []string{"import_url"},
 	},
 	"build_coverage_regex": {
 		Type:     schema.TypeString,
@@ -316,43 +294,44 @@ func resourceGitlabProject() *schema.Resource {
 
 func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) error {
 	d.SetId(fmt.Sprintf("%d", project.ID))
-	values := map[string]interface{}{
-		"name":                                  project.Name,
-		"path":                                  project.Path,
-		"path_with_namespace":                   project.PathWithNamespace,
-		"description":                           project.Description,
-		"default_branch":                        project.DefaultBranch,
-		"request_access_enabled":                project.RequestAccessEnabled,
-		"issues_enabled":                        project.IssuesEnabled,
-		"merge_requests_enabled":                project.MergeRequestsEnabled,
-		"pipelines_enabled":                     project.JobsEnabled,
-		"approvals_before_merge":                project.ApprovalsBeforeMerge,
-		"wiki_enabled":                          project.WikiEnabled,
-		"snippets_enabled":                      project.SnippetsEnabled,
-		"container_registry_enabled":            project.ContainerRegistryEnabled,
-		"lfs_enabled":                           project.LFSEnabled,
-		"visibility_level":                      string(project.Visibility),
-		"merge_method":                          string(project.MergeMethod),
-		"only_allow_merge_if_pipeline_succeeds": project.OnlyAllowMergeIfPipelineSucceeds,
-		"only_allow_merge_if_all_discussions_are_resolved": project.OnlyAllowMergeIfAllDiscussionsAreResolved,
-		"namespace_id":                        project.Namespace.ID,
-		"ssh_url_to_repo":                     project.SSHURLToRepo,
-		"http_url_to_repo":                    project.HTTPURLToRepo,
-		"web_url":                             project.WebURL,
-		"runners_token":                       project.RunnersToken,
-		"shared_runners_enabled":              project.SharedRunnersEnabled,
-		"tags":                                project.TagList,
-		"archived":                            project.Archived,
-		"remove_source_branch_after_merge":    project.RemoveSourceBranchAfterMerge,
-		"packages_enabled":                    project.PackagesEnabled,
-		"pages_access_level":                  string(project.PagesAccessLevel),
-		"mirror":                              project.Mirror,
-		"mirror_trigger_builds":               project.MirrorTriggerBuilds,
-		"mirror_overwrites_diverged_branches": project.MirrorOverwritesDivergedBranches,
-		"only_mirror_protected_branches":      project.OnlyMirrorProtectedBranches,
-		"build_coverage_regex":                project.BuildCoverageRegex,
+	d.Set("name", project.Name)
+	d.Set("path", project.Path)
+	d.Set("path_with_namespace", project.PathWithNamespace)
+	d.Set("description", project.Description)
+	d.Set("default_branch", project.DefaultBranch)
+	d.Set("request_access_enabled", project.RequestAccessEnabled)
+	d.Set("issues_enabled", project.IssuesEnabled)
+	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
+	d.Set("pipelines_enabled", project.JobsEnabled)
+	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
+	d.Set("wiki_enabled", project.WikiEnabled)
+	d.Set("snippets_enabled", project.SnippetsEnabled)
+	d.Set("container_registry_enabled", project.ContainerRegistryEnabled)
+	d.Set("lfs_enabled", project.LFSEnabled)
+	d.Set("visibility_level", string(project.Visibility))
+	d.Set("merge_method", string(project.MergeMethod))
+	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
+	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
+	d.Set("namespace_id", project.Namespace.ID)
+	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
+	d.Set("http_url_to_repo", project.HTTPURLToRepo)
+	d.Set("web_url", project.WebURL)
+	d.Set("runners_token", project.RunnersToken)
+	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
+	if err := d.Set("tags", project.TagList); err != nil {
+		return err
 	}
-	return setResourceData(d, values)
+	d.Set("archived", project.Archived)
+	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
+	d.Set("packages_enabled", project.PackagesEnabled)
+	d.Set("pages_access_level", string(project.PagesAccessLevel))
+	d.Set("mirror", project.Mirror)
+	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
+	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
+	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
+	d.Set("build_coverage_regex", project.BuildCoverageRegex)
+
+	return nil
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -391,6 +370,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("default_branch"); ok {
+		options.DefaultBranch = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("tags"); ok {
@@ -436,10 +419,8 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	// is committed to state since we set its ID
 	d.SetId(fmt.Sprintf("%d", project.ID))
 
-	_, importURLSet := d.GetOk("import_url")
-	_, templateNameSet := d.GetOk("template_name")
-	_, templateProjectIDSet := d.GetOk("template_project_id")
-	if importURLSet || templateNameSet || templateProjectIDSet {
+	// An import can be triggered by import_url or by creating the project from a template.
+	if project.ImportStatus != "none" {
 		log.Printf("[DEBUG] waiting for project %q import to finish", *options.Name)
 
 		stateConf := &resource.StateChangeConf{
@@ -458,6 +439,12 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 		if _, err := stateConf.WaitForState(); err != nil {
 			return fmt.Errorf("error while waiting for project %q import to finish: %w", *options.Name, err)
+		}
+
+		// Read the project again, so that we can detect the default branch.
+		project, _, err = client.Projects.GetProject(project.ID, nil)
+		if err != nil {
+			return fmt.Errorf("Failed to get project %q after completing import: %w", d.Id(), err)
 		}
 	}
 
@@ -480,9 +467,69 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		}
 	}
 
-	// Some project settings can't be set in the Project Create API and have to
-	// set in a second call after project creation.
-	resourceGitlabProjectUpdate(d, meta) // nolint // TODO: Resolve this golangci-lint issue: Error return value is not checked (errcheck)
+	// default_branch cannot always be set during creation.
+	// If the branch does not exist, the update will fail, so we also create it here.
+	// See: https://gitlab.com/gitlab-org/gitlab/-/issues/333426
+	// This logic may be removed when the above issue is resolved.
+	if v, ok := d.GetOk("default_branch"); ok && project.DefaultBranch != "" && project.DefaultBranch != v.(string) {
+		oldDefaultBranch := project.DefaultBranch
+		newDefaultBranch := v.(string)
+
+		log.Printf("[DEBUG] create branch %q for project %q", newDefaultBranch, d.Id())
+		_, _, err := client.Branches.CreateBranch(project.ID, &gitlab.CreateBranchOptions{
+			Branch: gitlab.String(newDefaultBranch),
+			Ref:    gitlab.String(oldDefaultBranch),
+		})
+		if err != nil {
+			return fmt.Errorf("Failed to create branch %q for project %q: %w", newDefaultBranch, d.Id(), err)
+		}
+
+		log.Printf("[DEBUG] set new default branch to %q for project %q", newDefaultBranch, d.Id())
+		_, _, err = client.Projects.EditProject(project.ID, &gitlab.EditProjectOptions{
+			DefaultBranch: gitlab.String(newDefaultBranch),
+		})
+		if err != nil {
+			return fmt.Errorf("Failed to set default branch to %q for project %q: %w", newDefaultBranch, d.Id(), err)
+		}
+
+		log.Printf("[DEBUG] protect new default branch %q for project %q", newDefaultBranch, d.Id())
+		_, _, err = client.ProtectedBranches.ProtectRepositoryBranches(project.ID, &gitlab.ProtectRepositoryBranchesOptions{
+			Name: gitlab.String(newDefaultBranch),
+		})
+		if err != nil {
+			return fmt.Errorf("Failed to protect default branch %q for project %q: %w", newDefaultBranch, d.Id(), err)
+		}
+
+		log.Printf("[DEBUG] unprotect old default branch %q for project %q", oldDefaultBranch, d.Id())
+		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch)
+		if err != nil {
+			return fmt.Errorf("Failed to unprotect undesired default branch %q for project %q: %w", oldDefaultBranch, d.Id(), err)
+		}
+
+		log.Printf("[DEBUG] delete old default branch %q for project %q", oldDefaultBranch, d.Id())
+		_, err = client.Branches.DeleteBranch(project.ID, oldDefaultBranch)
+		if err != nil {
+			return fmt.Errorf("Failed to clean up undesired default branch %q for project %q: %w", oldDefaultBranch, d.Id(), err)
+		}
+	}
+
+	var editProjectOptions gitlab.EditProjectOptions
+
+	if v, ok := d.GetOk("mirror_overwrites_diverged_branches"); ok {
+		editProjectOptions.MirrorOverwritesDivergedBranches = gitlab.Bool(v.(bool))
+		editProjectOptions.ImportURL = gitlab.String(d.Get("import_url").(string))
+	}
+
+	if v, ok := d.GetOk("only_mirror_protected_branches"); ok {
+		editProjectOptions.OnlyMirrorProtectedBranches = gitlab.Bool(v.(bool))
+		editProjectOptions.ImportURL = gitlab.String(d.Get("import_url").(string))
+	}
+
+	if (editProjectOptions != gitlab.EditProjectOptions{}) {
+		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions); err != nil {
+			return fmt.Errorf("Could not update project %q: %w", d.Id(), err)
+		}
+	}
 
 	return resourceGitlabProjectRead(d, meta)
 }
@@ -501,8 +548,7 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	err = resourceGitlabProjectSetToState(d, project)
-	if err != nil {
+	if err := resourceGitlabProjectSetToState(d, project); err != nil {
 		return err
 	}
 
@@ -516,9 +562,7 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
 	}
 
-	d.Set("push_rules", flattenProjectPushRules(pushRules)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
-
-	return nil
+	return d.Set("push_rules", flattenProjectPushRules(pushRules))
 }
 
 func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -620,29 +664,21 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if d.HasChange("mirror") {
-		// It appears that GitLab API requires that import_url is also set when `mirror` is updated/changed
-		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
 	}
 
 	if d.HasChange("mirror_trigger_builds") {
-		// It appears that GitLab API requires that import_url is also set when `mirror_trigger_builds` is updated/changed
-		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
 	}
 
 	if d.HasChange("only_mirror_protected_branches") {
-		// It appears that GitLab API requires that import_url is also set when `only_mirror_protected_branches` is updated/changed
-		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.OnlyMirrorProtectedBranches = gitlab.Bool(d.Get("only_mirror_protected_branches").(bool))
 	}
 
 	if d.HasChange("mirror_overwrites_diverged_branches") {
-		// It appears that GitLab API requires that import_url is also set when `mirror_overwrites_diverged_branches` is updated/changed
-		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorOverwritesDivergedBranches = gitlab.Bool(d.Get("mirror_overwrites_diverged_branches").(bool))
 	}
