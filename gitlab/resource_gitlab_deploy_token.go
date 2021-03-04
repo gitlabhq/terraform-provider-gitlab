@@ -43,10 +43,11 @@ func resourceGitlabDeployToken() *schema.Resource {
 				ForceNew: true,
 			},
 			"expires_at": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.IsRFC3339Time,
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateFunc:     validation.IsRFC3339Time,
+				DiffSuppressFunc: expiresAtSuppressFunc,
+				ForceNew:         true,
 			},
 			"scopes": {
 				Type:     schema.TypeSet,
@@ -65,6 +66,15 @@ func resourceGitlabDeployToken() *schema.Resource {
 			},
 		},
 	}
+}
+
+func expiresAtSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	oldDate, oldDateErr := time.Parse(time.RFC3339, old)
+	newDate, newDateErr := time.Parse(time.RFC3339, new)
+	if oldDateErr != nil || newDateErr != nil {
+		return false
+	}
+	return oldDate == newDate
 }
 
 func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) error {

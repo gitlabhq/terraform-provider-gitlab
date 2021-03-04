@@ -156,7 +156,7 @@ resource "gitlab_deploy_token" "foo" {
   name     = "deployToken-%d"
   username = "my-username"
 
-  expires_at = "2021-03-14T07:20:50Z"
+  expires_at = "2021-03-14T07:20:50.000Z"
 
   scopes = [
 	"read_registry",
@@ -164,4 +164,47 @@ resource "gitlab_deploy_token" "foo" {
   ]
 }
   `, rInt, rInt)
+}
+
+type expiresAtSuppressFuncTest struct {
+	description string
+	old         string
+	new         string
+	expected    bool
+}
+
+func TestExpiresAtSuppressFunc(t *testing.T) {
+	testcases := []expiresAtSuppressFuncTest{
+		{
+			description: "same dates without millis",
+			old:         "2025-03-14T00:00:00Z",
+			new:         "2025-03-14T00:00:00Z",
+			expected:    true,
+		}, {
+			description: "different date without millis",
+			old:         "2025-03-14T00:00:00Z",
+			new:         "2025-03-14T11:11:11Z",
+			expected:    false,
+		}, {
+			description: "same date with and without millis",
+			old:         "2025-03-14T00:00:00Z",
+			new:         "2025-03-14T00:00:00.000Z",
+			expected:    true,
+		}, {
+			description: "cannot parse new date",
+			old:         "2025-03-14T00:00:00Z",
+			new:         "invalid-date",
+			expected:    false,
+		},
+	}
+
+	for _, test := range testcases {
+		t.Run(test.description, func(t *testing.T) {
+			actual := expiresAtSuppressFunc("", test.old, test.new, nil)
+			if actual != test.expected {
+				t.Fatalf("FAIL\n\told: %s, new: %s\n\texpected: %t\n\tactual: %t",
+					test.old, test.new, test.expected, actual)
+			}
+		})
+	}
 }
