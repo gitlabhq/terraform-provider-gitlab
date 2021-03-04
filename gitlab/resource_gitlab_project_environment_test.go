@@ -166,8 +166,8 @@ func testAccCheckGitlabProjectEnvironmentDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type == "gitlab_project" {
 			project = rs.Primary.ID
-			environment, err = strconv.Atoi(rs.Primary.ID)
 		} else if rs.Type == "gitlab_project_environment" {
+			environment, err = strconv.Atoi(rs.Primary.ID)
 		}
 	}
 
