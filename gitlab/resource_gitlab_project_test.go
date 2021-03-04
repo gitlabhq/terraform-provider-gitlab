@@ -3,6 +3,7 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -328,9 +329,7 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Config: testAccGitlabProjectConfigInitializeWithReadme(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
-						DefaultBranch: "main",
-					}),
+					testAccCheckGitlabProjectDefaultBranch(&project, nil),
 				),
 			},
 		},
@@ -541,6 +540,41 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 
 						return nil
 					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_initializeWithReadmeAndCustomDefaultBranch(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name        = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  initialize_with_readme = true
+  default_branch         = "foo"
+}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("gitlab_project.foo", "initialize_with_readme", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.foo", "default_branch", "foo"),
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "foo",
+					}),
 				),
 			},
 		},
@@ -774,13 +808,11 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 				}
 			}
 
-			err := resourceGitlabProjectSetToState(expectedData, expected)
-			if err != nil {
+			if err := resourceGitlabProjectSetToState(expectedData, expected); err != nil {
 				return err
 			}
 
-			err = resourceGitlabProjectSetToState(receivedData, received)
-			if err != nil {
+			if err := resourceGitlabProjectSetToState(receivedData, received); err != nil {
 				return err
 			}
 
@@ -792,8 +824,23 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 
 func testAccCheckGitlabProjectDefaultBranch(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if project.DefaultBranch != want.DefaultBranch {
+		if want != nil && project.DefaultBranch != want.DefaultBranch {
 			return fmt.Errorf("got default branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
+		}
+
+		client := testAccProvider.Meta().(*gitlab.Client)
+
+		branches, _, err := client.Branches.ListBranches(project.ID, nil)
+		if err != nil {
+			return fmt.Errorf("failed to list branches: %w", err)
+		}
+
+		if len(branches) != 1 {
+			return fmt.Errorf("expected 1 branch for new project; found %d", len(branches))
+		}
+
+		if !branches[0].Protected {
+			return errors.New("expected default branch to be protected")
 		}
 
 		return nil
@@ -1107,7 +1154,6 @@ resource "gitlab_project" "foo" {
   name = "foo-%[1]d"
   path = "foo.%[1]d"
   description = "Terraform acceptance tests"
-  default_branch = "main"
 
   push_rules {
 %[2]s
