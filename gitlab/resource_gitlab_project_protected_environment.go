@@ -12,6 +12,10 @@ import (
 
 // https://docs.gitlab.com/ee/ci/environments/protected_environments.html
 func resourceGitlabProjectProtectedEnvironment() *schema.Resource {
+	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
+	for k := range accessLevelID {
+		acceptedAccessLevels = append(acceptedAccessLevels, k)
+	}
 	return &schema.Resource{
 		Create: resourceGitlabProjectProtectedEnvironmentCreate,
 		Read:   resourceGitlabProjectProtectedEnvironmentRead,
@@ -42,7 +46,7 @@ func resourceGitlabProjectProtectedEnvironment() *schema.Resource {
 							Type:         schema.TypeString,
 							ForceNew:     true,
 							Optional:     true,
-							ValidateFunc: validation.StringIsNotEmpty,
+							ValidateFunc: validateValueFunc(acceptedAccessLevels),
 						},
 						"access_level_description": {
 							Type:     schema.TypeString,
@@ -52,13 +56,13 @@ func resourceGitlabProjectProtectedEnvironment() *schema.Resource {
 							Type:         schema.TypeInt,
 							ForceNew:     true,
 							Optional:     true,
-							ValidateFunc: validation.StringIsNotEmpty,
+							ValidateFunc: validation.IntAtLeast(1),
 						},
 						"group_id": {
 							Type:         schema.TypeInt,
 							ForceNew:     true,
 							Optional:     true,
-							ValidateFunc: validation.StringIsNotEmpty,
+							ValidateFunc: validation.IntAtLeast(1),
 						},
 					},
 				},
