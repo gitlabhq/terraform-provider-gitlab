@@ -54,10 +54,10 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
 		return err
 	}
-	return nil
+	return resourceGitlabBranchRead(d, meta)
 }
 
-
+// TODO investigate setting
 // type Branch struct {
 // 	Commit             *Commit `json:"commit"`
 // 	Name               string  `json:"name"`
@@ -72,17 +72,23 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] read gitlab group %s", d.Id())
-	name := d.Get("name").(string)
-	project := d.Get("project").(string)
-	branch, resp, err := client.Branches.GetBranch( project, name )
+	project, name, err := projectAndBranchFromID(d.Id())
+	log.Printf("[DEBUG] read gitlab branch %s", d.Id())
+	branch, resp, err := client.Branches.GetBranch(project, name)
 	if err != nil {
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", branch, resp)
 	}
-	d.Set("name", branch.Name) 
-	return nil
+	d.Set("name", branch.Name) 	
+	d.Set("ref", d.Get("ref").(string))
+	d.Set("project", project)
+	return err
 }
 
 func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*gitlab.Client)
+	project, name, err := projectAndBranchFromID(d.Id())
+	log.Printf("[DEBUG] delete gitlab branch %s", name)
+	_, err := client.Branches.DeleteBranch(project, name)
+
+	return err
 }
