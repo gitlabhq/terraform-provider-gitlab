@@ -88,7 +88,7 @@ func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*gitlab.Client)
 	project, name, err := projectAndBranchFromID(d.Id())
 	log.Printf("[DEBUG] delete gitlab branch %s", name)
-	_, err := client.Branches.DeleteBranch(project, name)
+	_, err = client.Branches.DeleteBranch(project, name)
 
 	return err
 }
