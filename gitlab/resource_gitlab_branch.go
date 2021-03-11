@@ -1,10 +1,8 @@
 package gitlab
 
 import (
-	// "errors"
-	// "fmt"
+	"fmt"
 	"log"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -35,6 +33,18 @@ func resourceGitlabBranch() *schema.Resource {
 				ForceNew: true,
 				Required: true,
 			},
+			"web_url": {
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"default": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"can_push": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -54,7 +64,7 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 	if err != nil {
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
 	}
-	return err
+	return resourceGitlabBranchRead(d, meta)
 }
 
 // TODO investigate setting
@@ -74,19 +84,31 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	name := d.Get("name").(string)
 	project := d.Get("project").(string)
+	ref := d.Get("ref").(string)
 	log.Printf("[DEBUG] read gitlab branch %s", name)
 	branch, resp, err := client.Branches.GetBranch(project, name)
 	if err != nil {
-		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", branch, resp)
+		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
+		return err
 	}
-	return err
+	d.SetId(fmt.Sprintf("%s-%s",project, name))
+	d.Set("name", branch.Name)
+	d.Set("project", project)
+	d.Set("ref", ref)
+	d.Set("web_url", branch.WebURL)
+	d.Set("default", branch.Default)
+	d.Set("can_push", branch.CanPush)
+	return nil
 }
 
 func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project, name, err := projectAndBranchFromID(d.Id())
+	project := d.Get("project").(string)
+	name := d.Get("name").(string)
 	log.Printf("[DEBUG] delete gitlab branch %s", name)
-	_, err = client.Branches.DeleteBranch(project, name)
-
+	resp, err := client.Branches.DeleteBranch(project, name)
+	if err != nil {
+		log.Printf("[DEBUG] failed to delete gitlab branch %s response %v", name, resp)
+	}
 	return err
 }
