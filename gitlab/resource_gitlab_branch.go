@@ -12,6 +12,7 @@ import (
 func resourceGitlabBranch() *schema.Resource {
 	// removed guest TODO check acceptable access levels
 	// ref force new false --- TODO resolve if incorrect
+	// TODO project -> project_name
 	// acceptedAccessLevels := []string{ "reporter", "developer", "maintainer"}
 
 	return &schema.Resource{
