@@ -53,9 +53,8 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 	branch, resp, err := client.Branches.CreateBranch(project, branchOptions)
 	if err != nil {
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
-		return err
 	}
-	return resourceGitlabBranchRead(d, meta)
+	return err
 }
 
 // TODO investigate setting
@@ -73,15 +72,13 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project, name, err := projectAndBranchFromID(d.Id())
-	log.Printf("[DEBUG] read gitlab branch %s", d.Id())
+	name := d.Get("name").(string)
+	project := d.Get("project").(string)
+	log.Printf("[DEBUG] read gitlab branch %s", name)
 	branch, resp, err := client.Branches.GetBranch(project, name)
 	if err != nil {
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", branch, resp)
 	}
-	d.Set("name", branch.Name)
-	d.Set("ref", d.Get("ref").(string))
-	d.Set("project", project)
 	return err
 }
 
