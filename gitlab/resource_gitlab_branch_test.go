@@ -11,7 +11,6 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-
 func TestAccGitlabBranch_basic(t *testing.T) {
 	var branch gitlab.Branch
 	rInt := acctest.RandInt()
@@ -31,7 +30,6 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 		},
 	})
 }
-
 
 func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 	// conn := testAccProvider.Meta().(*gitlab.Client)
@@ -59,9 +57,9 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 
 func testAccCheckGitlabBranchExists(n string, branch *gitlab.Branch, rInt int) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		_, ok := s.RootModule().Resources[n]
+		rs, ok := s.RootModule().Resources[n]
 		log.Println("resource")
-		log.Printf("%+v")
+		log.Printf("%+v", rs)
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
@@ -72,12 +70,9 @@ func testAccCheckGitlabBranchExists(n string, branch *gitlab.Branch, rInt int) r
 		// }
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotBranch, _, err := conn.Branches.GetBranch(fmt.Sprint("foo-%d", rInt) ,n)
-		if err != nil {
-			return err
-		}
+		gotBranch, _, err := conn.Branches.GetBranch(fmt.Sprintf("foo-%d", rInt), n)
 		*branch = *gotBranch
-		return nil
+		return err
 	}
 }
 

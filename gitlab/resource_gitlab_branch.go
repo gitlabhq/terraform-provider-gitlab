@@ -1,4 +1,4 @@
-package gitlab 
+package gitlab
 
 import (
 	// "errors"
@@ -10,7 +10,7 @@ import (
 )
 
 func resourceGitlabBranch() *schema.Resource {
-	// removed guest TODO check acceptable access levels 
+	// removed guest TODO check acceptable access levels
 	// ref force new false --- TODO resolve if incorrect
 	// acceptedAccessLevels := []string{ "reporter", "developer", "maintainer"}
 
@@ -30,9 +30,9 @@ func resourceGitlabBranch() *schema.Resource {
 				Required: true,
 			},
 			"ref": {
-				Type:         schema.TypeString,
-				ForceNew:     false,
-				Required:     true,
+				Type:     schema.TypeString,
+				ForceNew: true,
+				Required: true,
 			},
 		},
 	}
@@ -78,7 +78,7 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", branch, resp)
 	}
-	d.Set("name", branch.Name) 	
+	d.Set("name", branch.Name)
 	d.Set("ref", d.Get("ref").(string))
 	d.Set("project", project)
 	return err
