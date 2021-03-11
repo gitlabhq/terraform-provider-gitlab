@@ -2,6 +2,8 @@ module github.com/gitlabhq/terraform-provider-gitlab
 
 go 1.16
 
+replace github.com/xanzy/go-gitlab => github.com/randomswdev/go-gitlab v0.46.1-0.20210311212325-5c6b3b46bea4
+
 require (
 	github.com/bflad/tfproviderlint v0.27.0
 	github.com/hashicorp/go-retryablehttp v0.7.0
