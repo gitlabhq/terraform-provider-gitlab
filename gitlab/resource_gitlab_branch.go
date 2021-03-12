@@ -8,11 +8,7 @@ import (
 )
 
 func resourceGitlabBranch() *schema.Resource {
-	// removed guest TODO check acceptable access levels
-	// ref force new false --- TODO resolve if incorrect
 	// TODO project -> project_name
-	// acceptedAccessLevels := []string{ "reporter", "developer", "maintainer"}
-
 	return &schema.Resource{
 		Create: resourceGitlabBranchCreate,
 		Read:   resourceGitlabBranchRead,
@@ -37,6 +33,10 @@ func resourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"protected": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"default": {
 				Type:     schema.TypeBool,
 				Computed: true,
@@ -44,6 +44,84 @@ func resourceGitlabBranch() *schema.Resource {
 			"can_push": {
 				Type:     schema.TypeBool,
 				Computed: true,
+			},
+			"developer_can_push": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"developer_can_merge": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"merged": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
+			"commit": {
+				Type:     schema.TypeList,
+				MaxItems: 1,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"author_email": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"author_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"authored_date": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"committed_date": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"committer_email": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"committer_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"short_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"title": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"message": {
+							Type:     schema.TypeString,
+							Computed: true,
+							Optional: true,
+						},
+						"parent_ids": {
+							Type:     schema.TypeSet,
+							Computed: true,
+							Optional: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -59,26 +137,13 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	log.Printf("[DEBUG] create gitlab branch %s for project %s with ref %s", name, project, ref)
-	// requestOptions := &gitlab.RequestOptionFunc()
 	branch, resp, err := client.Branches.CreateBranch(project, branchOptions)
 	if err != nil {
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
+		return err
 	}
 	return resourceGitlabBranchRead(d, meta)
 }
-
-// TODO investigate setting
-// type Branch struct {
-// 	Commit             *Commit `json:"commit"`
-// 	Name               string  `json:"name"`
-// 	Protected          bool    `json:"protected"`
-// 	Merged             bool    `json:"merged"`
-// 	Default            bool    `json:"default"`
-// 	CanPush            bool    `json:"can_push"`
-// 	DevelopersCanPush  bool    `json:"developers_can_push"`
-// 	DevelopersCanMerge bool    `json:"developers_can_merge"`
-// 	WebURL             string  `json:"web_url"`
-// }
 
 func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
@@ -98,6 +163,11 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("web_url", branch.WebURL)
 	d.Set("default", branch.Default)
 	d.Set("can_push", branch.CanPush)
+	d.Set("protected", branch.Protected)
+	d.Set("merged", branch.Merged)
+	d.Set("developer_can_merge", branch.DevelopersCanMerge)
+	d.Set("developer_can_push", branch.DevelopersCanPush)
+	d.Set("commit", flattenCommit(branch.Commit))
 	return nil
 }
 
@@ -111,4 +181,26 @@ func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[DEBUG] failed to delete gitlab branch %s response %v", name, resp)
 	}
 	return err
+}
+
+func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
+	if commit == nil {
+		return []map[string]interface{}{}
+	}
+
+	return []map[string]interface{}{
+		{
+			"id":              commit.ID,
+			"short_id":        commit.ShortID,
+			"title":           commit.Title,
+			"author_name":     commit.AuthorName,
+			"author_email":    commit.AuthorEmail,
+			"authored_date":   commit.AuthoredDate.String(),
+			"committed_date":  commit.CommittedDate.String(),
+			"committer_email": commit.CommitterEmail,
+			"commiter_name":   commit.CommitterName,
+			"message":         commit.Message,
+			"parent_ids":      commit.ParentIDs,
+		},
+	}
 }
