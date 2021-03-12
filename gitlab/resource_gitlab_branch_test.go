@@ -24,7 +24,7 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchExists("testbranch", &branch, rInt),
+					testAccCheckGitlabBranchExists("gitlab_branch.foo", &branch, rInt),
 				),
 			},
 		},
@@ -58,27 +58,21 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 func testAccCheckGitlabBranchExists(n string, branch *gitlab.Branch, rInt int) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-		log.Println("resource")
-		log.Printf("%+v", rs)
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
-
-		// branchID := rs.Primary.ID
-		// if groupID == "" {
-		// 	return fmt.Errorf("No group ID is set")
-		// }
+		name := rs.Primary.Attributes["name"]
+		pid := s.RootModule().Resources["gitlab_project.test"].Primary.ID
 		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotBranch, _, err := conn.Branches.GetBranch(fmt.Sprintf("foo-%d", rInt), n)
-		*branch = *gotBranch
+		gotBranch, _, err := conn.Branches.GetBranch(pid, name)
+		branch = gotBranch
 		return err
 	}
 }
 
 func testAccGitlabBranchConfig(rInt int) string {
 	return fmt.Sprintf(`
-	resource "gitlab_project" "foo" {
+	resource "gitlab_project" "test" {
 		name = "foo-%d"
 		description = "Terraform acceptance tests"
 	  
@@ -87,9 +81,9 @@ func testAccGitlabBranchConfig(rInt int) string {
 		visibility_level = "public"
 	}
 	resource "gitlab_branch" "foo" {
-		name = "foo-name-%d"
+		name = "testbranch-%d"
 		ref = "master"
-		project = gitlab_project.foo.id
+		project = gitlab_project.test.id
 	}
   `, rInt, rInt)
 }

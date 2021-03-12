@@ -2,9 +2,9 @@ package gitlab
 
 import (
 	"fmt"
-	"log"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
+	"log"
 )
 
 func resourceGitlabBranch() *schema.Resource {
@@ -91,7 +91,7 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
 		return err
 	}
-	d.SetId(fmt.Sprintf("%s-%s",project, name))
+	d.SetId(fmt.Sprintf("%s-%s", project, name))
 	d.Set("name", branch.Name)
 	d.Set("project", project)
 	d.Set("ref", ref)
