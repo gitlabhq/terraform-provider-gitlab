@@ -12,7 +12,9 @@ import (
 
 func TestAccGitlabBranch_basic(t *testing.T) {
 	var branch gitlab.Branch
+	var branch2 gitlab.Branch
 	rInt := acctest.RandInt()
+	fooBranchName := fmt.Sprintf("testbranch-%d", rInt)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -22,14 +24,30 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchExists("gitlab_branch.foo", "test", &branch, rInt),
-					testAccCheckGitlabBranchAttributes("gitlab_branch.foo", "test", &branch, &testAccGitlabBranchExpectedAttributes{
+					testAccCheckGitlabBranchExists("foo", "test", &branch, rInt),
+					testAccCheckGitlabBranchExists("foo2", "test", &branch2, rInt),
+					testAccCheckGitlabBranchAttributes("foo", "test", &branch, &testAccGitlabBranchExpectedAttributes{
 						Name: fmt.Sprintf("testbranch-%d", rInt),
 					}),
+					testAccCheckGitlabBranchAttributes("foo2", "test", &branch2, &testAccGitlabBranchExpectedAttributes{
+						Name: fmt.Sprintf("testbranch2-%d", rInt),
+					}),
+					testAccCheckGitlabBranchRef("foo2", fooBranchName),
 				),
 			},
 		},
 	})
+}
+
+func testAccCheckGitlabBranchRef(n, expectedRef string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs := s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)]
+		ref := rs.Primary.Attributes["ref"]
+		if ref != expectedRef {
+			return fmt.Errorf("expected ref: %s got: %s", expectedRef, ref)
+		}
+		return nil
+	}
 }
 
 func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
@@ -60,8 +78,8 @@ func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want
 			return errors.New("got empty web url")
 		}
 		projectID := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
-		if s.RootModule().Resources[n].Primary.ID != fmt.Sprintf("%s-%s", projectID, want.Name) {
-			return fmt.Errorf("Got ID: %s expected: %s-%s", s.RootModule().Resources[n].Primary.ID, projectID, want.Name)
+		if s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID != fmt.Sprintf("%s-%s", projectID, want.Name) {
+			return fmt.Errorf("Got ID: %s expected: %s-%s", s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID, projectID, want.Name)
 		}
 		if branch.Commit.ID == "" {
 			return errors.New("Empty commit")
@@ -90,7 +108,7 @@ func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want
 
 func testAccCheckGitlabBranchExists(n, p string, branch *gitlab.Branch, rInt int) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
+		rs, ok := s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)]
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
@@ -118,7 +136,12 @@ func testAccGitlabBranchConfig(rInt int) string {
 		ref = "master"
 		project = gitlab_project.test.id
 	}
-  `, rInt, rInt)
+	resource "gitlab_branch" "foo2" {
+		name = "testbranch2-%d"
+		ref = gitlab_branch.foo.name
+		project = gitlab_project.test.id
+	}
+  `, rInt, rInt, rInt)
 }
 
 type testAccGitlabBranchExpectedAttributes struct {
