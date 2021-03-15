@@ -23,13 +23,8 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 				Config: testAccGitlabBranchConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchExists("gitlab_branch.foo", &branch, rInt),
-					testAccCheckGitlabBranchAttributes(&branch, &testAccGitlabBranchExpectedAttributes{
-						Name:               fmt.Sprintf("testbranch-%d", rInt),
-						CanPush:            true,
-						DevelopersCanMerge: false,
-						DevelopersCanPush:  false,
-						Default:            false,
-						Merged:             false,
+					testAccCheckGitlabBranchAttributes("gitlab_branch.foo", &branch, &testAccGitlabBranchExpectedAttributes{
+						Name: fmt.Sprintf("testbranch-%d", rInt),
 					}),
 				),
 			},
@@ -59,28 +54,34 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckGitlabBranchAttributes(branch *gitlab.Branch, want *testAccGitlabBranchExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabBranchAttributes(n string, branch *gitlab.Branch, want *testAccGitlabBranchExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if branch.WebURL == "" {
 			return errors.New("got empty web url")
 		}
+		if s.RootModule().Resources[n].Primary.ID == "" {
+			return errors.New("No ID set for branch")
+		}
+		if branch.Commit.ID == "" {
+			return errors.New("Empty commit message")
+		}
 		if branch.Name != want.Name {
 			return fmt.Errorf("got name %s; want %s", branch.Name, want.Name)
 		}
-		if branch.CanPush != want.CanPush {
+		if !branch.CanPush {
 			return fmt.Errorf("can push %t; want %t", branch.CanPush, want.CanPush)
 		}
-		if branch.DevelopersCanPush != want.DevelopersCanPush {
-			return fmt.Errorf("Developers can push %t; want %t", branch.DevelopersCanPush, want.DevelopersCanPush)
+		if branch.DevelopersCanPush {
+			return errors.New("Developers can push expected output to be false")
 		}
-		if branch.DevelopersCanMerge != want.DevelopersCanMerge {
-			return fmt.Errorf("Developers can merge %t; want %t", branch.DevelopersCanMerge, want.DevelopersCanMerge)
+		if branch.DevelopersCanMerge {
+			return errors.New("Developers can merge expected output to be false")
 		}
-		if branch.Default != want.Default {
-			return fmt.Errorf("Default set %t; want %t", branch.CanPush, want.CanPush)
+		if branch.Default {
+			return errors.New("Default branch set to true")
 		}
-		if branch.Merged != want.Merged {
-			return fmt.Errorf("Merged %t; want %t", branch.CanPush, want.CanPush)
+		if branch.Merged {
+			return errors.New("Merged set to true")
 		}
 		return nil
 	}
