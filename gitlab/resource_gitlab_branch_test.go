@@ -63,7 +63,7 @@ func testAccCheckGitlabBranchAttributes(n string, branch *gitlab.Branch, want *t
 			return errors.New("No ID set for branch")
 		}
 		if branch.Commit.ID == "" {
-			return errors.New("Empty commit message")
+			return errors.New("Empty commit")
 		}
 		if branch.Name != want.Name {
 			return fmt.Errorf("got name %s; want %s", branch.Name, want.Name)
