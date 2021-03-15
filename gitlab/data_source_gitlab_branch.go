@@ -4,16 +4,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	// "github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
-
 func dataSourceGitlabBranch() *schema.Resource {
-	// TODO project -> project_name
 	return &schema.Resource{
-		Read:   dataSourceGitlabBranchRead,
+		Read: dataSourceGitlabBranchRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -123,13 +121,8 @@ func dataSourceGitlabBranch() *schema.Resource {
 
 func dataSourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	nameData, nameOk := d.GetOk("name")
-	projectData, projectOk := d.GetOk("project")
-	if !nameOk || !projectOk {
-		return fmt.Errorf("Name and project must be set for a gitlab branch")
-	}
-	name := nameData.(string)
-	project := projectData.(string)
+	name := d.Get("name").(string)
+	project := d.Get("project").(string)
 	log.Printf("[DEBUG] read gitlab branch %s", name)
 	branch, resp, err := client.Branches.GetBranch(project, name)
 	if err != nil {

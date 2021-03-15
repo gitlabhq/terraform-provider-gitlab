@@ -8,7 +8,6 @@ import (
 )
 
 func resourceGitlabBranch() *schema.Resource {
-	// TODO project -> project_name
 	return &schema.Resource{
 		Create: resourceGitlabBranchCreate,
 		Read:   resourceGitlabBranchRead,
@@ -27,7 +26,8 @@ func resourceGitlabBranch() *schema.Resource {
 			"ref": {
 				Type:     schema.TypeString,
 				ForceNew: true,
-				Required: true,
+				Optional: true,
+				Default:  "master",
 			},
 			"web_url": {
 				Type:     schema.TypeString,

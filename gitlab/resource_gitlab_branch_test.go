@@ -22,8 +22,8 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 			{
 				Config: testAccGitlabBranchConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabBranchExists("gitlab_branch.foo", &branch, rInt),
-					testAccCheckGitlabBranchAttributes("gitlab_branch.foo", &branch, &testAccGitlabBranchExpectedAttributes{
+					testAccCheckGitlabBranchExists("gitlab_branch.foo", "test", &branch, rInt),
+					testAccCheckGitlabBranchAttributes("gitlab_branch.foo", "test", &branch, &testAccGitlabBranchExpectedAttributes{
 						Name: fmt.Sprintf("testbranch-%d", rInt),
 					}),
 				),
@@ -38,9 +38,9 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 			continue
 		}
 		name := rs.Primary.Attributes["name"]
-		pid := s.RootModule().Resources["gitlab_project.test"].Primary.ID
+		project := rs.Primary.Attributes["project"]
 		conn := testAccProvider.Meta().(*gitlab.Client)
-		branch, resp, err := conn.Branches.GetBranch(pid, name)
+		branch, resp, err := conn.Branches.GetBranch(project, name)
 		if err == nil {
 			if branch != nil && fmt.Sprintf("%s", branch.Name) == name {
 				return fmt.Errorf("Branch still exists")
@@ -54,13 +54,14 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCheckGitlabBranchAttributes(n string, branch *gitlab.Branch, want *testAccGitlabBranchExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want *testAccGitlabBranchExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if branch.WebURL == "" {
 			return errors.New("got empty web url")
 		}
-		if s.RootModule().Resources[n].Primary.ID == "" {
-			return errors.New("No ID set for branch")
+		projectID := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
+		if s.RootModule().Resources[n].Primary.ID != fmt.Sprintf("%s-%s", projectID, want.Name) {
+			return fmt.Errorf("Got ID: %s expected: %s-%s", s.RootModule().Resources[n].Primary.ID, projectID, want.Name)
 		}
 		if branch.Commit.ID == "" {
 			return errors.New("Empty commit")
@@ -87,14 +88,14 @@ func testAccCheckGitlabBranchAttributes(n string, branch *gitlab.Branch, want *t
 	}
 }
 
-func testAccCheckGitlabBranchExists(n string, branch *gitlab.Branch, rInt int) resource.TestCheckFunc {
+func testAccCheckGitlabBranchExists(n, p string, branch *gitlab.Branch, rInt int) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
 		name := rs.Primary.Attributes["name"]
-		pid := s.RootModule().Resources["gitlab_project.test"].Primary.ID
+		pid := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
 		conn := testAccProvider.Meta().(*gitlab.Client)
 		gotBranch, _, err := conn.Branches.GetBranch(pid, name)
 		*branch = *gotBranch
