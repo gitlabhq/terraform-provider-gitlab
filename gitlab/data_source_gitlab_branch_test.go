@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-// TODO branch with existing protection
 func TestAccDataGitlabBranch_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
@@ -43,9 +42,6 @@ func testAccDataSourceGitlabBranch(src, n string) resource.TestCheckFunc {
 			"default",
 			"project",
 			"can_push",
-			"protected",
-			"developer_can_push",
-			"developer_can_merge",
 			"merged",
 			"commit",
 			"parent_ids",
@@ -56,7 +52,6 @@ func testAccDataSourceGitlabBranch(src, n string) resource.TestCheckFunc {
 				return fmt.Errorf("expected branch's parameter `%s` to be: %s, but got: `%s`", attribute, branchAttr[attribute], searchAttr[attribute])
 			}
 		}
-
 		return nil
 	}
 }

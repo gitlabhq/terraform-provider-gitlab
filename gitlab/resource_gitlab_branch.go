@@ -33,23 +33,11 @@ func resourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"protected": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
 			"default": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 			"can_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"developer_can_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"developer_can_merge": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
@@ -59,9 +47,8 @@ func resourceGitlabBranch() *schema.Resource {
 			},
 			"commit": {
 				Type:     schema.TypeList,
-				MaxItems: 1,
 				Computed: true,
-				Optional: true,
+				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
@@ -113,13 +100,6 @@ func resourceGitlabBranch() *schema.Resource {
 							Computed: true,
 							Optional: true,
 						},
-						"parent_ids": {
-							Type:     schema.TypeSet,
-							Computed: true,
-							Optional: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-							Set:      schema.HashString,
-						},
 					},
 				},
 			},
@@ -163,11 +143,12 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("web_url", branch.WebURL)
 	d.Set("default", branch.Default)
 	d.Set("can_push", branch.CanPush)
-	d.Set("protected", branch.Protected)
 	d.Set("merged", branch.Merged)
-	d.Set("developer_can_merge", branch.DevelopersCanMerge)
-	d.Set("developer_can_push", branch.DevelopersCanPush)
-	d.Set("commit", flattenCommit(branch.Commit))
+	commit := flattenCommit(branch.Commit)
+	if err := d.Set("commit", commit); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -190,17 +171,11 @@ func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
 
 	return []map[string]interface{}{
 		{
-			"id":              commit.ID,
-			"short_id":        commit.ShortID,
-			"title":           commit.Title,
-			"author_name":     commit.AuthorName,
-			"author_email":    commit.AuthorEmail,
-			"authored_date":   commit.AuthoredDate.String(),
-			"committed_date":  commit.CommittedDate.String(),
-			"committer_email": commit.CommitterEmail,
-			"commiter_name":   commit.CommitterName,
-			"message":         commit.Message,
-			"parent_ids":      commit.ParentIDs,
+			"id":          commit.ID,
+			"short_id":    commit.ShortID,
+			"title":       commit.Title,
+			"author_name": commit.AuthorName,
+			"message":     commit.Message,
 		},
 	}
 }

@@ -53,7 +53,6 @@ func dataSourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeList,
 				MaxItems: 1,
 				Computed: true,
-				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
@@ -139,6 +138,9 @@ func dataSourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("merged", branch.Merged)
 	d.Set("developer_can_merge", branch.DevelopersCanMerge)
 	d.Set("developer_can_push", branch.DevelopersCanPush)
-	d.Set("commit", flattenCommit(branch.Commit))
+	commit := flattenCommit(branch.Commit)
+	if err := d.Set("commit", commit); err != nil {
+		return err
+	}
 	return nil
 }
