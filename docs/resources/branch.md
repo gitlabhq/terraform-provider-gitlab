@@ -1,22 +1,14 @@
 # gitlab\_branch
 
-Provides details about a specific branch in the gitlab provider. 
+This resource allows you to create and manage branches for a gitlab project.
 
 ## Example Usage
 
-
-**Branch name and url encoded project path**
 ```hcl
-data "gitlab_branch" "example" {
+resource "gitlab_branch" "example" {
   name = "branch-name"
-  project = "namespace/project-name"
-}
-```
-**Branch name and test project ID**
-```hcl
-data "gitlab_branch" "example" {
-  name = "branch-name"
-  project = "270771234"
+  project = "12345"
+  ref = "existing-branch"
 }
 ```
 
@@ -27,6 +19,8 @@ The following arguments are supported:
 * `name` - (Required) The name of the branch.
 
 * `project` - (Required) The full path of the group.
+
+* `ref` - (Optional) The ref you branch from. Defaults to `master`
 
 ## Attributes Reference
 
