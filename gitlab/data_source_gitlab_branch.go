@@ -25,23 +25,11 @@ func dataSourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"protected": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
 			"default": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
 			"can_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"developer_can_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
-			},
-			"developer_can_merge": {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
