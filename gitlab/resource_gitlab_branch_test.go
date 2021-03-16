@@ -27,12 +27,44 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 					testAccCheckGitlabBranchExists("foo", "test", &branch, rInt),
 					testAccCheckGitlabBranchExists("foo2", "test", &branch2, rInt),
 					testAccCheckGitlabBranchAttributes("foo", "test", &branch, &testAccGitlabBranchExpectedAttributes{
-						Name: fmt.Sprintf("testbranch-%d", rInt),
+						Name:               fmt.Sprintf("testbranch-%d", rInt),
+						Protected:          false,
+						DevelopersCanMerge: false,
+						DevelopersCanPush:  false,
 					}),
 					testAccCheckGitlabBranchAttributes("foo2", "test", &branch2, &testAccGitlabBranchExpectedAttributes{
-						Name: fmt.Sprintf("testbranch2-%d", rInt),
+						Name:               fmt.Sprintf("testbranch2-%d", rInt),
+						Protected:          false,
+						DevelopersCanMerge: false,
+						DevelopersCanPush:  false,
 					}),
 					testAccCheckGitlabBranchRef("foo2", fooBranchName),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabBranch_protected(t *testing.T) {
+	var branch gitlab.Branch
+	rInt := acctest.RandInt()
+	fooBranchName := fmt.Sprintf("testbranch-%d", rInt)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabBranchDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabBranchProtectedConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchExists("foo", "test", &branch, rInt),
+					testAccCheckGitlabBranchAttributes("foo", "test", &branch, &testAccGitlabBranchExpectedAttributes{
+						Name:               fooBranchName,
+						Protected:          true,
+						DevelopersCanMerge: true,
+						DevelopersCanPush:  true,
+					}),
 				),
 			},
 		},
@@ -77,11 +109,14 @@ func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want
 		if branch.WebURL == "" {
 			return errors.New("got empty web url")
 		}
+		if branch.Protected != want.Protected {
+			return fmt.Errorf("protected %t; want %t", branch.CanPush, want.CanPush)
+		}
 		projectID := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
 		if s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID != fmt.Sprintf("%s-%s", projectID, want.Name) {
 			return fmt.Errorf("Got ID: %s expected: %s-%s", s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID, projectID, want.Name)
 		}
-		if branch.Commit.ID == "" {
+		if branch.Commit == nil {
 			return errors.New("Empty commit")
 		}
 		if branch.Name != want.Name {
@@ -90,11 +125,11 @@ func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want
 		if !branch.CanPush {
 			return fmt.Errorf("can push %t; want %t", branch.CanPush, want.CanPush)
 		}
-		if branch.DevelopersCanPush {
-			return errors.New("Developers can push expected output to be false")
+		if branch.DevelopersCanPush != want.DevelopersCanPush {
+			return fmt.Errorf("Developers can push  %t; want %t", branch.DevelopersCanPush, want.DevelopersCanPush)
 		}
-		if branch.DevelopersCanMerge {
-			return errors.New("Developers can merge expected output to be false")
+		if branch.DevelopersCanMerge != want.DevelopersCanMerge {
+			return fmt.Errorf("Developers can merge  %t; want %t", branch.DevelopersCanMerge, want.DevelopersCanMerge)
 		}
 		if branch.Default {
 			return errors.New("Default branch set to true")
@@ -119,6 +154,31 @@ func testAccCheckGitlabBranchExists(n, p string, branch *gitlab.Branch, rInt int
 		*branch = *gotBranch
 		return err
 	}
+}
+
+func testAccGitlabBranchProtectedConfig(rInt int) string {
+	return fmt.Sprintf(`
+	resource "gitlab_project" "test" {
+		name = "foo-%d"
+		description = "Terraform acceptance tests"
+	  
+		# So that acceptance tests can be run in a gitlab organization
+		# with no billing
+		visibility_level = "public"
+	}
+
+	resource "gitlab_branch_protection" "foo" {
+		project = "${gitlab_branch.foo.project}"
+		branch = "${gitlab_branch.foo.name}"
+		push_access_level = "developer"
+		merge_access_level = "developer"
+	  }
+	resource "gitlab_branch" "foo" {
+		name = "testbranch-%d"
+		ref = "master"
+		project = gitlab_project.test.id
+	}
+`, rInt, rInt)
 }
 
 func testAccGitlabBranchConfig(rInt int) string {
