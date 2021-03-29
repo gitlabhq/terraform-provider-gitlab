@@ -6,8 +6,8 @@ This resource allows you to create and manage Project Access Token for your GitL
 ## Example Usage
 
 ```hcl
-resource "gitlab_deploy_token" "example" {
-  project    = "example/deploying"
+resource "gitlab_project_access_token" "example" {
+  project    = "25"
   name       = "Example project access token"
   expires_at = "2020-03-14"
   
@@ -19,9 +19,9 @@ resource "gitlab_deploy_token" "example" {
 
 The following arguments are supported:
 
-* `project` - (Required, string) The id of the project to add the deploy token to.
+* `project` - (Required, string) The id of the project to add the project access token to.
  
-* `name` - (Required, string) A name to describe the deploy token with.
+* `name` - (Required, string) A name to describe the project access token.
 
 * `expires_at` - (Optional, string) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
 
@@ -31,7 +31,7 @@ The following arguments are supported:
 
 The following attributes are exported in addition to the arguments listed above:
 
-* `token` - The secret token. This is only populated when creating a new deploy token.
+* `token` - The secret token. This is only populated when creating a new project access token.
 
 * `active` - True if the token is active.
 
