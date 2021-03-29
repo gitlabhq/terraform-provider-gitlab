@@ -91,12 +91,12 @@ func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interfa
 	log.Printf("[DEBUG] create gitlab ProjectAccessToken %s %s", *options.Name, options.Scopes)
 
 	if v, ok := d.GetOk("expires_at"); ok {
-		var parsedExpiresAt gitlab.ISOTime
-		err := parsedExpiresAt.UnmarshalJSON([]byte(v.(string)))
+		parsedExpiresAt, err := time.Parse("2006-01-02", v.(string))
 		if err != nil {
 			return fmt.Errorf("Invalid expires_at date: %v", err)
 		}
-		options.ExpiresAt = &parsedExpiresAt
+		parsedExpiresAtISOTime := gitlab.ISOTime(parsedExpiresAt)
+		options.ExpiresAt = &parsedExpiresAtISOTime
 		log.Printf("[DEBUG] create gitlab ProjectAccessToken with expires_at %s", *options.ExpiresAt)
 	}
 
