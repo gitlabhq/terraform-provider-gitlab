@@ -26,6 +26,7 @@ resource "gitlab_project_level_mr_approvals" "foo" {
   disable_overriding_approvers_per_merge_request = false
   merge_requests_author_approval                 = false
   merge_requests_disable_committers_approval     = true
+  require_password_to_approve                    = true
 }
 ```
 
@@ -43,6 +44,8 @@ resource "gitlab_project_level_mr_approvals" "foo" {
 - **merge_requests_author_approval** (Boolean) Set to `true` if you want to allow merge request authors to self-approve merge requests. Authors
 - **merge_requests_disable_committers_approval** (Boolean) Set to `true` if you want to prevent approval of merge requests by merge request committers. Default is `false`.
 - **reset_approvals_on_push** (Boolean) Set to `true` if you want to remove all approvals in a merge request when new commits are pushed to its source branch. Default is `true`.
+
+* `require_password_to_approve` - (Optional) Set to `true` if you want to require authentification when approving a merge request. Default is `false`.
 
 ## Import
 
