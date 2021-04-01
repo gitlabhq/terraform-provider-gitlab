@@ -20,7 +20,7 @@ The following arguments are supported:
 
 * `group_id` - (Required) The id of the group.
 
-* `access_level` - (Required) One of five levels of access to the project.
+* `access_level` - (Required) One of six levels of access to the project.
 
 ## Import
 
