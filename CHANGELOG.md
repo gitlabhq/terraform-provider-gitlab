@@ -1,3 +1,17 @@
+## 3.6.0 (Apr 6, 2021)
+
+ENHANCEMENTS:
+
+* Support the Note field in the User resource/data ([#572](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#572))
+* add diffSuppressFunc for 'expires_at' attribute in 'deploy_token' ([#575](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#575))
+* Update to Go 1.16 and terraform-plugin-sdk 1.16 ([#579](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#579))
+* Bump github.com/xanzy/go-gitlab from 0.44.0 to 0.46.0 ([#586](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#586))
+
+BUG FIXES:
+
+* Fix "Run failed" on forks ([#565](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#565))
+
+
 ## 3.5.0 (Feb 18, 2021)
 
 FEATURES:
