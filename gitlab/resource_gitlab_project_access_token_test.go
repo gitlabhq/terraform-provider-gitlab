@@ -32,7 +32,7 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the pipeline trigger to change the parameters
+			// Update the Project Access Token to change the parameters
 			{
 				Config: testAccGitlabProjectAccessTokenUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -44,7 +44,20 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the pipeline trigger to get back to initial settings
+			// Add a CICD variable with Project Access Token value
+			{
+				Config: testAccGitlabProjectAccessTokenUpdateConfigWithCICDvar(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectAccessTokenExists("gitlab_project_access_token.bar", &pat),
+					testAccCheckGitlabProjectVariableExists(testAccProvider.Meta().(*gitlab.Client), "gitlab_project_variable.var"),
+					testAccCheckGitlabProjectAccessTokenAttributes(&pat, &testAccGitlabProjectAccessTokenExpectedAttributes{
+						name:      "my new project token",
+						scopes:    map[string]bool{"read_repository": false, "api": true, "write_repository": false, "read_api": false},
+						expiresAt: "2022-05-01",
+					}),
+				),
+			},
+			//Restore Project Access Token initial parameters
 			{
 				Config: testAccGitlabProjectAccessTokenConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -200,5 +213,33 @@ resource "gitlab_project_access_token" "bar" {
     expires_at = "2022-05-01"
     scopes = ["api"]
 }
+	`, rInt)
+}
+
+func testAccGitlabProjectAccessTokenUpdateConfigWithCICDvar(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_project_access_token" "bar" {
+	name = "my new project token"
+    project = gitlab_project.foo.id
+    expires_at = "2022-05-01"
+    scopes = ["api"]
+}
+
+
+resource "gitlab_project_variable" "var" {
+	project   = gitlab_project.foo.id
+	key       = "my_proj_access_token"
+	value     = gitlab_project_access_token.bar.token
+ }
+
 	`, rInt)
 }
