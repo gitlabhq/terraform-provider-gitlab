@@ -79,6 +79,11 @@ func resourceGitlabServicePipelinesEmailRead(d *schema.ResourceData, meta interf
 
 	service, _, err := client.Services.GetPipelinesEmailService(project)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab pipelines emails service not found for project %s", project)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

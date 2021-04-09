@@ -144,6 +144,11 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 	mirrors, _, err := client.ProjectMirrors.ListProjectMirror(projectID)
 
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab project mirror not found for project %s", projectID)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

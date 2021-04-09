@@ -75,9 +75,12 @@ func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{
 
 	projectInformation, _, err := client.Projects.GetProject(projectId, nil)
 	if err != nil {
-		log.Printf("[DEBUG] failed to read gitlab project %s: %s", id, err)
-		d.SetId("")
-		return nil
+		if is404(err) {
+			log.Printf("[DEBUG] failed to read gitlab project %s: %s", id, err)
+			d.SetId("")
+			return nil
+		}
+		return err
 	}
 
 	for _, v := range projectInformation.SharedWithGroups {
@@ -125,7 +128,7 @@ func resourceGitlabProjectShareGroupSetToState(d *schema.ResourceData, group str
 }, projectId *string) {
 
 	//This cast is needed due to an inconsistency in the upstream API
-	//GroupAcessLevel is returned as an int but the map we lookup is sorted by the int alias AccessLevelValue
+	//GroupAccessLevel is returned as an int but the map we lookup is sorted by the int alias AccessLevelValue
 	convertedAccessLevel := gitlab.AccessLevelValue(group.GroupAccessLevel)
 
 	d.Set("project_id", projectId)

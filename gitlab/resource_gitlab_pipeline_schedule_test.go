@@ -66,6 +66,47 @@ func TestAccGitlabPipelineSchedule_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabPipelineSchedule_import(t *testing.T) {
+	rInt := acctest.RandInt()
+	resourceName := "gitlab_pipeline_schedule.schedule"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabPipelineScheduleDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabPipelineScheduleConfig(rInt),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateIdFunc: getPipelineScheduleID(resourceName),
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func getPipelineScheduleID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("not found: %s", n)
+		}
+
+		pipelineScheduleID := rs.Primary.ID
+		if pipelineScheduleID == "" {
+			return "", fmt.Errorf("no pipeline schedule ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("no project ID is set")
+		}
+		return fmt.Sprintf("%s:%s", projectID, pipelineScheduleID), nil
+	}
+}
+
 func testAccCheckGitlabPipelineScheduleExists(n string, schedule *gitlab.PipelineSchedule) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -131,19 +172,22 @@ func testAccCheckGitlabPipelineScheduleDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
+		if rs.Type != "gitlab_pipeline_schedule" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		id, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("could not convert pipeline schedule id to integer: %s", err)
+		}
+
+		gotPS, _, err := conn.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], id)
 		if err == nil {
-			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
-				}
+			if gotPS != nil && fmt.Sprintf("%d", gotPS.ID) == rs.Primary.ID {
+				return fmt.Errorf("pipeline schedule still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

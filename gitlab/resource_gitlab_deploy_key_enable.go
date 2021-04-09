@@ -77,6 +77,11 @@ func resourceGitlabDeployKeyEnableRead(d *schema.ResourceData, meta interface{})
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab deploy key not found %s/%d", project, deployKeyID)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
@@ -100,7 +105,7 @@ func resourceGitlabDeployKeyEnableDelete(d *schema.ResourceData, meta interface{
 	response, err := client.DeployKeys.DeleteDeployKey(project, deployKeyID)
 
 	// HTTP 2XX is success including 204 with no body
-	if response.StatusCode/100 == 2 {
+	if response != nil && response.StatusCode/100 == 2 {
 		return nil
 	}
 	return err

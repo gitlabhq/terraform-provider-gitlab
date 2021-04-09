@@ -80,6 +80,11 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab deploy key not found %s/%d", project, deployKeyID)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
@@ -99,7 +104,6 @@ func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) err
 	log.Printf("[DEBUG] Delete gitlab deploy key %s", d.Id())
 
 	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID)
-
 	return err
 }
 

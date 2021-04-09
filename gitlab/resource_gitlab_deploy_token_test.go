@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"net/http"
 	"strconv"
 	"testing"
 
@@ -114,12 +113,11 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 		group := rs.Primary.Attributes["group"]
 
 		var gotDeployTokens []*gitlab.DeployToken
-		var resp *gitlab.Response
 
 		if project != "" {
-			gotDeployTokens, resp, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
+			gotDeployTokens, _, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
 		} else if group != "" {
-			gotDeployTokens, resp, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
+			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
 		} else {
 			return fmt.Errorf("somehow neither project nor group were set")
 		}
@@ -132,7 +130,7 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 			}
 		}
 
-		if resp.StatusCode != http.StatusNotFound {
+		if !is404(err) {
 			return err
 		}
 	}

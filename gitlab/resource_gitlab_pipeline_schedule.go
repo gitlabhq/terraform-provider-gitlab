@@ -1,10 +1,10 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -16,6 +16,9 @@ func resourceGitlabPipelineSchedule() *schema.Resource {
 		Read:   resourceGitlabPipelineScheduleRead,
 		Update: resourceGitlabPipelineScheduleUpdate,
 		Delete: resourceGitlabPipelineScheduleDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabPipelineScheduleImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -113,7 +116,9 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		opt.Page = resp.NextPage
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID))
+		log.Printf("[DEBUG] PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
+		d.SetId("")
+		return nil
 	}
 
 	return nil
@@ -177,9 +182,21 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err = client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
-		return fmt.Errorf("failed to delete pipeline schedule %q: %w", d.Id(), err)
+	if _, err := client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
+		return fmt.Errorf("%s failed to delete pipeline schedule: %s", d.Id(), err.Error())
 	}
+	return err
+}
 
-	return nil
+func resourceGitlabPipelineScheduleImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 2 {
+		return nil, fmt.Errorf("invalid pipeline schedule import format; expected '{project_id}:{pipeline_schedule_id}'")
+	}
+	project, id := s[0], s[1]
+
+	d.SetId(id)
+	d.Set("project", project)
+
+	return []*schema.ResourceData{d}, nil
 }

@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -17,6 +18,10 @@ func resourceGitlabTagProtection() *schema.Resource {
 		Create: resourceGitlabTagProtectionCreate,
 		Read:   resourceGitlabTagProtectionRead,
 		Delete: resourceGitlabTagProtectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -81,12 +86,21 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 
 	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab tag protection not found %s/%s", project, tag)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 
 	d.Set("project", project)
 	d.Set("tag", pt.Name)
-	d.Set("create_access_level", pt.CreateAccessLevels[0].AccessLevel)
+	if v, ok := accessLevelValueToName[pt.CreateAccessLevels[0].AccessLevel]; ok {
+		d.Set("create_access_level", v)
+	} else {
+		return fmt.Errorf("unknown access level: %d", pt.CreateAccessLevels[0].AccessLevel)
+	}
 
 	d.SetId(buildTwoPartID(&project, &pt.Name))
 

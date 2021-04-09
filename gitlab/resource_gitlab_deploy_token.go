@@ -176,9 +176,11 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 					d.Set("scopes.read_registry", true)
 				}
 			}
+			return nil
 		}
 	}
-
+	log.Printf("[DEBUG] GitLab deploy token %d in group %s was not found", deployTokenID, group.(string))
+	d.SetId("")
 	return nil
 }
 
