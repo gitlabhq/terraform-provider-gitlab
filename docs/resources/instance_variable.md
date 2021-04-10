@@ -1,11 +1,3 @@
----
-layout: "gitlab"
-page_title: "GitLab: gitlab_instance_variable"
-sidebar_current: "docs-gitlab-resource-instance-variable"
-description: |-
-  Creates and manages CI/CD variables for GitLab instances
----
-
 # gitlab\_instance\_variable
 
 This resource allows you to create and manage CI/CD variables for your GitLab instance.
