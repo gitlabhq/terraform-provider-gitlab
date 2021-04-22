@@ -54,7 +54,8 @@ var _ = registerResource("gitlab_deploy_key_enable", func() *schema.Resource {
 				Description: "Can deploy key push to the project’s repository.",
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     false,
+				ForceNew:    true,
 			},
 		},
 	}
@@ -68,6 +69,14 @@ func resourceGitlabDeployKeyEnableCreate(ctx context.Context, d *schema.Resource
 	log.Printf("[DEBUG] enable gitlab deploy key %s/%d", project, key_id)
 
 	deployKey, _, err := client.DeployKeys.EnableDeployKey(project, key_id, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	options := &gitlab.UpdateDeployKeyOptions{
+		CanPush: gitlab.Bool(d.Get("can_push").(bool)),
+	}
+	_, _, err = client.DeployKeys.UpdateDeployKey(project, key_id, options)
 	if err != nil {
 		return diag.FromErr(err)
 	}
