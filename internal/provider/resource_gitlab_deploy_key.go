@@ -50,7 +50,7 @@ var _ = registerResource("gitlab_deploy_key", func() *schema.Resource {
 				},
 			},
 			"can_push": {
-				Description: "Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.",
+				Description: "Allow this deploy key to be used to push changes to the project. Defaults to `false`.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
