@@ -77,7 +77,7 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
 
 * `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 
-* `initialize_with_readme` - (Optional) Create master branch with first commit containing a README.md file.
+* `initialize_with_readme` - (Optional) Create main branch with first commit containing a README.md file.
 
 * `packages_enabled` - (Optional) Enable packages repository for the project.
 
