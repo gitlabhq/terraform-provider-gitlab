@@ -71,6 +71,11 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			},
 			"allowed_to_push":  schemaAllowedTo(),
 			"allowed_to_merge": schemaAllowedTo(),
+			"allow_force_push": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -103,6 +108,7 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 
 	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+	allowForcePush := d.Get("allow_force_push").(bool)
 	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	allowedToPush := expandBranchPermissionOptions(d.Get("allowed_to_push").(*schema.Set).List())
@@ -114,6 +120,7 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 		MergeAccessLevel:          &mergeAccessLevel,
 		AllowedToPush:             allowedToPush,
 		AllowedToMerge:            allowedToMerge,
+		AllowForcePush:            &allowForcePush,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	})
 	if err != nil {
@@ -171,6 +178,10 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	if err := d.Set("allowed_to_merge", convertAllowedToToBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return fmt.Errorf("error setting allowed_to_merge: %v", err)
 	}
+	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
+	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
+		return fmt.Errorf("error setting allow_force_push: %v", err)
+	}
 
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
 		return fmt.Errorf("error setting code_owner_approval_required: %v", err)
@@ -184,28 +195,40 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface{}) error {
-	// NOTE: At the time of writing, the only value that does not force re-creation is code_owner_approval_required,
-	// so therefore that is the only update that needs to be handled.
-
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	branch := d.Get("branch").(string)
-	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	log.Printf("[DEBUG] update gitlab branch protection for project %s, branch %s", project, branch)
 
-	options := &gitlab.RequireCodeOwnerApprovalsOptions{
-		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
-	}
+	if d.HasChange("allow_force_push") {
+		allowForcePush := d.Get("allow_force_push").(bool)
 
-	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
-		// The user might be running a version of GitLab that does not support this feature.
-		// We enhance the generic 404 error with a more informative message.
-		if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
-			return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+		options := &gitlab.AllowForcePushOptions{
+			AllowForcePush: &allowForcePush,
 		}
 
-		return err
+		if _, err := client.ProtectedBranches.AllowForcePush(project, branch, options); err != nil {
+			return err
+		}
+	}
+
+	if d.HasChange("code_owner_approval_required") {
+		codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
+
+		options := &gitlab.RequireCodeOwnerApprovalsOptions{
+			CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
+		}
+
+		if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+			// The user might be running a version of GitLab that does not support this feature.
+			// We enhance the generic 404 error with a more informative message.
+			if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
+				return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+			}
+
+			return err
+		}
 	}
 
 	return resourceGitlabBranchProtectionRead(d, meta)
