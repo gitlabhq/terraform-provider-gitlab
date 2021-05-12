@@ -427,7 +427,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	// is committed to state since we set its ID
 	d.SetId(fmt.Sprintf("%d", project.ID))
 
-	if _, ok := d.GetOk("import_url"); ok {
+	_, importURLSet := d.GetOk("import_url")
+	_, templateNameSet := d.GetOk("template_name")
+	_, templateProjectIDSet := d.GetOk("template_project_id")
+	if importURLSet || templateNameSet || templateProjectIDSet {
 		log.Printf("[DEBUG] waiting for project %q import to finish", *options.Name)
 
 		stateConf := &resource.StateChangeConf{
