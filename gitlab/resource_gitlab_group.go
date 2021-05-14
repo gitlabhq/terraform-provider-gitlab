@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/internal/version"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -107,7 +109,7 @@ func resourceGitlabGroup() *schema.Resource {
 				Default:  48,
 			},
 			"parent_id": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Default:  0,
@@ -174,7 +176,7 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if v, ok := d.GetOk("parent_id"); ok {
-		options.ParentID = gitlab.Int(v.(int))
+		options.ParentID = readParentID(v.(string), meta)
 	}
 
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
@@ -187,6 +189,26 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
 	return resourceGitlabGroupRead(d, meta)
+}
+
+func readParentID(parentID string, meta interface{}) *int {
+	if id, err := strconv.Atoi(parentID); err == nil {
+		return gitlab.Int(id)
+	}
+	client := meta.(*gitlab.Client)
+	group, resp, err := client.Groups.GetGroup(parentID)
+	if err != nil {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
+			log.Printf("[DEBUG] gitlab group %s not found", parentID)
+			return nil
+		}
+		return nil
+	}
+	if group.MarkedForDeletionOn != nil {
+		log.Printf("[DEBUG] gitlab group %s is marked for deletion", parentID)
+		return nil
+	}
+	return gitlab.Int(group.ID)
 }
 
 func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
