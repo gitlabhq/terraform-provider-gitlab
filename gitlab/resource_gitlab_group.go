@@ -1,6 +1,8 @@
 package gitlab
 
 import (
+	"errors"
+	"math/rand"
 	"fmt"
 	"log"
 	"net/http"
@@ -175,7 +177,11 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if v, ok := d.GetOk("parent_id"); ok {
-		options.ParentID = readParentID(v.(string), meta)
+		id, err := readParentID(v.(string), meta)
+		if err != nil {
+			return err
+		}
+		options.ParentID = id
 	}
 
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
@@ -190,24 +196,54 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	return resourceGitlabGroupRead(d, meta)
 }
 
-func readParentID(parentID string, meta interface{}) *int {
-	if id, err := strconv.Atoi(parentID); err == nil {
-		return gitlab.Int(id)
+func retryGetGroup(attempts int, sleep time.Duration, client *gitlab.Client, parentID string) (*int, error) {
+	id, err := getGroup(client, parentID);
+	rand.Seed(time.Now().UnixNano())
+	if err != nil {
+		if s, ok := err.(stop); ok {
+			return nil, s.error
+		}
+
+		if attempts--; attempts > 0 {
+			// Add some randomness to prevent creating a Thundering Herd
+			jitter := time.Duration(rand.Int63n(int64(sleep)))
+			sleep = sleep + jitter/2
+
+			time.Sleep(sleep)
+			return retryGetGroup(attempts, sleep, client, parentID)
+		}
+		return nil, err
 	}
-	client := meta.(*gitlab.Client)
+	return id, err
+}
+
+type stop struct {
+	error
+}
+
+func getGroup(client *gitlab.Client, parentID string) (*int, error) {
 	group, resp, err := client.Groups.GetGroup(parentID)
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab group %s not found", parentID)
-			return nil
+			return nil, err
 		}
-		return nil
+		return nil, err
 	}
 	if group.MarkedForDeletionOn != nil {
 		log.Printf("[DEBUG] gitlab group %s is marked for deletion", parentID)
-		return nil
+		return nil, errors.New("")
 	}
-	return gitlab.Int(group.ID)
+	return gitlab.Int(group.ID), nil
+}
+
+func readParentID(parentID string, meta interface{}) (*int, error) {
+	if id, err := strconv.Atoi(parentID); err == nil {
+		return gitlab.Int(id), err
+	}
+	client := meta.(*gitlab.Client)
+	
+	return retryGetGroup(5, 10 * time.Second, client, parentID)
 }
 
 func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
