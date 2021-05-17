@@ -200,10 +200,6 @@ func retryGetGroup(attempts int, sleep time.Duration, client *gitlab.Client, par
 	id, err := getGroup(client, parentID)
 	rand.Seed(time.Now().UnixNano())
 	if err != nil {
-		if s, ok := err.(stop); ok {
-			return nil, s.error
-		}
-
 		if attempts--; attempts > 0 {
 			// Add some randomness to prevent creating a Thundering Herd
 			jitter := time.Duration(rand.Int63n(int64(2)))
@@ -214,10 +210,6 @@ func retryGetGroup(attempts int, sleep time.Duration, client *gitlab.Client, par
 		return nil, err
 	}
 	return id, err
-}
-
-type stop struct {
-	error
 }
 
 func getGroup(client *gitlab.Client, parentID string) (*int, error) {
