@@ -230,7 +230,7 @@ func getGroup(client *gitlab.Client, parentID string) (*int, error) {
 
 func readParentID(parentID string, meta interface{}) (*int, error) {
 	if parentID == "" {
-		nil, nil
+		return nil, nil
 	}
 	if id, err := strconv.Atoi(parentID); err == nil {
 		return gitlab.Int(id), err
