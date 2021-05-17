@@ -206,9 +206,8 @@ func retryGetGroup(attempts int, sleep time.Duration, client *gitlab.Client, par
 
 		if attempts--; attempts > 0 {
 			// Add some randomness to prevent creating a Thundering Herd
-			jitter := time.Duration(rand.Int63n(int64(sleep)))
+			jitter := time.Duration(rand.Int63n(int64(2)))
 			sleep = sleep + jitter/2
-
 			time.Sleep(sleep)
 			return retryGetGroup(attempts, sleep, client, parentID)
 		}
@@ -243,7 +242,7 @@ func readParentID(parentID string, meta interface{}) (*int, error) {
 	}
 	client := meta.(*gitlab.Client)
 
-	return retryGetGroup(25, 4*time.Second, client, parentID)
+	return retryGetGroup(25, 3*time.Second, client, parentID)
 }
 
 func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
