@@ -243,7 +243,7 @@ func readParentID(parentID string, meta interface{}) (*int, error) {
 	}
 	client := meta.(*gitlab.Client)
 	
-	return retryGetGroup(5, 10 * time.Second, client, parentID)
+	return retryGetGroup(25, 4 * time.Second, client, parentID)
 }
 
 func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
