@@ -57,12 +57,7 @@ resource "gitlab_user" "test" {
   password = "test%dtt"
   email    = "listest%d@ssss.com"
 }
-
-resource "gitlab_group_membership" "foo" {
-  group_id     = gitlab_group.foo.id
-  user_id      = gitlab_user.test.id
-  access_level = "developer"
-}`, rInt, rInt, rInt, rInt, rInt, rInt)
+`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccDataSourceGitlabGroupMembershipConfig_basic(rInt int) string {
@@ -70,10 +65,6 @@ func testAccDataSourceGitlabGroupMembershipConfig_basic(rInt int) string {
 resource "gitlab_group" "foo" {
   name = "foo%d"
   path = "foo%d"
-}
-
-data "gitlab_group_membership" "foo" {
-  group_id = gitlab_group.foo.id
 }`, rInt, rInt)
 }
 
@@ -82,10 +73,5 @@ func testAccDataSourceGitlabGroupMembershipConfigFilterAccessLevel(rInt int) str
 resource "gitlab_group" "foo" {
   name = "foo%d"
   path = "foo%d"
-}
-
-data "gitlab_group_membership" "foomaintainers" {
-  group_id     = gitlab_group.foo.id
-  access_level = "maintainer"
 }`, rInt, rInt)
 }
