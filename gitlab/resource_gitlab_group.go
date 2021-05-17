@@ -113,7 +113,7 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
-				Default:  0,
+				Default:  "",
 			},
 			"runners_token": {
 				Type:      schema.TypeString,
