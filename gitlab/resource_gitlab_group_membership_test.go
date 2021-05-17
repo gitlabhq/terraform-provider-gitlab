@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"testing"
 
@@ -58,7 +57,6 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 		}
 
 		groupId := rs.Primary.Attributes["group_id"]
-		log.Println(groupId)
 		if groupId == "" {
 			return fmt.Errorf("No group ID is set")
 		}
@@ -142,8 +140,8 @@ resource "gitlab_user" "test" {
 }
 
 resource "gitlab_group_membership" "foo" {
-  group_id 		= gitlab_group.foo.id
-  user_id 		= gitlab_user.test.id
+  group_id 		= "${gitlab_group.foo.id}"
+  user_id 		= "${gitlab_user.test.id}"
   access_level 	= "developer"
 }`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -163,8 +161,8 @@ resource "gitlab_user" "test" {
 }
 
 resource "gitlab_group_membership" "foo" {
-  group_id 		= gitlab_group.foo.id
-  user_id 		= gitlab_user.test.id
+  group_id 		= "${gitlab_group.foo.id}"
+  user_id 		= "${gitlab_user.test.id}"
   expires_at    = "2099-01-01"
   access_level 	= "guest"
 }`, rInt, rInt, rInt, rInt, rInt, rInt)

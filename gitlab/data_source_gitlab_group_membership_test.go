@@ -59,8 +59,8 @@ resource "gitlab_user" "test" {
 }
 
 resource "gitlab_group_membership" "foo" {
-  group_id     = "${gitlab_group.foo.id}"
-  user_id      = "${gitlab_user.test.id}"
+  group_id     = gitlab_group.foo.id
+  user_id      = gitlab_user.test.id
   access_level = "developer"
 }`, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -73,7 +73,7 @@ resource "gitlab_group" "foo" {
 }
 
 data "gitlab_group_membership" "foo" {
-  group_id = "${gitlab_group.foo.id}"
+  group_id = gitlab_group.foo.id
 }`, rInt, rInt)
 }
 
@@ -85,7 +85,7 @@ resource "gitlab_group" "foo" {
 }
 
 data "gitlab_group_membership" "foomaintainers" {
-  group_id     = "${gitlab_group.foo.id}"
+  group_id     = gitlab_group.foo.id
   access_level = "maintainer"
 }`, rInt, rInt)
 }
