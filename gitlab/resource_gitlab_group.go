@@ -2,9 +2,9 @@ package gitlab
 
 import (
 	"errors"
-	"math/rand"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -197,7 +197,7 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func retryGetGroup(attempts int, sleep time.Duration, client *gitlab.Client, parentID string) (*int, error) {
-	id, err := getGroup(client, parentID);
+	id, err := getGroup(client, parentID)
 	rand.Seed(time.Now().UnixNano())
 	if err != nil {
 		if s, ok := err.(stop); ok {
@@ -242,8 +242,8 @@ func readParentID(parentID string, meta interface{}) (*int, error) {
 		return gitlab.Int(id), err
 	}
 	client := meta.(*gitlab.Client)
-	
-	return retryGetGroup(25, 4 * time.Second, client, parentID)
+
+	return retryGetGroup(25, 4*time.Second, client, parentID)
 }
 
 func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
