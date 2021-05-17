@@ -62,16 +62,20 @@ resource "gitlab_user" "test" {
 
 func testAccDataSourceGitlabGroupMembershipConfig_basic(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-  name = "foo%d"
-  path = "foo%d"
-}`, rInt, rInt)
+	resource "gitlab_user" "test" {
+		name     = "foo%d"
+		username = "listest%d"
+		password = "test%dtt"
+		email    = "listest%d@ssss.com"
+	  }`, rInt, rInt, rInt, rInt)
 }
 
 func testAccDataSourceGitlabGroupMembershipConfigFilterAccessLevel(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-  name = "foo%d"
-  path = "foo%d"
-}`, rInt, rInt)
+	resource "gitlab_user" "test" {
+		name     = "foo%d"
+		username = "listest%d"
+		password = "test%dtt"
+		email    = "listest%d@ssss.com"
+	  }`, rInt, rInt, rInt, rInt)
 }
