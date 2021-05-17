@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"testing"
 
@@ -57,6 +58,7 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 		}
 
 		groupId := rs.Primary.Attributes["group_id"]
+		log.Println(groupId)
 		if groupId == "" {
 			return fmt.Errorf("No group ID is set")
 		}
