@@ -113,7 +113,7 @@ func resourceGitlabGroup() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
-				Default:  0,
+				Default:  "",
 			},
 			"runners_token": {
 				Type:      schema.TypeString,
@@ -229,6 +229,9 @@ func getGroup(client *gitlab.Client, parentID string) (*int, error) {
 }
 
 func readParentID(parentID string, meta interface{}) (*int, error) {
+	if parentID == "" {
+		return nil, nil
+	}
 	if id, err := strconv.Atoi(parentID); err == nil {
 		return gitlab.Int(id), err
 	}
