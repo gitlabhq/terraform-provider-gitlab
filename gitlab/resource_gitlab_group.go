@@ -185,8 +185,6 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		if err != nil {
 			return err
 		}
-		log.Println("[DEBUG] setting id")
-		log.Println(id)
 		options.ParentID = id
 	}
 
@@ -237,15 +235,11 @@ func readParentID(parentID string, meta interface{}) (*int, error) {
 	if parentID == "" {
 		return nil, nil
 	}
-	log.Println("[DEBUG] should see a debug here if parent id is not empty")
-	log.Println(parentID)
 	if id, err := strconv.Atoi(parentID); err == nil {
-		log.Println("[DEBUG] should see an int number")
 		// BUG(eddb7): If path is purely numeric it may appear as an ID in this block
 		return gitlab.Int(id), err
 	}
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] URL PATH %s", parentID)
 	return retryGetGroup(25, 3*time.Second, client, parentID)
 }
 
