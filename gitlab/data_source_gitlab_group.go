@@ -61,7 +61,7 @@ func dataSourceGitlabGroup() *schema.Resource {
 				Computed: true,
 			},
 			"parent_id": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"runners_token": {
@@ -99,7 +99,6 @@ func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	} else {
 		return fmt.Errorf("one and only one of group_id or full_path must be set")
 	}
-
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 	d.Set("name", group.Name)
@@ -110,7 +109,7 @@ func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", group.Visibility)
-	d.Set("parent_id", group.ParentID)
+	d.Set("parent_id", fmt.Sprintf("%d", group.ParentID))
 	d.Set("runners_token", group.RunnersToken)
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
