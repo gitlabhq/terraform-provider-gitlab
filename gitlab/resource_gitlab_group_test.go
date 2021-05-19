@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -194,6 +195,9 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 
 func TestAccGitlabGroup_disappears(t *testing.T) {
 	var group gitlab.Group
+	var emptyGroup = gitlab.Group{
+		FullPath: "made/up/path",
+	}
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -204,7 +208,9 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGetGitlabGroup(&emptyGroup, true),
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGetGitlabGroup(&group, false),
 					testAccCheckGitlabGroupDisappears(&group),
 				),
 				ExpectNonEmptyPlan: true,
@@ -236,6 +242,29 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 			}
 		}
 		return fmt.Errorf("waited for more than 15 seconds for group to be asynchronously deleted")
+	}
+}
+
+func testAccCheckGetGitlabGroup(group *gitlab.Group, hasError bool) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		client := testAccProvider.Meta().(*gitlab.Client)
+		// get group with full path or ID
+		gid, err:= getGroup(client, group.FullPath)
+		if hasError {
+			if err == nil {
+				return errors.New("Expected error but found none")
+			}
+			if gid != nil {
+				return fmt.Errorf("expected nil value for group go %d", gid)
+			}
+		}
+		if err != nil {
+			return err
+		}
+		if gid == nil || *gid != group.ID {
+			return fmt.Errorf("Unexpected ID returned %d", gid)
+		}
+		return nil
 	}
 }
 
