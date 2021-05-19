@@ -64,7 +64,7 @@ equire all users in this group to setup Two-factor authentication.
 * `two_factor_grace_period` - (Optional) Int, defaults to 48.
 Time before Two-factor authentication is enforced (in hours).
 
-* `parent_id` - (Optional) Integer, id of the parent group (creates a nested group).
+* `parent_id` - (Optional) Integer, id or full path of the parent group (creates a nested group).
 
 ## Attributes Reference
 
