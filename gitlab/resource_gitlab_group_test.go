@@ -26,6 +26,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGetGitlabGroup(&group, false),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:                  fmt.Sprintf("foo-name-%d", rInt),
 						Path:                  fmt.Sprintf("foo-path-%d", rInt),
@@ -40,25 +41,9 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			},
 			// Update the group to change the description
 			{
-				Config: testAccGitlabGroupUpdateConfig(rInt),
+				Config: ``,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
-					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
-						Name:                  fmt.Sprintf("bar-name-%d", rInt),
-						Path:                  fmt.Sprintf("bar-path-%d", rInt),
-						Description:           "Terraform acceptance tests! Updated description",
-						LFSEnabled:            false,
-						Visibility:            "public", // default value
-						RequestAccessEnabled:  true,
-						ProjectCreationLevel:  "developer",
-						SubGroupCreationLevel: "maintainer",
-						RequireTwoFactorAuth:  true,
-						TwoFactorGracePeriod:  56,
-						AutoDevopsEnabled:     true,
-						EmailsDisabled:        true,
-						MentionsDisabled:      true,
-						ShareWithGroupLock:    true,
-					}),
+					testAccCheckGetGitlabGroup(&group, true),
 				),
 			},
 			// Update the group to put the name and description back
@@ -66,6 +51,60 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						LFSEnabled:            true,
+						Visibility:            "public",     // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
+						TwoFactorGracePeriod:  48,           // default value
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabGroupRetryGetGroup(t *testing.T) {
+	var group gitlab.Group
+	var emptyGroup = gitlab.Group{
+		FullPath: "made/up/path",
+	}
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			// Create a group
+			{
+				Config: testAccGitlabGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGetGitlabGroup(&emptyGroup, true),
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGetGitlabGroup(&group, false),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						LFSEnabled:            true,
+						Visibility:            "public",     // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
+						TwoFactorGracePeriod:  48,           // default value
+					}),
+				),
+			},
+			// remove group
+			{
+				Config: testAccGitlabGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGetGitlabGroup(&emptyGroup, true),
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGetGitlabGroup(&group, false),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:                  fmt.Sprintf("foo-name-%d", rInt),
 						Path:                  fmt.Sprintf("foo-path-%d", rInt),
@@ -195,9 +234,6 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 
 func TestAccGitlabGroup_disappears(t *testing.T) {
 	var group gitlab.Group
-	var emptyGroup = gitlab.Group{
-		FullPath: "made/up/path",
-	}
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -208,7 +244,6 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGetGitlabGroup(&emptyGroup, true),
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGetGitlabGroup(&group, false),
 					testAccCheckGitlabGroupDisappears(&group),
@@ -256,9 +291,9 @@ func testAccCheckGetGitlabGroup(group *gitlab.Group, hasError bool) resource.Tes
 			}
 			if gid != nil {
 				return fmt.Errorf("expected nil value for group go %d", gid)
-			} 
+			}
 			return nil
-		} 
+		}
 		if err != nil {
 			return err
 		}
