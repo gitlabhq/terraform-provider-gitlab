@@ -256,8 +256,9 @@ func testAccCheckGetGitlabGroup(group *gitlab.Group, hasError bool) resource.Tes
 			}
 			if gid != nil {
 				return fmt.Errorf("expected nil value for group go %d", gid)
-			}
-		}
+			} 
+			return nil
+		} 
 		if err != nil {
 			return err
 		}
