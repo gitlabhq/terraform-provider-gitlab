@@ -249,7 +249,7 @@ func testAccCheckGetGitlabGroup(group *gitlab.Group, hasError bool) resource.Tes
 	return func(s *terraform.State) error {
 		client := testAccProvider.Meta().(*gitlab.Client)
 		// get group with full path or ID
-		gid, err:= getGroup(client, group.FullPath)
+		gid, err := getGroup(client, group.FullPath)
 		if hasError {
 			if err == nil {
 				return errors.New("Expected error but found none")
