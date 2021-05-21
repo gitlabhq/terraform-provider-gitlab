@@ -295,6 +295,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 		Default:  false,
 	},
+	"build_coverage_regex": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -345,6 +349,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
+	d.Set("build_coverage_regex",project.BuildCoverageRegex)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -370,6 +375,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
+		BuildCoverageRegex:                        gitlab.String(d.Get("build_coverage_regex").(string)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -630,6 +636,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorOverwritesDivergedBranches = gitlab.Bool(d.Get("mirror_overwrites_diverged_branches").(bool))
+	}
+
+	if d.HasChange("build_coverage_regex") {
+		options.BuildCoverageRegex = gitlab.String(d.Get("build_coverage_regex").(string))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
