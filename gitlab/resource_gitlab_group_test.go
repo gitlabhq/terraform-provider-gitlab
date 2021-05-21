@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -75,6 +76,49 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						SubGroupCreationLevel: "owner",      // default value
 						TwoFactorGracePeriod:  48,           // default value
 					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabGroupRetryGetGroup(t *testing.T) {
+	var group gitlab.Group
+	var emptyGroup = gitlab.Group{
+		FullPath: "made/up/path",
+	}
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			// Create a group
+			{
+				Config: testAccGitlabGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGetGitlabGroup(&emptyGroup, true),
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGetGitlabGroup(&group, false),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                  fmt.Sprintf("foo-name-%d", rInt),
+						Path:                  fmt.Sprintf("foo-path-%d", rInt),
+						Description:           "Terraform acceptance tests",
+						LFSEnabled:            true,
+						Visibility:            "public",     // default value
+						ProjectCreationLevel:  "maintainer", // default value
+						SubGroupCreationLevel: "owner",      // default value
+						TwoFactorGracePeriod:  48,           // default value
+					}),
+				),
+			},
+
+			// remove group
+			{
+				Config: testAccGitlabNoGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGetGitlabGroup(&group, true),
 				),
 			},
 		},
@@ -205,6 +249,7 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGetGitlabGroup(&group, false),
 					testAccCheckGitlabGroupDisappears(&group),
 				),
 				ExpectNonEmptyPlan: true,
@@ -236,6 +281,30 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 			}
 		}
 		return fmt.Errorf("waited for more than 15 seconds for group to be asynchronously deleted")
+	}
+}
+
+func testAccCheckGetGitlabGroup(group *gitlab.Group, hasError bool) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		client := testAccProvider.Meta().(*gitlab.Client)
+		// get group with full path or ID
+		gid, err := getGroup(client, group.FullPath)
+		if hasError {
+			if err == nil {
+				return errors.New("Expected error but found none")
+			}
+			if gid != nil {
+				return fmt.Errorf("expected nil value for group go %d", gid)
+			}
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if gid == nil || *gid != group.ID {
+			return fmt.Errorf("Unexpected ID returned %d", gid)
+		}
+		return nil
 	}
 }
 
@@ -373,6 +442,19 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
+}
+
+func testAccGitlabNoGroupConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-name-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+  `, rInt)
 }
 
 func testAccGitlabGroupConfig(rInt int) string {

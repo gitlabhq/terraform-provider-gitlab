@@ -33,7 +33,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Computed: true,
 	},
 	"namespace_id": {
-		Type:     schema.TypeInt,
+		Type:     schema.TypeString,
 		Optional: true,
 		Computed: true,
 	},
@@ -330,7 +330,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("merge_method", string(project.MergeMethod))
 	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
 	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
-	d.Set("namespace_id", project.Namespace.ID)
+	d.Set("namespace_id", fmt.Sprintf("%d", project.Namespace.ID))
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
 	d.Set("web_url", project.WebURL)
@@ -377,7 +377,11 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if v, ok := d.GetOk("namespace_id"); ok {
-		options.NamespaceID = gitlab.Int(v.(int))
+		id, err := readParentID(v.(string), meta)
+		if err != nil {
+			return err
+		}
+		options.NamespaceID = id
 	}
 
 	if v, ok := d.GetOk("description"); ok {
@@ -521,7 +525,11 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if d.HasChange("namespace_id") {
-		transferOptions.Namespace = gitlab.Int(d.Get("namespace_id").(int))
+		id, err := readParentID(d.Get("namespace_id").(string), meta)
+		if err != nil {
+			return err
+		}
+		transferOptions.Namespace = id
 	}
 
 	if d.HasChange("description") {
