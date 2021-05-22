@@ -191,6 +191,8 @@ Projects items have the following fields:
 
 * `custom_attributes`
 
+* `build_coverage_regex`
+
 The `owner` attribute exposes the following sub-attributes:
 
 ~> NOTE: These sub-attributes are only populated if the Gitlab token used has an administrator scope.
