@@ -44,6 +44,8 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		Archived:         false, // needless, but let's make this explicit
 		PackagesEnabled:  true,
 		PagesAccessLevel: gitlab.PublicAccessControl,
+		BuildCoverageRegex:				  "foo",
+
 	}
 
 	defaultsMasterBranch = defaults
@@ -86,6 +88,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Archived:         true,
 						PackagesEnabled:  false,
 						PagesAccessLevel: gitlab.DisabledAccessControl,
+						BuildCoverageRegex:				  "foo",
 					}, &received),
 				),
 			},
@@ -358,6 +361,8 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 		PackagesEnabled:  true,
 		PagesAccessLevel: gitlab.PublicAccessControl,
+		BuildCoverageRegex:				  "foo",
+
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -458,6 +463,8 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
 		PackagesEnabled:  true,
 		PagesAccessLevel: gitlab.PrivateAccessControl,
+		BuildCoverageRegex:				  "foo",
+
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -996,6 +1003,7 @@ resource "gitlab_project" "foo" {
   archived = true
   packages_enabled = false
   pages_access_level = "disabled"
+  "build_coverage_regex" = "bar"
 }
 	`, rInt, rInt)
 }

@@ -158,6 +158,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"ci_config_path":                      project.CIConfigPath,
 				"custom_attributes":                   project.CustomAttributes,
 				"packages_enabled":                    project.PackagesEnabled,
+				"build_coverage_regex":					project.BuildCoverageRegex,
 			}
 			values = append(values, v)
 		}
@@ -652,6 +653,10 @@ func dataSourceGitlabProjects() *schema.Resource {
 						},
 						"packages_enabled": {
 							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"build_coverage_regex": {
+							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},
