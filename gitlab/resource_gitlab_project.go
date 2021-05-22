@@ -349,7 +349,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
-	d.Set("build_coverage_regex",project.BuildCoverageRegex)
+	d.Set("build_coverage_regex", project.BuildCoverageRegex)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
