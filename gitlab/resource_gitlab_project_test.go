@@ -41,11 +41,10 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		Archived:         false, // needless, but let's make this explicit
-		PackagesEnabled:  true,
-		PagesAccessLevel: gitlab.PublicAccessControl,
-		BuildCoverageRegex:				  "foo",
-
+		Archived:           false, // needless, but let's make this explicit
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PublicAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 
 	defaultsMasterBranch = defaults
@@ -85,10 +84,10 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						Archived:         true,
-						PackagesEnabled:  false,
-						PagesAccessLevel: gitlab.DisabledAccessControl,
-						BuildCoverageRegex:				  "foo",
+						Archived:           true,
+						PackagesEnabled:    false,
+						PagesAccessLevel:   gitlab.DisabledAccessControl,
+						BuildCoverageRegex: "foo",
 					}, &received),
 				),
 			},
@@ -359,10 +358,9 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		PackagesEnabled:  true,
-		PagesAccessLevel: gitlab.PublicAccessControl,
-		BuildCoverageRegex:				  "foo",
-
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PublicAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -461,10 +459,9 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-		PackagesEnabled:  true,
-		PagesAccessLevel: gitlab.PrivateAccessControl,
-		BuildCoverageRegex:				  "foo",
-
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PrivateAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 
 	resource.Test(t, resource.TestCase{
