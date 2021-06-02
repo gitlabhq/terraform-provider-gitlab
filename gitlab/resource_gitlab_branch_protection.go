@@ -43,6 +43,11 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 			},
+			"allow_force_push": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -58,12 +63,14 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 	branch := gitlab.String(d.Get("branch").(string))
 	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+	allowForcePush := d.Get("allow_force_push").(bool)
 	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	options := &gitlab.ProtectRepositoryBranchesOptions{
 		Name:                      branch,
 		MergeAccessLevel:          &mergeAccessLevel,
 		PushAccessLevel:           &pushAccessLevel,
+		AllowForcePush:            &allowForcePush,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	}
 
@@ -118,6 +125,7 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	d.Set("branch", pb.Name)
 	d.Set("merge_access_level", accessLevel[pb.MergeAccessLevels[0].AccessLevel])
 	d.Set("push_access_level", accessLevel[pb.PushAccessLevels[0].AccessLevel])
+	d.Set("allow_force_push", pb.AllowForcePush)
 	d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
@@ -126,28 +134,40 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 }
 
 func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface{}) error {
-	// NOTE: At the time of writing, the only value that does not force re-creation is code_owner_approval_required,
-	// so therefore that is the only update that needs to be handled.
-
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	branch := d.Get("branch").(string)
-	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	log.Printf("[DEBUG] update gitlab branch protection for project %s, branch %s", project, branch)
 
-	options := &gitlab.RequireCodeOwnerApprovalsOptions{
-		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
-	}
+	if d.HasChange("allow_force_push") {
+		allowForcePush := d.Get("allow_force_push").(bool)
 
-	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
-		// The user might be running a version of GitLab that does not support this feature.
-		// We enhance the generic 404 error with a more informative message.
-		if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
-			return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+		options := &gitlab.AllowForcePushOptions{
+			AllowForcePush: &allowForcePush,
 		}
 
-		return err
+		if _, err := client.ProtectedBranches.AllowForcePush(project, branch, options); err != nil {
+			return err
+		}
+	}
+
+	if d.HasChange("code_owner_approval_required") {
+		codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
+
+		options := &gitlab.RequireCodeOwnerApprovalsOptions{
+			CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
+		}
+
+		if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+			// The user might be running a version of GitLab that does not support this feature.
+			// We enhance the generic 404 error with a more informative message.
+			if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
+				return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+			}
+
+			return err
+		}
 	}
 
 	return resourceGitlabBranchProtectionRead(d, meta)

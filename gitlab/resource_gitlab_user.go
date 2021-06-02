@@ -126,7 +126,7 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	id, _ := strconv.Atoi(d.Id())
 
-	user, _, err := client.Users.GetUser(id)
+	user, _, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
 	if err != nil {
 		return err
 	}
@@ -199,7 +199,7 @@ func resourceGitlabUserDelete(d *schema.ResourceData, meta interface{}) error {
 		Timeout: 5 * time.Minute,
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			user, resp, err := client.Users.GetUser(id)
+			user, resp, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
 			if resp != nil && resp.StatusCode == 404 {
 				return user, "Deleted", nil
 			}

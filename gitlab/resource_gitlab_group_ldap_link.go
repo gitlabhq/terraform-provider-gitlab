@@ -59,7 +59,7 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
-	group_access := int(accessLevelNameToValue[d.Get("access_level").(string)])
+	group_access := accessLevelNameToValue[d.Get("access_level").(string)]
 	ldap_provider := d.Get("ldap_provider").(string)
 	force := d.Get("force").(bool)
 
