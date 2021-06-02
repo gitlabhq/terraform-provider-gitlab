@@ -62,19 +62,31 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the the Branch Protection allow force push setting
+			// Update the the Branch Protection allow force push setting to true
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt),
+				Config: testAccGitlabBranchProtectionUpdateConfigAllowForcePushTrue(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect_blah2", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+						AllowForcePush:   true,
+					}),
+				),
+			},
+			// Update the the Branch Protection allow force push setting to false
+			{
+				Config: testAccGitlabBranchProtectionUpdateConfigAllowForcePushFalse(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
 					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
-						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
-						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
-						MergeAccessLevel:          accessLevel[gitlab.DeveloperPermissions],
-						AllowForcePush:            true,
-						CodeOwnerApprovalRequired: false,
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+						AllowForcePush:   false,
 					}),
 				),
 			},
@@ -89,7 +101,6 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 						Name:                      fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:           accessLevel[gitlab.DeveloperPermissions],
 						MergeAccessLevel:          accessLevel[gitlab.DeveloperPermissions],
-						AllowForcePush:            true,
 						CodeOwnerApprovalRequired: true,
 					}),
 				),
@@ -106,7 +117,6 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
 						PushAccessLevel:  accessLevel[gitlab.DeveloperPermissions],
 						MergeAccessLevel: accessLevel[gitlab.DeveloperPermissions],
-						AllowForcePush:   true,
 					}),
 				),
 			},
@@ -474,6 +484,48 @@ resource "gitlab_branch_protection" "branch_protect" {
   merge_access_level = "maintainer"
 }
 	`, rInt)
+}
+
+func testAccGitlabBranchProtectionUpdateConfigAllowForcePushTrue(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_branch_protection" "branch_protect" {
+  project = gitlab_project.foo.id
+  branch = "BranchProtect-%d"
+  push_access_level = "developer"
+  merge_access_level = "developer"
+  allow_force_push = true
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabBranchProtectionUpdateConfigAllowForcePushFalse(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_branch_protection" "branch_protect" {
+  project = gitlab_project.foo.id
+  branch = "BranchProtect-%d"
+  push_access_level = "developer"
+  merge_access_level = "developer"
+  allow_force_push = true
+}
+	`, rInt, rInt)
 }
 
 func testAccGitlabBranchProtectionUpdateConfigCodeOwnerTrue(rInt int) string {
