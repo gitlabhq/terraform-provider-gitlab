@@ -25,6 +25,10 @@ The following arguments are supported:
 
 * `url` - (Required) 	The URL of the remote repository to be mirrored.
 
+**Note**: Due to limitations of the GitLab API, the provider cannot update the
+username and passwords that are present in the URL. To change the username or
+the password, we recommend you to taint the resources.
+
 * `enabled` - 	Determines if the mirror is enabled.
 
 * `only_protected_branches` - Determines if only protected branches are mirrored.
