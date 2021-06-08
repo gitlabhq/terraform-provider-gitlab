@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -16,6 +17,9 @@ func resourceGitlabPipelineSchedule() *schema.Resource {
 		Read:   resourceGitlabPipelineScheduleRead,
 		Update: resourceGitlabPipelineScheduleUpdate,
 		Delete: resourceGitlabPipelineScheduleDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabPipelineScheduleStateImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -182,4 +186,18 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 	}
 
 	return nil
+}
+
+func resourceGitlabPipelineScheduleStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 2 {
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Pipeline Schedule import format; expected '{project_id}:{pipeline_schedule_id}'")
+	}
+	project, id := s[0], s[1]
+
+	d.SetId(id)
+	d.Set("project", project)
+
+	return []*schema.ResourceData{d}, nil
 }
