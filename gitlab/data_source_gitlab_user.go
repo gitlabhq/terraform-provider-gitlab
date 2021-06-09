@@ -154,7 +154,7 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	if userIDOk {
 		// Get user by id
-		user, _, err = client.Users.GetUser(userIDData.(int))
+		user, _, err = client.Users.GetUser(userIDData.(int), gitlab.GetUsersOptions{})
 		if err != nil {
 			return err
 		}
