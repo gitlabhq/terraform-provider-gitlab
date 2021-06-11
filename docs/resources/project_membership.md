@@ -20,7 +20,7 @@ The following arguments are supported:
 
 * `user_id` - (Required) The id of the user.
 
-* `access_level` - (Required) One of five levels of access to the project.
+* `access_level` - (Required) One of six levels of access to the project.
 
 ## Import
 

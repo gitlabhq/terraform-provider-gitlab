@@ -43,6 +43,6 @@ The following attributes are exported:
   * `state` - Whether the user is active or blocked.
   * `avatar_url` - The avatar URL of the user.
   * `web_url` - User's website URL.
-  * `access_level` - One of five levels of access to the group.
+  * `access_level` - One of six levels of access to the group.
   * `expires_at` - Expiration date for the group membership.
 

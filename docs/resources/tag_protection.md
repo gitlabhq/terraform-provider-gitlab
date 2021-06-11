@@ -20,4 +20,4 @@ The following arguments are supported:
 
 * `tag` - (Required) Name of the tag or wildcard.
 
-* `create_access_level` - (Required) One of five levels of access to the project.
+* `create_access_level` - (Required) One of six levels of access to the project.

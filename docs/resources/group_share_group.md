@@ -21,7 +21,7 @@ The following arguments are supported:
 
 * `share_group_id` - (Required) The id of an additional group which will be shared with the main group.
 
-* `group_access` - (Required) One of five levels of access to the group.
+* `group_access` - (Required) One of six levels of access to the group.
 
 * `expires_at` - (Optional) Share expiration date. Format: `YYYY-MM-DD`
 
