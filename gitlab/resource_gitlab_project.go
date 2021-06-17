@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -330,7 +331,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("merge_method", string(project.MergeMethod))
 	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
 	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
-	d.Set("namespace_id", fmt.Sprintf("%d", project.Namespace.ID))
+	d.Set("namespace_id", setNamespaceID(d, project))
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
 	d.Set("web_url", project.WebURL)
@@ -345,6 +346,18 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
+}
+
+func setNamespaceID(d *schema.ResourceData, project *gitlab.Project) string {
+	ns := d.Get("namespace_id").(string)
+	if ns != "" {
+		_, err := strconv.Atoi(ns)
+		if err == nil {
+			return fmt.Sprintf("%d", project.Namespace.ID)
+		}
+		return project.Namespace.FullPath
+	}
+	return fmt.Sprintf("%d", project.Namespace.ID)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
