@@ -36,9 +36,10 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-inverse-%s", rString),
-						Protected: true,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-inverse-%s", rString),
+						Protected:        true,
+						EnvironmentScope: fmt.Sprintf("foo%s", rString),
 					}),
 				),
 			},
@@ -48,9 +49,10 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-%s", rString),
-						Protected: false,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						Protected:        false,
+						EnvironmentScope: "",
 					}),
 				),
 			},
@@ -85,10 +87,11 @@ func testAccCheckGitlabGroupVariableExists(n string, groupVariable *gitlab.Group
 }
 
 type testAccGitlabGroupVariableExpectedAttributes struct {
-	Key       string
-	Value     string
-	Protected bool
-	Masked    bool
+	Key              string
+	Value            string
+	Protected        bool
+	Masked           bool
+	EnvironmentScope string
 }
 
 func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, want *testAccGitlabGroupVariableExpectedAttributes) resource.TestCheckFunc {
@@ -107,6 +110,10 @@ func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, w
 
 		if variable.Masked != want.Masked {
 			return fmt.Errorf("got masked %t; want %t", variable.Masked, want.Masked)
+		}
+
+		if variable.EnvironmentScope != want.EnvironmentScope {
+			return fmt.Errorf("got environment_scope %s; environment_scope %s", variable.EnvironmentScope, want.EnvironmentScope)
 		}
 
 		return nil
@@ -167,6 +174,7 @@ resource "gitlab_group_variable" "foo" {
   value = "value-inverse-%s"
   protected = true
   masked = false
+  environment_scope = "foo%s"
 }
-	`, rString, rString, rString, rString)
+	`, rString, rString, rString, rString, rString)
 }
