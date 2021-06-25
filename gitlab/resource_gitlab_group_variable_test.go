@@ -30,9 +30,10 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Update the group variable to toggle all the values to their inverse
+			// Update the group variable to toggle all the values to their inverse - check environment_scope if license allows it
 			{
-				Config: testAccGitlabGroupVariableUpdateConfig(rString),
+				Config:   testAccGitlabGroupVariableUpdateConfig(rString),
+				SkipFunc: isRunningInCE,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
@@ -40,6 +41,19 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 						Value:            fmt.Sprintf("value-inverse-%s", rString),
 						Protected:        true,
 						EnvironmentScope: fmt.Sprintf("foo%s", rString),
+					}),
+				),
+			},
+			// Update the group variable to toggle all the values to their inverse - skip check of environment_scope as it is only available in Premium
+			{
+				Config:   testAccGitlabGroupVariableUpdateConfig(rString),
+				SkipFunc: isRunningInEE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:       fmt.Sprintf("key_%s", rString),
+						Value:     fmt.Sprintf("value-inverse-%s", rString),
+						Protected: true,
 					}),
 				),
 			},
