@@ -13,6 +13,18 @@ resource "gitlab_project" "example" {
 
   visibility_level = "public"
 }
+
+# Project with custom push rules
+resource "gitlab_project" "example-two" {
+  name = "example-two"
+
+  push_rules {
+    author_email_regex     = "@example\\.com$"
+    commit_committer_check = true
+    member_check           = true
+    prevent_secrets        = true
+  }
+}
 ```
 
 ## Argument Reference
@@ -145,13 +157,15 @@ For information on push rules, consult the [GitLab documentation](https://docs.g
 
 * `max_file_size` - (Optional, int) Maximum file size (MB).
 
-## Importing projects
+## Import
 
 You can import a project state using `terraform import <resource> <id>`.  The
 `id` can be whatever the [get single project api][get_single_project] takes for
 its `:id` value, so for example:
 
-    terraform import gitlab_project.example richardc/example
+```shell
+$ terraform import gitlab_project.example richardc/example
+```
 
 [get_single_project]: https://docs.gitlab.com/ee/api/projects.html#get-single-project
 [group_members_permissions]: https://docs.gitlab.com/ce/user/permissions.html#group-members-permissions
