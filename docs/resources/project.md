@@ -95,6 +95,10 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
   Valid values are `disabled`, `private`, `enabled`, `public`.
   `private` is the default.
 
+* `issues_template` - (Optional) Sets the template for new issues in the project.
+
+* `merge_requests_template` - (Optional) Sets the template for new merge requests in the project.
+
 ## Attributes Reference
 
 The following additional attributes are exported:
