@@ -202,6 +202,21 @@ func buildTwoPartID(a, b *string) string {
 	return fmt.Sprintf("%s:%s", *a, *b)
 }
 
+// return the pieces of id `a:b:c` as a, b, c
+func parseThreePartID(id string) (string, string, string, error) {
+	parts := strings.SplitN(id, ":", 3)
+	if len(parts) != 3 {
+		return "", "", "", fmt.Errorf("Unexpected ID format (%q). Expected project:key", id)
+	}
+
+	return parts[0], parts[1], parts[2], nil
+}
+
+// format the strings into an id `a:b:c`
+func buildThreePartID(a, b, c *string) string {
+	return fmt.Sprintf("%s:%s:%s", *a, *b, *c)
+}
+
 var accessLevelID = map[string]gitlab.AccessLevelValue{
 	"no one":     gitlab.NoPermissions,
 	"guest":      gitlab.GuestPermissions,
