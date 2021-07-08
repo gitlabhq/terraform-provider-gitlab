@@ -15,9 +15,9 @@ resource "gitlab_project_access_token" "example" {
 }
 
 resource "gitlab_project_variable" "example" {
-	project   = gitlab_project.example.id
-	key       = "pat"
-	value     = gitlab_project_access_token.example.token
+  project   = gitlab_project.example.id
+  key       = "pat"
+  value     = gitlab_project_access_token.example.token
 }
 ```
 

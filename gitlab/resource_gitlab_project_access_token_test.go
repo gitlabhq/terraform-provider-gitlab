@@ -191,10 +191,10 @@ resource "gitlab_project" "foo" {
 }
 
 resource "gitlab_project_access_token" "bar" {
-	name = "my project token"
-    project = gitlab_project.foo.id
-    expires_at = "2022-04-01"
-    scopes = ["read_repository" , "api", "write_repository", "read_api"]
+  name = "my project token"
+  project = gitlab_project.foo.id
+  expires_at = "2022-04-01"
+  scopes = ["read_repository" , "api", "write_repository", "read_api"]
 }
 	`, rInt)
 }
@@ -211,10 +211,10 @@ resource "gitlab_project" "foo" {
 }
 
 resource "gitlab_project_access_token" "bar" {
-	name = "my new project token"
-    project = gitlab_project.foo.id
-    expires_at = "2022-05-01"
-    scopes = ["api"]
+  name = "my new project token"
+  project = gitlab_project.foo.id
+  expires_at = "2022-05-01"
+  scopes = ["api"]
 }
 	`, rInt)
 }
@@ -231,17 +231,17 @@ resource "gitlab_project" "foo" {
 }
 
 resource "gitlab_project_access_token" "bar" {
-	name = "my new project token"
-    project = gitlab_project.foo.id
-    expires_at = "2022-05-01"
-    scopes = ["api"]
+  name = "my new project token"
+  project = gitlab_project.foo.id
+  expires_at = "2022-05-01"
+  scopes = ["api"]
 }
 
 
 resource "gitlab_project_variable" "var" {
-	project   = gitlab_project.foo.id
-	key       = "my_proj_access_token"
-	value     = gitlab_project_access_token.bar.token
+  project   = gitlab_project.foo.id
+  key       = "my_proj_access_token"
+  value     = gitlab_project_access_token.bar.token
  }
 
 	`, rInt)
