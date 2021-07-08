@@ -295,6 +295,14 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 		Default:  false,
 	},
+	"issues_template": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"merge_requests_template": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -345,6 +353,8 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
+	d.Set("issues_template", project.IssuesTemplate)
+	d.Set("merge_requests_template", project.MergeRequestsTemplate)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -633,6 +643,14 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorOverwritesDivergedBranches = gitlab.Bool(d.Get("mirror_overwrites_diverged_branches").(bool))
+	}
+
+	if d.HasChange("issues_template") {
+		options.IssuesTemplate = gitlab.String(d.Get("issues_template").(string))
+	}
+
+	if d.HasChange("merge_requests_template") {
+		options.MergeRequestsTemplate = gitlab.String(d.Get("merge_requests_template").(string))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
