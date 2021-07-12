@@ -4,7 +4,6 @@ This resource allows you to create and manage project clusters for your GitLab p
 For further information on clusters, consult the [gitlab
 documentation](https://docs.gitlab.com/ce/user/project/clusters/index.html).
 
-
 ## Example Usage
 
 ```hcl
@@ -53,7 +52,7 @@ The following arguments are supported:
 
 * `environment_scope` - (Optional, string) The associated environment to the cluster. Defaults to `*`.
 
-* `management_project_id` - (Optional, string) The ID of the management project for the cluster. 
+* `management_project_id` - (Optional, string) The ID of the management project for the cluster.
 
 ## Import
 

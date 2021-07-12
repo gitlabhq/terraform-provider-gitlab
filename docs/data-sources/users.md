@@ -40,7 +40,6 @@ The following arguments are supported:
 
 * `created_after` - (Optional)  Search for users created after a specific date. (Requires administrator privileges)
 
-
 ## Attributes Reference
 
 The following attributes are exported:

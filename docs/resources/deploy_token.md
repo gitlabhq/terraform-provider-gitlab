@@ -2,7 +2,6 @@
 
 This resource allows you to create and manage deploy token for your GitLab projects and groups.
 
-
 ## Example Usage - Project
 
 ```hcl

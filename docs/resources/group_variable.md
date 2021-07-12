@@ -4,7 +4,6 @@ This resource allows you to create and manage CI/CD variables for your GitLab gr
 For further information on variables, consult the [gitlab
 documentation](https://docs.gitlab.com/ce/ci/variables/README.html#variables).
 
-
 ## Example Usage
 
 ```hcl
@@ -31,7 +30,7 @@ The following arguments are supported:
 
 * `protected` - (Optional, boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
 
-* `masked ` - (Optional, boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
+* `masked` - (Optional, boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 
 ## Import
 
