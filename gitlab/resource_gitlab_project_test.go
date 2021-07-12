@@ -18,7 +18,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 }
 
 func TestAccGitlabProject_basic(t *testing.T) {
-	var received, defaults, defaultsMasterBranch gitlab.Project
+	var received, defaults, defaultsMainBranch gitlab.Project
 	rInt := acctest.RandInt()
 
 	defaults = gitlab.Project{
@@ -46,8 +46,8 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		PagesAccessLevel: gitlab.PublicAccessControl,
 	}
 
-	defaultsMasterBranch = defaults
-	defaultsMasterBranch.DefaultBranch = "master"
+	defaultsMainBranch = defaults
+	defaultsMainBranch.DefaultBranch = "main"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -100,11 +100,11 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			// Update the project creating the default branch
 			{
 				// Get the ID from the project data at the previous step
-				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "master"),
-				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "main"),
+				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "main"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(&defaultsMasterBranch, &received),
+					testAccCheckAggregateGitlabProject(&defaultsMainBranch, &received),
 				),
 			},
 			// Test import without push rules (checks read function)
@@ -198,7 +198,7 @@ max_file_size = 1234
 			// NOTE: The push rules will still exist upstream because the push_rules block is computed.
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "main"),
 				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
 					AuthorEmailRegex: "foo_author",
 				}),
@@ -213,7 +213,7 @@ max_file_size = 1234
 			},
 			// Destroy the project so we can next test creating a project with push rules simultaneously
 			{
-				Config:  testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Config:  testAccGitlabProjectConfigDefaultBranch(rInt, "main"),
 				Destroy: true,
 				Check:   testAccCheckGitlabProjectDestroy,
 			},
@@ -325,7 +325,7 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
-						DefaultBranch: "master",
+						DefaultBranch: "main",
 					}),
 				),
 			},
@@ -506,7 +506,7 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 
 	// Add a file to the base project, for later verifying the import.
 	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
-		Branch:        gitlab.String("master"),
+		Branch:        gitlab.String("main"),
 		CommitMessage: gitlab.String("add file"),
 		Content:       gitlab.String(""),
 	})
@@ -526,7 +526,7 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -590,7 +590,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 
 	// Add a file to the base project, for later verifying the import.
 	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
-		Branch:        gitlab.String("master"),
+		Branch:        gitlab.String("main"),
 		CommitMessage: gitlab.String("add file"),
 		Content:       gitlab.String(""),
 	})
@@ -620,7 +620,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -647,7 +647,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -674,7 +674,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -1015,7 +1015,7 @@ func testAccGitlabProjectConfigImportURL(rInt int, importURL string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "imported" {
   name = "imported-%d"
-  default_branch = "master"
+  default_branch = "main"
   import_url = "%s"
 
   # So that acceptance tests can be run in a gitlab organization
@@ -1029,7 +1029,7 @@ func testAccGitlabProjectConfigImportURLMirror(rInt int, importURL string) strin
 	return fmt.Sprintf(`
 resource "gitlab_project" "imported" {
   name = "imported-%d"
-  default_branch = "master"
+  default_branch = "main"
   import_url = "%s"
   mirror = true
   mirror_trigger_builds = true
@@ -1047,7 +1047,7 @@ func testAccGitlabProjectConfigImportURLMirrorDisabledOptionals(rInt int, import
 	return fmt.Sprintf(`
 resource "gitlab_project" "imported" {
   name = "imported-%d"
-  default_branch = "master"
+  default_branch = "main"
   import_url = "%s"
   mirror = true
   mirror_trigger_builds = false
@@ -1065,7 +1065,7 @@ func testAccGitlabProjectConfigImportURLMirrorDisabled(rInt int, importURL strin
 	return fmt.Sprintf(`
 resource "gitlab_project" "imported" {
   name = "imported-%d"
-  default_branch = "master"
+  default_branch = "main"
   import_url = "%s"
   mirror = false
   mirror_trigger_builds = false
@@ -1085,7 +1085,7 @@ resource "gitlab_project" "foo" {
   name = "foo-%[1]d"
   path = "foo.%[1]d"
   description = "Terraform acceptance tests"
-  default_branch = "master"
+  default_branch = "main"
 
   push_rules {
 %[2]s
@@ -1112,7 +1112,7 @@ resource "gitlab_project" "template-name" {
 // 2020-09-07: Currently Gitlab (version 13.3.6 ) doesn't allow in admin API
 // ability to set a group as instance level templates.
 // To test resource_gitlab_project_test template features we add
-// group, project myrails and admin settings directly in scripts/start-gitlab.sh
+// group, project myrails and admin settings directly in scripts/healthcheck-and-setup.sh
 // Once Gitlab add admin template in API we could manage group/project/settings
 // directly in tests like TestAccGitlabProject_basic.
 func testAccGitlabProjectConfigTemplateNameCustom(rInt int) string {
