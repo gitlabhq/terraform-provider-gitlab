@@ -25,14 +25,15 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:   fmt.Sprintf("key_%s", rString),
-						Value: fmt.Sprintf("value-%s", rString),
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						EnvironmentScope: "*",
 					}),
 				),
 			},
 			// Update the group variable to toggle all the values to their inverse - check environment_scope if license allows it
 			{
-				Config:   testAccGitlabGroupVariableUpdateConfig(rString),
+				Config:   testAccGitlabGroupVariableUpdateConfigWithEnvironmentScope(rString),
 				SkipFunc: isRunningInCE,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
@@ -51,9 +52,10 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-inverse-%s", rString),
-						Protected: true,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-inverse-%s", rString),
+						Protected:        true,
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -66,7 +68,7 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 						Key:              fmt.Sprintf("key_%s", rString),
 						Value:            fmt.Sprintf("value-%s", rString),
 						Protected:        false,
-						EnvironmentScope: "",
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -111,11 +113,11 @@ type testAccGitlabGroupVariableExpectedAttributes struct {
 func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, want *testAccGitlabGroupVariableExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if variable.Key != want.Key {
-			return fmt.Errorf("got key %s; want %s", variable.Key, want.Key)
+			return fmt.Errorf("got key %q; want %q", variable.Key, want.Key)
 		}
 
 		if variable.Value != want.Value {
-			return fmt.Errorf("got value %s; value %s", variable.Value, want.Value)
+			return fmt.Errorf("got value %q; value %q", variable.Value, want.Value)
 		}
 
 		if variable.Protected != want.Protected {
@@ -127,7 +129,7 @@ func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, w
 		}
 
 		if variable.EnvironmentScope != want.EnvironmentScope {
-			return fmt.Errorf("got environment_scope %s; environment_scope %s", variable.EnvironmentScope, want.EnvironmentScope)
+			return fmt.Errorf("got environment_scope %q; want %q", variable.EnvironmentScope, want.EnvironmentScope)
 		}
 
 		return nil
@@ -176,6 +178,23 @@ resource "gitlab_group_variable" "foo" {
 }
 
 func testAccGitlabGroupVariableUpdateConfig(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+name = "foo%v"
+path = "foo%v"
+}
+
+resource "gitlab_group_variable" "foo" {
+  group = "${gitlab_group.foo.id}"
+  key = "key_%s"
+  value = "value-inverse-%s"
+  protected = true
+  masked = false
+}
+	`, rString, rString, rString, rString)
+}
+
+func testAccGitlabGroupVariableUpdateConfigWithEnvironmentScope(rString string) string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
 name = "foo%v"
