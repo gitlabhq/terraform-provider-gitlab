@@ -37,20 +37,8 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectBadgeExists("gitlab_project_badge.foo", &badge),
 					testAccCheckGitlabProjectBadgeAttributes(&badge, &testAccGitlabProjectBadgeExpectedAttributes{
-						LinkURL:                fmt.Sprintf("https://example.com/badge-%d", rInt),
-						ImageURL:               fmt.Sprintf("https://example.com/badge-%d.svg", rInt),
-					}),
-				),
-			},
-			// Delete the project badge to toggle the options back
-			{
-				Config: testAccGitlabProjectBadgeConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectBadgeExists("gitlab_project_badge.foo", &badge),
-					testAccCheckGitlabProjectBadgeAttributes(&badge, &testAccGitlabProjectBadgeExpectedAttributes{
-						URL:                   fmt.Sprintf("https://example.com/badge-%d", rInt),
-						PushEvents:            true,
-						EnableSSLVerification: true,
+						LinkURL:  fmt.Sprintf("https://example.com/badge-%d", rInt),
+						ImageURL: fmt.Sprintf("https://example.com/badge-%d.svg", rInt),
 					}),
 				),
 			},
@@ -75,7 +63,7 @@ func testAccCheckGitlabProjectBadgeExists(n string, badge *gitlab.ProjectBadge) 
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotBadge, _, err := conn.Projects.GetProjectBadge(repoName, badgeID)
+		gotBadge, _, err := conn.ProjectBadges.GetProjectBadge(repoName, badgeID)
 		if err != nil {
 			return err
 		}
@@ -96,7 +84,7 @@ func testAccCheckGitlabProjectBadgeAttributes(badge *gitlab.ProjectBadge, want *
 		}
 
 		if badge.ImageURL != want.ImageURL {
-			return fmt.Errorf("got image_url %t; want %t", badge.ImageURL, want.ImageURL)
+			return fmt.Errorf("got image_url %s; want %s", badge.ImageURL, want.ImageURL)
 		}
 
 		return nil
@@ -143,7 +131,7 @@ resource "gitlab_project_badge" "foo" {
   link_url  = "https://example.com/badge-%d"
   image_url = "https://example.com/badge-%d.svg"
 }
-	`, rInt, rInt)
+	`, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectBadgeUpdateConfig(rInt int) string {
@@ -162,5 +150,5 @@ resource "gitlab_project_badge" "foo" {
   link_url  = "https://example.com/badge-%d"
   image_url = "https://example.com/badge-%d.svg"
 }
-	`, rInt, rInt)
+	`, rInt, rInt, rInt)
 }

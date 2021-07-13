@@ -97,6 +97,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_instance_variable":          resourceGitlabInstanceVariable(),
 			"gitlab_project_freeze_period":      resourceGitlabProjectFreezePeriod(),
 			"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
+			"gitlab_project_badge":              resourceGitlabProjectBadge(),
 		},
 	}
 

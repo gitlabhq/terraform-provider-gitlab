@@ -26,7 +26,7 @@ func resourceGitlabProjectBadge() *schema.Resource {
 				Required: true,
 			},
 			"image_url": {
-				Type:      schema.TypeString,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			"rendered_link_url": {
@@ -34,7 +34,7 @@ func resourceGitlabProjectBadge() *schema.Resource {
 				Computed: true,
 			},
 			"rendered_image_url": {
-				Type:      schema.TypeString,
+				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},
@@ -49,9 +49,9 @@ func resourceGitlabProjectBadgeCreate(d *schema.ResourceData, meta interface{}) 
 		ImageURL: gitlab.String(d.Get("image_url").(string)),
 	}
 
-	log.Printf("[DEBUG] create gitlab project badge %q", *options.URL)
+	log.Printf("[DEBUG] create gitlab project badge %q / %q", *options.LinkURL, *options.ImageURL)
 
-	badge, _, err := client.Projects.AddProjectBadge(project, options)
+	badge, _, err := client.ProjectBadges.AddProjectBadge(project, options)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func resourceGitlabProjectBadgeRead(d *schema.ResourceData, meta interface{}) er
 	}
 	log.Printf("[DEBUG] read gitlab project badge %s/%d", project, badgeId)
 
-	badge, _, err := client.Projects.GetProjectBadge(project, badgeId)
+	badge, _, err := client.ProjectBadges.GetProjectBadge(project, badgeId)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func resourceGitlabProjectBadgeUpdate(d *schema.ResourceData, meta interface{}) 
 
 	log.Printf("[DEBUG] update gitlab project badge %s", d.Id())
 
-	_, _, err = client.Projects.EditProjectBadge(project, badgeId, options)
+	_, _, err = client.ProjectBadges.EditProjectBadge(project, badgeId, options)
 	if err != nil {
 		return err
 	}
@@ -113,6 +113,6 @@ func resourceGitlabProjectBadgeDelete(d *schema.ResourceData, meta interface{}) 
 	}
 	log.Printf("[DEBUG] Delete gitlab project badge %s", d.Id())
 
-	_, err = client.Projects.DeleteProjectBadge(project, badgeId)
+	_, err = client.ProjectBadges.DeleteProjectBadge(project, badgeId)
 	return err
 }
