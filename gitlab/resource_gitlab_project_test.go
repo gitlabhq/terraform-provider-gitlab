@@ -762,10 +762,18 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 				} else {
 					return err
 				}
-
 			}
-			resourceGitlabProjectSetToState(expectedData, expected)
-			resourceGitlabProjectSetToState(receivedData, received)
+
+			err := resourceGitlabProjectSetToState(expectedData, expected)
+			if err != nil {
+				return err
+			}
+
+			err = resourceGitlabProjectSetToState(receivedData, received)
+			if err != nil {
+				return err
+			}
+
 			return testAccCompareGitLabAttribute(attribute, expectedData, receivedData)
 		})
 	}

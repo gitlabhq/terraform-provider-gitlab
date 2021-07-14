@@ -303,3 +303,13 @@ func parseVersionMajorMinor(version string) (int, int, error) {
 
 	return major, minor, nil
 }
+
+func setResourceData(d *schema.ResourceData, values map[string]interface{}) error {
+	for name, value := range values {
+		err := d.Set(name, value)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

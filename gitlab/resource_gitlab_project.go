@@ -310,41 +310,44 @@ func resourceGitlabProject() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) {
+func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) error {
 	d.SetId(fmt.Sprintf("%d", project.ID))
-	d.Set("name", project.Name)
-	d.Set("path", project.Path)
-	d.Set("path_with_namespace", project.PathWithNamespace)
-	d.Set("description", project.Description)
-	d.Set("default_branch", project.DefaultBranch)
-	d.Set("request_access_enabled", project.RequestAccessEnabled)
-	d.Set("issues_enabled", project.IssuesEnabled)
-	d.Set("merge_requests_enabled", project.MergeRequestsEnabled)
-	d.Set("pipelines_enabled", project.JobsEnabled)
-	d.Set("approvals_before_merge", project.ApprovalsBeforeMerge)
-	d.Set("wiki_enabled", project.WikiEnabled)
-	d.Set("snippets_enabled", project.SnippetsEnabled)
-	d.Set("container_registry_enabled", project.ContainerRegistryEnabled)
-	d.Set("lfs_enabled", project.LFSEnabled)
-	d.Set("visibility_level", string(project.Visibility))
-	d.Set("merge_method", string(project.MergeMethod))
-	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
-	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
-	d.Set("namespace_id", project.Namespace.ID)
-	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
-	d.Set("http_url_to_repo", project.HTTPURLToRepo)
-	d.Set("web_url", project.WebURL)
-	d.Set("runners_token", project.RunnersToken)
-	d.Set("shared_runners_enabled", project.SharedRunnersEnabled)
-	d.Set("tags", project.TagList)
-	d.Set("archived", project.Archived)
-	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
-	d.Set("packages_enabled", project.PackagesEnabled)
-	d.Set("pages_access_level", string(project.PagesAccessLevel))
-	d.Set("mirror", project.Mirror)
-	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
-	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
-	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
+	values := map[string]interface{}{
+		"name":                                  project.Name,
+		"path":                                  project.Path,
+		"path_with_namespace":                   project.PathWithNamespace,
+		"description":                           project.Description,
+		"default_branch":                        project.DefaultBranch,
+		"request_access_enabled":                project.RequestAccessEnabled,
+		"issues_enabled":                        project.IssuesEnabled,
+		"merge_requests_enabled":                project.MergeRequestsEnabled,
+		"pipelines_enabled":                     project.JobsEnabled,
+		"approvals_before_merge":                project.ApprovalsBeforeMerge,
+		"wiki_enabled":                          project.WikiEnabled,
+		"snippets_enabled":                      project.SnippetsEnabled,
+		"container_registry_enabled":            project.ContainerRegistryEnabled,
+		"lfs_enabled":                           project.LFSEnabled,
+		"visibility_level":                      string(project.Visibility),
+		"merge_method":                          string(project.MergeMethod),
+		"only_allow_merge_if_pipeline_succeeds": project.OnlyAllowMergeIfPipelineSucceeds,
+		"only_allow_merge_if_all_discussions_are_resolved": project.OnlyAllowMergeIfAllDiscussionsAreResolved,
+		"namespace_id":                        project.Namespace.ID,
+		"ssh_url_to_repo":                     project.SSHURLToRepo,
+		"http_url_to_repo":                    project.HTTPURLToRepo,
+		"web_url":                             project.WebURL,
+		"runners_token":                       project.RunnersToken,
+		"shared_runners_enabled":              project.SharedRunnersEnabled,
+		"tags":                                project.TagList,
+		"archived":                            project.Archived,
+		"remove_source_branch_after_merge":    project.RemoveSourceBranchAfterMerge,
+		"packages_enabled":                    project.PackagesEnabled,
+		"pages_access_level":                  string(project.PagesAccessLevel),
+		"mirror":                              project.Mirror,
+		"mirror_trigger_builds":               project.MirrorTriggerBuilds,
+		"mirror_overwrites_diverged_branches": project.MirrorOverwritesDivergedBranches,
+		"only_mirror_protected_branches":      project.OnlyMirrorProtectedBranches,
+	}
+	return setResourceData(d, values)
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -492,7 +495,10 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 		return nil
 	}
 
-	resourceGitlabProjectSetToState(d, project)
+	err = resourceGitlabProjectSetToState(d, project)
+	if err != nil {
+		return err
+	}
 
 	log.Printf("[DEBUG] read gitlab project %q push rules", d.Id())
 
