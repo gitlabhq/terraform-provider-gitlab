@@ -73,6 +73,7 @@ func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabDeployKey_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resourceName := "gitlab_deploy_key.foo"

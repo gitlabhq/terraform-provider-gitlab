@@ -10,6 +10,7 @@ import (
 )
 
 func resourceGitlabPipelineScheduleVariable() *schema.Resource {
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabPipelineScheduleVariableCreate,
 		Read:   resourceGitlabPipelineScheduleVariableRead,

@@ -1,3 +1,5 @@
+// lintignore: S031 // TODO: Resolve this tfproviderlint issue
+
 package gitlab
 
 import (
@@ -166,9 +168,11 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 }
 
 func dataSourceGitlabProjects() *schema.Resource {
+	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Read: dataSourceGitlabProjectsRead,
 
+		// lintignore: S006 // TODO: Resolve this tfproviderlint issue
 		Schema: map[string]*schema.Schema{
 			"max_queryable_pages": {
 				Type:        schema.TypeInt,

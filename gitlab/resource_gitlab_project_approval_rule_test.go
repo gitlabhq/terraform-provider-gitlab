@@ -82,6 +82,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 	randomInt := acctest.RandInt()
 

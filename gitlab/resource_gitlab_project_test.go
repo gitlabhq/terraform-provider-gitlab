@@ -1,3 +1,5 @@
+// lintignore: AT012 // TODO: Resolve this tfproviderlint issue
+
 package gitlab
 
 import (
@@ -394,6 +396,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
@@ -484,6 +487,7 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURL(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
 	if os.Getenv(resource.TestEnvVar) == "" {
@@ -567,6 +571,7 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 	}
 }
 
+// lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
 	if os.Getenv(resource.TestEnvVar) == "" {
@@ -690,6 +695,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 func TestAccGitlabProjec_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
+	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,

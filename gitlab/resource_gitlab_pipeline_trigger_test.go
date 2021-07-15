@@ -54,6 +54,7 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabPipelineTrigger_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resourceName := "gitlab_pipeline_trigger.trigger"

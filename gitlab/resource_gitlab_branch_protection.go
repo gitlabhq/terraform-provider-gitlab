@@ -159,9 +159,11 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 		}
 	}
 
+	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("allowed_to_push", convertAllowedToToBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
 		return fmt.Errorf("error setting allowed_to_push: %v", err)
 	}
+	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("allowed_to_merge", convertAllowedToToBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return fmt.Errorf("error setting allowed_to_merge: %v", err)
 	}
