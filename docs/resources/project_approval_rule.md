@@ -37,6 +37,7 @@ resource "gitlab_project_approval_rule" "example-two" {
 ```
 
 ### Example using `data.gitlab_user` and `for` loop
+
 ```hcl
 data "gitlab_user" "users" {
   for_each = toset(["user1", "user2", "user3"])
