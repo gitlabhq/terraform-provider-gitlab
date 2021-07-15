@@ -88,7 +88,10 @@ func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	resourceGitlabProjectMembershipSetToState(d, projectMember, &projectId)
+	if err := resourceGitlabProjectMembershipSetToState(d, projectMember, &projectId); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -138,12 +141,17 @@ func resourceGitlabProjectMembershipDelete(d *schema.ResourceData, meta interfac
 	return err
 }
 
-func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) {
-
-	d.Set("project_id", projectId)
-	d.Set("user_id", projectMember.ID)
-	d.Set("access_level", accessLevel[projectMember.AccessLevel])
+func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) error {
+	if err := setResourceData(d, map[string]interface{}{
+		"project_id":   projectId,
+		"user_id":      projectMember.ID,
+		"access_level": accessLevel[projectMember.AccessLevel],
+	}); err != nil {
+		return err
+	}
 
 	userId := strconv.Itoa(projectMember.ID)
 	d.SetId(buildTwoPartID(projectId, &userId))
+
+	return nil
 }

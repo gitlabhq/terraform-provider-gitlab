@@ -53,6 +53,9 @@ func resourceGitlabDeployKeyEnableCreate(d *schema.ResourceData, meta interface{
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	key_id, err := strconv.Atoi(d.Get("key_id").(string))
+	if err != nil {
+		return err
+	}
 
 	log.Printf("[DEBUG] enable gitlab deploy key %s/%d", project, key_id)
 
@@ -80,12 +83,20 @@ func resourceGitlabDeployKeyEnableRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	d.Set("title", deployKey.Title)
-	d.Set("key_id", deployKey.ID)
-	d.Set("key", deployKey.Key)
-	d.Set("can_push", deployKey.CanPush)
-	d.Set("project", project)
-	return nil
+	err = d.Set("title", deployKey.Title)
+	if err != nil {
+		return err
+	}
+
+	if err := d.Set("key_id", deployKey.ID); err != nil {
+		return err
+	}
+
+	return setResourceData(d, map[string]interface{}{
+		"key":      deployKey.Key,
+		"can_push": deployKey.CanPush,
+		"project":  project,
+	})
 }
 
 func resourceGitlabDeployKeyEnableDelete(d *schema.ResourceData, meta interface{}) error {
@@ -115,8 +126,13 @@ func resourceGitlabDeployKeyEnableStateImporter(d *schema.ResourceData, meta int
 	project, id := s[0], s[1]
 
 	d.SetId(fmt.Sprintf("%s:%s", project, id))
-	d.Set("key_id", id)
-	d.Set("project", project)
+
+	if err := setResourceData(d, map[string]interface{}{
+		"key_id":  id,
+		"project": project,
+	}); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

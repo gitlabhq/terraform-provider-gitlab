@@ -72,10 +72,10 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	d.Set("description", pipelineTrigger.Description)
-	d.Set("token", pipelineTrigger.Token)
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"description": pipelineTrigger.Description,
+		"token":       pipelineTrigger.Token,
+	})
 }
 
 func resourceGitlabPipelineTriggerUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -129,7 +129,12 @@ func resourceGitlabPipelineTriggerStateImporter(d *schema.ResourceData, meta int
 	project, id := s[0], s[1]
 
 	d.SetId(id)
-	d.Set("project", project)
+
+	if err := setResourceData(d, map[string]interface{}{
+		"project": project,
+	}); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

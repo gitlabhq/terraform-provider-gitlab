@@ -141,33 +141,36 @@ func resourceGitlabServiceSlack() *schema.Resource {
 	}
 }
 
-func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitlab.SlackService) {
+func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitlab.SlackService) error {
 	d.SetId(fmt.Sprintf("%d", service.ID))
-	d.Set("webhook", service.Properties.WebHook)
-	d.Set("username", service.Properties.Username)
-	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON)
-	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)
-	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
-	d.Set("push_events", service.PushEvents)
-	d.Set("push_channel", service.Properties.PushChannel)
-	d.Set("issues_events", service.IssuesEvents)
-	d.Set("issue_channel", service.Properties.IssueChannel)
-	d.Set("confidential_issues_events", service.ConfidentialIssuesEvents)
-	d.Set("confidential_issue_channel", service.Properties.ConfidentialIssueChannel)
-	d.Set("merge_requests_events", service.MergeRequestsEvents)
-	d.Set("merge_request_channel", service.Properties.MergeRequestChannel)
-	d.Set("tag_push_events", service.TagPushEvents)
-	d.Set("tag_push_channel", service.Properties.TagPushChannel)
-	d.Set("note_events", service.NoteEvents)
-	d.Set("note_channel", service.Properties.NoteChannel)
-	d.Set("confidential_note_events", service.ConfidentialNoteEvents)
-	// See comment to "confidential_note_channel" in resourceGitlabServiceSlack()
-	//d.Set("confidential_note_channel", service.Properties.ConfidentialNoteChannel)
-	d.Set("pipeline_events", service.PipelineEvents)
-	d.Set("pipeline_channel", service.Properties.PipelineChannel)
-	d.Set("wiki_page_events", service.WikiPageEvents)
-	d.Set("wiki_page_channel", service.Properties.WikiPageChannel)
-	d.Set("job_events", service.JobEvents)
+
+	return setResourceData(d, map[string]interface{}{
+		"webhook":                      service.Properties.WebHook,
+		"username":                     service.Properties.Username,
+		"notify_only_broken_pipelines": service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON,
+		"notify_only_default_branch":   service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON,
+		"branches_to_be_notified":      service.Properties.BranchesToBeNotified,
+		"push_events":                  service.PushEvents,
+		"push_channel":                 service.Properties.PushChannel,
+		"issues_events":                service.IssuesEvents,
+		"issue_channel":                service.Properties.IssueChannel,
+		"confidential_issues_events":   service.ConfidentialIssuesEvents,
+		"confidential_issue_channel":   service.Properties.ConfidentialIssueChannel,
+		"merge_requests_events":        service.MergeRequestsEvents,
+		"merge_request_channel":        service.Properties.MergeRequestChannel,
+		"tag_push_events":              service.TagPushEvents,
+		"tag_push_channel":             service.Properties.TagPushChannel,
+		"note_events":                  service.NoteEvents,
+		"note_channel":                 service.Properties.NoteChannel,
+		"confidential_note_events":     service.ConfidentialNoteEvents,
+		// See comment to "confidential_note_channel" in resourceGitlabServiceSlack()
+		//"confidential_note_channel": service.Properties.ConfidentialNoteChannel,
+		"pipeline_events":   service.PipelineEvents,
+		"pipeline_channel":  service.Properties.PipelineChannel,
+		"wiki_page_events":  service.WikiPageEvents,
+		"wiki_page_channel": service.Properties.WikiPageChannel,
+		"job_events":        service.JobEvents,
+	})
 }
 
 func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) error {
@@ -221,7 +224,9 @@ func resourceGitlabServiceSlackRead(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	resourceGitlabServiceSlackSetToState(d, service)
+	if err := resourceGitlabServiceSlackSetToState(d, service); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -241,7 +246,9 @@ func resourceGitlabServiceSlackDelete(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceGitlabServiceSlackImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	d.Set("project", d.Id())
+	if err := d.Set("project", d.Id()); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

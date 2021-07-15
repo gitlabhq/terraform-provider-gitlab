@@ -158,26 +158,27 @@ func resourceGitlabInstanceClusterRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	d.Set("name", cluster.Name)
-	d.Set("domain", cluster.Domain)
-	d.Set("created_at", cluster.CreatedAt.String())
-	d.Set("provider_type", cluster.ProviderType)
-	d.Set("platform_type", cluster.PlatformType)
-	d.Set("environment_scope", cluster.EnvironmentScope)
-	d.Set("cluster_type", cluster.ClusterType)
-
-	d.Set("kubernetes_api_url", cluster.PlatformKubernetes.APIURL)
-	d.Set("kubernetes_ca_cert", cluster.PlatformKubernetes.CaCert)
-	d.Set("kubernetes_namespace", cluster.PlatformKubernetes.Namespace)
-	d.Set("kubernetes_authorization_type", cluster.PlatformKubernetes.AuthorizationType)
-
-	if cluster.ManagementProject == nil {
-		d.Set("management_project_id", "")
-	} else {
-		d.Set("management_project_id", strconv.Itoa(cluster.ManagementProject.ID))
+	values := map[string]interface{}{
+		"name":                          cluster.Name,
+		"domain":                        cluster.Domain,
+		"created_at":                    cluster.CreatedAt.String(),
+		"provider_type":                 cluster.ProviderType,
+		"platform_type":                 cluster.PlatformType,
+		"environment_scope":             cluster.EnvironmentScope,
+		"cluster_type":                  cluster.ClusterType,
+		"kubernetes_api_url":            cluster.PlatformKubernetes.APIURL,
+		"kubernetes_ca_cert":            cluster.PlatformKubernetes.CaCert,
+		"kubernetes_namespace":          cluster.PlatformKubernetes.Namespace,
+		"kubernetes_authorization_type": cluster.PlatformKubernetes.AuthorizationType,
 	}
 
-	return nil
+	if cluster.ManagementProject == nil {
+		values["management_project_id"] = ""
+	} else {
+		values["management_project_id"] = strconv.Itoa(cluster.ManagementProject.ID)
+	}
+
+	return setResourceData(d, values)
 }
 
 func resourceGitlabInstanceClusterUpdate(d *schema.ResourceData, meta interface{}) error {

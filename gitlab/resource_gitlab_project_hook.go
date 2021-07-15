@@ -148,21 +148,22 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	d.Set("url", hook.URL)
-	d.Set("push_events", hook.PushEvents)
-	d.Set("push_events_branch_filter", hook.PushEventsBranchFilter)
-	d.Set("issues_events", hook.IssuesEvents)
-	d.Set("confidential_issues_events", hook.ConfidentialIssuesEvents)
-	d.Set("merge_requests_events", hook.MergeRequestsEvents)
-	d.Set("tag_push_events", hook.TagPushEvents)
-	d.Set("note_events", hook.NoteEvents)
-	d.Set("confidential_note_events", hook.ConfidentialNoteEvents)
-	d.Set("job_events", hook.JobEvents)
-	d.Set("pipeline_events", hook.PipelineEvents)
-	d.Set("wiki_page_events", hook.WikiPageEvents)
-	d.Set("deployment_events", hook.DeploymentEvents)
-	d.Set("enable_ssl_verification", hook.EnableSSLVerification)
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"url":                        hook.URL,
+		"push_events":                hook.PushEvents,
+		"push_events_branch_filter":  hook.PushEventsBranchFilter,
+		"issues_events":              hook.IssuesEvents,
+		"confidential_issues_events": hook.ConfidentialIssuesEvents,
+		"merge_requests_events":      hook.MergeRequestsEvents,
+		"tag_push_events":            hook.TagPushEvents,
+		"note_events":                hook.NoteEvents,
+		"confidential_note_events":   hook.ConfidentialNoteEvents,
+		"job_events":                 hook.JobEvents,
+		"pipeline_events":            hook.PipelineEvents,
+		"wiki_page_events":           hook.WikiPageEvents,
+		"deployment_events":          hook.DeploymentEvents,
+		"enable_ssl_verification":    hook.EnableSSLVerification,
+	})
 }
 
 func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) error {

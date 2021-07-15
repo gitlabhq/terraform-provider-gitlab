@@ -24,7 +24,7 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
-					accessLevel: fmt.Sprintf("developer"),
+					accessLevel: "developer",
 				})),
 			},
 
@@ -32,8 +32,8 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupMembershipUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
-					accessLevel: fmt.Sprintf("guest"),
-					expiresAt:   fmt.Sprintf("2099-01-01"),
+					accessLevel: "guest",
+					expiresAt:   "2099-01-01",
 				})),
 			},
 
@@ -41,7 +41,7 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
-					accessLevel: fmt.Sprintf("developer"),
+					accessLevel: "developer",
 				})),
 			},
 		},
@@ -109,6 +109,10 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 
 		// GetGroupMember needs int type for userIdString
 		userId, err := strconv.Atoi(userIdString)
+		if err != nil {
+			return err
+		}
+
 		groupMember, resp, err := conn.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
 			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["accessLevel"] {

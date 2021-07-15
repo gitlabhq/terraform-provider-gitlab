@@ -10,7 +10,7 @@ import (
 )
 
 func TestAccDataSourceGitlabUser_basic(t *testing.T) {
-	rString := fmt.Sprintf("%s", acctest.RandString(5))
+	rString := acctest.RandString(5)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },

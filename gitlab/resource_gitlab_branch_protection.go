@@ -142,8 +142,12 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 		return nil
 	}
 
-	d.Set("project", project)
-	d.Set("branch", pb.Name)
+	if err := setResourceData(d, map[string]interface{}{
+		"project": project,
+		"branch":  pb.Name,
+	}); err != nil {
+		return err
+	}
 
 	pushAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.PushAccessLevels)
 	if len(pushAccessLevels) > 0 {

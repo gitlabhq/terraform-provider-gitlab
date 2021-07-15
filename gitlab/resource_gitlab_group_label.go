@@ -81,10 +81,11 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 		}
 		for _, label := range labels {
 			if label.Name == labelName {
-				d.Set("description", label.Description)
-				d.Set("color", label.Color)
-				d.Set("name", label.Name)
-				return nil
+				return setResourceData(d, map[string]interface{}{
+					"description": label.Description,
+					"color":       label.Color,
+					"name":        label.Name,
+				})
 			}
 		}
 		labelsLen = len(labels)

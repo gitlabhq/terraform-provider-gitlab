@@ -102,17 +102,19 @@ func resourceGitlabGroupShareGroupRead(d *schema.ResourceData, meta interface{})
 		if sharedGroupId == sharedGroup.GroupID {
 			convertedAccessLevel := gitlab.AccessLevelValue(sharedGroup.GroupAccessLevel)
 
-			d.Set("group_id", groupId)
-			d.Set("share_group_id", sharedGroup.GroupID)
-			d.Set("group_access", accessLevel[convertedAccessLevel])
-
-			if sharedGroup.ExpiresAt == nil {
-				d.Set("expires_at", "")
-			} else {
-				d.Set("expires_at", sharedGroup.ExpiresAt.String())
+			values := map[string]interface{}{
+				"group_id":       groupId,
+				"share_group_id": sharedGroup.GroupID,
+				"group_access":   accessLevel[convertedAccessLevel],
 			}
 
-			return nil
+			if sharedGroup.ExpiresAt == nil {
+				values["expires_at"] = ""
+			} else {
+				values["expires_at"] = sharedGroup.ExpiresAt.String()
+			}
+
+			return setResourceData(d, values)
 		}
 	}
 

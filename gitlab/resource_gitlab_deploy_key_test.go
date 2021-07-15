@@ -152,7 +152,12 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
+
 		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return nil
+		}
+
 		project := rs.Primary.Attributes["project"]
 
 		gotDeployKey, resp, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)

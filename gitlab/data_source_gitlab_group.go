@@ -100,18 +100,22 @@ func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("one and only one of group_id or full_path must be set")
 	}
 
-	d.Set("group_id", group.ID)
-	d.Set("full_path", group.FullPath)
-	d.Set("name", group.Name)
-	d.Set("full_name", group.FullName)
-	d.Set("web_url", group.WebURL)
-	d.Set("path", group.Path)
-	d.Set("description", group.Description)
-	d.Set("lfs_enabled", group.LFSEnabled)
-	d.Set("request_access_enabled", group.RequestAccessEnabled)
-	d.Set("visibility_level", group.Visibility)
-	d.Set("parent_id", group.ParentID)
-	d.Set("runners_token", group.RunnersToken)
+	if err := setResourceData(d, map[string]interface{}{
+		"group_id":               group.ID,
+		"full_path":              group.FullPath,
+		"name":                   group.Name,
+		"full_name":              group.FullName,
+		"web_url":                group.WebURL,
+		"path":                   group.Path,
+		"description":            group.Description,
+		"lfs_enabled":            group.LFSEnabled,
+		"request_access_enabled": group.RequestAccessEnabled,
+		"visibility_level":       group.Visibility,
+		"parent_id":              group.ParentID,
+		"runners_token":          group.RunnersToken,
+	}); err != nil {
+		return err
+	}
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 

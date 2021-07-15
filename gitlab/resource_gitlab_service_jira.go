@@ -125,34 +125,36 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
+	values := map[string]interface{}{
+		"title":                    jiraService.Title,
+		"created_at":               jiraService.CreatedAt.String(),
+		"updated_at":               jiraService.UpdatedAt.String(),
+		"active":                   jiraService.Active,
+		"push_events":              jiraService.PushEvents,
+		"issues_events":            jiraService.IssuesEvents,
+		"commit_events":            jiraService.CommitEvents,
+		"merge_requests_events":    jiraService.MergeRequestsEvents,
+		"comment_on_event_enabled": jiraService.CommentOnEventEnabled,
+		"tag_push_events":          jiraService.TagPushEvents,
+		"note_events":              jiraService.NoteEvents,
+		"pipeline_events":          jiraService.PipelineEvents,
+		"job_events":               jiraService.JobEvents,
+	}
+
 	if v := jiraService.Properties.URL; v != "" {
-		d.Set("url", v)
+		values["url"] = v
 	}
 	if v := jiraService.Properties.Username; v != "" {
-		d.Set("username", v)
+		values["username"] = v
 	}
 	if v := jiraService.Properties.ProjectKey; v != "" {
-		d.Set("project_key", v)
+		values["project_key"] = v
 	}
 	if v := jiraService.Properties.JiraIssueTransitionID; v != "" {
-		d.Set("jira_issue_transition_id", v)
+		values["jira_issue_transition_id"] = v
 	}
 
-	d.Set("title", jiraService.Title)
-	d.Set("created_at", jiraService.CreatedAt.String())
-	d.Set("updated_at", jiraService.UpdatedAt.String())
-	d.Set("active", jiraService.Active)
-	d.Set("push_events", jiraService.PushEvents)
-	d.Set("issues_events", jiraService.IssuesEvents)
-	d.Set("commit_events", jiraService.CommitEvents)
-	d.Set("merge_requests_events", jiraService.MergeRequestsEvents)
-	d.Set("comment_on_event_enabled", jiraService.CommentOnEventEnabled)
-	d.Set("tag_push_events", jiraService.TagPushEvents)
-	d.Set("note_events", jiraService.NoteEvents)
-	d.Set("pipeline_events", jiraService.PipelineEvents)
-	d.Set("job_events", jiraService.JobEvents)
-
-	return nil
+	return setResourceData(d, values)
 }
 
 func resourceGitlabServiceJiraUpdate(d *schema.ResourceData, meta interface{}) error {
@@ -192,7 +194,9 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 }
 
 func resourceGitlabServiceJiraImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	d.Set("project", d.Id())
+	if err := d.Set("project", d.Id()); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

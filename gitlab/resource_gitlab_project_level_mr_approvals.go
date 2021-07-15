@@ -81,13 +81,13 @@ func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta inte
 		return fmt.Errorf("couldn't read approval configuration: %w", err)
 	}
 
-	d.Set("project_id", projectId)
-	d.Set("reset_approvals_on_push", approvalConfig.ResetApprovalsOnPush)
-	d.Set("disable_overriding_approvers_per_merge_request", approvalConfig.DisableOverridingApproversPerMergeRequest)
-	d.Set("merge_requests_author_approval", approvalConfig.MergeRequestsAuthorApproval)
-	d.Set("merge_requests_disable_committers_approval", approvalConfig.MergeRequestsDisableCommittersApproval)
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"project_id":              projectId,
+		"reset_approvals_on_push": approvalConfig.ResetApprovalsOnPush,
+		"disable_overriding_approvers_per_merge_request": approvalConfig.DisableOverridingApproversPerMergeRequest,
+		"merge_requests_author_approval":                 approvalConfig.MergeRequestsAuthorApproval,
+		"merge_requests_disable_committers_approval":     approvalConfig.MergeRequestsDisableCommittersApproval,
+	})
 }
 
 func resourceGitlabProjectLevelMRApprovalsUpdate(d *schema.ResourceData, meta interface{}) error {

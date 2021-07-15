@@ -120,10 +120,13 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 		return err
 	}
 
-	d.Set("group_id", group.ID)
-	d.Set("full_path", group.FullPath)
-
-	d.Set("members", flattenGitlabMembers(d, gm))
+	if err := setResourceData(d, map[string]interface{}{
+		"group_id":  group.ID,
+		"full_path": group.FullPath,
+		"members":   flattenGitlabMembers(d, gm),
+	}); err != nil {
+		return err
+	}
 
 	var optionsHash strings.Builder
 	optionsHash.WriteString(strconv.Itoa(group.ID))

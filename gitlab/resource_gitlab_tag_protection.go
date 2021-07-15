@@ -84,9 +84,13 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	d.Set("project", project)
-	d.Set("tag", pt.Name)
-	d.Set("create_access_level", pt.CreateAccessLevels[0].AccessLevel)
+	if err := setResourceData(d, map[string]interface{}{
+		"project":             project,
+		"tag":                 pt.Name,
+		"create_access_level": pt.CreateAccessLevels[0].AccessLevel,
+	}); err != nil {
+		return err
+	}
 
 	d.SetId(buildTwoPartID(&project, &pt.Name))
 

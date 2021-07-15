@@ -95,12 +95,13 @@ func resourceGitlabInstanceVariableRead(d *schema.ResourceData, meta interface{}
 		return err
 	}
 
-	d.Set("key", v.Key)
-	d.Set("value", v.Value)
-	d.Set("variable_type", v.VariableType)
-	d.Set("protected", v.Protected)
-	d.Set("masked", v.Masked)
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"key":           v.Key,
+		"value":         v.Value,
+		"variable_type": v.VariableType,
+		"protected":     v.Protected,
+		"masked":        v.Masked,
+	})
 }
 
 func resourceGitlabInstanceVariableUpdate(d *schema.ResourceData, meta interface{}) error {

@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"testing"
@@ -37,7 +36,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("developer"),
+						accessLevel: "developer",
 					})),
 			},
 
@@ -48,7 +47,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("maintainer"),
+						accessLevel: "maintainer",
 					})),
 			},
 
@@ -59,7 +58,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("developer"),
+						accessLevel: "developer",
 					})),
 			},
 		},
@@ -160,9 +159,9 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 	if err != nil {
 		// The read/GET API wasn't implemented in GitLab until version 12.8 (March 2020, well after the add and delete APIs).
 		// If we 404, assume GitLab is at an older version and take things on faith.
-		switch err.(type) {
+		switch err := err.(type) {
 		case *gitlab.ErrorResponse:
-			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 {
+			if err.Response.StatusCode == 404 {
 				// Do nothing
 			} else {
 				return err
@@ -186,7 +185,7 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 		}
 
 		if !found {
-			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", desiredLdapLinkId))
+			return fmt.Errorf("LdapLink %s does not exist.", desiredLdapLinkId)
 		}
 	} else {
 		*ldapLink = desiredLdapLink

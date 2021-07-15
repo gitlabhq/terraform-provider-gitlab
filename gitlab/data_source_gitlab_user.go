@@ -188,31 +188,35 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("one and only one of user_id, username or email must be set")
 	}
 
-	d.Set("user_id", user.ID)
-	d.Set("username", user.Username)
-	d.Set("email", user.Email)
-	d.Set("name", user.Name)
-	d.Set("is_admin", user.IsAdmin)
-	d.Set("can_create_group", user.CanCreateGroup)
-	d.Set("can_create_project", user.CanCreateProject)
-	d.Set("projects_limit", user.ProjectsLimit)
-	d.Set("state", user.State)
-	d.Set("external", user.External)
-	d.Set("extern_uid", user.ExternUID)
-	d.Set("created_at", user.CreatedAt)
-	d.Set("organization", user.Organization)
-	d.Set("two_factor_enabled", user.TwoFactorEnabled)
-	d.Set("note", user.Note)
-	d.Set("provider", user.Provider)
-	d.Set("avatar_url", user.AvatarURL)
-	d.Set("bio", user.Bio)
-	d.Set("location", user.Location)
-	d.Set("skype", user.Skype)
-	d.Set("linkedin", user.Linkedin)
-	d.Set("twitter", user.Twitter)
-	d.Set("website_url", user.WebsiteURL)
-	d.Set("theme_id", user.ThemeID)
-	d.Set("color_scheme_id", user.ColorSchemeID)
+	if err := setResourceData(d, map[string]interface{}{
+		"user_id":            user.ID,
+		"username":           user.Username,
+		"email":              user.Email,
+		"name":               user.Name,
+		"is_admin":           user.IsAdmin,
+		"can_create_group":   user.CanCreateGroup,
+		"can_create_project": user.CanCreateProject,
+		"projects_limit":     user.ProjectsLimit,
+		"state":              user.State,
+		"external":           user.External,
+		"extern_uid":         user.ExternUID,
+		"created_at":         user.CreatedAt,
+		"organization":       user.Organization,
+		"two_factor_enabled": user.TwoFactorEnabled,
+		"note":               user.Note,
+		"provider":           user.Provider,
+		"avatar_url":         user.AvatarURL,
+		"bio":                user.Bio,
+		"location":           user.Location,
+		"skype":              user.Skype,
+		"linkedin":           user.Linkedin,
+		"twitter":            user.Twitter,
+		"website_url":        user.WebsiteURL,
+		"theme_id":           user.ThemeID,
+		"color_scheme_id":    user.ColorSchemeID,
+	}); err != nil {
+		return err
+	}
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
 
