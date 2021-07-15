@@ -476,7 +476,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	// Some project settings can't be set in the Project Create API and have to
 	// set in a second call after project creation.
-	resourceGitlabProjectUpdate(d, meta)
+	resourceGitlabProjectUpdate(d, meta) // nolint // TODO: Resolve this golangci-lint issue: Error return value is not checked (errcheck)
 
 	return resourceGitlabProjectRead(d, meta)
 }

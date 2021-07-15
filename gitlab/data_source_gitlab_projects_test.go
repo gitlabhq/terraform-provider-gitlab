@@ -137,7 +137,7 @@ func testAccDataSourceGitlabProjects(src string, n string) resource.TestCheckFun
 
 		var errorMessageExpected strings.Builder
 		for _, attr := range testAttributes {
-			errorMessageExpected.WriteString(fmt.Sprintf("%s=%v, ", attr, projectResource[fmt.Sprintf("%s", attr)]))
+			errorMessageExpected.WriteString(fmt.Sprintf("%s=%v, ", attr, projectResource[fmt.Sprintf("%s", attr)])) // nolint // TODO: Resolve this golangci-lint issue: S1025: the argument is already a string, there's no need to use fmt.Sprintf (gosimple)
 		}
 
 		var errorMessageGot strings.Builder

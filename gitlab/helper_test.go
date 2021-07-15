@@ -14,9 +14,9 @@ import (
 func testAccCompareGitLabAttribute(attr string, expected, received *schema.ResourceData) error {
 	e := expected.Get(attr)
 	r := received.Get(attr)
-	switch e.(type) {
+	switch e.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch e := e.(type)) could eliminate type assertions in switch cases (gosimple)
 	case *schema.Set:
-		if !e.(*schema.Set).Equal(r) {
+		if !e.(*schema.Set).Equal(r) { // nolint // TODO: Resolve this golangci-lint issue: S1034(related information): could eliminate this type assertion (gosimple)
 			return fmt.Errorf(`attribute set %s expected "%+v" received "%+v"`, attr, e, r)
 		}
 	default:

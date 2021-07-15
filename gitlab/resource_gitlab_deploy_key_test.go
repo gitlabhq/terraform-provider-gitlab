@@ -153,7 +153,7 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
-		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
+		deployKeyID, err := strconv.Atoi(rs.Primary.ID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
 		project := rs.Primary.Attributes["project"]
 
 		gotDeployKey, resp, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
