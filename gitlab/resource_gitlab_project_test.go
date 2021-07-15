@@ -506,7 +506,7 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 		t.Fatalf("failed to create base project: %v", err)
 	}
 
-	defer client.Projects.DeleteProject(baseProject.ID)
+	defer client.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `client.Projects.DeleteProject` is not checked (errcheck)
 
 	// Add a file to the base project, for later verifying the import.
 	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
@@ -591,7 +591,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		t.Fatalf("failed to create base project: %v", err)
 	}
 
-	defer client.Projects.DeleteProject(baseProject.ID)
+	defer client.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `client.Projects.DeleteProject` is not checked (errcheck)
 
 	// Add a file to the base project, for later verifying the import.
 	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{

@@ -102,7 +102,7 @@ func flattenGitlabBasicUser(user *gitlab.User) (values []map[string]interface{})
 }
 
 func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{}) {
-	if projects != nil {
+	if projects != nil { // nolint // TODO: Resolve this golangci-lint issue: S1031: unnecessary nil check around range (gosimple)
 		for _, project := range projects {
 			v := map[string]interface{}{
 				"id":                                    project.ID,
