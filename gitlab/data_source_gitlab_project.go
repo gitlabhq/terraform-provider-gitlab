@@ -169,25 +169,30 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 	}
 
 	d.SetId(fmt.Sprintf("%d", found.ID))
-	d.Set("name", found.Name)
-	d.Set("path", found.Path)
-	d.Set("path_with_namespace", found.PathWithNamespace)
-	d.Set("description", found.Description)
-	d.Set("default_branch", found.DefaultBranch)
-	d.Set("request_access_enabled", found.RequestAccessEnabled)
-	d.Set("issues_enabled", found.IssuesEnabled)
-	d.Set("merge_requests_enabled", found.MergeRequestsEnabled)
-	d.Set("pipelines_enabled", found.JobsEnabled)
-	d.Set("wiki_enabled", found.WikiEnabled)
-	d.Set("snippets_enabled", found.SnippetsEnabled)
-	d.Set("visibility_level", string(found.Visibility))
-	d.Set("namespace_id", found.Namespace.ID)
-	d.Set("ssh_url_to_repo", found.SSHURLToRepo)
-	d.Set("http_url_to_repo", found.HTTPURLToRepo)
-	d.Set("web_url", found.WebURL)
-	d.Set("runners_token", found.RunnersToken)
-	d.Set("archived", found.Archived)
-	d.Set("remove_source_branch_after_merge", found.RemoveSourceBranchAfterMerge)
+
+	if err := setResourceData(d, map[string]interface{}{
+		"name":                             found.Name,
+		"path":                             found.Path,
+		"path_with_namespace":              found.PathWithNamespace,
+		"description":                      found.Description,
+		"default_branch":                   found.DefaultBranch,
+		"request_access_enabled":           found.RequestAccessEnabled,
+		"issues_enabled":                   found.IssuesEnabled,
+		"merge_requests_enabled":           found.MergeRequestsEnabled,
+		"pipelines_enabled":                found.JobsEnabled,
+		"wiki_enabled":                     found.WikiEnabled,
+		"snippets_enabled":                 found.SnippetsEnabled,
+		"visibility_level":                 string(found.Visibility),
+		"namespace_id":                     found.Namespace.ID,
+		"ssh_url_to_repo":                  found.SSHURLToRepo,
+		"http_url_to_repo":                 found.HTTPURLToRepo,
+		"web_url":                          found.WebURL,
+		"runners_token":                    found.RunnersToken,
+		"archived":                         found.Archived,
+		"remove_source_branch_after_merge": found.RemoveSourceBranchAfterMerge,
+	}); err != nil {
+		return err
+	}
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 
@@ -199,7 +204,7 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
 	}
 
-	d.Set("push_rules", flattenProjectPushRules(pushRules))
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"push_rules": flattenProjectPushRules(pushRules),
+	})
 }

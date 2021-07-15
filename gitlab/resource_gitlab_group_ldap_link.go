@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -70,7 +69,10 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	if force {
-		resourceGitlabGroupLdapLinkDelete(d, meta)
+		err := resourceGitlabGroupLdapLinkDelete(d, meta)
+		if err != nil {
+			return err
+		}
 	}
 
 	log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
@@ -94,9 +96,9 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		// The read/GET API wasn't implemented in GitLab until version 12.8 (March 2020, well after the add and delete APIs).
 		// If we 404, assume GitLab is at an older version and take things on faith.
-		switch err.(type) {
+		switch err := err.(type) {
 		case *gitlab.ErrorResponse:
-			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 {
+			if err.Response.StatusCode == 404 {
 				log.Printf("[WARNING] This GitLab instance doesn't have the GET API for group_ldap_sync.  Please upgrade to 12.8 or later for best results.")
 			} else {
 				return err
@@ -112,10 +114,14 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 		found := false
 		for _, ldapLink := range ldapLinks {
 			if buildTwoPartID(&ldapLink.Provider, &ldapLink.CN) == d.Id() {
-				d.Set("group_id", groupId)
-				d.Set("cn", ldapLink.CN)
-				d.Set("group_access", ldapLink.GroupAccess)
-				d.Set("ldap_provider", ldapLink.Provider)
+				if err := setResourceData(d, map[string]interface{}{
+					"group_id":      groupId,
+					"cn":            ldapLink.CN,
+					"group_access":  ldapLink.GroupAccess,
+					"ldap_provider": ldapLink.Provider,
+				}); err != nil {
+					return err
+				}
 				found = true
 				break
 			}
@@ -123,7 +129,7 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 
 		if !found {
 			d.SetId("")
-			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", d.Id()))
+			return fmt.Errorf("LdapLink %s does not exist.", d.Id())
 		}
 	}
 
@@ -139,10 +145,10 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
 	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn)
 	if err != nil {
-		switch err.(type) {
+		switch err := err.(type) {
 		case *gitlab.ErrorResponse:
 			// Ignore LDAP links that don't exist
-			if strings.Contains(string(err.(*gitlab.ErrorResponse).Message), "Linked LDAP group not found") {
+			if strings.Contains(string(err.Message), "Linked LDAP group not found") {
 				log.Printf("[WARNING] %s", err)
 			} else {
 				return err

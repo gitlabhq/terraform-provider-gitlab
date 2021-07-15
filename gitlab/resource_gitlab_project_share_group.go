@@ -82,7 +82,9 @@ func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{
 
 	for _, v := range projectInformation.SharedWithGroups {
 		if groupId == v.GroupID {
-			resourceGitlabProjectShareGroupSetToState(d, v, &projectId)
+			if err := resourceGitlabProjectShareGroupSetToState(d, v, &projectId); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -122,16 +124,22 @@ func resourceGitlabProjectShareGroupSetToState(d *schema.ResourceData, group str
 	GroupID          int    "json:\"group_id\""
 	GroupName        string "json:\"group_name\""
 	GroupAccessLevel int    "json:\"group_access_level\""
-}, projectId *string) {
+}, projectId *string) error {
 
 	//This cast is needed due to an inconsistency in the upstream API
 	//GroupAcessLevel is returned as an int but the map we lookup is sorted by the int alias AccessLevelValue
 	convertedAccessLevel := gitlab.AccessLevelValue(group.GroupAccessLevel)
 
-	d.Set("project_id", projectId)
-	d.Set("group_id", group.GroupID)
-	d.Set("access_level", accessLevel[convertedAccessLevel])
+	if err := setResourceData(d, map[string]interface{}{
+		"project_id":   projectId,
+		"group_id":     group.GroupID,
+		"access_level": accessLevel[convertedAccessLevel],
+	}); err != nil {
+		return err
+	}
 
 	groupId := strconv.Itoa(group.GroupID)
 	d.SetId(buildTwoPartID(projectId, &groupId))
+
+	return nil
 }

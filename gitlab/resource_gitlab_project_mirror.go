@@ -76,7 +76,12 @@ func resourceGitlabProjectMirrorCreate(d *schema.ResourceData, meta interface{})
 	if err != nil {
 		return err
 	}
-	d.Set("mirror_id", mirror.ID)
+
+	if err := setResourceData(d, map[string]interface{}{
+		"mirror_id": mirror.ID,
+	}); err != nil {
+		return err
+	}
 
 	mirrorID := strconv.Itoa(mirror.ID)
 	d.SetId(buildTwoPartID(&projectID, &mirrorID))
@@ -163,15 +168,20 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 		return nil
 	}
 
-	resourceGitlabProjectMirrorSetToState(d, mirror, &projectID)
+	if err := resourceGitlabProjectMirrorSetToState(d, mirror, &projectID); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func resourceGitlabProjectMirrorSetToState(d *schema.ResourceData, projectMirror *gitlab.ProjectMirror, projectID *string) {
-	d.Set("enabled", projectMirror.Enabled)
-	d.Set("mirror_id", projectMirror.ID)
-	d.Set("keep_divergent_refs", projectMirror.KeepDivergentRefs)
-	d.Set("only_protected_branches", projectMirror.OnlyProtectedBranches)
-	d.Set("project", projectID)
-	d.Set("url", projectMirror.URL)
+func resourceGitlabProjectMirrorSetToState(d *schema.ResourceData, projectMirror *gitlab.ProjectMirror, projectID *string) error {
+	return setResourceData(d, map[string]interface{}{
+		"enabled":                 projectMirror.Enabled,
+		"mirror_id":               projectMirror.ID,
+		"keep_divergent_refs":     projectMirror.KeepDivergentRefs,
+		"only_protected_branches": projectMirror.OnlyProtectedBranches,
+		"project":                 projectID,
+		"url":                     projectMirror.URL,
+	})
 }

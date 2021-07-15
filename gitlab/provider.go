@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
+	"github.com/hashicorp/terraform-plugin-sdk/meta"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
@@ -142,7 +142,8 @@ func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{},
 
 	// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
 	// After upgrading the SDK to v2 replace with p.UserAgent("terraform-provider-gitlab")
-	client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab"
+	// client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab"
+	client.UserAgent = fmt.Sprintf("HashiCorp Terraform/%s (+https://www.terraform.io) Terraform Plugin SDK/%s", p.TerraformVersion, meta.SDKVersionString())
 
 	return client, err
 }

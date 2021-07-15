@@ -129,10 +129,10 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 	d.SetId(fmt.Sprintf("%d", deployToken.ID))
 
 	// Token is only available on creation
-	d.Set("token", deployToken.Token)
-	d.Set("username", deployToken.Username)
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"token":    deployToken.Token,
+		"username": deployToken.Username,
+	})
 }
 
 func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) error {
@@ -160,21 +160,25 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 
 	for _, token := range deployTokens {
 		if token.ID == deployTokenID {
-			d.Set("name", token.Name)
-			d.Set("username", token.Username)
-
-			if token.ExpiresAt != nil {
-				d.Set("expires_at", token.ExpiresAt)
+			values := map[string]interface{}{
+				"name":     token.Name,
+				"username": token.Username,
 			}
 
-			for _, scope := range token.Scopes {
-				if scope == "read_repository" {
-					d.Set("scopes.read_repository", true)
-				}
+			if token.ExpiresAt != nil {
+				values["expires_at"] = token.ExpiresAt.Format(time.RFC3339)
+			}
 
-				if scope == "read_registry" {
-					d.Set("scopes.read_registry", true)
+			var scopes []string
+			for _, scope := range token.Scopes {
+				if scope == "read_repository" || scope == "read_registry" {
+					scopes = append(scopes, scope)
 				}
+			}
+			values["scopes"] = scopes
+
+			if err := setResourceData(d, values); err != nil {
+				return err
 			}
 		}
 	}

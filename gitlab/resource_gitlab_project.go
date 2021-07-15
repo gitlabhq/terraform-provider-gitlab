@@ -312,7 +312,8 @@ func resourceGitlabProject() *schema.Resource {
 
 func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) error {
 	d.SetId(fmt.Sprintf("%d", project.ID))
-	values := map[string]interface{}{
+
+	return setResourceData(d, map[string]interface{}{
 		"name":                                  project.Name,
 		"path":                                  project.Path,
 		"path_with_namespace":                   project.PathWithNamespace,
@@ -346,8 +347,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 		"mirror_trigger_builds":               project.MirrorTriggerBuilds,
 		"mirror_overwrites_diverged_branches": project.MirrorOverwritesDivergedBranches,
 		"only_mirror_protected_branches":      project.OnlyMirrorProtectedBranches,
-	}
-	return setResourceData(d, values)
+	})
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
@@ -476,7 +476,9 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	// Some project settings can't be set in the Project Create API and have to
 	// set in a second call after project creation.
-	resourceGitlabProjectUpdate(d, meta)
+	if err := resourceGitlabProjectUpdate(d, meta); err != nil {
+		return err
+	}
 
 	return resourceGitlabProjectRead(d, meta)
 }
@@ -510,9 +512,9 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
 	}
 
-	d.Set("push_rules", flattenProjectPushRules(pushRules))
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"push_rules": flattenProjectPushRules(pushRules),
+	})
 }
 
 func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error {

@@ -83,10 +83,11 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 		return err
 	}
 
-	d.Set("title", deployKey.Title)
-	d.Set("key", deployKey.Key)
-	d.Set("can_push", deployKey.CanPush)
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"title":    deployKey.Title,
+		"key":      deployKey.Key,
+		"can_push": deployKey.CanPush,
+	})
 }
 
 func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) error {
@@ -112,7 +113,10 @@ func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, meta interface
 	project, id := s[0], s[1]
 
 	d.SetId(id)
-	d.Set("project", project)
+
+	if err := d.Set("project", project); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

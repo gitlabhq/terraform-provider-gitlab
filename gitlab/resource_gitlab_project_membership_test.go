@@ -24,7 +24,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+					access_level: "developer",
 				})),
 			},
 
@@ -32,7 +32,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("guest"),
+					access_level: "guest",
 				})),
 			},
 
@@ -40,7 +40,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+					access_level: "developer",
 				})),
 			},
 		},
@@ -107,6 +107,10 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 
 		// GetProjectMember needs int type for userID
 		userIDI, err := strconv.Atoi(userID)
+		if err != nil {
+			return err
+		}
+
 		gotMembership, resp, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
 		if err != nil {
 			if gotMembership != nil && fmt.Sprintf("%d", gotMembership.AccessLevel) == rs.Primary.Attributes["access_level"] {

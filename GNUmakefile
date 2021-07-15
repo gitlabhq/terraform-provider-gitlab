@@ -46,4 +46,7 @@ fmtcheck:
 errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
-.PHONY: default build test testacc-up testacc-down testacc vet fmt fmtcheck errcheck
+lint:
+	@sh -c "'$(CURDIR)/scripts/lint.sh'"
+
+.PHONY: default build test testacc-up testacc-down testacc vet fmt fmtcheck errcheck lint

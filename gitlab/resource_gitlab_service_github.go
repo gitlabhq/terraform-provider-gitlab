@@ -60,15 +60,17 @@ func resourceGitlabServiceGithub() *schema.Resource {
 	}
 }
 
-func resourceGitlabServiceGithubSetToState(d *schema.ResourceData, service *gitlab.GithubService) {
+func resourceGitlabServiceGithubSetToState(d *schema.ResourceData, service *gitlab.GithubService) error {
 	d.SetId(fmt.Sprintf("%d", service.ID))
-	d.Set("repository_url", service.Properties.RepositoryURL)
-	d.Set("static_context", service.Properties.StaticContext)
 
-	d.Set("title", service.Title)
-	d.Set("created_at", service.CreatedAt.String())
-	d.Set("updated_at", service.UpdatedAt.String())
-	d.Set("active", service.Active)
+	return setResourceData(d, map[string]interface{}{
+		"repository_url": service.Properties.RepositoryURL,
+		"static_context": service.Properties.StaticContext,
+		"title":          service.Title,
+		"created_at":     service.CreatedAt.String(),
+		"updated_at":     service.UpdatedAt.String(),
+		"active":         service.Active,
+	})
 }
 
 func resourceGitlabServiceGithubCreate(d *schema.ResourceData, meta interface{}) error {
@@ -102,7 +104,9 @@ func resourceGitlabServiceGithubRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
-	resourceGitlabServiceGithubSetToState(d, service)
+	if err := resourceGitlabServiceGithubSetToState(d, service); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -122,7 +126,9 @@ func resourceGitlabServiceGithubDelete(d *schema.ResourceData, meta interface{})
 }
 
 func resourceGitlabServiceGithubImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	d.Set("project", d.Id())
+	if err := d.Set("project", d.Id()); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

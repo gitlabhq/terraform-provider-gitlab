@@ -194,7 +194,12 @@ func dataSourceGitlabUsersRead(d *schema.ResourceData, meta interface{}) error {
 		page = page + 1
 	}
 
-	d.Set("users", flattenGitlabUsers(users))
+	if err := setResourceData(d, map[string]interface{}{
+		"users": flattenGitlabUsers(users),
+	}); err != nil {
+		return err
+	}
+
 	d.SetId(fmt.Sprintf("%d", id))
 
 	return nil

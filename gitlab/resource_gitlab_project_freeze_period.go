@@ -84,12 +84,12 @@ func resourceGitlabProjectFreezePeriodRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 
-	d.Set("freeze_start", freezePeriod.FreezeStart)
-	d.Set("freeze_end", freezePeriod.FreezeEnd)
-	d.Set("cron_timezone", freezePeriod.CronTimezone)
-	d.Set("project_id", projectID)
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"freeze_start":  freezePeriod.FreezeStart,
+		"freeze_end":    freezePeriod.FreezeEnd,
+		"cron_timezone": freezePeriod.CronTimezone,
+		"project_id":    projectID,
+	})
 }
 
 func resourceGitlabProjectFreezePeriodUpdate(d *schema.ResourceData, meta interface{}) error {

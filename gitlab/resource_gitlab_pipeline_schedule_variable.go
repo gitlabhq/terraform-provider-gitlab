@@ -79,10 +79,14 @@ func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta int
 	found := false
 	for _, pipelineVariable := range pipelineSchedule.Variables {
 		if pipelineVariable.Key == pipelineVariableKey {
-			d.Set("project", project)
-			d.Set("key", pipelineVariable.Key)
-			d.Set("value", pipelineVariable.Value)
-			d.Set("pipeline_schedule_id", scheduleID)
+			if err := setResourceData(d, map[string]interface{}{
+				"project":              project,
+				"key":                  pipelineVariable.Key,
+				"value":                pipelineVariable.Value,
+				"pipeline_schedule_id": scheduleID,
+			}); err != nil {
+				return err
+			}
 			found = true
 			break
 		}

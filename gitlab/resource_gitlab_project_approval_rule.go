@@ -91,7 +91,6 @@ func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interfac
 	if err != nil {
 		return err
 	}
-	d.Set("project", projectID)
 
 	rule, err := getApprovalRuleByID(meta.(*gitlab.Client), d.Id())
 	if err != nil {
@@ -102,22 +101,14 @@ func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 
-	d.Set("name", rule.Name)
-	d.Set("approvals_required", rule.ApprovalsRequired)
-
-	if err := d.Set("group_ids", flattenApprovalRuleGroupIDs(rule.Groups)); err != nil {
-		return err
-	}
-
-	if err := d.Set("user_ids", flattenApprovalRuleUserIDs(rule.Users)); err != nil {
-		return err
-	}
-
-	if err := d.Set("protected_branch_ids", flattenProtectedBranchIDs(rule.ProtectedBranches)); err != nil {
-		return err
-	}
-
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"project":              projectID,
+		"name":                 rule.Name,
+		"approvals_required":   rule.ApprovalsRequired,
+		"group_ids":            flattenApprovalRuleGroupIDs(rule.Groups),
+		"user_ids":             flattenApprovalRuleUserIDs(rule.Users),
+		"protected_branch_ids": flattenProtectedBranchIDs(rule.ProtectedBranches),
+	})
 }
 
 func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interface{}) error {

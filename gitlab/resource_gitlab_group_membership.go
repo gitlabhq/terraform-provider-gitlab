@@ -93,7 +93,10 @@ func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	resourceGitlabGroupMembershipSetToState(d, groupMember, &groupId)
+	if err := resourceGitlabGroupMembershipSetToState(d, groupMember, &groupId); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -146,13 +149,23 @@ func resourceGitlabGroupMembershipDelete(d *schema.ResourceData, meta interface{
 	return err
 }
 
-func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, groupId *string) {
+func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, groupId *string) error {
+	values := map[string]interface{}{
+		"group_id":     groupId,
+		"user_id":      groupMember.ID,
+		"access_level": accessLevel[groupMember.AccessLevel],
+	}
 
-	d.Set("group_id", groupId)
-	d.Set("user_id", groupMember.ID)
-	d.Set("access_level", accessLevel[groupMember.AccessLevel])
-	d.Set("expires_at", groupMember.ExpiresAt)
+	if groupMember.ExpiresAt != nil {
+		values["expires_at"] = groupMember.ExpiresAt.String()
+	}
+
+	if err := setResourceData(d, values); err != nil {
+		return err
+	}
 
 	userId := strconv.Itoa(groupMember.ID)
 	d.SetId(buildTwoPartID(groupId, &userId))
+
+	return nil
 }

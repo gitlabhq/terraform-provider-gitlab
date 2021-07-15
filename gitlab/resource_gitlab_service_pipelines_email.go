@@ -45,10 +45,12 @@ func resourceGitlabServicePipelinesEmail() *schema.Resource {
 	}
 }
 
-func resourceGitlabServicePipelinesEmailSetToState(d *schema.ResourceData, service *gitlab.PipelinesEmailService) {
-	d.Set("recipients", strings.Split(service.Properties.Recipients, ","))
-	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines)
-	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
+func resourceGitlabServicePipelinesEmailSetToState(d *schema.ResourceData, service *gitlab.PipelinesEmailService) error {
+	return setResourceData(d, map[string]interface{}{
+		"recipients":                   strings.Split(service.Properties.Recipients, ","),
+		"notify_only_broken_pipelines": service.Properties.NotifyOnlyBrokenPipelines,
+		"branches_to_be_notified":      service.Properties.BranchesToBeNotified,
+	})
 }
 
 func resourceGitlabServicePipelinesEmailCreate(d *schema.ResourceData, meta interface{}) error {
@@ -82,8 +84,16 @@ func resourceGitlabServicePipelinesEmailRead(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	d.Set("project", project)
-	resourceGitlabServicePipelinesEmailSetToState(d, service)
+	if err := setResourceData(d, map[string]interface{}{
+		"project": project,
+	}); err != nil {
+		return err
+	}
+
+	if err := resourceGitlabServicePipelinesEmailSetToState(d, service); err != nil {
+		return err
+	}
+
 	return nil
 }
 

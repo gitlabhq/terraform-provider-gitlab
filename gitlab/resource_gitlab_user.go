@@ -76,16 +76,18 @@ func resourceGitlabUser() *schema.Resource {
 	}
 }
 
-func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
-	d.Set("username", user.Username)
-	d.Set("name", user.Name)
-	d.Set("can_create_group", user.CanCreateGroup)
-	d.Set("projects_limit", user.ProjectsLimit)
-	d.Set("email", user.Email)
-	d.Set("is_admin", user.IsAdmin)
-	d.Set("is_external", user.External)
-	d.Set("note", user.Note)
-	d.Set("skip_confirmation", user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero())
+func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) error {
+	return setResourceData(d, map[string]interface{}{
+		"username":          user.Username,
+		"name":              user.Name,
+		"can_create_group":  user.CanCreateGroup,
+		"projects_limit":    user.ProjectsLimit,
+		"email":             user.Email,
+		"is_admin":          user.IsAdmin,
+		"is_external":       user.External,
+		"note":              user.Note,
+		"skip_confirmation": user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero(),
+	})
 }
 
 func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
@@ -131,8 +133,7 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	resourceGitlabUserSetToState(d, user)
-	return nil
+	return resourceGitlabUserSetToState(d, user)
 }
 
 func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {

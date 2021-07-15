@@ -209,27 +209,28 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
-	d.Set("name", group.Name)
-	d.Set("path", group.Path)
-	d.Set("full_path", group.FullPath)
-	d.Set("full_name", group.FullName)
-	d.Set("web_url", group.WebURL)
-	d.Set("description", group.Description)
-	d.Set("lfs_enabled", group.LFSEnabled)
-	d.Set("request_access_enabled", group.RequestAccessEnabled)
-	d.Set("visibility_level", group.Visibility)
-	d.Set("project_creation_level", group.ProjectCreationLevel)
-	d.Set("subgroup_creation_level", group.SubGroupCreationLevel)
-	d.Set("require_two_factor_authentication", group.RequireTwoFactorAuth)
-	d.Set("two_factor_grace_period", group.TwoFactorGracePeriod)
-	d.Set("auto_devops_enabled", group.AutoDevopsEnabled)
-	d.Set("emails_disabled", group.EmailsDisabled)
-	d.Set("mentions_disabled", group.MentionsDisabled)
-	d.Set("parent_id", group.ParentID)
-	d.Set("runners_token", group.RunnersToken)
-	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"name":                              group.Name,
+		"path":                              group.Path,
+		"full_path":                         group.FullPath,
+		"full_name":                         group.FullName,
+		"web_url":                           group.WebURL,
+		"description":                       group.Description,
+		"lfs_enabled":                       group.LFSEnabled,
+		"request_access_enabled":            group.RequestAccessEnabled,
+		"visibility_level":                  group.Visibility,
+		"project_creation_level":            group.ProjectCreationLevel,
+		"subgroup_creation_level":           group.SubGroupCreationLevel,
+		"require_two_factor_authentication": group.RequireTwoFactorAuth,
+		"two_factor_grace_period":           group.TwoFactorGracePeriod,
+		"auto_devops_enabled":               group.AutoDevopsEnabled,
+		"emails_disabled":                   group.EmailsDisabled,
+		"mentions_disabled":                 group.MentionsDisabled,
+		"parent_id":                         group.ParentID,
+		"runners_token":                     group.RunnersToken,
+		"share_with_group_lock":             group.ShareWithGroupLock,
+	})
 }
 
 func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {

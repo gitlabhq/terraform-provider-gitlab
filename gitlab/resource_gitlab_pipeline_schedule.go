@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -100,11 +99,15 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		}
 		for _, pipelineSchedule := range pipelineSchedules {
 			if pipelineSchedule.ID == pipelineScheduleID {
-				d.Set("description", pipelineSchedule.Description)
-				d.Set("ref", pipelineSchedule.Ref)
-				d.Set("cron", pipelineSchedule.Cron)
-				d.Set("cron_timezone", pipelineSchedule.CronTimezone)
-				d.Set("active", pipelineSchedule.Active)
+				if err := setResourceData(d, map[string]interface{}{
+					"description":   pipelineSchedule.Description,
+					"ref":           pipelineSchedule.Ref,
+					"cron":          pipelineSchedule.Cron,
+					"cron_timezone": pipelineSchedule.CronTimezone,
+					"active":        pipelineSchedule.Active,
+				}); err != nil {
+					return err
+				}
 				found = true
 				break
 			}
@@ -117,7 +120,7 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		opt.Page = resp.NextPage
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID))
+		return fmt.Errorf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
 	}
 
 	return nil
@@ -197,7 +200,12 @@ func resourceGitlabPipelineScheduleStateImporter(d *schema.ResourceData, meta in
 	project, id := s[0], s[1]
 
 	d.SetId(id)
-	d.Set("project", project)
+
+	if err := setResourceData(d, map[string]interface{}{
+		"project": project,
+	}); err != nil {
+		return nil, err
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

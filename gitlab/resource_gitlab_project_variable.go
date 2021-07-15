@@ -138,14 +138,15 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 		return augmentProjectVariableClientError(d, err)
 	}
 
-	d.Set("key", v.Key)
-	d.Set("value", v.Value)
-	d.Set("variable_type", v.VariableType)
-	d.Set("project", project)
-	d.Set("protected", v.Protected)
-	d.Set("masked", v.Masked)
-	d.Set("environment_scope", v.EnvironmentScope)
-	return nil
+	return setResourceData(d, map[string]interface{}{
+		"key":               v.Key,
+		"value":             v.Value,
+		"variable_type":     v.VariableType,
+		"project":           project,
+		"protected":         v.Protected,
+		"masked":            v.Masked,
+		"environment_scope": v.EnvironmentScope,
+	})
 }
 
 func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{}) error {
