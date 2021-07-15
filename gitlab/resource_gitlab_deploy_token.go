@@ -166,18 +166,16 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 			}
 
 			if token.ExpiresAt != nil {
-				values["expires_at"] = token.ExpiresAt
+				values["expires_at"] = token.ExpiresAt.Format(time.RFC3339)
 			}
 
+			var scopes []string
 			for _, scope := range token.Scopes {
-				if scope == "read_repository" {
-					values["scopes.read_repository"] = true
-				}
-
-				if scope == "read_registry" {
-					values["scopes.read_registry"] = true
+				if scope == "read_repository" || scope == "read_registry" {
+					scopes = append(scopes, scope)
 				}
 			}
+			values["scopes"] = scopes
 
 			if err := setResourceData(d, values); err != nil {
 				return err

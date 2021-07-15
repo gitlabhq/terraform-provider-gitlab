@@ -130,15 +130,9 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 		"created_at":               jiraService.CreatedAt.String(),
 		"updated_at":               jiraService.UpdatedAt.String(),
 		"active":                   jiraService.Active,
-		"push_events":              jiraService.PushEvents,
-		"issues_events":            jiraService.IssuesEvents,
 		"commit_events":            jiraService.CommitEvents,
 		"merge_requests_events":    jiraService.MergeRequestsEvents,
 		"comment_on_event_enabled": jiraService.CommentOnEventEnabled,
-		"tag_push_events":          jiraService.TagPushEvents,
-		"note_events":              jiraService.NoteEvents,
-		"pipeline_events":          jiraService.PipelineEvents,
-		"job_events":               jiraService.JobEvents,
 	}
 
 	if v := jiraService.Properties.URL; v != "" {

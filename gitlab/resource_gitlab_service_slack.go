@@ -147,8 +147,8 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	return setResourceData(d, map[string]interface{}{
 		"webhook":                      service.Properties.WebHook,
 		"username":                     service.Properties.Username,
-		"notify_only_broken_pipelines": service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON,
-		"notify_only_default_branch":   service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON,
+		"notify_only_broken_pipelines": service.Properties.NotifyOnlyBrokenPipelines,
+		"notify_only_default_branch":   service.Properties.NotifyOnlyDefaultBranch,
 		"branches_to_be_notified":      service.Properties.BranchesToBeNotified,
 		"push_events":                  service.PushEvents,
 		"push_channel":                 service.Properties.PushChannel,

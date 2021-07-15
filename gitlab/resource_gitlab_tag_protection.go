@@ -87,7 +87,7 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 	if err := setResourceData(d, map[string]interface{}{
 		"project":             project,
 		"tag":                 pt.Name,
-		"create_access_level": pt.CreateAccessLevels[0].AccessLevel,
+		"create_access_level": accessLevelValueToName[gitlab.AccessLevelValue(pt.CreateAccessLevels[0].AccessLevel)],
 	}); err != nil {
 		return err
 	}

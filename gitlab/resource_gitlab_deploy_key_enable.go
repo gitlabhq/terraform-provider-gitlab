@@ -88,7 +88,7 @@ func resourceGitlabDeployKeyEnableRead(d *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	if err := d.Set("key_id", deployKey.ID); err != nil {
+	if err := d.Set("key_id", fmt.Sprintf("%d", deployKey.ID)); err != nil {
 		return err
 	}
 

@@ -150,12 +150,17 @@ func resourceGitlabGroupMembershipDelete(d *schema.ResourceData, meta interface{
 }
 
 func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, groupId *string) error {
-	if err := setResourceData(d, map[string]interface{}{
+	values := map[string]interface{}{
 		"group_id":     groupId,
 		"user_id":      groupMember.ID,
 		"access_level": accessLevel[groupMember.AccessLevel],
-		"expires_at":   groupMember.ExpiresAt,
-	}); err != nil {
+	}
+
+	if groupMember.ExpiresAt != nil {
+		values["expires_at"] = groupMember.ExpiresAt.String()
+	}
+
+	if err := setResourceData(d, values); err != nil {
 		return err
 	}
 
