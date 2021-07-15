@@ -504,8 +504,8 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 
 	defer func() {
 		_, derr := client.Projects.DeleteProject(baseProject.ID)
-		if err == nil {
-			err = derr
+		if derr != nil {
+			t.Fatalf("failed to delete base project: %v", derr)
 		}
 	}()
 
@@ -593,8 +593,8 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 
 	defer func() {
 		_, derr := client.Projects.DeleteProject(baseProject.ID)
-		if err == nil {
-			err = derr
+		if derr != nil {
+			t.Fatalf("failed to delete base project: %v", derr)
 		}
 	}()
 
