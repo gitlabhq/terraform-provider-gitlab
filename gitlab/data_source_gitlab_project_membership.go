@@ -10,29 +10,22 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabGroupMembership() *schema.Resource {
+func dataSourceGitlabProjectMembership() *schema.Resource {
 	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
 	for k := range accessLevelID {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
-		Read: dataSourceGitlabGroupMembershipRead,
+		Read: dataSourceGitlabProjectMembershipRead,
 		Schema: map[string]*schema.Schema{
-			"group_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
-				Optional: true,
-				ConflictsWith: []string{
-					"full_path",
-				},
-			},
-			"full_path": {
+			"id": {
 				Type:     schema.TypeString,
-				Computed: true,
+				Required: true,
+			},
+			"inherited": {
+				Type:     schema.TypeBool,
 				Optional: true,
-				ConflictsWith: []string{
-					"group_id",
-				},
+				Default:  true,
 			},
 			"access_level": {
 				Type:         schema.TypeString,
@@ -84,49 +77,43 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 	}
 }
 
-func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	var gm []*gitlab.GroupMember
-	var group *gitlab.Group
+	var pm []*gitlab.ProjectMember
+	var project *gitlab.Project
 	var err error
 
 	log.Printf("[INFO] Reading Gitlab group")
 
-	groupIDData, groupIDOk := d.GetOk("group_id")
-	fullPathData, fullPathOk := d.GetOk("full_path")
+	projectIDData, _ := d.GetOk("id")
+	inherited, _ := d.GetOk("inherited")
 
-	if groupIDOk {
-		// Get group by id
-		group, _, err = client.Groups.GetGroup(groupIDData.(int))
-		if err != nil {
-			return err
-		}
-	} else if fullPathOk {
-		// Get group by full path
-		group, _, err = client.Groups.GetGroup(fullPathData.(string))
-		if err != nil {
-			return err
-		}
-	} else {
-		return fmt.Errorf("one and only one of group_id or full_path must be set")
-	}
-
-	log.Printf("[INFO] Reading Gitlab group memberships")
-
-	// Get group memberships
-	gm, _, err = client.Groups.ListGroupMembers(group.ID, &gitlab.ListGroupMembersOptions{})
+	// Get project by ID
+	project, _, err = client.Projects.GetProject(projectIDData, nil)
 	if err != nil {
 		return err
 	}
 
-	d.Set("group_id", group.ID)
-	d.Set("full_path", group.FullPath)
+	log.Printf("[INFO] Reading Gitlab project memberships")
 
-	d.Set("members", flattenGitlabGroupMembers(d, gm))
+	// Get group memberships
+	if inherited.(bool) {
+		pm, _, err = client.ProjectMembers.ListAllProjectMembers(project.ID, &gitlab.ListProjectMembersOptions{})
+		if err != nil {
+			return err
+		}
+	} else {
+		pm, _, err = client.ProjectMembers.ListProjectMembers(project.ID, &gitlab.ListProjectMembersOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	d.Set("members", flattenGitlabProjectMembers(d, pm))
 
 	var optionsHash strings.Builder
-	optionsHash.WriteString(strconv.Itoa(group.ID))
+	optionsHash.WriteString(strconv.Itoa(project.ID))
 
 	if data, ok := d.GetOk("access_level"); ok {
 		optionsHash.WriteString(data.(string))
@@ -138,7 +125,7 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 	return nil
 }
 
-func flattenGitlabGroupMembers(d *schema.ResourceData, members []*gitlab.GroupMember) []interface{} {
+func flattenGitlabProjectMembers(d *schema.ResourceData, members []*gitlab.ProjectMember) []interface{} {
 	membersList := []interface{}{}
 
 	var filterAccessLevel gitlab.AccessLevelValue = gitlab.NoPermissions
