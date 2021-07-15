@@ -89,7 +89,7 @@ func resourceGitlabProjectEnvironmentRead(d *schema.ResourceData, meta interface
 
 	environment, resp, err := client.Environments.GetEnvironment(project, environmentIDInt)
 	if err != nil {
-		if resp.StatusCode == http.StatusNotFound {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Project %s gitlab environment %q not found", project, environmentID)
 			d.SetId("")
 			return nil

@@ -90,7 +90,7 @@ func resourceGitlabProjectProtectedEnvironmentCreate(d *schema.ResourceData, met
 
 	protectedEnvironment, resp, err := client.ProtectedEnvironments.ProtectRepositoryEnvironments(project, &options)
 	if err != nil {
-		if resp.StatusCode == http.StatusNotFound {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			return fmt.Errorf("feature Protected Environments is not available")
 		}
 		return err
@@ -117,7 +117,7 @@ func resourceGitlabProjectProtectedEnvironmentRead(d *schema.ResourceData, meta 
 
 	protectedEnvironment, resp, err := client.ProtectedEnvironments.GetProtectedEnvironment(project, environment)
 	if err != nil {
-		if resp.StatusCode == http.StatusNotFound {
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Project %s gitlab protected environment %q not found", project, environment)
 			d.SetId("")
 			return nil

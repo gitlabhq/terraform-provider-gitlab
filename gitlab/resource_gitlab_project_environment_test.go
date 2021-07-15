@@ -177,7 +177,7 @@ func testAccCheckGitlabProjectEnvironmentDestroy(s *terraform.State) error {
 			return fmt.Errorf("project Environment %v still exists", environment)
 		}
 	}
-	if response.StatusCode != 404 {
+	if response != nil && response.StatusCode != 404 {
 		return err
 	}
 	return nil

@@ -176,7 +176,7 @@ func testAccCheckGitlabProjectProtectedEnvironmentDestroy(s *terraform.State) er
 			return fmt.Errorf("project Protected Environment %s still exists", environment)
 		}
 	}
-	if response.StatusCode != 404 {
+	if response != nil && response.StatusCode != 404 {
 		return err
 	}
 	return nil
