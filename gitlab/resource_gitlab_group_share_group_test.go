@@ -13,6 +13,7 @@ import (
 func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
+	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -42,6 +43,7 @@ func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
