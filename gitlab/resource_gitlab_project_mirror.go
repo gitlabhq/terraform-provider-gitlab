@@ -173,5 +173,10 @@ func resourceGitlabProjectMirrorSetToState(d *schema.ResourceData, projectMirror
 	d.Set("keep_divergent_refs", projectMirror.KeepDivergentRefs)
 	d.Set("only_protected_branches", projectMirror.OnlyProtectedBranches)
 	d.Set("project", projectID)
-	d.Set("url", projectMirror.URL)
+
+	if strings.Contains(projectMirror.URL, "*****") {
+		log.Printf("[DEBUG] project mirror %q will not detect any possible change to the url because it is redacted by Gitlab", d.Id())
+	} else {
+		d.Set("url", projectMirror.URL)
+	}
 }
