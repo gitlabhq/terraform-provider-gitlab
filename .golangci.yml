@@ -1,3 +1,10 @@
+# https://golangci-lint.run/usage/configuration/
+
 linters-settings:
   errcheck:
     exclude: errcheck_excludes.txt
+
+linters:
+  enable:
+    - gofmt
+    - govet
