@@ -158,11 +158,7 @@ func expandDeployAccessLevels(vs []interface{}) ([]*gitlab.EnvironmentAccessOpti
 		opts := v.(map[string]interface{})
 		option := &gitlab.EnvironmentAccessOptions{}
 		if accessLevel, exists := opts["access_level"]; exists {
-			accessLevelValue, err := accessLevelStringToValue(accessLevel.(string))
-			if err != nil {
-				return nil, fmt.Errorf("error expanding access level: %v", err)
-			}
-			option.AccessLevel = &accessLevelValue
+			option.AccessLevel = gitlab.AccessLevel(accessLevelNameToValue[accessLevel.(string)])
 		} else if userID, exists := opts["user_id"]; exists {
 			option.UserID = gitlab.Int(userID.(int))
 		} else if groupID, exists := opts["group_id"]; exists {
@@ -191,25 +187,4 @@ func flattenDeployAccessLevels(vs []*gitlab.EnvironmentAccessDescription) []map[
 	}
 
 	return result
-}
-
-func accessLevelStringToValue(level string) (gitlab.AccessLevelValue, error) {
-	switch level {
-	case "noone":
-		return gitlab.NoPermissions, nil
-	case "minimal":
-		return gitlab.MinimalAccessPermissions, nil
-	case "guest":
-		return gitlab.GuestPermissions, nil
-	case "reporter":
-		return gitlab.ReporterPermissions, nil
-	case "developer":
-		return gitlab.DeveloperPermissions, nil
-	case "maintainer":
-		return gitlab.MaintainerPermissions, nil
-	case "owner":
-		return gitlab.OwnerPermissions, nil
-	default:
-		return -1, fmt.Errorf("unknown access level %q", level)
-	}
 }
