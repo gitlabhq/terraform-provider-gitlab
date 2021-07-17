@@ -1,9 +1,9 @@
 package gitlab
 
 import (
-	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -15,6 +15,9 @@ func resourceGitlabProjectBadge() *schema.Resource {
 		Read:   resourceGitlabProjectBadgeRead,
 		Update: resourceGitlabProjectBadgeUpdate,
 		Delete: resourceGitlabProjectBadgeDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -43,7 +46,7 @@ func resourceGitlabProjectBadge() *schema.Resource {
 
 func resourceGitlabProjectBadgeCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
+	projectID := d.Get("project").(string)
 	options := &gitlab.AddProjectBadgeOptions{
 		LinkURL:  gitlab.String(d.Get("link_url").(string)),
 		ImageURL: gitlab.String(d.Get("image_url").(string)),
@@ -51,52 +54,55 @@ func resourceGitlabProjectBadgeCreate(d *schema.ResourceData, meta interface{}) 
 
 	log.Printf("[DEBUG] create gitlab project badge %q / %q", *options.LinkURL, *options.ImageURL)
 
-	badge, _, err := client.ProjectBadges.AddProjectBadge(project, options)
+	badge, _, err := client.ProjectBadges.AddProjectBadge(projectID, options)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%d", badge.ID))
+	badgeID := strconv.Itoa(badge.ID)
+
+	d.SetId(buildTwoPartID(&projectID, &badgeID))
 
 	return resourceGitlabProjectBadgeRead(d, meta)
 }
 
 func resourceGitlabProjectBadgeRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	badgeId, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
-	log.Printf("[DEBUG] read gitlab project badge %s/%d", project, badgeId)
-
-	badge, _, err := client.ProjectBadges.GetProjectBadge(project, badgeId)
+	ids := strings.Split(d.Id(), ":")
+	projectID := ids[0]
+	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
 		return err
 	}
 
-	d.Set("link_url", badge.LinkURL)
-	d.Set("image_url", badge.ImageURL)
-	d.Set("rendered_link_url", badge.RenderedLinkURL)
-	d.Set("rendered_image_url", badge.RenderedImageURL)
+	log.Printf("[DEBUG] read gitlab project badge %s/%d", projectID, badgeID)
+
+	badge, _, err := client.ProjectBadges.GetProjectBadge(projectID, badgeID)
+	if err != nil {
+		return err
+	}
+
+	resourceGitlabProjectBadgeSetToState(d, badge, &projectID)
 	return nil
 }
 
 func resourceGitlabProjectBadgeUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	badgeId, err := strconv.Atoi(d.Id())
+	ids := strings.Split(d.Id(), ":")
+	projectID := ids[0]
+	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
 		return err
 	}
+
 	options := &gitlab.EditProjectBadgeOptions{
 		LinkURL:  gitlab.String(d.Get("link_url").(string)),
 		ImageURL: gitlab.String(d.Get("image_url").(string)),
 	}
 
-	log.Printf("[DEBUG] update gitlab project badge %s", d.Id())
+	log.Printf("[DEBUG] update gitlab project badge %s/%d", projectID, badgeID)
 
-	_, _, err = client.ProjectBadges.EditProjectBadge(project, badgeId, options)
+	_, _, err = client.ProjectBadges.EditProjectBadge(projectID, badgeID, options)
 	if err != nil {
 		return err
 	}
@@ -106,13 +112,23 @@ func resourceGitlabProjectBadgeUpdate(d *schema.ResourceData, meta interface{}) 
 
 func resourceGitlabProjectBadgeDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	badgeId, err := strconv.Atoi(d.Id())
+	ids := strings.Split(d.Id(), ":")
+	projectID := ids[0]
+	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
 		return err
 	}
-	log.Printf("[DEBUG] Delete gitlab project badge %s", d.Id())
 
-	_, err = client.ProjectBadges.DeleteProjectBadge(project, badgeId)
+	log.Printf("[DEBUG] Delete gitlab project badge %s/%d", projectID, badgeID)
+
+	_, err = client.ProjectBadges.DeleteProjectBadge(projectID, badgeID)
 	return err
+}
+
+func resourceGitlabProjectBadgeSetToState(d *schema.ResourceData, badge *gitlab.ProjectBadge, projectID *string) {
+	d.Set("link_url", badge.LinkURL)
+	d.Set("image_url", badge.ImageURL)
+	d.Set("rendered_link_url", badge.RenderedLinkURL)
+	d.Set("rendered_image_url", badge.RenderedImageURL)
+	d.Set("project", projectID)
 }

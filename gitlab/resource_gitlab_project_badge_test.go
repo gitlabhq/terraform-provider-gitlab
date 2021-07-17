@@ -3,6 +3,7 @@ package gitlab
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -46,6 +47,26 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectBadge_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectBadgeDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectBadgeConfig(rInt),
+			},
+			{
+				ResourceName:      "gitlab_project_badge.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectBadgeExists(n string, badge *gitlab.ProjectBadge) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -53,7 +74,9 @@ func testAccCheckGitlabProjectBadgeExists(n string, badge *gitlab.ProjectBadge) 
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		badgeID, err := strconv.Atoi(rs.Primary.ID)
+		splitID := strings.Split(rs.Primary.ID, ":")
+
+		badgeID, err := strconv.Atoi(splitID[len(splitID)-1])
 		if err != nil {
 			return err
 		}
@@ -61,6 +84,7 @@ func testAccCheckGitlabProjectBadgeExists(n string, badge *gitlab.ProjectBadge) 
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
+
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
 		gotBadge, _, err := conn.ProjectBadges.GetProjectBadge(repoName, badgeID)
