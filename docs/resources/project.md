@@ -105,6 +105,8 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
   Valid values are `disabled`, `private`, `enabled`, `public`.
   `private` is the default.
 
+* `build_coverage_regex` - (Optional) Test coverage parsing for the project.
+
 ## Attributes Reference
 
 The following additional attributes are exported:

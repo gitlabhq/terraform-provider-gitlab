@@ -43,9 +43,10 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		Archived:         false, // needless, but let's make this explicit
-		PackagesEnabled:  true,
-		PagesAccessLevel: gitlab.PublicAccessControl,
+		Archived:           false, // needless, but let's make this explicit
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PublicAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 
 	defaultsMainBranch = defaults
@@ -85,9 +86,10 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						Archived:         true,
-						PackagesEnabled:  false,
-						PagesAccessLevel: gitlab.DisabledAccessControl,
+						Archived:           true,
+						PackagesEnabled:    false,
+						PagesAccessLevel:   gitlab.DisabledAccessControl,
+						BuildCoverageRegex: "bar",
 					}, &received),
 				),
 			},
@@ -358,8 +360,9 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		PackagesEnabled:  true,
-		PagesAccessLevel: gitlab.PublicAccessControl,
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PublicAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -459,8 +462,9 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-		PackagesEnabled:  true,
-		PagesAccessLevel: gitlab.PrivateAccessControl,
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PrivateAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -887,6 +891,7 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
+  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, rInt)
 }
@@ -913,6 +918,7 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
+  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, rInt, rInt, rInt)
 }
@@ -943,6 +949,7 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
   pages_access_level = "public"
+  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, defaultBranchStatement)
 }
@@ -1010,6 +1017,7 @@ resource "gitlab_project" "foo" {
   archived = true
   packages_enabled = false
   pages_access_level = "disabled"
+  build_coverage_regex = "bar"
 }
 	`, rInt, rInt)
 }
