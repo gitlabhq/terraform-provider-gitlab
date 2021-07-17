@@ -52,7 +52,7 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 func resourceGitlabDeployKeyEnableCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	key_id, err := strconv.Atoi(d.Get("key_id").(string))
+	key_id, err := strconv.Atoi(d.Get("key_id").(string)) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
 
 	log.Printf("[DEBUG] enable gitlab deploy key %s/%d", project, key_id)
 

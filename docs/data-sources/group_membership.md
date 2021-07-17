@@ -1,10 +1,10 @@
 # gitlab\_group\_membership
 
-Provides details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.
+Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.
 
 ## Example Usage
 
-**By group's ID**
+### By group's ID
 
 ```hcl
 data "gitlab_group_membership" "example" {
@@ -12,7 +12,7 @@ data "gitlab_group_membership" "example" {
 }
 ```
 
-**By group's full path**
+### By group's full path
 
 ```hcl
 data "gitlab_group_membership" "example" {
@@ -28,9 +28,9 @@ The following arguments are supported:
 
 * `full_path` - (Optional) The full path of the group.
 
-* `access_level` - (Optional) Only return members with the desidered access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
+* `access_level` - (Optional) Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
 
-**Note**: exactly one of group_id or full_path must be provided.
+> **Note**: exactly one of group_id or full_path must be provided.
 
 ## Attributes Reference
 
@@ -45,4 +45,3 @@ The following attributes are exported:
   * `web_url` - User's website URL.
   * `access_level` - One of five levels of access to the group.
   * `expires_at` - Expiration date for the group membership.
-

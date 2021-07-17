@@ -126,7 +126,7 @@ func testAccCheckGitlabUserExists(n string, user *gitlab.User) resource.TestChec
 
 		id, _ := strconv.Atoi(userID)
 
-		gotUser, _, err := conn.Users.GetUser(id)
+		gotUser, _, err := conn.Users.GetUser(id, gitlab.GetUsersOptions{})
 		if err != nil {
 			return err
 		}
@@ -196,7 +196,7 @@ func testAccCheckGitlabUserDestroy(s *terraform.State) error {
 
 		id, _ := strconv.Atoi(rs.Primary.ID)
 
-		user, resp, err := conn.Users.GetUser(id)
+		user, resp, err := conn.Users.GetUser(id, gitlab.GetUsersOptions{})
 		if err == nil {
 			if user != nil && fmt.Sprintf("%d", user.ID) == rs.Primary.ID {
 				return fmt.Errorf("User still exists")

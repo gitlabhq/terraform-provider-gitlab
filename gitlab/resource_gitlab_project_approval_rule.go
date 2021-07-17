@@ -47,16 +47,23 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeInt},
 				Set:      schema.HashInt,
 			},
+			"protected_branch_ids": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeInt},
+				Set:      schema.HashInt,
+			},
 		},
 	}
 }
 
 func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interface{}) error {
 	options := gitlab.CreateProjectLevelRuleOptions{
-		Name:              gitlab.String(d.Get("name").(string)),
-		ApprovalsRequired: gitlab.Int(d.Get("approvals_required").(int)),
-		UserIDs:           expandApproverIds(d.Get("user_ids")),
-		GroupIDs:          expandApproverIds(d.Get("group_ids")),
+		Name:               gitlab.String(d.Get("name").(string)),
+		ApprovalsRequired:  gitlab.Int(d.Get("approvals_required").(int)),
+		UserIDs:            expandApproverIds(d.Get("user_ids")),
+		GroupIDs:           expandApproverIds(d.Get("group_ids")),
+		ProtectedBranchIDs: expandProtectedBranchIDs(d.Get("protected_branch_ids")),
 	}
 
 	project := d.Get("project").(string)
@@ -106,6 +113,10 @@ func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interfac
 		return err
 	}
 
+	if err := d.Set("protected_branch_ids", flattenProtectedBranchIDs(rule.ProtectedBranches)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -121,10 +132,11 @@ func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interf
 	}
 
 	options := gitlab.UpdateProjectLevelRuleOptions{
-		Name:              gitlab.String(d.Get("name").(string)),
-		ApprovalsRequired: gitlab.Int(d.Get("approvals_required").(int)),
-		UserIDs:           expandApproverIds(d.Get("user_ids")),
-		GroupIDs:          expandApproverIds(d.Get("group_ids")),
+		Name:               gitlab.String(d.Get("name").(string)),
+		ApprovalsRequired:  gitlab.Int(d.Get("approvals_required").(int)),
+		UserIDs:            expandApproverIds(d.Get("user_ids")),
+		GroupIDs:           expandApproverIds(d.Get("group_ids")),
+		ProtectedBranchIDs: expandProtectedBranchIDs(d.Get("protected_branch_ids")),
 	}
 
 	log.Printf("[DEBUG] Project %s update gitlab project-level approval rule %s", projectID, *options.Name)
@@ -215,6 +227,16 @@ func flattenApprovalRuleGroupIDs(groups []*gitlab.Group) []int {
 	return groupIDs
 }
 
+func flattenProtectedBranchIDs(protectedBranches []*gitlab.ProtectedBranch) []int {
+	var protectedBranchIDs []int
+
+	for _, protectedBranch := range protectedBranches {
+		protectedBranchIDs = append(protectedBranchIDs, protectedBranch.ID)
+	}
+
+	return protectedBranchIDs
+}
+
 // expandApproverIds Expands an interface into a list of ints to read from state.
 func expandApproverIds(ids interface{}) []int {
 	var approverIDs []int
@@ -224,4 +246,14 @@ func expandApproverIds(ids interface{}) []int {
 	}
 
 	return approverIDs
+}
+
+func expandProtectedBranchIDs(ids interface{}) []int {
+	var protectedBranchIDs []int
+
+	for _, id := range ids.(*schema.Set).List() {
+		protectedBranchIDs = append(protectedBranchIDs, id.(int))
+	}
+
+	return protectedBranchIDs
 }

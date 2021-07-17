@@ -10,6 +10,12 @@ resource "gitlab_project_membership" "test" {
   user_id      = 1337
   access_level = "guest"
 }
+
+resource "gitlab_project_membership" "example" {
+  project_id   = "67890"
+  user_id      = 1234
+  access_level = "guest"
+}
 ```
 
 ## Argument Reference
@@ -25,7 +31,6 @@ The following arguments are supported:
 ## Import
 
 GitLab group membership can be imported using an id made up of `group_id:user_id`, e.g.
-
 
 ```
 $ terraform import gitlab_project_membership.test "12345:1337"

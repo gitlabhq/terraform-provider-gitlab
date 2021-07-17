@@ -30,12 +30,12 @@ The following arguments are supported:
 
 * `token` - (Required) A GitHub personal access token with at least `repo:status` scope.
 
-* `static_context` - (Optional) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more. 
+* `static_context` - (Optional) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
 
-## Importing GitHub service
+## Import
 
  You can import a service_github state using `terraform import <resource> <project_id>`:
 
-```bash
+```
 $ terraform import gitlab_service_github.github 1
 ```

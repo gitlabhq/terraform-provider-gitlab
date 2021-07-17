@@ -84,6 +84,7 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabGroupLabel_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resourceName := "gitlab_group_label.fixme"

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -15,6 +16,9 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 		Read:   resourceGitlabPipelineTriggerRead,
 		Update: resourceGitlabPipelineTriggerUpdate,
 		Delete: resourceGitlabPipelineTriggerDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabPipelineTriggerStateImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -114,4 +118,18 @@ func resourceGitlabPipelineTriggerDelete(d *schema.ResourceData, meta interface{
 
 	_, err = client.PipelineTriggers.DeletePipelineTrigger(project, pipelineTriggerID)
 	return err
+}
+
+func resourceGitlabPipelineTriggerStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 2 {
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Pipeline Trigger import format; expected '{project_id}:{pipeline_trigger_id}'")
+	}
+	project, id := s[0], s[1]
+
+	d.SetId(id)
+	d.Set("project", project)
+
+	return []*schema.ResourceData{d}, nil
 }

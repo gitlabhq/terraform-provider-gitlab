@@ -29,11 +29,12 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
-						ApproverUsernames: []string{fmt.Sprintf("foo-user-%d", randomInt)},
-						ApprovalsRequired: 3,
-						GroupPaths:        []string{fmt.Sprintf("foo-group-%d", randomInt)},
-						Name:              fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt:         randomInt,
+						ApproverUsernames:    []string{fmt.Sprintf("foo-user-%d", randomInt)},
+						ApprovalsRequired:    3,
+						GroupPaths:           []string{fmt.Sprintf("foo-group-%d", randomInt)},
+						ProtectedBranchNames: []string{"master"},
+						Name:                 fmt.Sprintf("foo rule %d", randomInt),
+						RandomInt:            randomInt,
 					}),
 				),
 			},
@@ -53,8 +54,9 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 							fmt.Sprintf("bar-group-%d", randomInt),
 							fmt.Sprintf("foo-group-%d", randomInt),
 						},
-						Name:      fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt: randomInt,
+						ProtectedBranchNames: []string{"master"},
+						Name:                 fmt.Sprintf("foo rule %d", randomInt),
+						RandomInt:            randomInt,
 					}),
 				),
 			},
@@ -68,10 +70,11 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 							fmt.Sprintf("bar-user-%d", randomInt),
 							fmt.Sprintf("qux-user-%d", randomInt),
 						},
-						ApprovalsRequired: 1,
-						GroupPaths:        []string{fmt.Sprintf("bar-group-%d", randomInt)},
-						Name:              fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt:         randomInt,
+						ApprovalsRequired:    1,
+						GroupPaths:           []string{fmt.Sprintf("bar-group-%d", randomInt)},
+						ProtectedBranchNames: []string{"master"},
+						Name:                 fmt.Sprintf("foo rule %d", randomInt),
+						RandomInt:            randomInt,
 					}),
 				),
 			},
@@ -79,6 +82,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 	randomInt := acctest.RandInt()
 
@@ -102,11 +106,12 @@ func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 }
 
 type testAccGitlabProjectApprovalRuleExpectedAttributes struct {
-	ApprovalsRequired int
-	ApproverUsernames []string
-	GroupPaths        []string
-	Name              string
-	RandomInt         int
+	ApprovalsRequired    int
+	ApproverUsernames    []string
+	GroupPaths           []string
+	ProtectedBranchNames []string
+	Name                 string
+	RandomInt            int
 }
 
 func testAccCheckGitlabProjectApprovalRuleAttributes(projectApprovalRule *gitlab.ProjectApprovalRule, want *testAccGitlabProjectApprovalRuleExpectedAttributes) resource.TestCheckFunc {
@@ -145,6 +150,16 @@ func testAccCheckGitlabProjectApprovalRuleAttributes(projectApprovalRule *gitlab
 			return fmt.Errorf("got groups %s; want %s", groupPaths, want.GroupPaths)
 		}
 
+		var protectedBranchNames []string
+		for _, protectedBranch := range projectApprovalRule.ProtectedBranches {
+			protectedBranchNames = append(protectedBranchNames, protectedBranch.Name)
+		}
+		sort.Strings(protectedBranchNames)
+
+		if !reflect.DeepEqual(protectedBranchNames, want.ProtectedBranchNames) {
+			return fmt.Errorf("got protected branches %v; want %v", protectedBranchNames, want.ProtectedBranchNames)
+		}
+
 		return nil
 	}
 }
@@ -157,100 +172,108 @@ func testAccGitLabProjectApprovalRuleConfig(
 ) string {
 	return fmt.Sprintf(`
 resource "gitlab_user" "foo" {
-	name             = "foo user"
-	username         = "foo-user-%[1]d"
-	password         = "foo12345"
-	email            = "foo-user%[1]d@ssss.com"
-	is_admin         = false
+  name             = "foo user"
+  username         = "foo-user-%[1]d"
+  password         = "foo12345"
+  email            = "foo-user%[1]d@ssss.com"
+  is_admin         = false
   projects_limit   = 2
   can_create_group = false
   is_external      = false
 }
 
 resource "gitlab_user" "bar" {
-	name             = "bar user"
-	username         = "bar-user-%[1]d"
-	password         = "bar12345"
-	email            = "bar-user%[1]d@ssss.com"
-	is_admin         = false
+  name             = "bar user"
+  username         = "bar-user-%[1]d"
+  password         = "bar12345"
+  email            = "bar-user%[1]d@ssss.com"
+  is_admin         = false
   projects_limit   = 2
   can_create_group = false
   is_external      = false
 }
 
 resource "gitlab_user" "baz" {
-	name             = "baz user"
-	username         = "baz-user-%[1]d"
-	password         = "baz12345"
-	email            = "baz-user%[1]d@ssss.com"
-	is_admin         = false
+  name             = "baz user"
+  username         = "baz-user-%[1]d"
+  password         = "baz12345"
+  email            = "baz-user%[1]d@ssss.com"
+  is_admin         = false
   projects_limit   = 2
   can_create_group = false
   is_external      = false
 }
 
 resource "gitlab_user" "qux" {
-	name             = "qux user"
-	username         = "qux-user-%[1]d"
-	password         = "qux12345"
-	email            = "qux-user%[1]d@ssss.com"
-	is_admin         = false
+  name             = "qux user"
+  username         = "qux-user-%[1]d"
+  password         = "qux12345"
+  email            = "qux-user%[1]d@ssss.com"
+  is_admin         = false
   projects_limit   = 2
   can_create_group = false
   is_external      = false
 }
 
 resource "gitlab_project" "foo" {
-	name              = "foo project %[1]d"
-	path              = "foo-project-%[1]d"
-	description       = "Terraform acceptance test - Approval Rule"
-	visibility_level  = "public"
+  name             = "foo project %[1]d"
+  path             = "foo-project-%[1]d"
+  description      = "Terraform acceptance test - Approval Rule"
+  visibility_level = "public"
+}
+
+resource "gitlab_branch_protection" "default" {
+  project            = gitlab_project.foo.id
+  branch             = gitlab_project.foo.default_branch
+  push_access_level  = "maintainer"
+  merge_access_level = "developer"
 }
 
 resource "gitlab_project_membership" "baz" {
-  project_id     = gitlab_project.foo.id
-  user_id        = gitlab_user.baz.id
-  access_level   = "developer"
+  project_id   = gitlab_project.foo.id
+  user_id      = gitlab_user.baz.id
+  access_level = "developer"
 }
 
 resource "gitlab_project_membership" "qux" {
-  project_id     = gitlab_project.foo.id
-  user_id        = gitlab_user.qux.id
-  access_level   = "developer"
+  project_id   = gitlab_project.foo.id
+  user_id      = gitlab_user.qux.id
+  access_level = "developer"
 }
 
 resource "gitlab_group" "foo" {
-	name             = "foo-group %[1]d"
-	path             = "foo-group-%[1]d"
-	description      = "Terraform acceptance tests - Approval Rule"
-	visibility_level = "public"
+  name             = "foo-group %[1]d"
+  path             = "foo-group-%[1]d"
+  description      = "Terraform acceptance tests - Approval Rule"
+  visibility_level = "public"
 }
 
 resource "gitlab_group" "bar" {
-	name             = "bar-group %[1]d"
-	path             = "bar-group-%[1]d"
-	description      = "Terraform acceptance tests - Approval Rule"
-	visibility_level = "public"
+  name             = "bar-group %[1]d"
+  path             = "bar-group-%[1]d"
+  description      = "Terraform acceptance tests - Approval Rule"
+  visibility_level = "public"
 }
 
 resource "gitlab_group_membership" "foo" {
-  group_id         = gitlab_group.foo.id
-  user_id          = gitlab_user.foo.id
-  access_level     = "developer"
+  group_id     = gitlab_group.foo.id
+  user_id      = gitlab_user.foo.id
+  access_level = "developer"
 }
 
 resource "gitlab_group_membership" "bar" {
-  group_id        = gitlab_group.bar.id
-  user_id         = gitlab_user.bar.id
-  access_level    = "developer"
+  group_id     = gitlab_group.bar.id
+  user_id      = gitlab_user.bar.id
+  access_level = "developer"
 }
 
 resource "gitlab_project_approval_rule" "foo" {
-	project            = gitlab_project.foo.id
-	name               = "foo rule %[1]d"
-	approvals_required = %d
-	user_ids           = [%s]
-	group_ids          = [%s]
+  project              = gitlab_project.foo.id
+  name                 = "foo rule %[1]d"
+  approvals_required   = %d
+  user_ids             = [%s]
+  group_ids            = [%s]
+  protected_branch_ids = [gitlab_branch_protection.default.id]
 }
 	`,
 		randomInt,

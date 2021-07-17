@@ -46,4 +46,9 @@ fmtcheck:
 errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
-.PHONY: default build test testacc-up testacc-down testacc vet fmt fmtcheck errcheck
+tfproviderlint:
+	go run github.com/bflad/tfproviderlint/cmd/tfproviderlintx \
+	-XAT001=false -XR003=false -XR005=false -XS001=false -XS002=false \
+	./...
+
+.PHONY: default build test testacc-up testacc-down testacc vet fmt fmtcheck errcheck tfproviderlint

@@ -122,7 +122,7 @@ func testAccCheckGitlabGroupVariableDestroy(s *terraform.State) error {
 		}
 
 		_, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
-		if err == nil {
+		if err == nil { // nolint // TODO: Resolve this golangci-lint issue: SA9003: empty branch (staticcheck)
 			//if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 			//	if gotRepo.MarkedForDeletionAt == nil {
 			//		return fmt.Errorf("Repository still exists")

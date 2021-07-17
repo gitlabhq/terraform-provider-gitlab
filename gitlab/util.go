@@ -35,6 +35,7 @@ var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
 
 // copied from ../github/util.go
 func validateValueFunc(values []string) schema.SchemaValidateFunc {
+	// lintignore: V013 // TODO: Resolve this tfproviderlint issue
 	return func(v interface{}, k string) (we []string, errors []error) {
 		value := v.(string)
 		valid := false
@@ -157,6 +158,7 @@ func stringToAccessControlValue(s string) *gitlab.AccessControlValue {
 	return &value
 }
 
+// lintignore: V011 // TODO: Resolve this tfproviderlint issue
 var StringIsGitlabVariableName = func(v interface{}, k string) (s []string, es []error) {
 	value, ok := v.(string)
 	if !ok {
@@ -287,4 +289,14 @@ func parseVersionMajorMinor(version string) (int, int, error) {
 	}
 
 	return major, minor, nil
+}
+
+func setResourceData(d *schema.ResourceData, values map[string]interface{}) error {
+	for name, value := range values {
+		err := d.Set(name, value) // lintignore: R004,R001 // TODO: Resolve this tfproviderlint issue
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
