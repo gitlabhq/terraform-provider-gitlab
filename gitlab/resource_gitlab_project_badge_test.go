@@ -32,6 +32,12 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Test ImportState
+			{
+				ResourceName:      "gitlab_project_badge.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update the project badge
 			{
 				Config: testAccGitlabProjectBadgeUpdateConfig(rInt),
@@ -42,15 +48,6 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 						ImageURL: fmt.Sprintf("https://example.com/badge-%d.svg", rInt),
 					}),
 				),
-			},
-			// Test ImportState
-			{
-				Config: testAccGitlabProjectBadgeConfig(rInt),
-			},
-			{
-				ResourceName:      "gitlab_project_badge.foo",
-				ImportState:       true,
-				ImportStateVerify: true,
 			},
 		},
 	})
