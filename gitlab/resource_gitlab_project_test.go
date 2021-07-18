@@ -581,6 +581,36 @@ resource "gitlab_project" "foo" {
 	})
 }
 
+func TestAccGitlabProject_initializeWithCustomCIPath(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name        = "foo-%d"
+  description = "Terraform acceptance tests with custom CI Path"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
+}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					resource.TestCheckResourceAttr("gitlab_project.foo", "ci_config_path", ".gitlab-ci.yml@mynamespace/myproject"),
+				),
+			},
+		},
+	})
+}
+
 type testAccGitlabProjectMirroredExpectedAttributes struct {
 	Mirror                           bool
 	MirrorTriggerBuilds              bool

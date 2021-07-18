@@ -107,6 +107,8 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
 
 * `build_coverage_regex` - (Optional) Test coverage parsing for the project.
 
+* `ci_config_path` - (Optional) Custom Path to CI config file.
+
 ## Attributes Reference
 
 The following additional attributes are exported:
