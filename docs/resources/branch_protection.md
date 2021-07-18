@@ -56,6 +56,8 @@ An `allowed_to_push` or `allowed_to_merge` block supports the following argument
 
 The following attributes are exported:
 
+* `branch_protection_id` - The ID of the branch protection (not the branch name).
+
 * The `allowed_to_push` and `allowed_to_merge` blocks export the `access_level_description` field, which contains a textual description of the access level, user or group allowed to perform the relevant action.
 
 ## Import

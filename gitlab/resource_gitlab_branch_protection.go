@@ -76,6 +76,10 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"branch_protection_id": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -171,6 +175,8 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
 		return fmt.Errorf("error setting code_owner_approval_required: %v", err)
 	}
+
+	d.Set("branch_protection_id", pb.ID)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
