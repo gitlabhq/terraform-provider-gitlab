@@ -35,3 +35,12 @@ The resource exports the following attributes:
 * `rendered_link_url` - The link_url argument rendered (in case of use of placeholders).
 
 * `rendered_image_url` - The image_url argument rendered (in case of use of placeholders).
+
+## Import
+
+GitLab project badges can be imported using an id made up of `{project_id}:{badge_id}`,
+ e.g.
+
+```bash
+terraform import gitlab_project_badge.foo 1:3
+```
