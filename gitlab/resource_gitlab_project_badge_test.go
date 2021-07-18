@@ -43,18 +43,7 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 					}),
 				),
 			},
-		},
-	})
-}
-
-func TestAccGitlabProjectBadge_import(t *testing.T) {
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectBadgeDestroy,
-		Steps: []resource.TestStep{
+			// Test ImportState
 			{
 				Config: testAccGitlabProjectBadgeConfig(rInt),
 			},
