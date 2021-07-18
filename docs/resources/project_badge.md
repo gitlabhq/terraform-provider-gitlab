@@ -4,7 +4,6 @@ This resource allows you to create and manage badges for your GitLab projects.
 For further information on hooks, consult the [gitlab
 documentation](https://docs.gitlab.com/ce/user/project/badges.html).
 
-
 ## Example Usage
 
 ```hcl
@@ -28,7 +27,6 @@ The following arguments are supported:
 * `link_url` - (Required) The url linked with the badge.
 
 * `image_url` - (Required) The image url which will be presented on project overview.
-
 
 ## Attributes Reference
 
