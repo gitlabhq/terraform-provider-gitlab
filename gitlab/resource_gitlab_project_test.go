@@ -48,6 +48,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PublicAccessControl,
 		BuildCoverageRegex: "foo",
+		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
 	defaultsMainBranch = defaults
@@ -362,6 +363,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PublicAccessControl,
 		BuildCoverageRegex: "foo",
+		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -997,6 +999,7 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_all_discussions_are_resolved = true
   pages_access_level = "public"
   build_coverage_regex = "foo"
+  ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
 }
 	`, rInt, rInt, defaultBranchStatement)
 }

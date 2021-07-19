@@ -277,6 +277,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeString,
 		Optional: true,
 	},
+	"ci_config_path": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -330,7 +334,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
 	d.Set("build_coverage_regex", project.BuildCoverageRegex)
-
+	d.Set("ci_config_path", project.CIConfigPath)
 	return nil
 }
 
@@ -358,6 +362,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 		BuildCoverageRegex:                        gitlab.String(d.Get("build_coverage_regex").(string)),
+		CIConfigPath:                              gitlab.String(d.Get("ci_config_path").(string)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -406,6 +411,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("pages_access_level"); ok {
 		options.PagesAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("ci_config_path"); ok {
+		options.CIConfigPath = gitlab.String(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -685,6 +694,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("build_coverage_regex") {
 		options.BuildCoverageRegex = gitlab.String(d.Get("build_coverage_regex").(string))
+	}
+
+	if d.HasChange("ci_config_path") {
+		options.CIConfigPath = gitlab.String(d.Get("ci_config_path").(string))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
