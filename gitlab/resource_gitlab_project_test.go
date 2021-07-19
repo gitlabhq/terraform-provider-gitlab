@@ -48,6 +48,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PublicAccessControl,
 		BuildCoverageRegex: "foo",
+		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
 	defaultsMainBranch = defaults
@@ -362,6 +363,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PublicAccessControl,
 		BuildCoverageRegex: "foo",
+		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -575,36 +577,6 @@ resource "gitlab_project" "foo" {
 					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
 						DefaultBranch: "foo",
 					}),
-				),
-			},
-		},
-	})
-}
-
-func TestAccGitlabProject_initializeWithCustomCIPath(t *testing.T) {
-	var project gitlab.Project
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name        = "foo-%d"
-  description = "Terraform acceptance tests with custom CI Path"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-
-  ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
-}`, rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					resource.TestCheckResourceAttr("gitlab_project.foo", "ci_config_path", ".gitlab-ci.yml@mynamespace/myproject"),
 				),
 			},
 		},
@@ -1027,6 +999,7 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_all_discussions_are_resolved = true
   pages_access_level = "public"
   build_coverage_regex = "foo"
+  ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
 }
 	`, rInt, rInt, defaultBranchStatement)
 }
