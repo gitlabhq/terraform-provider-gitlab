@@ -29,7 +29,7 @@ The following arguments are supported:
 
 * `user_id` - (Optional) The ID of the user.
 
-> **Note**: only one of email, user_id or username must be provided.
+-> **Note** Only one of email, user_id, or username must be provided.
 
 ## Attributes Reference
 
@@ -85,5 +85,4 @@ The following arguments are supported:
 
 * `current_sign_in_at` - Current user's sign-in date.
 
-> **Note**: some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.
-
+-> **Note** Some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.
