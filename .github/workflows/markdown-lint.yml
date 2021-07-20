@@ -1,6 +1,6 @@
 name: Markdown lint
 
-on: push
+on: [push,pull_request]
 
 jobs:
   markdown-lint:
