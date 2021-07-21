@@ -2,7 +2,6 @@
 
 This resource allows you to create and manage Project Access Token for your GitLab projects.
 
-
 ## Example Usage
 
 ```hcl
@@ -26,7 +25,7 @@ resource "gitlab_project_variable" "example" {
 The following arguments are supported:
 
 * `project` - (Required, string) The id of the project to add the project access token to.
- 
+
 * `name` - (Required, string) A name to describe the project access token.
 
 * `expires_at` - (Optional, string) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.

@@ -12,6 +12,7 @@ import (
 )
 
 func resourceGitlabProjectAccessToken() *schema.Resource {
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabProjectAccessTokenCreate,
 		Read:   resourceGitlabProjectAccessTokenRead,
@@ -149,7 +150,7 @@ func resourceGitlabProjectAccessTokenRead(d *schema.ResourceData, meta interface
 				d.Set("created_at", projectAccessToken.CreatedAt.String())
 				d.Set("revoked", projectAccessToken.Revoked)
 				d.Set("user_id", projectAccessToken.UserID)
-				d.Set("scopes", projectAccessToken.Scopes)
+				d.Set("scopes", projectAccessToken.Scopes) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
 
 				return nil
 			}
