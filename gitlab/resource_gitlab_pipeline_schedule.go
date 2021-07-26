@@ -117,7 +117,7 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		opt.Page = resp.NextPage
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID))
+		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)) // nolint // TODO: Resolve this golangci-lint issue: S1028: should use fmt.Errorf(...) instead of errors.New(fmt.Sprintf(...)) (gosimple)
 	}
 
 	return nil

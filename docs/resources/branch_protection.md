@@ -40,7 +40,7 @@ The following arguments are supported:
 
 * `merge_access_level` - (Optional) One of five levels of access to the project. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 
-* `allowed_to_push`, `allowed_to_merge` - (Optional) One or more `allowed_to_push`, `allowed_to_merge` blocks as defined below. 
+* `allowed_to_push`, `allowed_to_merge` - (Optional) One or more `allowed_to_push`, `allowed_to_merge` blocks as defined below.
 
 * `code_owner_approval_required` (Optional) Bool, defaults to false. Can be set to true to require code owner approval before merging.
 
@@ -52,17 +52,17 @@ An `allowed_to_push` or `allowed_to_merge` block supports the following argument
 
 * `group_id` - (Required) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
 
-
 ## Attributes Reference
 
 The following attributes are exported:
+
+* `branch_protection_id` - The ID of the branch protection (not the branch name).
 
 * The `allowed_to_push` and `allowed_to_merge` blocks export the `access_level_description` field, which contains a textual description of the access level, user or group allowed to perform the relevant action.
 
 ## Import
 
 GitLab project freeze periods can be imported using an id made up of `project_id:branch`, e.g.
-
 
 ```
 $ terraform import gitlab_branch_protection.BranchProtect "12345:main"

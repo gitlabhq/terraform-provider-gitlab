@@ -25,7 +25,7 @@ The following arguments are supported:
 
 * `ref` - (Required, string) The branch/tag name to be triggered.
 
-* `cron` - (Required, string) 	The cron (e.g. `0 1 * * *`).
+* `cron` - (Required, string) The cron (e.g. `0 1 * * *`).
 
 * `cron_timezone` - (Optional, string) The timezone.
 

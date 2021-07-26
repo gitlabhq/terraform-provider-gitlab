@@ -15,7 +15,7 @@ func init() {
 	if os.Getenv(resource.TestEnvVar) != "" {
 		testAccProvider = Provider().(*schema.Provider)
 		if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
-			panic(err)
+			panic(err) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
 		}
 		testAccProviders = map[string]terraform.ResourceProvider{
 			"gitlab": testAccProvider,

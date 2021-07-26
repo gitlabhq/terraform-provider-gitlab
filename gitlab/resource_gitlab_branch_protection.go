@@ -76,6 +76,10 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"branch_protection_id": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 		},
 	}
 }
@@ -159,9 +163,11 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 		}
 	}
 
+	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("allowed_to_push", convertAllowedToToBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
 		return fmt.Errorf("error setting allowed_to_push: %v", err)
 	}
+	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("allowed_to_merge", convertAllowedToToBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return fmt.Errorf("error setting allowed_to_merge: %v", err)
 	}
@@ -169,6 +175,8 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
 		return fmt.Errorf("error setting code_owner_approval_required: %v", err)
 	}
+
+	d.Set("branch_protection_id", pb.ID)
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 

@@ -30,4 +30,4 @@ The following arguments are supported:
 
 * `key` - (Required, string) Name of the variable.
 
-* `value` - (Required, string) 	Value of the variable.
+* `value` - (Required, string) Value of the variable.

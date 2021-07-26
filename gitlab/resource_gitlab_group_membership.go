@@ -151,7 +151,7 @@ func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember
 	d.Set("group_id", groupId)
 	d.Set("user_id", groupMember.ID)
 	d.Set("access_level", accessLevel[groupMember.AccessLevel])
-	d.Set("expires_at", groupMember.ExpiresAt)
+	d.Set("expires_at", groupMember.ExpiresAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
 
 	userId := strconv.Itoa(groupMember.ID)
 	d.SetId(buildTwoPartID(groupId, &userId))

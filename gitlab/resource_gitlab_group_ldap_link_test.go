@@ -37,7 +37,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("developer"),
+						accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 					})),
 			},
 
@@ -48,7 +48,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("maintainer"),
+						accessLevel: fmt.Sprintf("maintainer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 					})),
 			},
 
@@ -59,7 +59,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("developer"),
+						accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 					})),
 			},
 		},
@@ -160,9 +160,9 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 	if err != nil {
 		// The read/GET API wasn't implemented in GitLab until version 12.8 (March 2020, well after the add and delete APIs).
 		// If we 404, assume GitLab is at an older version and take things on faith.
-		switch err.(type) {
+		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
-			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 {
+			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 { // nolint // TODO: Resolve this golangci-lint issue: S1034(related information): could eliminate this type assertion (gosimple)
 				// Do nothing
 			} else {
 				return err
@@ -186,7 +186,7 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 		}
 
 		if !found {
-			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", desiredLdapLinkId))
+			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", desiredLdapLinkId)) // nolint // TODO: Resolve this golangci-lint issue: S1028: should use fmt.Errorf(...) instead of errors.New(fmt.Sprintf(...)) (gosimple)
 		}
 	} else {
 		*ldapLink = desiredLdapLink
