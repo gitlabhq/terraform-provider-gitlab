@@ -67,13 +67,19 @@ func (c *Config) Client() (*gitlab.Client, error) {
 		opts = append(opts, gitlab.WithBaseURL(c.BaseURL))
 	}
 
+	return getGitlabClient(c, opts)
+}
+
+func getGitlabClient(c *Config, opts []gitlab.ClientOptionFunc) (*gitlab.Client, error) {
 	client, err := gitlab.NewClient(c.Token, opts...)
+	// Test the credentials by checking we can get information about the authenticated user.
+	_, _, err = client.Users.CurrentUser()
+	if err != nil {
+		client, err = gitlab.NewOAuthClient(c.Token, opts...)
+		_, _, err = client.Users.CurrentUser()
+	}
 	if err != nil {
 		return nil, err
 	}
-
-	// Test the credentials by checking we can get information about the authenticated user.
-	_, _, err = client.Users.CurrentUser()
-
 	return client, err
 }
