@@ -112,7 +112,7 @@ var descriptions map[string]string
 
 func init() {
 	descriptions = map[string]string{
-		"token": "The OAuth token used to connect to GitLab.",
+		"token": "The OAuth2 token or project/personal access token used to connect to GitLab.",
 
 		"base_url": "The GitLab Base API URL",
 
