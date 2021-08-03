@@ -1,3 +1,31 @@
+## 3.7.0 (July 20, 2021)
+
+FEATURES:
+
+* Add protected_branch_ids to gitlab_project_approval_rule #542
+* Add most Premium features for gitlab_branch_protection #556
+* Adds support for gitlab project badges #648
+
+ENHANCEMENTS:
+
+* Add CustomCIPath to resource gitlab_project #662
+* add build coverage regex #627
+* Add tfproviderlint linter to CI #653
+* Documentation improvements #642
+* chore: add error handling to resourceGitlabProjectSetToState #649
+* Missing documentation for gitlab_instance_variable #602
+* Add support for importing Pipeline Schedules and Triggers #618
+* update reference to master branch to main #612
+
+BUGFIXES:
+
+* Fix project approval rule tests #660
+* Fix markdown linter errors in branch_protection.md #656
+* fix: update default branch name to "main" #643
+* gitlab_project: Wait for template projects to be cloned/imported #621
+
+
+
 ## 3.6.0 (Apr 6, 2021)
 
 ENHANCEMENTS:
