@@ -1,6 +1,6 @@
 TEST?=./gitlab
 SERVICE?=gitlab-ce
-GITLAB_TOKEN?=ACCTEST
+GITLAB_TOKEN?=ACCTEST1234567890123
 GITLAB_BASE_URL?=http://127.0.0.1:8080/api/v4
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 
