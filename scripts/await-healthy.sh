@@ -11,5 +11,5 @@ echo
 echo 'GitLab is healthy'
 
 # Print the version, since it is useful debugging information.
-curl --silent --show-error --header 'PRIVATE-TOKEN: ACCTEST' http://127.0.0.1:8080/api/v4/version
+curl --silent --show-error --header 'Authorization: Bearer ACCTEST1234567890123' http://127.0.0.1:8080/api/v4/version
 echo

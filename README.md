@@ -106,7 +106,7 @@ $ make testacc GITLAB_TOKEN=example123 GITLAB_BASE_URL=https://example.com/api/v
   Then run the desired Go test as you would normally from your IDE, but configure your run configuration to set these environment variables:
 
   ```
-  GITLAB_TOKEN=ACCTEST
+  GITLAB_TOKEN=ACCTEST1234567890123
   GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4
   TF_ACC=1
   ```
