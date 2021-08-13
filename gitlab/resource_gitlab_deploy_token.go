@@ -55,8 +55,16 @@ func resourceGitlabDeployToken() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.StringInSlice([]string{"read_registry", "read_repository"}, false),
+					Type: schema.TypeString,
+					ValidateFunc: validation.StringInSlice(
+						[]string{
+							"read_registry",
+							"read_repository",
+							"read_package_registry",
+							"write_repository",
+							"write_registry",
+							"write_package_registry",
+						}, false),
 				},
 			},
 
@@ -169,12 +177,19 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 			}
 
 			for _, scope := range token.Scopes {
-				if scope == "read_repository" {
+				switch scope {
+				case "read_repository":
 					d.Set("scopes.read_repository", true)
-				}
-
-				if scope == "read_registry" {
+				case "read_registry":
 					d.Set("scopes.read_registry", true)
+				case "read_package_registry":
+					d.Set("scopes.read_package_registry", true)
+				case "write_repository":
+					d.Set("scopes.write_repository", true)
+				case "write_registry":
+					d.Set("scopes.write_registry", true)
+				case "write_package_registry":
+					d.Set("scopes.write_package_registry", true)
 				}
 			}
 		}
