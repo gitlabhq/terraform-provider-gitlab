@@ -157,6 +157,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeBool,
 		Optional: true,
 	},
+	"squash_option": {
+		Type:          schema.TypeString,
+		Optional:      true,
+	},
 	"remove_source_branch_after_merge": {
 		Type:     schema.TypeBool,
 		Optional: true,
@@ -387,6 +391,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("initialize_with_readme"); ok {
 		options.InitializeWithReadme = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("squash_option"); ok {
+		options.SquashOption = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("import_url"); ok {
