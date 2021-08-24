@@ -42,11 +42,7 @@ func resourceGitlabProjectAccessToken() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				ValidateFunc: func(i interface{}, k string) (warnings []string, errors []error) {
-					v, ok := i.(string)
-					if !ok {
-						errors = append(errors, fmt.Errorf("expected type of %q to be string", k))
-						return warnings, errors
-					}
+					v := i.(string)
 
 					if _, err := time.Parse("2006-01-02", v); err != nil {
 						errors = append(errors, fmt.Errorf("expected %q to be a valid YYYY-MM-DD date, got %q: %+v", k, i, err))
@@ -89,7 +85,7 @@ func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interfa
 		Scopes: *stringSetToStringSlice(d.Get("scopes").(*schema.Set)),
 	}
 
-	log.Printf("[DEBUG] create gitlab ProjectAccessToken %s %s", *options.Name, options.Scopes)
+	log.Printf("[DEBUG] create gitlab ProjectAccessToken %s %s for project ID %d", *options.Name, options.Scopes, project)
 
 	if v, ok := d.GetOk("expires_at"); ok {
 		parsedExpiresAt, err := time.Parse("2006-01-02", v.(string))
@@ -98,13 +94,15 @@ func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interfa
 		}
 		parsedExpiresAtISOTime := gitlab.ISOTime(parsedExpiresAt)
 		options.ExpiresAt = &parsedExpiresAtISOTime
-		log.Printf("[DEBUG] create gitlab ProjectAccessToken with expires_at %s", *options.ExpiresAt)
+		log.Printf("[DEBUG] create gitlab ProjectAccessToken %s with expires_at %s for project ID %d", *options.Name, *options.ExpiresAt, project)
 	}
 
 	projectAccessToken, _, err := client.ProjectAccessTokens.CreateProjectAccessToken(project, options)
 	if err != nil {
 		return err
 	}
+
+	log.Printf("[DEBUG] created gitlab ProjectAccessToken %d - %s for project ID %d", projectAccessToken.ID, *options.Name, project)
 
 	d.SetId(strconv.Itoa(projectAccessToken.ID))
 	d.Set("token", projectAccessToken.Token)

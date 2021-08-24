@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -72,8 +73,35 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 					}),
 				),
 			},
+			//Destroy Project Access Token
+			{
+				Config: testAccGitlabProjectAccessTokenDestroyToken(rInt),
+				Check:  testAccCheckGitlabProjectAccessTokenDoesNotExist(&pat),
+			},
 		},
 	})
+}
+
+func testAccCheckGitlabProjectAccessTokenDoesNotExist(pat *testAccGitlabProjectAccessTokenWrapper) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := testAccProvider.Meta().(*gitlab.Client)
+
+		//Unfortunately we need to wait a bit, since the API call doesn't wait to destroy the PAT and returns immediately
+		time.Sleep(3 * time.Second) // lintignore: R018 // TODO: Resolve this tfproviderlint issue
+
+		tokens, _, err := conn.ProjectAccessTokens.ListProjectAccessTokens(pat.project, nil)
+		if err != nil {
+			return err
+		}
+
+		for _, token := range tokens {
+			if token.ID == pat.pat.ID {
+				return fmt.Errorf("Found token %d for project %s (tokens found: %d)", token.ID, pat.project, len(tokens))
+			}
+		}
+
+		return nil
+	}
 }
 
 func testAccCheckGitlabProjectAccessTokenExists(n string, pat *testAccGitlabProjectAccessTokenWrapper) resource.TestCheckFunc {
@@ -103,7 +131,7 @@ func testAccCheckGitlabProjectAccessTokenExists(n string, pat *testAccGitlabProj
 				return nil
 			}
 		}
-		return fmt.Errorf("Project Acces Token does not exist")
+		return fmt.Errorf("Project Access Token does not exist")
 	}
 }
 
@@ -195,6 +223,19 @@ resource "gitlab_project_access_token" "bar" {
   project = gitlab_project.foo.id
   expires_at = "2022-04-01"
   scopes = ["read_repository" , "api", "write_repository", "read_api"]
+}
+	`, rInt)
+}
+
+func testAccGitlabProjectAccessTokenDestroyToken(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt)
 }
