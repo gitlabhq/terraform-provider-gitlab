@@ -145,6 +145,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"public_builds":                         project.PublicBuilds,
 				"only_allow_merge_if_pipeline_succeeds": project.OnlyAllowMergeIfPipelineSucceeds,
 				"only_allow_merge_if_all_discussions_are_resolved": project.OnlyAllowMergeIfAllDiscussionsAreResolved,
+				"allow_merge_on_skipped_pipeline":     project.AllowMergeOnSkippedPipeline,
 				"lfs_enabled":                         project.LFSEnabled,
 				"request_access_enabled":              project.RequestAccessEnabled,
 				"merge_method":                        project.MergeMethod,
@@ -538,6 +539,10 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed: true,
 						},
 						"only_allow_merge_if_all_discussions_are_resolved": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"allow_merge_on_skipped_pipeline": {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
