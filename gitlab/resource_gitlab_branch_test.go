@@ -140,7 +140,7 @@ func testAccGitlabBranchConfig(rInt int) string {
 	}
 	resource "gitlab_branch" "foo" {
 		name = "testbranch-%d"
-		ref = "master"
+		ref = "main"
 		project = gitlab_project.test.id
 	}
 	resource "gitlab_branch" "foo2" {

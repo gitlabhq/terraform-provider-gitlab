@@ -79,7 +79,7 @@ func testAccDataGitlabBranchSetup(rInt int) string {
 	}
 	resource "gitlab_branch" "foo" {
 		name = "testbranch-%d"
-		ref = "master"
+		ref = "main"
 		project = gitlab_project.test.id
 	}
   `, rInt, rInt)
