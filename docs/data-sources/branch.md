@@ -1,9 +1,8 @@
 # gitlab\_branch
 
-Provides details about a specific branch in the gitlab provider. 
+Provides details about a specific branch in the gitlab provider.
 
 ## Example Usage
-
 
 **Branch name and url encoded project path**
 ```hcl
