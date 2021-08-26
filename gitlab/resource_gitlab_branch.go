@@ -25,8 +25,8 @@ func resourceGitlabBranch() *schema.Resource {
 			"ref": {
 				Type:     schema.TypeString,
 				ForceNew: true,
-				Optional: true,
-				Default:  "master",
+				Required: true,
+				Default:  "main",
 			},
 			"web_url": {
 				Type:     schema.TypeString,
@@ -47,7 +47,6 @@ func resourceGitlabBranch() *schema.Resource {
 			"commit": {
 				Type:     schema.TypeMap,
 				Computed: true,
-				MaxItems: 1,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
