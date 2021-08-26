@@ -20,7 +20,7 @@ The following arguments are supported:
 
 * `project` - (Required) The full path of the group.
 
-* `ref` - (Optional) The ref you branch from. Defaults to `main`
+* `ref` - (Required) The ref you branch from.
 
 ## Attributes Reference
 
@@ -42,4 +42,3 @@ The resource exports the following attributes:
   * `title` - The title of the commit
   * `message` - The commit message
   * `parent_ids` - The id of the parents of the commit
-  
