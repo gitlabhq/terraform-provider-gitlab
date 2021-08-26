@@ -64,7 +64,7 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 		conn := testAccProvider.Meta().(*gitlab.Client)
 		branch, resp, err := conn.Branches.GetBranch(project, name)
 		if err == nil {
-			if branch != nil && fmt.Sprintf("%s", branch.Name) == name {
+			if branch != nil && branch.Name == name {
 				return fmt.Errorf("Branch still exists")
 			}
 		}
