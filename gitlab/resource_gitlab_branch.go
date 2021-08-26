@@ -45,7 +45,7 @@ func resourceGitlabBranch() *schema.Resource {
 				Computed: true,
 			},
 			"commit": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeMap,
 				Computed: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
@@ -57,47 +57,38 @@ func resourceGitlabBranch() *schema.Resource {
 						"author_email": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"author_name": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"authored_date": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"committed_date": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"committer_email": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"committer_name": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"short_id": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"title": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 						"message": {
 							Type:     schema.TypeString,
 							Computed: true,
-							Optional: true,
 						},
 					},
 				},
