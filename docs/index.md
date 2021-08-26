@@ -57,8 +57,8 @@ resource "gitlab_project" "sample_group_project" {
 
 The following arguments are supported in the `provider` block:
 
-* `token` - (Optional) This is the GitLab personal access token. It must be provided, but
-  it can also be sourced from the `GITLAB_TOKEN` environment variable.
+* `token` - (Required) The OAuth2 token or project/personal access token used to connect to GitLab.
+  It must be provided, but it can also be sourced from the `GITLAB_TOKEN` environment variable.
 
 * `base_url` - (Optional) This is the target GitLab base API endpoint. Providing a value is a
   requirement when working with GitLab CE or GitLab Enterprise e.g. `https://my.gitlab.server/api/v4/`.

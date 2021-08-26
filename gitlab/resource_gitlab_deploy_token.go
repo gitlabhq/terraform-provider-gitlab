@@ -13,6 +13,7 @@ import (
 )
 
 func resourceGitlabDeployToken() *schema.Resource {
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabDeployTokenCreate,
 		Read:   resourceGitlabDeployTokenRead,
@@ -164,7 +165,7 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 			d.Set("username", token.Username)
 
 			if token.ExpiresAt != nil {
-				d.Set("expires_at", token.ExpiresAt)
+				d.Set("expires_at", token.ExpiresAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
 			}
 
 			for _, scope := range token.Scopes {

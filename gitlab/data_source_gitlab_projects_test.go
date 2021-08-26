@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
+// lintignore: AT003 // TODO: Resolve this tfproviderlint issue
 func TestAccDataGitlabProjectsSearch(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
@@ -50,6 +51,7 @@ func TestAccDataGitlabProjectsSearch(t *testing.T) {
 	})
 }
 
+// lintignore: AT003 // TODO: Resolve this tfproviderlint issue
 func TestAccDataGitlabProjectsGroups(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 	groupName := fmt.Sprintf("tf-%s", acctest.RandString(5))
@@ -135,7 +137,7 @@ func testAccDataSourceGitlabProjects(src string, n string) resource.TestCheckFun
 
 		var errorMessageExpected strings.Builder
 		for _, attr := range testAttributes {
-			errorMessageExpected.WriteString(fmt.Sprintf("%s=%v, ", attr, projectResource[fmt.Sprintf("%s", attr)]))
+			errorMessageExpected.WriteString(fmt.Sprintf("%s=%v, ", attr, projectResource[fmt.Sprintf("%s", attr)])) // nolint // TODO: Resolve this golangci-lint issue: S1025: the argument is already a string, there's no need to use fmt.Sprintf (gosimple)
 		}
 
 		var errorMessageGot strings.Builder

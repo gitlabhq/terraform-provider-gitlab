@@ -54,6 +54,49 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
+func TestAccGitlabPipelineTrigger_import(t *testing.T) {
+	rInt := acctest.RandInt()
+	resourceName := "gitlab_pipeline_trigger.trigger"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabPipelineTriggerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabPipelineTriggerConfig(rInt),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateIdFunc: getPipelineTriggerImportID(resourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func getPipelineTriggerImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
+		}
+
+		pipelineTriggerID := rs.Primary.ID
+		if pipelineTriggerID == "" {
+			return "", fmt.Errorf("No pipeline trigger ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("No project ID is set")
+		}
+
+		return fmt.Sprintf("%s:%s", projectID, pipelineTriggerID), nil
+	}
+}
+
 func testAccCheckGitlabPipelineTriggerExists(n string, trigger *gitlab.PipelineTrigger) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

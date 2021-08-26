@@ -1,6 +1,6 @@
 TEST?=./gitlab
 SERVICE?=gitlab-ce
-GITLAB_TOKEN?=ACCTEST
+GITLAB_TOKEN?=ACCTEST1234567890123
 GITLAB_BASE_URL?=http://127.0.0.1:8080/api/v4
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 
@@ -10,10 +10,10 @@ endif
 
 default: build
 
-build: fmtcheck
+build:
 	go install
 
-test: fmtcheck
+test:
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
@@ -25,7 +25,7 @@ testacc-up:
 testacc-down:
 	docker-compose down
 
-testacc: fmtcheck
+testacc:
 	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(TEST) $(TESTARGS) -timeout 40m
 
 vet:
@@ -40,10 +40,9 @@ vet:
 fmt:
 	gofmt -w $(GOFMT_FILES)
 
-fmtcheck:
-	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
+tfproviderlint:
+	go run github.com/bflad/tfproviderlint/cmd/tfproviderlintx \
+	-XAT001=false -XR003=false -XR005=false -XS001=false -XS002=false \
+	./...
 
-errcheck:
-	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
-
-.PHONY: default build test testacc-up testacc-down testacc vet fmt fmtcheck errcheck
+.PHONY: default build test testacc-up testacc-down testacc vet fmt tfproviderlint

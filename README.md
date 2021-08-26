@@ -14,7 +14,7 @@ Terraform Provider for Gitlab
 Requirements
 ------------
 
--	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
+-	[Terraform](https://www.terraform.io/downloads.html) >= 0.12.x
 -	[Go](https://golang.org/doc/install) >= 1.14 (to build the provider plugin)
 
 ## Developing The Provider
@@ -106,7 +106,7 @@ $ make testacc GITLAB_TOKEN=example123 GITLAB_BASE_URL=https://example.com/api/v
   Then run the desired Go test as you would normally from your IDE, but configure your run configuration to set these environment variables:
 
   ```
-  GITLAB_TOKEN=ACCTEST
+  GITLAB_TOKEN=ACCTEST1234567890123
   GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4
   TF_ACC=1
   ```

@@ -123,7 +123,7 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 
-	d.Set("members", flattenGitlabMembers(d, gm))
+	d.Set("members", flattenGitlabMembers(d, gm)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 
 	var optionsHash strings.Builder
 	optionsHash.WriteString(strconv.Itoa(group.ID))

@@ -99,6 +99,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_instance_variable":          resourceGitlabInstanceVariable(),
 			"gitlab_project_freeze_period":      resourceGitlabProjectFreezePeriod(),
 			"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
+			"gitlab_project_badge":              resourceGitlabProjectBadge(),
 		},
 	}
 
@@ -113,7 +114,7 @@ var descriptions map[string]string
 
 func init() {
 	descriptions = map[string]string{
-		"token": "The OAuth token used to connect to GitLab.",
+		"token": "The OAuth2 token or project/personal access token used to connect to GitLab.",
 
 		"base_url": "The GitLab Base API URL",
 
@@ -144,7 +145,7 @@ func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{},
 
 	// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
 	// After upgrading the SDK to v2 replace with p.UserAgent("terraform-provider-gitlab")
-	client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab"
+	client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab" // nolint // TODO: Resolve this golangci-lint issue: SA1019: httpclient.TerraformUserAgent is deprecated: This will be removed in v2 without replacement. If you need its functionality, you can copy it or reference the v1 package. (staticcheck)
 
 	return client, err
 }

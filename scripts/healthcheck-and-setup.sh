@@ -24,7 +24,7 @@ test -f $done || {
     printf 'user_id: 1, '
     printf 'scopes: [:api, :read_user], '
     printf 'name: :terraform);'
-    printf "terraform_token.set_token('ACCTEST');"
+    printf "terraform_token.set_token('ACCTEST1234567890123');"
     printf 'terraform_token.save!;'
   ) | gitlab-rails console
 

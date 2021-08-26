@@ -154,7 +154,7 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	if userIDOk {
 		// Get user by id
-		user, _, err = client.Users.GetUser(userIDData.(int))
+		user, _, err = client.Users.GetUser(userIDData.(int), gitlab.GetUsersOptions{})
 		if err != nil {
 			return err
 		}
@@ -199,7 +199,7 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("state", user.State)
 	d.Set("external", user.External)
 	d.Set("extern_uid", user.ExternUID)
-	d.Set("created_at", user.CreatedAt)
+	d.Set("created_at", user.CreatedAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
 	d.Set("organization", user.Organization)
 	d.Set("two_factor_enabled", user.TwoFactorEnabled)
 	d.Set("note", user.Note)

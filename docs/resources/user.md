@@ -54,10 +54,12 @@ The resource exports the following attributes:
 
 * `id` - The unique id assigned to the user by the GitLab server.
 
-## Importing users
+## Import
 
 You can import a user to terraform state using `terraform import <resource> <id>`.
 The `id` must be an integer for the id of the user you want to import,
 for example:
 
-    terraform import gitlab_user.example 42
+```shell
+$ terraform import gitlab_user.example 42
+```

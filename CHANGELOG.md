@@ -1,50 +1,92 @@
+## 3.7.0 (July 20, 2021)
+
+FEATURES:
+
+* Add protected_branch_ids to gitlab_project_approval_rule #542
+* Add most Premium features for gitlab_branch_protection #556
+* Adds support for gitlab project badges #648
+
+ENHANCEMENTS:
+
+* Add CustomCIPath to resource gitlab_project #662
+* add build coverage regex #627
+* Add tfproviderlint linter to CI #653
+* Documentation improvements #642
+* chore: add error handling to resourceGitlabProjectSetToState #649
+* Missing documentation for gitlab_instance_variable #602
+* Add support for importing Pipeline Schedules and Triggers #618
+* update reference to master branch to main #612
+
+BUGFIXES:
+
+* Fix project approval rule tests #660
+* Fix markdown linter errors in branch_protection.md #656
+* fix: update default branch name to "main" #643
+* gitlab_project: Wait for template projects to be cloned/imported #621
+
+
+
+## 3.6.0 (Apr 6, 2021)
+
+ENHANCEMENTS:
+
+* Support the Note field in the User resource/data ([#572](https://github.com/gitlabhq/terraform-provider-gitlab/pull/572))
+* add diffSuppressFunc for 'expires_at' attribute in 'deploy_token' ([#575](https://github.com/gitlabhq/terraform-provider-gitlab/pull/575))
+* Update to Go 1.16 and terraform-plugin-sdk 1.16 ([#579](https://github.com/gitlabhq/terraform-provider-gitlab/pull/579))
+* Bump github.com/xanzy/go-gitlab from 0.44.0 to 0.46.0 ([#586](https://github.com/gitlabhq/terraform-provider-gitlab/pull/586))
+
+BUG FIXES:
+
+* Fix "Run failed" on forks ([#565](https://github.com/gitlabhq/terraform-provider-gitlab/pull/565))
+
+
 ## 3.5.0 (Feb 18, 2021)
 
 FEATURES:
 
-* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#516 ))  
+* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/516 ))  
 
 ENHANCEMENTS:
 
-* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#523)) 
-* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#525)) 
-* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#527)) 
-* gitlab_project: Check each push rule individually ([#531](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#531))
-* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#532)) 
-* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#535)) 
-* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#539)) 
-* Increase gitlab_project import timeout ([#536](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#536))
-* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#554)) 
-* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#546)) 
-* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#558)) 
-* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#564)) 
-* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#568)) 
+* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/523)) 
+* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/525)) 
+* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/527)) 
+* gitlab_project: Check each push rule individually ([#531](https://github.com/gitlabhq/terraform-provider-gitlab/pull/531))
+* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/532)) 
+* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/535)) 
+* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/539)) 
+* Increase gitlab_project import timeout ([#536](https://github.com/gitlabhq/terraform-provider-gitlab/pull/536))
+* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/554)) 
+* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/546)) 
+* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/558)) 
+* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/564)) 
+* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/568)) 
 
 BUG FIXES:
 
-* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#510)) 
-* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#555)) 
+* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/510)) 
+* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/555)) 
 
 ## 3.4.0 (Jan 14, 2021)
 
 FEATURES:
 
-* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#511)) 
-* Support Project Mirroring ([#512](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#512))
+* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/511)) 
+* Support Project Mirroring ([#512](https://github.com/gitlabhq/terraform-provider-gitlab/pull/512))
 
 ## 3.3.0 (Nov 30, 2020)
 
 FEATURES:
 
-* Support instance level CI variables ([#389](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#389))
+* Support instance level CI variables ([#389](https://github.com/gitlabhq/terraform-provider-gitlab/pull/389))
 
 ENHANCEMENTS
 
-*  Add the pages_access_level parameter ([#472](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#472))
-*  Do not fail when project member does not exist ([#473](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#473))
-* Make the runners_token on the project secret ([#474](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#474))
-*  Fix nil pointer dereference importing gitlab_user ([#490](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#490))
-* Fix unit and acceptance tests not running ([#495](https://github.com/gitlabhq/terraform-provider-gitlab/pull/#495))
+*  Add the pages_access_level parameter ([#472](https://github.com/gitlabhq/terraform-provider-gitlab/pull/472))
+*  Do not fail when project member does not exist ([#473](https://github.com/gitlabhq/terraform-provider-gitlab/pull/473))
+* Make the runners_token on the project secret ([#474](https://github.com/gitlabhq/terraform-provider-gitlab/pull/474))
+*  Fix nil pointer dereference importing gitlab_user ([#490](https://github.com/gitlabhq/terraform-provider-gitlab/pull/490))
+* Fix unit and acceptance tests not running ([#495](https://github.com/gitlabhq/terraform-provider-gitlab/pull/495))
 
 ## 3.2.0 (Nov 20, 2020)
 

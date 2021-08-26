@@ -98,6 +98,7 @@ func TestAccGitlabGroupCluster_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabGroupCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 

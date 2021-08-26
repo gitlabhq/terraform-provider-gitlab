@@ -24,7 +24,7 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
-					accessLevel: fmt.Sprintf("developer"),
+					accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 				})),
 			},
 
@@ -32,8 +32,8 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupMembershipUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
-					accessLevel: fmt.Sprintf("guest"),
-					expiresAt:   fmt.Sprintf("2099-01-01"),
+					accessLevel: fmt.Sprintf("guest"),      // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
+					expiresAt:   fmt.Sprintf("2099-01-01"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 				})),
 			},
 
@@ -41,7 +41,7 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.foo", &groupMember), testAccCheckGitlabGroupMembershipAttributes(&groupMember, &testAccGitlabGroupMembershipExpectedAttributes{
-					accessLevel: fmt.Sprintf("developer"),
+					accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 				})),
 			},
 		},
@@ -108,7 +108,7 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 		userIdString := rs.Primary.Attributes["user_id"]
 
 		// GetGroupMember needs int type for userIdString
-		userId, err := strconv.Atoi(userIdString)
+		userId, err := strconv.Atoi(userIdString) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
 		groupMember, resp, err := conn.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
 			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["accessLevel"] {
