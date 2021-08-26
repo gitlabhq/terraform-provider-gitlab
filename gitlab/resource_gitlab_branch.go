@@ -26,7 +26,6 @@ func resourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
-				Default:  "main",
 			},
 			"web_url": {
 				Type:     schema.TypeString,
