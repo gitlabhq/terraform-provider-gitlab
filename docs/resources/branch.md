@@ -42,3 +42,4 @@ The resource exports the following attributes:
   * `title` - The title of the commit
   * `message` - The commit message
   * `parent_ids` - The id of the parents of the commit
+  
