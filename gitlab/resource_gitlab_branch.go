@@ -154,18 +154,16 @@ func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error 
 	return err
 }
 
-func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
+func flattenCommit(commit *gitlab.Commit) (values map[string]interface{}) {
 	if commit == nil {
-		return []map[string]interface{}{}
+		return map[string]interface{}{}
 	}
 
-	return []map[string]interface{}{
-		{
-			"id":          commit.ID,
-			"short_id":    commit.ShortID,
-			"title":       commit.Title,
-			"author_name": commit.AuthorName,
-			"message":     commit.Message,
-		},
+	return map[string]interface{}{
+		"id":          commit.ID,
+		"short_id":    commit.ShortID,
+		"title":       commit.Title,
+		"author_name": commit.AuthorName,
+		"message":     commit.Message,
 	}
 }
