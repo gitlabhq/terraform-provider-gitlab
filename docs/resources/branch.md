@@ -20,7 +20,7 @@ The following arguments are supported:
 
 * `project` - (Required) The full path of the group.
 
-* `ref` - (Optional) The ref you branch from. Defaults to `master`
+* `ref` - (Optional) The ref you branch from. Defaults to `main`
 
 ## Attributes Reference
 
