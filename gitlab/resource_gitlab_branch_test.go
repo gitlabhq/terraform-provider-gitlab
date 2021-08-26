@@ -82,7 +82,7 @@ func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want
 			return errors.New("got empty web url")
 		}
 		projectID := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
-		if s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID != fmt.Sprintf("%s-%s", projectID, want.Name) {
+		if s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID != fmt.Sprintf("%s:%s", projectID, want.Name) {
 			return fmt.Errorf("Got ID: %s expected: %s-%s", s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID, projectID, want.Name)
 		}
 		if want.Commit {

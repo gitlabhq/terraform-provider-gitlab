@@ -38,7 +38,8 @@ func dataSourceGitlabBranch() *schema.Resource {
 			"commit": {
 				Type:     schema.TypeMap,
 				Computed: true,
-				Elem: map[string]*schema.Schema{
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
 						"id": {
 							Type:     schema.TypeString,
 							Computed: true,
