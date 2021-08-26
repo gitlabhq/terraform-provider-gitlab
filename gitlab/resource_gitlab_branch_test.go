@@ -51,7 +51,7 @@ func testAccCheckGitlabBranchCommit(n string) resource.TestCheckFunc {
 		if commit == "" {
 			return errors.New("expected commit")
 		}
-		return nil
+		return errors.New(commit)
 	}
 }
 
