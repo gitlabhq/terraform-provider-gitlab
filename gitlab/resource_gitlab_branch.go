@@ -11,6 +11,9 @@ func resourceGitlabBranch() *schema.Resource {
 		Create: resourceGitlabBranchCreate,
 		Read:   resourceGitlabBranchRead,
 		Delete: resourceGitlabBranchDelete,
+		Importer: &schema.ResourceImporter{
+			State: schema.ImportStatePassthrough,
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
