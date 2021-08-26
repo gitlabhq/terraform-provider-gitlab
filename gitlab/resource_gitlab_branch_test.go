@@ -37,10 +37,22 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 						Commit:  true,
 					}),
 					testAccCheckGitlabBranchRef("foo2", fooBranchName),
+					testAccCheckGitlabBranchCommit("foo2"),
 				),
 			},
 		},
 	})
+}
+
+func testAccCheckGitlabBranchCommit(n string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs := s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)]
+		commit := rs.Primary.Attributes["commit"]
+		if commit == "" {
+			return errors.New("expected commit")
+		}
+		return nil
+	}
 }
 
 func testAccCheckGitlabBranchRef(n, expectedRef string) resource.TestCheckFunc {
