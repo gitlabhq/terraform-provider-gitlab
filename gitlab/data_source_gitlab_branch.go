@@ -115,7 +115,8 @@ func dataSourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
 		return err
 	}
-	d.SetId(fmt.Sprintf("%s-%s", project, name))
+	
+	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
 	d.Set("project", project)
 	d.Set("web_url", branch.WebURL)
