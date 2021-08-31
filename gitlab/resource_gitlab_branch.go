@@ -49,50 +49,57 @@ func resourceGitlabBranch() *schema.Resource {
 			"commit": {
 				Type:     schema.TypeMap,
 				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString}}, // Schema: map[string]*schema.Schema{
-			// 	"id": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"author_email": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"author_name": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"authored_date": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"committed_date": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"committer_email": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"committer_name": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"short_id": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"title": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// 	"message": {
-			// 		Type:     schema.TypeString,
-			// 		Computed: true,
-			// 	},
-			// },
-
-			// },
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"author_email": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"author_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"authored_date": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"committed_date": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"committer_email": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"committer_name": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"short_id": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"title": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"message": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"parent_ids": {
+							Type:     schema.TypeSet,
+							Computed: true,
+							Elem:     &schema.Schema{Type: schema.TypeString},
+							Set:      schema.HashString,
+						},
+					},
+				},
+			},
 		},
 	}
 }
