@@ -47,11 +47,11 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 func testAccCheckGitlabBranchCommit(n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs := s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)]
-		commit := rs.Primary.Attributes["commit.id"]
-		if commit == "" {
-			return fmt.Errorf("expected commit to be populated")
-		}
-		return nil
+		commit := rs.Primary.Attributes["commit"]
+		// if commit == "" {
+		// 	return fmt.Errorf("expected commit to be populated")
+		// }
+		return fmt.Errorf("%+v", commit)
 	}
 }
 
