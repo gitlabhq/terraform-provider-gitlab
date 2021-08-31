@@ -50,7 +50,7 @@ func testAccCheckGitlabBranchCommit(n string) resource.TestCheckFunc {
 		attributes := rs.Primary.Attributes
 		commit := attributes["commit"]
 		if commit == "" {
-			return fmt.Errorf("expected commit %+v", attributes)
+			return fmt.Errorf("expected commit %+v, \n %+v", attributes, commit)
 		}
 		return errors.New(commit)
 	}
