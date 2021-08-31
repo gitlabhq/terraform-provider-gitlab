@@ -39,7 +39,7 @@ func dataSourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      schema.HashResource(commitSchema),
-				Elem: commitSchema,
+				Elem:     commitSchema,
 			},
 		},
 	}
