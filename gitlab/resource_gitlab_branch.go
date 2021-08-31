@@ -49,59 +49,62 @@ func resourceGitlabBranch() *schema.Resource {
 			"commit": {
 				Type:     schema.TypeSet,
 				Computed: true,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"author_email": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"author_name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"authored_date": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"committed_date": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"committer_email": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"committer_name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"short_id": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"title": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"message": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"parent_ids": {
-							Type:     schema.TypeSet,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
-							Set:      schema.HashString,
-						},
-					},
-				},
+				Set:      schema.HashResource(commitSchema),
+				Elem: commitSchema,
 			},
 		},
 	}
+}
+
+var commitSchema = &schema.Resource{
+	Schema: map[string]*schema.Schema{
+		"id": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"author_email": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"author_name": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"authored_date": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"committed_date": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"committer_email": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"committer_name": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"short_id": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"title": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"message": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"parent_ids": {
+			Type:     schema.TypeSet,
+			Computed: true,
+			Elem:     &schema.Schema{Type: schema.TypeString},
+			Set:      schema.HashString,
+		},
+	},
 }
 
 func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error {
@@ -170,7 +173,6 @@ func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
 	if commit == nil {
 		return []map[string]interface{}{}
 	}
-
 	return []map[string]interface{}{
 		{
 			"id":          commit.ID,
