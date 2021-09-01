@@ -122,12 +122,13 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
 		return err
 	}
+	d.SetId(buildTwoPartID(&project, &name))
 	return resourceGitlabBranchRead(d, meta)
 }
 
 func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project, name, err := projectAndBranchFromID(d.Id())
+	project, name, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return err
 	}
