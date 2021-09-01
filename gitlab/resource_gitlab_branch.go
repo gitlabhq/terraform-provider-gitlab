@@ -127,8 +127,11 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 
 func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	name := d.Get("name").(string)
-	project := d.Get("project").(string)
+	project, name, err := projectAndBranchFromID(d.Id())
+	if err != nil {
+		return err
+	}
+
 	ref := d.Get("ref").(string)
 	log.Printf("[DEBUG] read gitlab branch %s", name)
 	branch, resp, err := client.Branches.GetBranch(project, name)
