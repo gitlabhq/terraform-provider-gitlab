@@ -6,10 +6,6 @@ import (
 	"log"
 )
 
-func ImportBranch(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	return []*schema.ResourceData{d}, nil
-}
-
 func resourceGitlabBranch() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabBranchCreate,
