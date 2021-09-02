@@ -146,6 +146,9 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	ref := d.Get("ref").(string)
+	if ref == "" {
+		ref = "main"
+	}
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
 	d.Set("project", project)
