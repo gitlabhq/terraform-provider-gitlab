@@ -6,16 +6,6 @@ import (
 	"log"
 )
 
-func resourceGitlabBranchStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	_, _, err := parseTwoPartID(d.Id())
-	if err != nil {
-		return nil, err
-	}
-	ref := d.Get("ref").(string)
-	d.Set("ref", ref)
-	return []*schema.ResourceData{d}, nil
-}
-
 func ImportBranch(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 	return []*schema.ResourceData{d}, nil
 }
