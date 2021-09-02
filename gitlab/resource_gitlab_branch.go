@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 	"log"
