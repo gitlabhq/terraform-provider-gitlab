@@ -26,7 +26,7 @@ func resourceGitlabBranch() *schema.Resource {
 		Read:   resourceGitlabBranchRead,
 		Delete: resourceGitlabBranchDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabBranchStateImporter,
+			State: schema.ImportStatePassthrough,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -147,7 +147,6 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	ref := d.Get("ref").(string)
 	log.Printf("[DEBUG] read gitlab branch %s", name)
 	branch, resp, err := client.Branches.GetBranch(project, name)
 	if err != nil {
@@ -158,6 +157,11 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 		}
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
 		return err
+	}
+	ref := d.Get("ref").(string)
+	// use ref on last pipeline run when ref is empty (in case of import)
+	if ref == "" {
+		ref = branch.Commit.LastPipeline.Ref
 	}
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
