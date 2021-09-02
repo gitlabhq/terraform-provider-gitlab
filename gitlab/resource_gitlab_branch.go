@@ -147,7 +147,11 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 	ref := d.Get("ref").(string)
 	// use ref on last pipeline run when ref is empty (in case of import)
 	if ref == "" {
-		ref = branch.Commit.LastPipeline.Ref
+		commit, _, err := client.Commits.GetCommit(project, branch.Commit.ID)
+		if err != nil {
+			return err
+		}
+		ref = commit.LastPipeline.Ref
 	}
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
