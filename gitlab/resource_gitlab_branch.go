@@ -28,7 +28,6 @@ func resourceGitlabBranch() *schema.Resource {
 			"ref": {
 				Type:     schema.TypeString,
 				ForceNew: true,
-				Required: true,
 				Default:  "main", // Default value required for import logic -- api does not return consistent value to use for ref
 			},
 			"web_url": {
