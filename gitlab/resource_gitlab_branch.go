@@ -187,11 +187,17 @@ func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
 	}
 	return []map[string]interface{}{
 		{
-			"id":          commit.ID,
-			"short_id":    commit.ShortID,
-			"title":       commit.Title,
-			"author_name": commit.AuthorName,
-			"message":     commit.Message,
+			"id":              commit.ID,
+			"short_id":        commit.ShortID,
+			"title":           commit.Title,
+			"author_name":     commit.AuthorName,
+			"author_email":    commit.AuthorEmail,
+			"authored_date":   commit.AuthoredDate,
+			"committed_date":  commit.CommittedDate,
+			"committer_email": commit.CommitterEmail,
+			"committer_name":  commit.CommitterName,
+			"message":         commit.Message,
+			"parent_ids":      commit.ParentIDs,
 		},
 	}
 }
