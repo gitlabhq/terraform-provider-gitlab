@@ -20,7 +20,7 @@ The following arguments are supported:
 
 * `project` - (Required) The full path of the group.
 
-* `ref` - (Required) The ref you branch from.
+* `ref` - (Optional) The ref you branch from. Defaults to main -- this is required for importing external branches into state safely until refs are added into the api for branches
 
 ## Attributes Reference
 
