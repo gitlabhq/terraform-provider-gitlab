@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 	"log"
@@ -151,7 +152,10 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 		if err != nil {
 			return err
 		}
-		ref = commit.LastPipeline.Ref
+		ref, err = getRefFromCommit(commit)
+		if err != nil {
+			return err
+		}
 	}
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
@@ -200,4 +204,14 @@ func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
 			"parent_ids":      commit.ParentIDs,
 		},
 	}
+}
+
+func getRefFromCommit(commit *gitlab.Commit) (string, error) {
+	if commit == nil {
+		return "", errors.New("[DEBUG] Failed to retrieve commit for branch")
+	}
+	if commit.LastPipeline == nil {
+		return "", errors.New("[DEBUG] Failed to retrieve ref from commit for branch")
+	}
+	return commit.LastPipeline.Ref, nil
 }
