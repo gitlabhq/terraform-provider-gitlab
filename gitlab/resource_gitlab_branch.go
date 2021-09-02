@@ -6,13 +6,27 @@ import (
 	"log"
 )
 
+func resourceGitlabBranchStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	_, _, err := parseTwoPartID(d.Id())
+	if err != nil {
+		return nil, err
+	}
+	ref := d.Get("ref").(string)
+	d.Set("ref", ref)
+	return []*schema.ResourceData{d}, nil
+}
+
+func ImportBranch(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	return []*schema.ResourceData{d}, nil
+}
+
 func resourceGitlabBranch() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabBranchCreate,
 		Read:   resourceGitlabBranchRead,
 		Delete: resourceGitlabBranchDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: resourceGitlabBranchStateImporter,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -122,7 +136,6 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
 		return err
 	}
-	d.Set("ref", ref)
 	d.SetId(buildTwoPartID(&project, &name))
 	return resourceGitlabBranchRead(d, meta)
 }
