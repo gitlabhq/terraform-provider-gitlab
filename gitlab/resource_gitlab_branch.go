@@ -30,6 +30,7 @@ func resourceGitlabBranch() *schema.Resource {
 				Type:     schema.TypeString,
 				ForceNew: true,
 				Required: true,
+				Default:  "main", // Default value required for import logic -- api does not return consistent value to use for ref
 			},
 			"web_url": {
 				Type:     schema.TypeString,
@@ -146,17 +147,6 @@ func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	ref := d.Get("ref").(string)
-	// use ref on last pipeline run when ref is empty (in case of import)
-	if ref == "" {
-		commit, _, err := client.Commits.GetCommit(project, branch.Commit.ID)
-		if err != nil {
-			return err
-		}
-		ref, err = getRefFromCommit(commit)
-		if err != nil {
-			return err
-		}
-	}
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
 	d.Set("project", project)
@@ -204,14 +194,4 @@ func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {
 			"parent_ids":      commit.ParentIDs,
 		},
 	}
-}
-
-func getRefFromCommit(commit *gitlab.Commit) (string, error) {
-	if commit == nil {
-		return "", errors.New("[DEBUG] Failed to retrieve commit for branch")
-	}
-	if commit.LastPipeline == nil {
-		return "", errors.New("[DEBUG] Failed to retrieve ref from commit for branch")
-	}
-	return commit.LastPipeline.Ref, nil
 }
