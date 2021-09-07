@@ -56,7 +56,7 @@ func resourceGitlabGroup() *schema.Resource {
 			"default_branch_protection": {
 				Type:         schema.TypeInt,
 				Optional:     true,
-				Default:      0,
+				Default:      2,
 				ValidateFunc: validation.IntInSlice([]int{0, 1, 2}),
 			},
 			"request_access_enabled": {
