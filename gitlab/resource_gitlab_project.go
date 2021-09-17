@@ -160,6 +160,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"squash_option": {
 		Type:          schema.TypeString,
 		Optional:      true,
+		Default:  	   "never",
 	},
 	"remove_source_branch_after_merge": {
 		Type:     schema.TypeBool,
@@ -330,6 +331,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 		return err
 	}
 	d.Set("archived", project.Archived)
+	d.Set("squash_option", project.SquashOption)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
@@ -361,6 +363,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
+		SquashOption:              				   gitlab.String(d.Get("squash_option").(string)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
@@ -391,10 +394,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if v, ok := d.GetOk("initialize_with_readme"); ok {
 		options.InitializeWithReadme = gitlab.Bool(v.(bool))
-	}
-
-	if v, ok := d.GetOk("squash_option"); ok {
-		options.SquashOption = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("import_url"); ok {
@@ -666,6 +665,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("lfs_enabled") {
 		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
+	}
+
+	if d.HasChange("squash_option") {
+		options.SquashOption = gitlab.String(d.Get("squash_option").(string))
 	}
 
 	if d.HasChange("remove_source_branch_after_merge") {
