@@ -89,7 +89,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						AllowMergeOnSkippedPipeline:               true,
+						AllowMergeOnSkippedPipeline:               false,
 						Archived:                                  true,
 						PackagesEnabled:                           false,
 						PagesAccessLevel:                          gitlab.DisabledAccessControl,
@@ -1055,7 +1055,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
-  allow_merge_on_skipped_pipeline = true
+  allow_merge_on_skipped_pipeline = false
 
   request_access_enabled = false
   issues_enabled = false
