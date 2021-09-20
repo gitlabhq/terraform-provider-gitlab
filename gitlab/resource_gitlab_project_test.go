@@ -45,11 +45,11 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 		AllowMergeOnSkippedPipeline:               true,
-		Archived:           false, // needless, but let's make this explicit
-		PackagesEnabled:    true,
-		PagesAccessLevel:   gitlab.PublicAccessControl,
-		BuildCoverageRegex: "foo",
-		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
+		Archived:                                  false, // needless, but let's make this explicit
+		PackagesEnabled:                           true,
+		PagesAccessLevel:                          gitlab.PublicAccessControl,
+		BuildCoverageRegex:                        "foo",
+		CIConfigPath:                              ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
 	defaultsMainBranch = defaults
