@@ -501,14 +501,6 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 			return fmt.Errorf("Failed to set default branch to %q for project %q: %w", newDefaultBranch, d.Id(), err)
 		}
 
-		log.Printf("[DEBUG] protect new default branch %q for project %q", newDefaultBranch, d.Id())
-		_, _, err = client.ProtectedBranches.ProtectRepositoryBranches(project.ID, &gitlab.ProtectRepositoryBranchesOptions{
-			Name: gitlab.String(newDefaultBranch),
-		})
-		if err != nil {
-			return fmt.Errorf("Failed to protect default branch %q for project %q: %w", newDefaultBranch, d.Id(), err)
-		}
-
 		log.Printf("[DEBUG] unprotect old default branch %q for project %q", oldDefaultBranch, d.Id())
 		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch)
 		if err != nil {
