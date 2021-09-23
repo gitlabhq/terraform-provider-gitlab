@@ -44,7 +44,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		SquashOption:                stringToSquashOptionValue("always"),
+		SquashOption:                gitlab.SquashOptionAlways,
 		AllowMergeOnSkippedPipeline: false,
 		Archived:                    false, // needless, but let's make this explicit
 		PackagesEnabled:             true,
@@ -90,7 +90,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						SquashOption:                stringToSquashOptionValue("default_on"),
+						SquashOption:                gitlab.SquashOptionDefaultOn,
 						AllowMergeOnSkippedPipeline: true,
 						Archived:                    true,
 						PackagesEnabled:             false,
