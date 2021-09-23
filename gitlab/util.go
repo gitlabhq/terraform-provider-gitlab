@@ -145,10 +145,10 @@ func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
 
 func stringToSquashOptionValue(s string) *gitlab.SquashOptionValue {
 	lookup := map[string]gitlab.SquashOptionValue{
-		"never": gitlab.SquashOptionNever,
-		"always":  gitlab.SquashOptionAlways,
+		"never":       gitlab.SquashOptionNever,
+		"always":      gitlab.SquashOptionAlways,
 		"default_on":  gitlab.SquashOptionDefaultOff,
-		"default_off":   gitlab.SquashOptionDefaultOn,
+		"default_off": gitlab.SquashOptionDefaultOn,
 	}
 
 	value, ok := lookup[s]
