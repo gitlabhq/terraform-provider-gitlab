@@ -158,9 +158,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 	},
 	"squash_option": {
-		Type:          schema.TypeString,
-		Optional:      true,
-		Default:  	   "default_off",
+		Type:     schema.TypeString,
+		Optional: true,
+		Default:  "default_off",
 	},
 	"remove_source_branch_after_merge": {
 		Type:     schema.TypeBool,
@@ -363,7 +363,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
-		SquashOption:              				   gitlab.String(d.Get("squash_option").(string)),
+		SquashOption:                              gitlab.String(d.Get("squash_option").(string)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
