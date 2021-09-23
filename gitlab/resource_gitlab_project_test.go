@@ -45,11 +45,12 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 		SquashOption:       "always",
-		Archived:           false, // needless, but let's make this explicit
-		PackagesEnabled:    true,
-		PagesAccessLevel:   gitlab.PublicAccessControl,
-		BuildCoverageRegex: "foo",
-		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
+		AllowMergeOnSkippedPipeline:               false,
+		Archived:                                  false, // needless, but let's make this explicit
+		PackagesEnabled:                           true,
+		PagesAccessLevel:                          gitlab.PublicAccessControl,
+		BuildCoverageRegex:                        "foo",
+		CIConfigPath:                              ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
 	defaultsMainBranch = defaults
@@ -90,10 +91,11 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 						SquashOption:       "default_on",
-						Archived:           true,
-						PackagesEnabled:    false,
-						PagesAccessLevel:   gitlab.DisabledAccessControl,
-						BuildCoverageRegex: "bar",
+						AllowMergeOnSkippedPipeline:               true,
+						Archived:                                  true,
+						PackagesEnabled:                           false,
+						PagesAccessLevel:                          gitlab.DisabledAccessControl,
+						BuildCoverageRegex:                        "bar",
 					}, &received),
 				),
 			},
@@ -1002,6 +1004,7 @@ resource "gitlab_project" "foo" {
   squash_option = "always"
   pages_access_level = "public"
   build_coverage_regex = "foo"
+  allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
 }
 	`, rInt, rInt, defaultBranchStatement)
@@ -1057,6 +1060,7 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
   squash_option = "default_on"
+  allow_merge_on_skipped_pipeline = true
 
   request_access_enabled = false
   issues_enabled = false
