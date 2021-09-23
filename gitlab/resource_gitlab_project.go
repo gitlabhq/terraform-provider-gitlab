@@ -337,7 +337,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 		return err
 	}
 	d.Set("archived", project.Archived)
-	d.Set("squash_option", project.SquashOption)
+	d.Set("squash_option", string(project.SquashOption))
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
@@ -370,7 +370,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		AllowMergeOnSkippedPipeline:               gitlab.Bool(d.Get("allow_merge_on_skipped_pipeline").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
-		SquashOption:                              gitlab.String(d.Get("squash_option").(string)),
+		SquashOption:                              stringToSquashOptionValue(d.Get("squash_option").(string)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
@@ -679,7 +679,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 	}
 
 	if d.HasChange("squash_option") {
-		options.SquashOption = gitlab.String(d.Get("squash_option").(string))
+		options.SquashOption = stringToSquashOptionValue(d.Get("squash_option").(string))
 	}
 
 	if d.HasChange("remove_source_branch_after_merge") {
