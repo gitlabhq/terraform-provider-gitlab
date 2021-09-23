@@ -193,7 +193,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab group %s", d.Id())
 
-	group, resp, err := client.Groups.GetGroup(d.Id())
+	group, resp, err := client.Groups.GetGroup(d.Id(), nil)
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
@@ -320,7 +320,7 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 		Pending: []string{"Deleting"},
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Groups.GetGroup(d.Id())
+			out, response, err := client.Groups.GetGroup(d.Id(), nil)
 			if err != nil {
 				if response != nil && response.StatusCode == 404 {
 					return out, "Deleted", nil
