@@ -337,7 +337,9 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 		return err
 	}
 	d.Set("archived", project.Archived)
-	d.Set("squash_option", project.SquashOption)
+	if err := d.Set("squash_option", project.SquashOption); err != nil {
+		return err
+	}
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
