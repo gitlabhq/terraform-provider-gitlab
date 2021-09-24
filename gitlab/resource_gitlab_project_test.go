@@ -44,7 +44,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		SquashOption:                gitlab.SquashOptionAlways,
+		SquashOption:                gitlab.SquashOptionDefaultOff,
 		AllowMergeOnSkippedPipeline: false,
 		Archived:                    false, // needless, but let's make this explicit
 		PackagesEnabled:             true,
@@ -1001,7 +1001,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
-  squash_option = "always"
+  squash_option = "default_off"
   pages_access_level = "public"
   build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
