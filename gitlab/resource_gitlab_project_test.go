@@ -44,7 +44,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		SquashOption:                gitlab.SquashOptionDefaultOff,
+		SquashOption:                gitlab.SquashOptionDefaultOn,
 		AllowMergeOnSkippedPipeline: false,
 		Archived:                    false, // needless, but let's make this explicit
 		PackagesEnabled:             true,
@@ -90,7 +90,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						SquashOption:                gitlab.SquashOptionDefaultOn,
+						SquashOption:                gitlab.SquashOptionDefaultOff,
 						AllowMergeOnSkippedPipeline: true,
 						Archived:                    true,
 						PackagesEnabled:             false,
@@ -1001,7 +1001,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
-  squash_option = "default_off"
+  squash_option = "default_on"
   pages_access_level = "public"
   build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
@@ -1059,7 +1059,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
-  squash_option = "default_on"
+  squash_option = "default_off"
   allow_merge_on_skipped_pipeline = true
 
   request_access_enabled = false
