@@ -53,6 +53,12 @@ func resourceGitlabGroup() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"default_branch_protection": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Default:      2,
+				ValidateFunc: validation.IntInSlice([]int{0, 1, 2}),
+			},
 			"request_access_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -177,6 +183,10 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 		options.ParentID = gitlab.Int(v.(int))
 	}
 
+	if v, ok := d.GetOk("default_branch_protection"); ok {
+		options.DefaultBranchProtection = gitlab.Int(v.(int))
+	}
+
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
 
 	group, _, err := client.Groups.CreateGroup(options)
@@ -228,6 +238,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
 	d.Set("share_with_group_lock", group.ShareWithGroupLock)
+	d.Set("default_branch_protection", group.DefaultBranchProtection)
 
 	return nil
 }
@@ -293,6 +304,10 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("share_with_group_lock") {
 		options.ShareWithGroupLock = gitlab.Bool(d.Get("share_with_group_lock").(bool))
+	}
+
+	if d.HasChange("default_branch_protection") {
+		options.DefaultBranchProtection = gitlab.Int(d.Get("default_branch_protection").(int))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
