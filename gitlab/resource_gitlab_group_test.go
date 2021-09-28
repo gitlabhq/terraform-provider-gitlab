@@ -81,6 +81,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabGroup_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
@@ -224,7 +225,7 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 		// Fixes groups API async deletion issue
 		// https://github.com/gitlabhq/terraform-provider-gitlab/issues/319
 		for start := time.Now(); time.Since(start) < 15*time.Second; {
-			g, resp, err := conn.Groups.GetGroup(group.ID)
+			g, resp, err := conn.Groups.GetGroup(group.ID, nil)
 			if resp != nil && resp.StatusCode == http.StatusNotFound {
 				return nil
 			}
@@ -252,7 +253,7 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotGroup, _, err := conn.Groups.GetGroup(groupID)
+		gotGroup, _, err := conn.Groups.GetGroup(groupID, nil)
 		if err != nil {
 			return err
 		}
@@ -359,7 +360,7 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 			continue
 		}
 
-		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
+		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {

@@ -14,6 +14,7 @@ func TestAccGitlabInstanceVariable_basic(t *testing.T) {
 	var instanceVariable gitlab.InstanceVariable
 	rString := acctest.RandString(5)
 
+	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,

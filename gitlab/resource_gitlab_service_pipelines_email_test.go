@@ -56,6 +56,7 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabServicePipelinesEmail_import(t *testing.T) {
 	pipelinesEmailResourceName := "gitlab_service_pipelines_email.email"
 	rInt := acctest.RandInt()

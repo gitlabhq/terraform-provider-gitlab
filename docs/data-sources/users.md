@@ -1,8 +1,8 @@
 # gitlab\_users
 
-Provides details about a list of users in the gitlab provider. The results include id, username, email, name and more about the requested users. Users can also be sorted and filtered using several options.
+Provide details about a list of users in the gitlab provider. The results include id, username, email, name and more about the requested users. Users can also be sorted and filtered using several options.
 
-**NOTE**: Some of the available options require administrator privileges. Please visit [Gitlab API documentation][users_for_admins] for more information.
+**NOTE**: Some available options require administrator privileges. Please visit [Gitlab API documentation][users_for_admins] for more information.
 
 ## Example Usage
 
@@ -11,6 +11,10 @@ data "gitlab_users" "example" {
   sort = "desc"
   order_by = "name"
   created_before = "2019-01-01"
+}
+
+data "gitlab_users" "example-two" {
+  search = "username"
 }
 ```
 
@@ -36,7 +40,6 @@ The following arguments are supported:
 
 * `created_after` - (Optional)  Search for users created after a specific date. (Requires administrator privileges)
 
-
 ## Attributes Reference
 
 The following attributes are exported:
@@ -56,19 +59,18 @@ The following attributes are exported:
   * `extern_uid` - The external UID of the user.
   * `provider` - The UID provider of the user.
   * `organization` - The organization of the user.
-  * `two_factor_enabled` - Whether user's two factor auth is enabled.
+  * `two_factor_enabled` - Whether user's two-factor auth is enabled.
   * `note` - The note associated to the user.
   * `avatar_url` - The avatar URL of the user.
   * `bio` - The bio of the user.
   * `location` - The location of the user.
   * `skype` - Skype username of the user.
-  * `linkedin` - Linkedin profile of the user.
+  * `linkedin` - LinkedIn profile of the user.
   * `twitter` - Twitter username of the user.
   * `website_url` - User's website URL.
   * `theme_id` - User's theme ID.
   * `color_scheme_id` - User's color scheme ID.
   * `last_sign_in_at` - Last user's sign-in date.
   * `current_sign_in_at` - Current user's sign-in date.
-
 
 [users_for_admins]: https://docs.gitlab.com/ce/api/users.html#for-admins

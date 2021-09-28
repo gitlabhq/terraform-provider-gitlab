@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"testing"
@@ -31,21 +30,9 @@ func (c testAccGitlabProjectContext) finish() {
 // testAccGitlabProjectStart initializes the GitLab client and creates a test project. Remember to
 // call testAccGitlabProjectContext.finish() when finished with the testAccGitlabProjectContext.
 func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
-	if os.Getenv(resource.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
-		return testAccGitlabProjectContext{}
-	}
+	testAccCheck(t)
 
-	var options []gitlab.ClientOptionFunc
-	baseURL := os.Getenv("GITLAB_BASE_URL")
-	if baseURL != "" {
-		options = append(options, gitlab.WithBaseURL(baseURL))
-	}
-
-	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"), options...)
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := testAccNewClient(t)
 
 	project, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
 		Name:        gitlab.String(acctest.RandomWithPrefix("acctest")),

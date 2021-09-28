@@ -1,8 +1,6 @@
 # gitlab\_project
 
-This resource allows you to create and manage projects within your
-GitLab group or within your user.
-
+This resource allows you to create and manage projects within your GitLab group or within your user.
 
 ## Example Usage
 
@@ -12,6 +10,18 @@ resource "gitlab_project" "example" {
   description = "My awesome codebase"
 
   visibility_level = "public"
+}
+
+# Project with custom push rules
+resource "gitlab_project" "example-two" {
+  name = "example-two"
+
+  push_rules {
+    author_email_regex     = "@example\\.com$"
+    commit_committer_check = true
+    member_check           = true
+    prevent_secrets        = true
+  }
 }
 ```
 
@@ -73,6 +83,8 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
 
 * `only_allow_merge_if_all_discussions_are_resolved` - (Optional) Set to true if you want allow merges only if all discussions are resolved.
 
+* `allow_merge_on_skipped_pipeline` - (Optional) Set to true if you want to treat skipped pipelines as if they finished with success.
+
 * `shared_runners_enabled` - (Optional) Enable shared runners for this project.
 
 * `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
@@ -98,6 +110,10 @@ consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repos
 * `issues_template` - (Optional) Sets the template for new issues in the project.
 
 * `merge_requests_template` - (Optional) Sets the template for new merge requests in the project.
+
+* `build_coverage_regex` - (Optional) Test coverage parsing for the project.
+
+* `ci_config_path` - (Optional) Custom Path to CI config file.
 
 ## Attributes Reference
 
@@ -149,13 +165,15 @@ For information on push rules, consult the [GitLab documentation](https://docs.g
 
 * `max_file_size` - (Optional, int) Maximum file size (MB).
 
-## Importing projects
+## Import
 
 You can import a project state using `terraform import <resource> <id>`.  The
 `id` can be whatever the [get single project api][get_single_project] takes for
 its `:id` value, so for example:
 
-    terraform import gitlab_project.example richardc/example
+```shell
+$ terraform import gitlab_project.example richardc/example
+```
 
 [get_single_project]: https://docs.gitlab.com/ee/api/projects.html#get-single-project
 [group_members_permissions]: https://docs.gitlab.com/ce/user/permissions.html#group-members-permissions

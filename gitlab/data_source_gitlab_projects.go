@@ -1,3 +1,5 @@
+// lintignore: S031 // TODO: Resolve this tfproviderlint issue
+
 package gitlab
 
 import (
@@ -100,7 +102,7 @@ func flattenGitlabBasicUser(user *gitlab.User) (values []map[string]interface{})
 }
 
 func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{}) {
-	if projects != nil {
+	if projects != nil { // nolint // TODO: Resolve this golangci-lint issue: S1031: unnecessary nil check around range (gosimple)
 		for _, project := range projects {
 			v := map[string]interface{}{
 				"id":                                    project.ID,
@@ -143,21 +145,23 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"public_builds":                         project.PublicBuilds,
 				"only_allow_merge_if_pipeline_succeeds": project.OnlyAllowMergeIfPipelineSucceeds,
 				"only_allow_merge_if_all_discussions_are_resolved": project.OnlyAllowMergeIfAllDiscussionsAreResolved,
-				"lfs_enabled":                         project.LFSEnabled,
-				"request_access_enabled":              project.RequestAccessEnabled,
-				"merge_method":                        project.MergeMethod,
-				"forked_from_project":                 flattenForkedFromProject(project.ForkedFromProject),
-				"mirror":                              project.Mirror,
-				"mirror_user_id":                      project.MirrorUserID,
-				"mirror_trigger_builds":               project.MirrorTriggerBuilds,
-				"only_mirror_protected_branches":      project.OnlyMirrorProtectedBranches,
-				"mirror_overwrites_diverged_branches": project.MirrorOverwritesDivergedBranches,
-				"shared_with_groups":                  flattenSharedWithGroupsOptions(project),
-				"statistics":                          project.Statistics,
-				"_links":                              flattenProjectLinks(project.Links),
-				"ci_config_path":                      project.CIConfigPath,
-				"custom_attributes":                   project.CustomAttributes,
-				"packages_enabled":                    project.PackagesEnabled,
+				"allow_merge_on_skipped_pipeline":                  project.AllowMergeOnSkippedPipeline,
+				"lfs_enabled":                                      project.LFSEnabled,
+				"request_access_enabled":                           project.RequestAccessEnabled,
+				"merge_method":                                     project.MergeMethod,
+				"forked_from_project":                              flattenForkedFromProject(project.ForkedFromProject),
+				"mirror":                                           project.Mirror,
+				"mirror_user_id":                                   project.MirrorUserID,
+				"mirror_trigger_builds":                            project.MirrorTriggerBuilds,
+				"only_mirror_protected_branches":                   project.OnlyMirrorProtectedBranches,
+				"mirror_overwrites_diverged_branches":              project.MirrorOverwritesDivergedBranches,
+				"shared_with_groups":                               flattenSharedWithGroupsOptions(project),
+				"statistics":                                       project.Statistics,
+				"_links":                                           flattenProjectLinks(project.Links),
+				"ci_config_path":                                   project.CIConfigPath,
+				"custom_attributes":                                project.CustomAttributes,
+				"packages_enabled":                                 project.PackagesEnabled,
+				"build_coverage_regex":                             project.BuildCoverageRegex,
 			}
 			values = append(values, v)
 		}
@@ -166,9 +170,11 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 }
 
 func dataSourceGitlabProjects() *schema.Resource {
+	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Read: dataSourceGitlabProjectsRead,
 
+		// lintignore: S006 // TODO: Resolve this tfproviderlint issue
 		Schema: map[string]*schema.Schema{
 			"max_queryable_pages": {
 				Type:        schema.TypeInt,
@@ -536,6 +542,10 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Type:     schema.TypeBool,
 							Computed: true,
 						},
+						"allow_merge_on_skipped_pipeline": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
 						"lfs_enabled": {
 							Type:     schema.TypeBool,
 							Computed: true,
@@ -652,6 +662,10 @@ func dataSourceGitlabProjects() *schema.Resource {
 						},
 						"packages_enabled": {
 							Type:     schema.TypeBool,
+							Computed: true,
+						},
+						"build_coverage_regex": {
+							Type:     schema.TypeString,
 							Computed: true,
 						},
 					},

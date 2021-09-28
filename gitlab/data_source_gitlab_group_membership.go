@@ -98,13 +98,13 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 
 	if groupIDOk {
 		// Get group by id
-		group, _, err = client.Groups.GetGroup(groupIDData.(int))
+		group, _, err = client.Groups.GetGroup(groupIDData.(int), nil)
 		if err != nil {
 			return err
 		}
 	} else if fullPathOk {
 		// Get group by full path
-		group, _, err = client.Groups.GetGroup(fullPathData.(string))
+		group, _, err = client.Groups.GetGroup(fullPathData.(string), nil)
 		if err != nil {
 			return err
 		}
@@ -123,7 +123,7 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 
-	d.Set("members", flattenGitlabMembers(d, gm))
+	d.Set("members", flattenGitlabMembers(d, gm)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 
 	var optionsHash strings.Builder
 	optionsHash.WriteString(strconv.Itoa(group.ID))

@@ -24,7 +24,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+					access_level: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 				})),
 			},
 
@@ -32,7 +32,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("guest"),
+					access_level: fmt.Sprintf("guest"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 				})),
 			},
 
@@ -40,7 +40,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"),
+					access_level: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 				})),
 			},
 		},
@@ -106,7 +106,7 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 		userID := rs.Primary.Attributes["user_id"]
 
 		// GetProjectMember needs int type for userID
-		userIDI, err := strconv.Atoi(userID)
+		userIDI, err := strconv.Atoi(userID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
 		gotMembership, resp, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
 		if err != nil {
 			if gotMembership != nil && fmt.Sprintf("%d", gotMembership.AccessLevel) == rs.Primary.Attributes["access_level"] {

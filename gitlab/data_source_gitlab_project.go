@@ -99,6 +99,7 @@ func dataSourceGitlabProject() *schema.Resource {
 				Type:     schema.TypeBool,
 				Computed: true,
 			},
+			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
 				Type:     schema.TypeList,
 				MaxItems: 1,
@@ -199,7 +200,7 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
 	}
 
-	d.Set("push_rules", flattenProjectPushRules(pushRules))
+	d.Set("push_rules", flattenProjectPushRules(pushRules)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 
 	return nil
 }

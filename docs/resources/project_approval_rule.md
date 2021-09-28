@@ -4,25 +4,37 @@ This resource allows you to create and manage multiple approval rules for your G
 projects. For further information on approval rules, consult the [gitlab
 documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
 
--> This feature requires a GitLab Starter account or above.
+-> This feature requires GitLab Premium.
 
 ## Example Usage
 
 ```hcl
 resource "gitlab_project_approval_rule" "example-one" {
   project            = 5
-  name               = "Example Rule 1"
+  name               = "Example Rule"
   approvals_required = 3
   user_ids           = [50, 500]
   group_ids          = [51]
 }
+```
 
-resource "gitlab_project_approval_rule" "example-two" {
+### With Protected Branch IDs
+
+```hcl
+resource "gitlab_branch_protection" "example" {
   project            = 5
-  name               = "Example Rule 2"
-  approvals_required = 1
-  user_ids           = []
-  group_ids          = [52]
+  branch             = "release/*"
+  push_access_level  = "maintainer"
+  merge_access_level = "developer"
+}
+
+resource "gitlab_project_approval_rule" "example" {
+  project              = 5
+  name                 = "Example Rule"
+  approvals_required   = 3
+  user_ids             = [50, 500]
+  group_ids            = [51]
+  protected_branch_ids = [gitlab_branch_protection.example.branch_protection_id]
 }
 ```
 
@@ -38,7 +50,9 @@ The following arguments are supported:
 
 * `user_ids` - (Optional)  A list of specific User IDs to add to the list of approvers.
 
-* `group_ids` - (Optional) A list of group IDs who's members can approve of the merge request
+* `group_ids` - (Optional) A list of group IDs whose members can approve of the merge request.
+
+* `protected_branch_ids` - (Optional) A list of protected branch IDs (not branch names) for which the rule applies.
 
 ## Import
 
