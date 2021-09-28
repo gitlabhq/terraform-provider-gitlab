@@ -721,7 +721,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		options.MergeRequestsTemplate = gitlab.String(d.Get("merge_requests_template").(string))
 	}
 
-  if d.HasChange("build_coverage_regex") {
+	if d.HasChange("build_coverage_regex") {
 		options.BuildCoverageRegex = gitlab.String(d.Get("build_coverage_regex").(string))
 	}
 
