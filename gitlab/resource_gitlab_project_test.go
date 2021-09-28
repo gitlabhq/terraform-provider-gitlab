@@ -1182,8 +1182,8 @@ resource "gitlab_project" "foo" {
   name = "foo-%d"
   path = "foo.%d"
   description = "Terraform acceptance tests"
-  issue_template = "foo"
-  merge_request_template = "foo"
+  issues_template = "foo"
+  merge_requests_template = "foo"
 }
 	`, rInt, rInt)
 }
