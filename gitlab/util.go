@@ -147,8 +147,8 @@ func stringToSquashOptionValue(s string) *gitlab.SquashOptionValue {
 	lookup := map[string]gitlab.SquashOptionValue{
 		"never":       gitlab.SquashOptionNever,
 		"always":      gitlab.SquashOptionAlways,
-		"default_on":  gitlab.SquashOptionDefaultOff,
-		"default_off": gitlab.SquashOptionDefaultOn,
+		"default_on":  gitlab.SquashOptionDefaultOn,
+		"default_off": gitlab.SquashOptionDefaultOff,
 	}
 
 	value, ok := lookup[s]
