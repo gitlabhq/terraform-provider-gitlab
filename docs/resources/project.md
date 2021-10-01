@@ -41,6 +41,7 @@ The following arguments are supported:
 * `tags` - (Optional) Tags (topics) of the project.
 
 * `default_branch` - (Optional) The default branch for the project.
+Default branch is not protected at project creation, to do so manage default branch with [`gitlab_branch_protection`](branch_protection.html) resource.
 
 * `import_url` - (Optional) Git URL to a repository to be imported.
 
