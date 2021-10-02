@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -21,7 +21,7 @@ func resourceGitlabGroupMembership() *schema.Resource {
 		Update: resourceGitlabGroupMembershipUpdate,
 		Delete: resourceGitlabGroupMembershipDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -36,9 +36,9 @@ func resourceGitlabGroupMembership() *schema.Resource {
 				Required: true,
 			},
 			"access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				Required:         true,
 			},
 			"expires_at": {
 				Type:         schema.TypeString, // Format YYYY-MM-DD
@@ -151,8 +151,9 @@ func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember
 	d.Set("group_id", groupId)
 	d.Set("user_id", groupMember.ID)
 	d.Set("access_level", accessLevel[groupMember.AccessLevel])
-	d.Set("expires_at", groupMember.ExpiresAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
-
+	if groupMember.ExpiresAt != nil {
+		d.Set("expires_at", groupMember.ExpiresAt.String())
+	}
 	userId := strconv.Itoa(groupMember.ID)
 	d.SetId(buildTwoPartID(groupId, &userId))
 }

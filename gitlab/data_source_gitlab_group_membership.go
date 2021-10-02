@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -35,10 +35,10 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 				},
 			},
 			"access_level": {
-				Type:         schema.TypeString,
-				Computed:     true,
-				Optional:     true,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
+				Type:             schema.TypeString,
+				Computed:         true,
+				Optional:         true,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 			},
 			"members": {
 				Type:     schema.TypeList,

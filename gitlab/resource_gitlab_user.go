@@ -1,24 +1,26 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabUser() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabUserCreate,
-		Read:   resourceGitlabUserRead,
-		Update: resourceGitlabUserUpdate,
-		Delete: resourceGitlabUserDelete,
+		Create:        resourceGitlabUserCreate,
+		Read:          resourceGitlabUserRead,
+		Update:        resourceGitlabUserUpdate,
+		DeleteContext: resourceGitlabUserDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -185,14 +187,14 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 	return resourceGitlabUserRead(d, meta)
 }
 
-func resourceGitlabUserDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabUserDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] Delete gitlab user %s", d.Id())
 
 	id, _ := strconv.Atoi(d.Id())
 
 	if _, err := client.Users.DeleteUser(id); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	stateConf := &resource.StateChangeConf{
@@ -210,8 +212,8 @@ func resourceGitlabUserDelete(d *schema.ResourceData, meta interface{}) error {
 		},
 	}
 
-	if _, err := stateConf.WaitForState(); err != nil {
-		return fmt.Errorf("Could not finish deleting user %d: %w", id, err)
+	if _, err := stateConf.WaitForStateContext(ctx); err != nil {
+		return diag.Errorf("Could not finish deleting user %d: %s", id, err)
 	}
 
 	return nil

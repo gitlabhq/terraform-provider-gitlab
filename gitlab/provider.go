@@ -1,18 +1,15 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-// Provider returns a terraform.ResourceProvider.
-func Provider() terraform.ResourceProvider {
-
-	// The actual provider
+func Provider() *schema.Provider {
 	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"token": {
@@ -106,8 +103,8 @@ func Provider() terraform.ResourceProvider {
 		},
 	}
 
-	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
-		return providerConfigure(provider, d)
+	provider.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+		return providerConfigure(ctx, provider, d)
 	}
 
 	return provider
@@ -131,7 +128,7 @@ func init() {
 	}
 }
 
-func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(ctx context.Context, p *schema.Provider, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	config := Config{
 		Token:      d.Get("token").(string),
 		BaseURL:    d.Get("base_url").(string),
@@ -143,14 +140,13 @@ func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{},
 
 	client, err := config.Client()
 	if err != nil {
-		return nil, err
+		return nil, diag.FromErr(err)
 	}
 
-	// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
-	// After upgrading the SDK to v2 replace with p.UserAgent("terraform-provider-gitlab")
-	client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab" // nolint // TODO: Resolve this golangci-lint issue: SA1019: httpclient.TerraformUserAgent is deprecated: This will be removed in v2 without replacement. If you need its functionality, you can copy it or reference the v1 package. (staticcheck)
+	userAgent := p.UserAgent("terraform-provider-gitlab", "")
+	client.UserAgent = userAgent
 
-	return client, err
+	return client, nil
 }
 
 func validateApiURLVersion(value interface{}, key string) (ws []string, es []error) {

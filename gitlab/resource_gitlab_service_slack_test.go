@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -215,7 +215,6 @@ resource "gitlab_service_slack" "slack" {
   wiki_page_events             = true
   wiki_page_channel            = "test"
   notify_only_broken_pipelines = true
-  notify_only_default_branch   = true
   branches_to_be_notified      = "all"
 }
 `, rInt)
@@ -254,7 +253,6 @@ resource "gitlab_service_slack" "slack" {
   wiki_page_events             = false
   wiki_page_channel            = "test wiki_page_channel"
   notify_only_broken_pipelines = false
-  notify_only_default_branch   = false
   branches_to_be_notified      = "all"
 }
 `, rInt)

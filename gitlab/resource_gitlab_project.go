@@ -1,15 +1,17 @@
 package gitlab
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -296,12 +298,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 
 func resourceGitlabProject() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectCreate,
-		Read:   resourceGitlabProjectRead,
-		Update: resourceGitlabProjectUpdate,
-		Delete: resourceGitlabProjectDelete,
+		CreateContext: resourceGitlabProjectCreate,
+		ReadContext:   resourceGitlabProjectRead,
+		UpdateContext: resourceGitlabProjectUpdate,
+		DeleteContext: resourceGitlabProjectDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: resourceGitLabProjectSchema,
 	}
@@ -351,7 +353,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	return nil
 }
 
-func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	options := &gitlab.CreateProjectOptions{
@@ -436,7 +438,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	project, _, err := client.Projects.CreateProject(options)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	// from this point onwards no matter how we return, resource creation
@@ -461,21 +463,21 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 			},
 		}
 
-		if _, err := stateConf.WaitForState(); err != nil {
-			return fmt.Errorf("error while waiting for project %q import to finish: %w", *options.Name, err)
+		if _, err := stateConf.WaitForStateContext(ctx); err != nil {
+			return diag.Errorf("error while waiting for project %q import to finish: %s", *options.Name, err)
 		}
 
 		// Read the project again, so that we can detect the default branch.
 		project, _, err = client.Projects.GetProject(project.ID, nil)
 		if err != nil {
-			return fmt.Errorf("Failed to get project %q after completing import: %w", d.Id(), err)
+			return diag.Errorf("Failed to get project %q after completing import: %s", d.Id(), err)
 		}
 	}
 
 	if d.Get("archived").(bool) {
 		// strange as it may seem, this project is created in archived state...
 		if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
-			return fmt.Errorf("new project %q could not be archived: %w", d.Id(), err)
+			return diag.Errorf("new project %q could not be archived: %s", d.Id(), err)
 		}
 	}
 
@@ -484,10 +486,10 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		var httpError *gitlab.ErrorResponse
 		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
-			return errors.New("Project push rules are not supported in your version of GitLab")
+			return diag.Errorf("Project push rules are not supported in your version of GitLab")
 		}
 		if err != nil {
-			return fmt.Errorf("Failed to edit push rules for project %q: %w", d.Id(), err)
+			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
 	}
 
@@ -505,7 +507,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 			Ref:    gitlab.String(oldDefaultBranch),
 		})
 		if err != nil {
-			return fmt.Errorf("Failed to create branch %q for project %q: %w", newDefaultBranch, d.Id(), err)
+			return diag.Errorf("Failed to create branch %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
 
 		log.Printf("[DEBUG] set new default branch to %q for project %q", newDefaultBranch, d.Id())
@@ -513,7 +515,7 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 			DefaultBranch: gitlab.String(newDefaultBranch),
 		})
 		if err != nil {
-			return fmt.Errorf("Failed to set default branch to %q for project %q: %w", newDefaultBranch, d.Id(), err)
+			return diag.Errorf("Failed to set default branch to %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
 
 		log.Printf("[DEBUG] protect new default branch %q for project %q", newDefaultBranch, d.Id())
@@ -521,19 +523,19 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 			Name: gitlab.String(newDefaultBranch),
 		})
 		if err != nil {
-			return fmt.Errorf("Failed to protect default branch %q for project %q: %w", newDefaultBranch, d.Id(), err)
+			return diag.Errorf("Failed to protect default branch %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
 
 		log.Printf("[DEBUG] unprotect old default branch %q for project %q", oldDefaultBranch, d.Id())
 		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch)
 		if err != nil {
-			return fmt.Errorf("Failed to unprotect undesired default branch %q for project %q: %w", oldDefaultBranch, d.Id(), err)
+			return diag.Errorf("Failed to unprotect undesired default branch %q for project %q: %s", oldDefaultBranch, d.Id(), err)
 		}
 
 		log.Printf("[DEBUG] delete old default branch %q for project %q", oldDefaultBranch, d.Id())
 		_, err = client.Branches.DeleteBranch(project.ID, oldDefaultBranch)
 		if err != nil {
-			return fmt.Errorf("Failed to clean up undesired default branch %q for project %q: %w", oldDefaultBranch, d.Id(), err)
+			return diag.Errorf("Failed to clean up undesired default branch %q for project %q: %s", oldDefaultBranch, d.Id(), err)
 		}
 	}
 
@@ -551,20 +553,20 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
 		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions); err != nil {
-			return fmt.Errorf("Could not update project %q: %w", d.Id(), err)
+			return diag.Errorf("Could not update project %q: %s", d.Id(), err)
 		}
 	}
 
-	return resourceGitlabProjectRead(d, meta)
+	return resourceGitlabProjectRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
 	project, _, err := client.Projects.GetProject(d.Id(), nil)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if project.MarkedForDeletionAt != nil {
 		log.Printf("[DEBUG] gitlab project %s is marked for deletion", d.Id())
@@ -573,7 +575,7 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if err := resourceGitlabProjectSetToState(d, project); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab project %q push rules", d.Id())
@@ -583,13 +585,16 @@ func resourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
 	if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 		log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
 	} else if err != nil {
-		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
+		return diag.Errorf("Failed to get push rules for project %q: %s", d.Id(), err)
 	}
 
-	return d.Set("push_rules", flattenProjectPushRules(pushRules))
+	if err := d.Set("push_rules", flattenProjectPushRules(pushRules)); err != nil {
+		return diag.FromErr(err)
+	}
+	return nil
 }
 
-func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	options := &gitlab.EditProjectOptions{}
@@ -727,7 +732,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[DEBUG] update gitlab project %s", d.Id())
 		_, _, err := client.Projects.EditProject(d.Id(), options)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
@@ -735,18 +740,18 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		log.Printf("[DEBUG] transferring project %s to namespace %d", d.Id(), transferOptions.Namespace)
 		_, _, err := client.Projects.TransferProject(d.Id(), transferOptions)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
 	if d.HasChange("archived") {
 		if d.Get("archived").(bool) {
 			if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
-				return fmt.Errorf("project %q could not be archived: %w", d.Id(), err)
+				return diag.Errorf("project %q could not be archived: %s", d.Id(), err)
 			}
 		} else {
 			if _, _, err := client.Projects.UnarchiveProject(d.Id()); err != nil {
-				return fmt.Errorf("project %q could not be unarchived: %w", d.Id(), err)
+				return diag.Errorf("project %q could not be unarchived: %s", d.Id(), err)
 			}
 		}
 	}
@@ -756,23 +761,23 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		var httpError *gitlab.ErrorResponse
 		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
-			return errors.New("Project push rules are not supported in your version of GitLab")
+			return diag.Errorf("Project push rules are not supported in your version of GitLab")
 		}
 		if err != nil {
-			return fmt.Errorf("Failed to edit push rules for project %q: %w", d.Id(), err)
+			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
 	}
 
-	return resourceGitlabProjectRead(d, meta)
+	return resourceGitlabProjectRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
 
 	_, err := client.Projects.DeleteProject(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Wait for the project to be deleted.
@@ -801,9 +806,9 @@ func resourceGitlabProjectDelete(d *schema.ResourceData, meta interface{}) error
 		Delay:      5 * time.Second,
 	}
 
-	_, err = stateConf.WaitForState()
+	_, err = stateConf.WaitForStateContext(ctx)
 	if err != nil {
-		return fmt.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
+		return diag.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
 	}
 	return nil
 }
