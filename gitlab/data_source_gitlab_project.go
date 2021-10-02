@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -136,9 +135,8 @@ func dataSourceGitlabProject() *schema.Resource {
 			},
 			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
-				Description: "Push rules for the project.",
-				Type:        schema.TypeList,
-				Computed:    true,
+				Type:     schema.TypeList,
+				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"author_email_regex": {

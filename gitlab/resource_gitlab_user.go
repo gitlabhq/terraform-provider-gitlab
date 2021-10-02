@@ -15,13 +15,9 @@ import (
 
 func resourceGitlabUser() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage GitLab users.\n" +
-			"Note your provider will need to be configured with admin-level access for this resource to work.\n\n" +
-			"-> You must specify either `password` or `reset_password`.",
-
-		CreateContext: resourceGitlabUserCreate,
-		ReadContext:   resourceGitlabUserRead,
-		UpdateContext: resourceGitlabUserUpdate,
+		Create:        resourceGitlabUserCreate,
+		Read:          resourceGitlabUserRead,
+		Update:        resourceGitlabUserUpdate,
 		DeleteContext: resourceGitlabUserDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
@@ -215,7 +211,7 @@ func resourceGitlabUserDelete(ctx context.Context, d *schema.ResourceData, meta 
 
 	id, _ := strconv.Atoi(d.Id())
 
-	if _, err := client.Users.DeleteUser(id, gitlab.WithContext(ctx)); err != nil {
+	if _, err := client.Users.DeleteUser(id); err != nil {
 		return diag.FromErr(err)
 	}
 

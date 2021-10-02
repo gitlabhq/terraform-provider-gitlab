@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
@@ -177,6 +176,8 @@ func resourceGitlabDeployTokenRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
+	var scopes []string
+
 	for _, token := range deployTokens {
 		if token.ID == deployTokenID {
 			d.Set("name", token.Name)
@@ -186,17 +187,13 @@ func resourceGitlabDeployTokenRead(ctx context.Context, d *schema.ResourceData, 
 				d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
 			}
 
-			if err := d.Set("scopes", token.Scopes); err != nil {
-				return diag.FromErr(err)
-			}
-
-			return nil
+			scopes = append(scopes, token.Scopes...)
 		}
 	}
 
-	log.Printf("[DEBUG] GitLab deploy token %d in group %s was not found", deployTokenID, group.(string))
-
-	d.SetId("")
+	if err := d.Set("scopes", scopes); err != nil {
+		return err
+	}
 
 	return nil
 }

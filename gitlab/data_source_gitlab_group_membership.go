@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -42,7 +41,6 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 				},
 			},
 			"access_level": {
-				Description:      "Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.",
 				Type:             schema.TypeString,
 				Computed:         true,
 				Optional:         true,

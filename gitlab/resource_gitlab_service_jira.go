@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -89,6 +88,16 @@ func resourceGitlabServiceJira() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"push_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"issues_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 			"commit_events": {
 				Description: "Enable notifications for commit events",
 				Type:        schema.TypeBool,
@@ -124,6 +133,26 @@ func resourceGitlabServiceJira() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
+			},
+			"tag_push_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"note_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"pipeline_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"job_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
 			},
 			"comment_on_event_enabled": {
 				Description: "Enable comments inside Jira issues on each GitLab event (commit / merge request)",

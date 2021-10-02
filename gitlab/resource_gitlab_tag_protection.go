@@ -1,10 +1,9 @@
 package gitlab
 
 import (
-	"context"
+	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -39,7 +38,6 @@ func resourceGitlabTagProtection() *schema.Resource {
 				Required:    true,
 			},
 			"create_access_level": {
-				Description:      "One of five levels of access to the project.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,
@@ -103,6 +101,11 @@ func resourceGitlabTagProtectionRead(ctx context.Context, d *schema.ResourceData
 	accessLevel, ok := tagProtectionAccessLevelNames[pt.CreateAccessLevels[0].AccessLevel]
 	if !ok {
 		return diag.Errorf("tag protection access level %d is not supported. Supported are: %v", pt.CreateAccessLevels[0].AccessLevel, tagProtectionAccessLevelNames)
+	}
+
+	accessLevel, ok := tagProtectionAccessLevelNames[pt.CreateAccessLevels[0].AccessLevel]
+	if !ok {
+		return fmt.Errorf("tag protection access level %d is not supported. Supported are: %v", pt.CreateAccessLevels[0].AccessLevel, tagProtectionAccessLevelNames)
 	}
 
 	d.Set("project", project)

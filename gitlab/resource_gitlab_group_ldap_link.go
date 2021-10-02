@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -38,7 +37,6 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 			},
 			// Using the friendlier "access_level" here instead of the GitLab API "group_access".
 			"access_level": {
-				Description:      "Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,

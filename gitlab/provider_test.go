@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 
@@ -18,7 +17,7 @@ func init() {
 	if os.Getenv(resource.TestEnvVar) != "" {
 		testAccProvider = Provider()
 		if err := testAccProvider.Configure(context.TODO(), &terraform.ResourceConfig{}); err != nil {
-			panic(fmt.Sprintf("%#v", err)) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
+			panic(err) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
 		}
 		testAccProviders = map[string]*schema.Provider{
 			"gitlab": testAccProvider,

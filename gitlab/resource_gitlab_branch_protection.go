@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -68,14 +67,12 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required:    true,
 			},
 			"merge_access_level": {
-				Description:      "Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,
 				ForceNew:         true,
 			},
 			"push_access_level": {
-				Description:      "Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,

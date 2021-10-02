@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -43,7 +42,6 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 				Required:    true,
 			},
 			"group_access": {
-				Description:      "One of five levels of access to the group.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				ForceNew:         true,

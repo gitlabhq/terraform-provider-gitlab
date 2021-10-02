@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )

@@ -362,8 +362,6 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 
 func resourceGitlabProject() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage projects within your GitLab group or within your user.",
-
 		CreateContext: resourceGitlabProjectCreate,
 		ReadContext:   resourceGitlabProjectRead,
 		UpdateContext: resourceGitlabProjectUpdate,
@@ -544,7 +542,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.Get("archived").(bool) {
 		// strange as it may seem, this project is created in archived state...
-		if _, _, err := client.Projects.ArchiveProject(d.Id(), gitlab.WithContext(ctx)); err != nil {
+		if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
 			return diag.Errorf("new project %q could not be archived: %s", d.Id(), err)
 		}
 	}
@@ -628,7 +626,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 	}
 
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
-		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions, gitlab.WithContext(ctx)); err != nil {
+		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions); err != nil {
 			return diag.Errorf("Could not update project %q: %s", d.Id(), err)
 		}
 	}
@@ -830,11 +828,11 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("archived") {
 		if d.Get("archived").(bool) {
-			if _, _, err := client.Projects.ArchiveProject(d.Id(), gitlab.WithContext(ctx)); err != nil {
+			if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
 				return diag.Errorf("project %q could not be archived: %s", d.Id(), err)
 			}
 		} else {
-			if _, _, err := client.Projects.UnarchiveProject(d.Id(), gitlab.WithContext(ctx)); err != nil {
+			if _, _, err := client.Projects.UnarchiveProject(d.Id()); err != nil {
 				return diag.Errorf("project %q could not be unarchived: %s", d.Id(), err)
 			}
 		}

@@ -17,12 +17,9 @@ import (
 
 func resourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage GitLab groups.\n" +
-			"Note your provider will need to be configured with admin-level access for this resource to work.",
-
-		CreateContext: resourceGitlabGroupCreate,
-		ReadContext:   resourceGitlabGroupRead,
-		UpdateContext: resourceGitlabGroupUpdate,
+		Create:        resourceGitlabGroupCreate,
+		Read:          resourceGitlabGroupRead,
+		Update:        resourceGitlabGroupUpdate,
 		DeleteContext: resourceGitlabGroupDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,

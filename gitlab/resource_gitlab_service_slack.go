@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -257,7 +256,7 @@ func resourceGitlabServiceSlackRead(ctx context.Context, d *schema.ResourceData,
 	}
 
 	if err = resourceGitlabServiceSlackSetToState(d, service); err != nil {
-		return diag.FromErr(err)
+		return err
 	}
 
 	return nil

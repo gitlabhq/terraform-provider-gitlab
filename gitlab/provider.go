@@ -120,6 +120,24 @@ func Provider() *schema.Provider {
 	return provider
 }
 
+var descriptions map[string]string
+
+func init() {
+	descriptions = map[string]string{
+		"token": "The OAuth2 token or project/personal access token used to connect to GitLab.",
+
+		"base_url": "The GitLab Base API URL",
+
+		"cacert_file": "A file containing the ca certificate to use in case ssl certificate is not from a standard chain",
+
+		"insecure": "Disable SSL verification of API calls",
+
+		"client_cert": "File path to client certificate when GitLab instance is behind company proxy. File  must contain PEM encoded data.",
+
+		"client_key": "File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data.",
+	}
+}
+
 func providerConfigure(ctx context.Context, p *schema.Provider, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	config := Config{
 		Token:         d.Get("token").(string),

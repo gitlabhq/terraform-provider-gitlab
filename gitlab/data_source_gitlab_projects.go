@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/hashstructure"
@@ -386,9 +385,8 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 						"owner": {
-							Description: "The owner of the project, due to Terraform aggregate types limitations, this field's attributes are accessed with the `owner.0` prefix. Structure is documented below.",
-							Type:        schema.TypeList,
-							Computed:    true,
+							Type:     schema.TypeList,
+							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"id": {
@@ -505,9 +503,8 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed:    true,
 						},
 						"namespace": {
-							Description: "Namespace of the project (parent group/s).",
-							Type:        schema.TypeList,
-							Computed:    true,
+							Type:     schema.TypeList,
+							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"id": {
@@ -549,9 +546,8 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed:    true,
 						},
 						"permissions": {
-							Description: "Permissions for the project.",
-							Type:        schema.TypeList,
-							Computed:    true,
+							Type:     schema.TypeList,
+							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"project_access": {
@@ -640,9 +636,8 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed:    true,
 						},
 						"forked_from_project": {
-							Description: "Present if the project is a fork. Contains information about the upstream project.",
-							Type:        schema.TypeList,
-							Computed:    true,
+							Type:     schema.TypeList,
+							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"http_url_to_repo": {

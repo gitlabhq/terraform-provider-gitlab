@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -38,7 +37,6 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 				Required:    true,
 			},
 			"access_level": {
-				Description:      "One of five levels of access to the project.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				ForceNew:         true,
