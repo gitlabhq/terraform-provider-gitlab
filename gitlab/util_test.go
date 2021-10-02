@@ -3,6 +3,7 @@ package gitlab
 import (
 	"testing"
 
+	"github.com/hashicorp/go-cty/cty"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -28,9 +29,9 @@ func TestGitlab_validation(t *testing.T) {
 	validationFunc := validateValueFunc([]string{"valid_one", "valid_two"})
 
 	for _, tc := range cases {
-		_, errors := validationFunc(tc.Value, "test_arg")
+		diags := validationFunc(tc.Value, cty.Path{cty.IndexStep{Key: cty.StringVal("test_arg")}})
 
-		if len(errors) != tc.ErrCount {
+		if len(diags) != tc.ErrCount {
 			t.Fatalf("Expected 1 validation error")
 		}
 	}

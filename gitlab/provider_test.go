@@ -1,36 +1,38 @@
 package gitlab
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"context"
 	"os"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-var testAccProviders map[string]terraform.ResourceProvider
+var testAccProviders map[string]*schema.Provider
 var testAccProvider *schema.Provider
 
 func init() {
 	if os.Getenv(resource.TestEnvVar) != "" {
-		testAccProvider = Provider().(*schema.Provider)
-		if err := testAccProvider.Configure(&terraform.ResourceConfig{}); err != nil {
+		testAccProvider = Provider()
+		if err := testAccProvider.Configure(context.TODO(), &terraform.ResourceConfig{}); err != nil {
 			panic(err) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
 		}
-		testAccProviders = map[string]terraform.ResourceProvider{
+		testAccProviders = map[string]*schema.Provider{
 			"gitlab": testAccProvider,
 		}
 	}
 }
 
 func TestProvider(t *testing.T) {
-	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
+	if err := Provider().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 }
 
 func TestProvider_impl(t *testing.T) {
-	var _ terraform.ResourceProvider = Provider()
+	var _ *schema.Provider = Provider()
 }
 
 func testAccPreCheck(t *testing.T) {

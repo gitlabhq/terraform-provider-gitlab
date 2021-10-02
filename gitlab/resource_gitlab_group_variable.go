@@ -3,7 +3,7 @@ package gitlab
 import (
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -14,7 +14,7 @@ func resourceGitlabGroupVariable() *schema.Resource {
 		Update: resourceGitlabGroupVariableUpdate,
 		Delete: resourceGitlabGroupVariableDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -23,7 +23,7 @@ func resourceGitlabProjectMembership() *schema.Resource {
 		Update: resourceGitlabProjectMembershipUpdate,
 		Delete: resourceGitlabProjectMembershipDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -38,9 +38,9 @@ func resourceGitlabProjectMembership() *schema.Resource {
 				Required: true,
 			},
 			"access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				Required:         true,
 			},
 		},
 	}

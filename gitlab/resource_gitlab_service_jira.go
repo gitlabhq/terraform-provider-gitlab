@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -64,12 +64,42 @@ func resourceGitlabServiceJira() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"push_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"issues_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
 			"commit_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 			"merge_requests_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"tag_push_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"note_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"pipeline_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"job_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,

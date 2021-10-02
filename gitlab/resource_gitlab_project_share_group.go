@@ -5,7 +5,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -17,7 +17,7 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 		Read:   resourceGitlabProjectShareGroupRead,
 		Delete: resourceGitlabProjectShareGroupDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -32,10 +32,10 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 				Required: true,
 			},
 			"access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				ForceNew:     true,
-				Required:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ForceNew:         true,
+				Required:         true,
 			},
 		},
 	}
