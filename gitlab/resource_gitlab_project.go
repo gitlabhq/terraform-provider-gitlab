@@ -163,9 +163,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 	},
 	"squash_option": {
-		Type:     schema.TypeString,
-		Optional: true,
-		Default:  "default_off",
+		Type:         schema.TypeString,
+		Optional:     true,
+		Default:      "default_off",
 		ValidateFunc: validation.StringInSlice([]string{"never", "default_on", "always", "default_off"}, true),
 	},
 	"remove_source_branch_after_merge": {
