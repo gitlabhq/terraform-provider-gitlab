@@ -232,7 +232,7 @@ resource gitlab_instance_cluster "foo" {
   managed                       = "%s"
   kubernetes_api_url            = "https://123.123.123"
   kubernetes_token              = "some-token"
-	kubernetes_ca_cert            = "${trimspace(var.cert)}"
+	kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "abac"
 }
 `, instanceClusterFakeCert, rInt, m)
@@ -251,7 +251,7 @@ resource gitlab_instance_cluster "foo" {
   domain                        = "example-new.com"
   kubernetes_api_url            = "https://124.124.124"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "%s"
 }
 `, instanceClusterFakeCert, rInt, authType)

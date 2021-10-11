@@ -79,6 +79,9 @@ func resourceGitlabGroupCluster() *schema.Resource {
 			"kubernetes_ca_cert": {
 				Type:     schema.TypeString,
 				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return strings.TrimSpace(old) == strings.TrimSpace(new)
+				},
 			},
 			"kubernetes_authorization_type": {
 				Type:         schema.TypeString,
