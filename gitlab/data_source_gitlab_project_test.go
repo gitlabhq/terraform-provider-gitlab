@@ -17,6 +17,11 @@ func TestAccDataGitlabProject_basic(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
+				Config: testAccDataGitlabProjectConfigByPathWithNamespace(projectname),
+				Check: testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo",
+					[]string{"id", "name", "path", "visibility", "description"}),
+			},
+			{
 				Config: testAccDataGitlabProjectConfig(projectname),
 				Check: testAccDataSourceGitlabProject("gitlab_project.test", "data.gitlab_project.foo",
 					[]string{"id", "name", "path", "visibility", "description"}),
@@ -64,6 +69,21 @@ resource "gitlab_project" "test"{
 
 data "gitlab_project" "foo" {
 	id = "${gitlab_project.test.id}"
+}
+	`, projectname, projectname)
+}
+
+func testAccDataGitlabProjectConfigByPathWithNamespace(projectname string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "test"{
+	name = "%s"
+	path = "%s"
+	description = "Terraform acceptance tests"
+	visibility_level = "public"
+}
+
+data "gitlab_project" "foo" {
+	id = gitlab_project.test.path_with_namespace
 }
 	`, projectname, projectname)
 }

@@ -1,8 +1,6 @@
 # gitlab\_project
 
-This resource allows you to create and manage projects within your
-GitLab group or within your user.
-
+This resource allows you to create and manage projects within your GitLab group or within your user.
 
 ## Example Usage
 
@@ -12,6 +10,18 @@ resource "gitlab_project" "example" {
   description = "My awesome codebase"
 
   visibility_level = "public"
+}
+
+# Project with custom push rules
+resource "gitlab_project" "example-two" {
+  name = "example-two"
+
+  push_rules {
+    author_email_regex     = "@example\\.com$"
+    commit_committer_check = true
+    member_check           = true
+    prevent_secrets        = true
+  }
 }
 ```
 
@@ -33,6 +43,15 @@ The following arguments are supported:
 * `default_branch` - (Optional) The default branch for the project.
 
 * `import_url` - (Optional) Git URL to a repository to be imported.
+
+* `mirror` (Optional) Enables pull mirroring in a project. Default is `false`. For further information on mirroring,
+consult the [gitlab documentation](https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring).
+
+* `mirror_trigger_builds` (Optional) Pull mirroring triggers builds. Default is `false`.
+
+* `mirror_overwrites_diverged_branches` (Optional) Pull mirror overwrites diverged branches.
+
+* `only_mirror_protected_branches` (Optional) Only mirror protected branches.
 
 * `request_access_enabled` - Allow users to request member access.
 
@@ -64,11 +83,13 @@ The following arguments are supported:
 
 * `only_allow_merge_if_all_discussions_are_resolved` - (Optional) Set to true if you want allow merges only if all discussions are resolved.
 
+* `allow_merge_on_skipped_pipeline` - (Optional) Set to true if you want to treat skipped pipelines as if they finished with success.
+
 * `shared_runners_enabled` - (Optional) Enable shared runners for this project.
 
 * `archived` - (Optional) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 
-* `initialize_with_readme` - (Optional) Create master branch with first commit containing a README.md file.
+* `initialize_with_readme` - (Optional) Create main branch with first commit containing a README.md file.
 
 * `packages_enabled` - (Optional) Enable packages repository for the project.
 
@@ -81,6 +102,14 @@ The following arguments are supported:
 * `use_custom_template` - (Optional) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
 
 * `group_with_project_templates_id` - (Optional) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+
+* `pages_access_level` - (Optional) Enable pages access control
+  Valid values are `disabled`, `private`, `enabled`, `public`.
+  `private` is the default.
+
+* `build_coverage_regex` - (Optional) Test coverage parsing for the project.
+
+* `ci_config_path` - (Optional) Custom Path to CI config file.
 
 ## Attributes Reference
 
@@ -132,13 +161,15 @@ For information on push rules, consult the [GitLab documentation](https://docs.g
 
 * `max_file_size` - (Optional, int) Maximum file size (MB).
 
-## Importing projects
+## Import
 
 You can import a project state using `terraform import <resource> <id>`.  The
 `id` can be whatever the [get single project api][get_single_project] takes for
 its `:id` value, so for example:
 
-    terraform import gitlab_project.example richardc/example
+```shell
+$ terraform import gitlab_project.example richardc/example
+```
 
 [get_single_project]: https://docs.gitlab.com/ee/api/projects.html#get-single-project
 [group_members_permissions]: https://docs.gitlab.com/ce/user/permissions.html#group-members-permissions

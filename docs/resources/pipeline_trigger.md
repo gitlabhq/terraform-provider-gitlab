@@ -18,3 +18,11 @@ The following arguments are supported:
 * `project` - (Required, string) The name or id of the project to add the trigger to.
 
 * `description` - (Required, string) The description of the pipeline trigger.
+
+## Import
+
+GitLab pipeline triggers can be imported using an id made up of `{project_id}:{pipeline_trigger_id}`, e.g.
+
+```
+$ terraform import gitlab_pipeline_trigger.test 1:3
+```

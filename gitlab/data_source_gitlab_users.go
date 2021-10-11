@@ -194,7 +194,7 @@ func dataSourceGitlabUsersRead(d *schema.ResourceData, meta interface{}) error {
 		page = page + 1
 	}
 
-	d.Set("users", flattenGitlabUsers(users))
+	d.Set("users", flattenGitlabUsers(users)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 	d.SetId(fmt.Sprintf("%d", id))
 
 	return nil

@@ -100,6 +100,7 @@ func TestAccGitlabInstanceCluster_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabInstanceCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
@@ -217,7 +218,6 @@ func testAccCheckGitlabInstanceClusterAttributes(cluster *gitlab.InstanceCluster
 
 func testAccGitlabInstanceClusterConfig(rInt int, managed bool) string {
 	m := fmt.Sprintf("%t", managed)
-	fmt.Println(m)
 
 	return fmt.Sprintf(`
 variable "cert" {

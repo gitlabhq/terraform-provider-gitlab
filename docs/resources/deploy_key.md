@@ -1,7 +1,6 @@
 # gitlab\_deploy\_key
 
-This resource allows you to create and manage deploy keys for your GitLab projects.
-
+This resource allows you to create and manage [deploy keys](https://docs.gitlab.com/ee/user/project/deploy_keys/) for your GitLab projects.
 
 ## Example Usage
 

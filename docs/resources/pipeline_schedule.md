@@ -25,7 +25,7 @@ The following arguments are supported:
 
 * `ref` - (Required, string) The branch/tag name to be triggered.
 
-* `cron` - (Required, string) 	The cron (e.g. `0 1 * * *`).
+* `cron` - (Required, string) The cron (e.g. `0 1 * * *`).
 
 * `cron_timezone` - (Optional, string) The timezone.
 
@@ -33,6 +33,8 @@ The following arguments are supported:
 
 ## Import
 
-Pipeline schedules can be imported using an id made up of `project_id:pipeline_schedule_id`, e.g.
+GitLab pipeline schedules can be imported using an id made up of `{project_id}:{pipeline_schedule_id}`, e.g.
 
-    terraform import gitlab_pipeline_schedule.example 123456789:13
+```
+$ terraform import gitlab_pipeline_schedule.test 1:3
+```

@@ -13,6 +13,7 @@ import (
 )
 
 func resourceGitlabDeployToken() *schema.Resource {
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabDeployTokenCreate,
 		Read:   resourceGitlabDeployTokenRead,
@@ -43,10 +44,11 @@ func resourceGitlabDeployToken() *schema.Resource {
 				ForceNew: true,
 			},
 			"expires_at": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ValidateFunc: validation.IsRFC3339Time,
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateFunc:     validation.IsRFC3339Time,
+				DiffSuppressFunc: expiresAtSuppressFunc,
+				ForceNew:         true,
 			},
 			"scopes": {
 				Type:     schema.TypeSet,
@@ -67,16 +69,26 @@ func resourceGitlabDeployToken() *schema.Resource {
 	}
 }
 
+func expiresAtSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
+	oldDate, oldDateErr := time.Parse(time.RFC3339, old)
+	newDate, newDateErr := time.Parse(time.RFC3339, new)
+	if oldDateErr != nil || newDateErr != nil {
+		return false
+	}
+	return oldDate == newDate
+}
+
 func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 	project, isProject := d.GetOk("project")
 	group, isGroup := d.GetOk("group")
 
-	var expiresAt time.Time
+	var expiresAt *time.Time
 	var err error
 
 	if exp, ok := d.GetOk("expires_at"); ok {
-		expiresAt, err = time.Parse(time.RFC3339, exp.(string))
+		parsedExpiresAt, err := time.Parse(time.RFC3339, exp.(string))
+		expiresAt = &parsedExpiresAt
 		if err != nil {
 			return fmt.Errorf("Invalid expires_at date: %v", err)
 		}
@@ -90,7 +102,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 		options := &gitlab.CreateProjectDeployTokenOptions{
 			Name:      gitlab.String(d.Get("name").(string)),
 			Username:  gitlab.String(d.Get("username").(string)),
-			ExpiresAt: gitlab.Time(expiresAt),
+			ExpiresAt: expiresAt,
 			Scopes:    *scopes,
 		}
 
@@ -102,7 +114,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 		options := &gitlab.CreateGroupDeployTokenOptions{
 			Name:      gitlab.String(d.Get("name").(string)),
 			Username:  gitlab.String(d.Get("username").(string)),
-			ExpiresAt: gitlab.Time(expiresAt),
+			ExpiresAt: expiresAt,
 			Scopes:    *scopes,
 		}
 
@@ -151,7 +163,10 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 		if token.ID == deployTokenID {
 			d.Set("name", token.Name)
 			d.Set("username", token.Username)
-			d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
+
+			if token.ExpiresAt != nil {
+				d.Set("expires_at", token.ExpiresAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+			}
 
 			for _, scope := range token.Scopes {
 				if scope == "read_repository" {

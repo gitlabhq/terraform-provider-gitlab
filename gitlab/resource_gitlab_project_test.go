@@ -1,6 +1,9 @@
+// lintignore: AT012 // TODO: Resolve this tfproviderlint issue
+
 package gitlab
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -18,7 +21,7 @@ type testAccGitlabProjectExpectedAttributes struct {
 }
 
 func TestAccGitlabProject_basic(t *testing.T) {
-	var received, defaults, defaultsMasterBranch gitlab.Project
+	var received, defaults, defaultsMainBranch gitlab.Project
 	rInt := acctest.RandInt()
 
 	defaults = gitlab.Project{
@@ -41,12 +44,16 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		Archived:        false, // needless, but let's make this explicit
-		PackagesEnabled: true,
+		AllowMergeOnSkippedPipeline:               false,
+		Archived:                                  false, // needless, but let's make this explicit
+		PackagesEnabled:                           true,
+		PagesAccessLevel:                          gitlab.PublicAccessControl,
+		BuildCoverageRegex:                        "foo",
+		CIConfigPath:                              ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
-	defaultsMasterBranch = defaults
-	defaultsMasterBranch.DefaultBranch = "master"
+	defaultsMainBranch = defaults
+	defaultsMainBranch.DefaultBranch = "main"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -82,8 +89,11 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						Archived:        true,
-						PackagesEnabled: false,
+						AllowMergeOnSkippedPipeline:               true,
+						Archived:                                  true,
+						PackagesEnabled:                           false,
+						PagesAccessLevel:                          gitlab.DisabledAccessControl,
+						BuildCoverageRegex:                        "bar",
 					}, &received),
 				),
 			},
@@ -98,11 +108,11 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			// Update the project creating the default branch
 			{
 				// Get the ID from the project data at the previous step
-				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "master"),
-				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				SkipFunc: testAccGitlabProjectConfigDefaultBranchSkipFunc(&received, "main"),
+				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "main"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(&defaultsMasterBranch, &received),
+					testAccCheckAggregateGitlabProject(&defaultsMainBranch, &received),
 				),
 			},
 			// Test import without push rules (checks read function)
@@ -148,6 +158,36 @@ max_file_size = 123
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Update some push rules but not others
+			{
+				SkipFunc: isRunningInCE,
+				Config: testAccGitlabProjectConfigPushRules(rInt, `
+author_email_regex = "foo_author"
+branch_name_regex = "foo_branch"
+commit_message_regex = "foo_commit"
+commit_message_negative_regex = "foo_not_commit"
+file_name_regex = "foo_file_2"
+commit_committer_check = true
+deny_delete_tag = true
+member_check = false
+prevent_secrets = true
+reject_unsigned_commits = true
+max_file_size = 1234
+`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					AuthorEmailRegex:           "foo_author",
+					BranchNameRegex:            "foo_branch",
+					CommitMessageRegex:         "foo_commit",
+					CommitMessageNegativeRegex: "foo_not_commit",
+					FileNameRegex:              "foo_file_2",
+					CommitCommitterCheck:       true,
+					DenyDeleteTag:              true,
+					MemberCheck:                false,
+					PreventSecrets:             true,
+					RejectUnsignedCommits:      true,
+					MaxFileSize:                1234,
+				}),
+			},
 			// Try to add push rules to an existing project in CE
 			{
 				SkipFunc:    isRunningInEE,
@@ -166,7 +206,7 @@ max_file_size = 123
 			// NOTE: The push rules will still exist upstream because the push_rules block is computed.
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Config:   testAccGitlabProjectConfigDefaultBranch(rInt, "main"),
 				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
 					AuthorEmailRegex: "foo_author",
 				}),
@@ -181,7 +221,7 @@ max_file_size = 123
 			},
 			// Destroy the project so we can next test creating a project with push rules simultaneously
 			{
-				Config:  testAccGitlabProjectConfigDefaultBranch(rInt, "master"),
+				Config:  testAccGitlabProjectConfigDefaultBranch(rInt, "main"),
 				Destroy: true,
 				Check:   testAccCheckGitlabProjectDestroy,
 			},
@@ -292,9 +332,7 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Config: testAccGitlabProjectConfigInitializeWithReadme(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
-					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
-						DefaultBranch: "master",
-					}),
+					testAccCheckGitlabProjectDefaultBranch(&project, nil),
 				),
 			},
 		},
@@ -324,7 +362,10 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		PackagesEnabled: true,
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PublicAccessControl,
+		BuildCoverageRegex: "foo",
+		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -361,6 +402,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
@@ -423,7 +465,9 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-		PackagesEnabled: true,
+		PackagesEnabled:    true,
+		PagesAccessLevel:   gitlab.PrivateAccessControl,
+		BuildCoverageRegex: "foo",
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -450,6 +494,7 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURL(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
 	if os.Getenv(resource.TestEnvVar) == "" {
@@ -468,11 +513,11 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 		t.Fatalf("failed to create base project: %v", err)
 	}
 
-	defer client.Projects.DeleteProject(baseProject.ID)
+	defer client.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `client.Projects.DeleteProject` is not checked (errcheck)
 
 	// Add a file to the base project, for later verifying the import.
 	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
-		Branch:        gitlab.String("master"),
+		Branch:        gitlab.String("main"),
 		CommitMessage: gitlab.String("add file"),
 		Content:       gitlab.String(""),
 	})
@@ -492,7 +537,191 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_initializeWithReadmeAndCustomDefaultBranch(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name        = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  initialize_with_readme = true
+  default_branch         = "foo"
+}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("gitlab_project.foo", "initialize_with_readme", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.foo", "default_branch", "foo"),
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
+						DefaultBranch: "foo",
+					}),
+				),
+			},
+		},
+	})
+}
+
+type testAccGitlabProjectMirroredExpectedAttributes struct {
+	Mirror                           bool
+	MirrorTriggerBuilds              bool
+	MirrorOverwritesDivergedBranches bool
+	OnlyMirrorProtectedBranches      bool
+}
+
+func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *testAccGitlabProjectMirroredExpectedAttributes) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		if project.Mirror != want.Mirror {
+			return fmt.Errorf("got mirror %t; want %t", project.Mirror, want.Mirror)
+		}
+
+		if project.MirrorTriggerBuilds != want.MirrorTriggerBuilds {
+			return fmt.Errorf("got mirror_trigger_builds %t; want %t", project.MirrorTriggerBuilds, want.MirrorTriggerBuilds)
+		}
+
+		if project.MirrorOverwritesDivergedBranches != want.MirrorOverwritesDivergedBranches {
+			return fmt.Errorf("got mirror_overwrites_diverged_branches %t; want %t", project.MirrorOverwritesDivergedBranches, want.MirrorOverwritesDivergedBranches)
+		}
+
+		if project.OnlyMirrorProtectedBranches != want.OnlyMirrorProtectedBranches {
+			return fmt.Errorf("got only_mirror_protected_branches %t; want %t", project.OnlyMirrorProtectedBranches, want.OnlyMirrorProtectedBranches)
+		}
+		return nil
+	}
+}
+
+// lintignore: AT002 // not a Terraform import test
+func TestAccGitlabProject_importURLMirrored(t *testing.T) {
+	// Since we do some manual setup in this test, we need to handle the test skip first.
+	if os.Getenv(resource.TestEnvVar) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	}
+
+	client := testAccProvider.Meta().(*gitlab.Client)
+	var mirror gitlab.Project
+	rInt := acctest.RandInt()
+
+	// Create a base project for importing.
+	baseProject, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+		Name:       gitlab.String(fmt.Sprintf("base-%d", rInt)),
+		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
+	})
+	if err != nil {
+		t.Fatalf("failed to create base project: %v", err)
+	}
+
+	defer client.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `client.Projects.DeleteProject` is not checked (errcheck)
+
+	// Add a file to the base project, for later verifying the import.
+	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
+		Branch:        gitlab.String("main"),
+		CommitMessage: gitlab.String("add file"),
+		Content:       gitlab.String(""),
+	})
+	if err != nil {
+		t.Fatalf("failed to commit file to base project: %v", err)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				// First, import, as mirrored
+				Config:   testAccGitlabProjectConfigImportURLMirror(rInt, baseProject.HTTPURLToRepo),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror:                           true,
+						MirrorTriggerBuilds:              true,
+						MirrorOverwritesDivergedBranches: true,
+						OnlyMirrorProtectedBranches:      true,
+					}),
+
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			{
+				// Second, disable all optional mirroring options
+				Config:   testAccGitlabProjectConfigImportURLMirrorDisabledOptionals(rInt, baseProject.HTTPURLToRepo),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror:                           true,
+						MirrorTriggerBuilds:              false,
+						MirrorOverwritesDivergedBranches: false,
+						OnlyMirrorProtectedBranches:      false,
+					}),
+
+					// Ensure the test file still is as expected
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get file from imported project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+			{
+				// Third, disable mirroring, using the original ImportURL acceptance test
+				Config:   testAccGitlabProjectConfigImportURLMirrorDisabled(rInt, baseProject.HTTPURLToRepo),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.imported", &mirror),
+					resource.TestCheckResourceAttr("gitlab_project.imported", "import_url", baseProject.HTTPURLToRepo),
+					testAccCheckGitlabProjectMirroredAttributes(&mirror, &testAccGitlabProjectMirroredExpectedAttributes{
+						Mirror:                           false,
+						MirrorTriggerBuilds:              false,
+						MirrorOverwritesDivergedBranches: false,
+						OnlyMirrorProtectedBranches:      false,
+					}),
+
+					// Ensure the test file still is as expected
+					func(state *terraform.State) error {
+						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -508,6 +737,7 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 func TestAccGitlabProjec_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
+	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -580,10 +810,16 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 				} else {
 					return err
 				}
-
 			}
-			resourceGitlabProjectSetToState(expectedData, expected)
-			resourceGitlabProjectSetToState(receivedData, received)
+
+			if err := resourceGitlabProjectSetToState(expectedData, expected); err != nil {
+				return err
+			}
+
+			if err := resourceGitlabProjectSetToState(receivedData, received); err != nil {
+				return err
+			}
+
 			return testAccCompareGitLabAttribute(attribute, expectedData, receivedData)
 		})
 	}
@@ -592,8 +828,23 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 
 func testAccCheckGitlabProjectDefaultBranch(project *gitlab.Project, want *testAccGitlabProjectExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if project.DefaultBranch != want.DefaultBranch {
+		if want != nil && project.DefaultBranch != want.DefaultBranch {
 			return fmt.Errorf("got default branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
+		}
+
+		client := testAccProvider.Meta().(*gitlab.Client)
+
+		branches, _, err := client.Branches.ListBranches(project.ID, nil)
+		if err != nil {
+			return fmt.Errorf("failed to list branches: %w", err)
+		}
+
+		if len(branches) != 1 {
+			return fmt.Errorf("expected 1 branch for new project; found %d", len(branches))
+		}
+
+		if !branches[0].Protected {
+			return errors.New("expected default branch to be protected")
 		}
 
 		return nil
@@ -691,6 +942,7 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
+  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, rInt)
 }
@@ -717,6 +969,7 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
+  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, rInt, rInt, rInt)
 }
@@ -746,6 +999,10 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  pages_access_level = "public"
+  build_coverage_regex = "foo"
+  allow_merge_on_skipped_pipeline = false
+  ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
 }
 	`, rInt, rInt, defaultBranchStatement)
 }
@@ -754,12 +1011,21 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 	return func() (bool, error) {
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
+		// Commit data
 		commitMessage := "Initial Commit"
-
+		commitFile := "file.txt"
+		commitFileAction := gitlab.FileCreate
+		commitActions := []*gitlab.CommitActionOptions{
+			{
+				Action:   &commitFileAction,
+				FilePath: &commitFile,
+				Content:  &commitMessage,
+			},
+		}
 		options := &gitlab.CreateCommitOptions{
 			Branch:        &defaultBranch,
 			CommitMessage: &commitMessage,
-			Actions:       []*gitlab.CommitAction{},
+			Actions:       commitActions,
 		}
 
 		_, _, err := conn.Commits.CreateCommit(project.ID, options)
@@ -790,6 +1056,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  allow_merge_on_skipped_pipeline = true
 
   request_access_enabled = false
   issues_enabled = false
@@ -803,6 +1070,8 @@ resource "gitlab_project" "foo" {
   shared_runners_enabled = false
   archived = true
   packages_enabled = false
+  pages_access_level = "disabled"
+  build_coverage_regex = "bar"
 }
 	`, rInt, rInt)
 }
@@ -822,8 +1091,62 @@ func testAccGitlabProjectConfigImportURL(rInt int, importURL string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project" "imported" {
   name = "imported-%d"
-  default_branch = "master"
+  default_branch = "main"
   import_url = "%s"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirror(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "main"
+  import_url = "%s"
+  mirror = true
+  mirror_trigger_builds = true
+  mirror_overwrites_diverged_branches = true
+  only_mirror_protected_branches = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirrorDisabledOptionals(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "main"
+  import_url = "%s"
+  mirror = true
+  mirror_trigger_builds = false
+  mirror_overwrites_diverged_branches = false
+  only_mirror_protected_branches = false
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+`, rInt, importURL)
+}
+
+func testAccGitlabProjectConfigImportURLMirrorDisabled(rInt int, importURL string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "imported" {
+  name = "imported-%d"
+  default_branch = "main"
+  import_url = "%s"
+  mirror = false
+  mirror_trigger_builds = false
+  mirror_overwrites_diverged_branches = false
+  only_mirror_protected_branches = false
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
@@ -838,7 +1161,6 @@ resource "gitlab_project" "foo" {
   name = "foo-%[1]d"
   path = "foo.%[1]d"
   description = "Terraform acceptance tests"
-  default_branch = "master"
 
   push_rules {
 %[2]s
@@ -865,7 +1187,7 @@ resource "gitlab_project" "template-name" {
 // 2020-09-07: Currently Gitlab (version 13.3.6 ) doesn't allow in admin API
 // ability to set a group as instance level templates.
 // To test resource_gitlab_project_test template features we add
-// group, project myrails and admin settings directly in scripts/start-gitlab.sh
+// group, project myrails and admin settings directly in scripts/healthcheck-and-setup.sh
 // Once Gitlab add admin template in API we could manage group/project/settings
 // directly in tests like TestAccGitlabProject_basic.
 func testAccGitlabProjectConfigTemplateNameCustom(rInt int) string {

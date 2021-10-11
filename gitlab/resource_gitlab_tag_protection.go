@@ -14,6 +14,7 @@ func resourceGitlabTagProtection() *schema.Resource {
 	for k := range accessLevelID {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabTagProtectionCreate,
 		Read:   resourceGitlabTagProtectionRead,

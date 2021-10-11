@@ -54,6 +54,7 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabServiceGithub_import(t *testing.T) {
 	githubResourceName := "gitlab_service_github.github"
 	rInt := acctest.RandInt()

@@ -66,6 +66,7 @@ func TestAccGitlabPipelineSchedule_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabPipelineSchedule_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resourceName := "gitlab_pipeline_schedule.schedule"
@@ -80,29 +81,30 @@ func TestAccGitlabPipelineSchedule_import(t *testing.T) {
 			},
 			{
 				ResourceName:      resourceName,
+				ImportStateIdFunc: getPipelineScheduleImportID(resourceName),
 				ImportState:       true,
-				ImportStateIdFunc: getPipelineScheduleID(resourceName),
 				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
-func getPipelineScheduleID(n string) resource.ImportStateIdFunc {
+func getPipelineScheduleImportID(n string) resource.ImportStateIdFunc {
 	return func(s *terraform.State) (string, error) {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return "", fmt.Errorf("not found: %s", n)
+			return "", fmt.Errorf("Not Found: %s", n)
 		}
 
 		pipelineScheduleID := rs.Primary.ID
 		if pipelineScheduleID == "" {
-			return "", fmt.Errorf("no pipeline schedule ID is set")
+			return "", fmt.Errorf("No pipeline schedule ID is set")
 		}
 		projectID := rs.Primary.Attributes["project"]
 		if projectID == "" {
-			return "", fmt.Errorf("no project ID is set")
+			return "", fmt.Errorf("No project ID is set")
 		}
+
 		return fmt.Sprintf("%s:%s", projectID, pipelineScheduleID), nil
 	}
 }

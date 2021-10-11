@@ -2,97 +2,77 @@ package gitlab
 
 import (
 	"fmt"
-	"reflect"
-	"sort"
+	. "github.com/onsi/gomega"
 	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
+	// Set up project, groups, users, and branches to use in the test.
+
+	testAccCheck(t)
+
+	client := testAccNewClient(t)
+
+	testAccCheckEE(t, client)
+
+	// Need to get the current user (usually the admin) because they are automatically added as group members, and we
+	// will need the user ID for our assertions later.
+	currentUser := testAccCurrentUser(t, client)
+
+	project := testAccCreateProject(t, client)
+	projectUsers := testAccCreateUsers(t, client, 2)
+	branches := testAccCreateProtectedBranches(t, client, project, 2)
+	groups := testAccCreateGroups(t, client, 2)
+	group0Users := testAccCreateUsers(t, client, 1)
+	group1Users := testAccCreateUsers(t, client, 1)
+
+	testAccAddProjectMembers(t, client, project.ID, projectUsers) // Users must belong to the project for rules to work.
+	testAccAddGroupMembers(t, client, groups[0].ID, group0Users)
+	testAccAddGroupMembers(t, client, groups[1].ID, group1Users)
+
+	// Terraform test starts here.
+
 	var projectApprovalRule gitlab.ProjectApprovalRule
-	randomInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
 		Providers:    testAccProviders,
-		PreCheck:     func() { testAccPreCheck(t) },
-		CheckDestroy: testAccCheckGitlabProjectApprovalRuleDestroy,
+		CheckDestroy: testAccCheckGitlabProjectApprovalRuleDestroy(client, project.ID),
 		Steps: []resource.TestStep{
-			{ // Create Rule
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 3, "", "gitlab_group.foo.id"),
+			// Create rule
+			{
+				Config: testAccGitlabProjectApprovalRuleConfig(project.ID, 3, projectUsers[0].ID, groups[0].ID, branches[0].ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
-						ApproverUsernames: []string{fmt.Sprintf("foo-user-%d", randomInt)},
-						ApprovalsRequired: 3,
-						GroupPaths:        []string{fmt.Sprintf("foo-group-%d", randomInt)},
-						Name:              fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt:         randomInt,
+						Name:                "foo",
+						ApprovalsRequired:   3,
+						EligibleApproverIDs: []int{currentUser.ID, projectUsers[0].ID, group0Users[0].ID},
+						GroupIDs:            []int{groups[0].ID},
+						ProtectedBranchIDs:  []int{branches[0].ID},
 					}),
 				),
 			},
-			{ // Add group and user
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 2, "gitlab_user.baz.id", "gitlab_group.bar.id, gitlab_group.foo.id"),
+			// Update rule
+			{
+				Config: testAccGitlabProjectApprovalRuleConfig(project.ID, 2, projectUsers[1].ID, groups[1].ID, branches[1].ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
 					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
-						ApproverUsernames: []string{
-							fmt.Sprintf("bar-user-%d", randomInt),
-							fmt.Sprintf("baz-user-%d", randomInt),
-							fmt.Sprintf("foo-user-%d", randomInt),
-						},
-						ApprovalsRequired: 2,
-						GroupPaths: []string{
-							fmt.Sprintf("bar-group-%d", randomInt),
-							fmt.Sprintf("foo-group-%d", randomInt),
-						},
-						Name:      fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt: randomInt,
+						Name:                "foo",
+						ApprovalsRequired:   2,
+						EligibleApproverIDs: []int{currentUser.ID, projectUsers[1].ID, group1Users[0].ID},
+						GroupIDs:            []int{groups[1].ID},
+						ProtectedBranchIDs:  []int{branches[1].ID},
 					}),
 				),
 			},
-			{ // Remove group and user
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 1, "gitlab_user.qux.id", "gitlab_group.bar.id"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
-					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
-						ApproverUsernames: []string{
-							fmt.Sprintf("bar-user-%d", randomInt),
-							fmt.Sprintf("qux-user-%d", randomInt),
-						},
-						ApprovalsRequired: 1,
-						GroupPaths:        []string{fmt.Sprintf("bar-group-%d", randomInt)},
-						Name:              fmt.Sprintf("foo rule %d", randomInt),
-						RandomInt:         randomInt,
-					}),
-				),
-			},
-		},
-	})
-}
-
-func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
-	randomInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		PreCheck:     func() { testAccPreCheck(t) },
-		CheckDestroy: testAccCheckGitlabProjectApprovalRuleDestroy,
-		Steps: []resource.TestStep{
-			{ // Create Rule
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitLabProjectApprovalRuleConfig(randomInt, 1, "", "gitlab_group.foo.id"),
-			},
-			{ // Verify Import
-				SkipFunc:          isRunningInCE,
+			// Verify import
+			{
 				ResourceName:      "gitlab_project_approval_rule.foo",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -102,162 +82,50 @@ func TestAccGitLabProjectApprovalRule_import(t *testing.T) {
 }
 
 type testAccGitlabProjectApprovalRuleExpectedAttributes struct {
-	ApprovalsRequired int
-	ApproverUsernames []string
-	GroupPaths        []string
-	Name              string
-	RandomInt         int
+	Name                string
+	ApprovalsRequired   int
+	EligibleApproverIDs []int
+	GroupIDs            []int
+	ProtectedBranchIDs  []int
 }
 
-func testAccCheckGitlabProjectApprovalRuleAttributes(projectApprovalRule *gitlab.ProjectApprovalRule, want *testAccGitlabProjectApprovalRuleExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabProjectApprovalRuleAttributes(got *gitlab.ProjectApprovalRule, want *testAccGitlabProjectApprovalRuleExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		if projectApprovalRule.Name != want.Name {
-			return fmt.Errorf("got name %s; want %s", projectApprovalRule.Name, want.Name)
-		}
+		return InterceptGomegaFailure(func() {
+			Expect(got.Name).To(Equal(want.Name), "name")
+			Expect(got.ApprovalsRequired).To(Equal(want.ApprovalsRequired), "approvals_required")
 
-		if projectApprovalRule.ApprovalsRequired != want.ApprovalsRequired {
-			return fmt.Errorf("got approvals_required %d; want %d", projectApprovalRule.ApprovalsRequired, want.ApprovalsRequired)
-		}
-
-		// Compare unique usernames
-		var userNames []string
-		for _, approver := range projectApprovalRule.EligibleApprovers {
-			// Approvers will include the group creator, which will come from the GITLAB_TOKEN user.
-			// Filter for users with RandomInt in the username
-			if strings.HasSuffix(approver.Username, strconv.Itoa(want.RandomInt)) {
-				userNames = append(userNames, approver.Username)
+			var approverIDs []int
+			for _, approver := range got.EligibleApprovers {
+				approverIDs = append(approverIDs, approver.ID)
 			}
-		}
-		sort.Strings(userNames)
+			Expect(approverIDs).To(ConsistOf(want.EligibleApproverIDs), "eligible_approvers")
 
-		if !reflect.DeepEqual(userNames, want.ApproverUsernames) {
-			return fmt.Errorf("got approvers %s; want %s", userNames, want.ApproverUsernames)
-		}
+			var groupIDs []int
+			for _, group := range got.Groups {
+				groupIDs = append(groupIDs, group.ID)
+			}
+			Expect(groupIDs).To(ConsistOf(want.GroupIDs), "groups")
 
-		// Compare unique group paths
-		var groupPaths []string
-		for _, group := range projectApprovalRule.Groups {
-			groupPaths = append(groupPaths, group.Path)
-		}
-		sort.Strings(groupPaths)
-
-		if !reflect.DeepEqual(groupPaths, want.GroupPaths) {
-			return fmt.Errorf("got groups %s; want %s", groupPaths, want.GroupPaths)
-		}
-
-		return nil
+			var protectedBranchIDs []int
+			for _, branch := range got.ProtectedBranches {
+				protectedBranchIDs = append(protectedBranchIDs, branch.ID)
+			}
+			Expect(protectedBranchIDs).To(ConsistOf(want.ProtectedBranchIDs), "protected_branches")
+		})
 	}
 }
 
-func testAccGitLabProjectApprovalRuleConfig(
-	randomInt int,
-	approvals int,
-	userIDs string,
-	groupIDs string,
-) string {
+func testAccGitlabProjectApprovalRuleConfig(project, approvals, userID, groupID, protectedBranchID int) string {
 	return fmt.Sprintf(`
-resource "gitlab_user" "foo" {
-	name             = "foo user"
-	username         = "foo-user-%[1]d"
-	password         = "foo12345"
-	email            = "foo-user%[1]d@ssss.com"
-	is_admin         = false
-  projects_limit   = 2
-  can_create_group = false
-  is_external      = false
-}
-
-resource "gitlab_user" "bar" {
-	name             = "bar user"
-	username         = "bar-user-%[1]d"
-	password         = "bar12345"
-	email            = "bar-user%[1]d@ssss.com"
-	is_admin         = false
-  projects_limit   = 2
-  can_create_group = false
-  is_external      = false
-}
-
-resource "gitlab_user" "baz" {
-	name             = "baz user"
-	username         = "baz-user-%[1]d"
-	password         = "baz12345"
-	email            = "baz-user%[1]d@ssss.com"
-	is_admin         = false
-  projects_limit   = 2
-  can_create_group = false
-  is_external      = false
-}
-
-resource "gitlab_user" "qux" {
-	name             = "qux user"
-	username         = "qux-user-%[1]d"
-	password         = "qux12345"
-	email            = "qux-user%[1]d@ssss.com"
-	is_admin         = false
-  projects_limit   = 2
-  can_create_group = false
-  is_external      = false
-}
-
-resource "gitlab_project" "foo" {
-	name              = "foo project %[1]d"
-	path              = "foo-project-%[1]d"
-	description       = "Terraform acceptance test - Approval Rule"
-	visibility_level  = "public"
-}
-
-resource "gitlab_project_membership" "baz" {
-  project_id     = gitlab_project.foo.id
-  user_id        = gitlab_user.baz.id
-  access_level   = "developer"
-}
-
-resource "gitlab_project_membership" "qux" {
-  project_id     = gitlab_project.foo.id
-  user_id        = gitlab_user.qux.id
-  access_level   = "developer"
-}
-
-resource "gitlab_group" "foo" {
-	name             = "foo-group %[1]d"
-	path             = "foo-group-%[1]d"
-	description      = "Terraform acceptance tests - Approval Rule"
-	visibility_level = "public"
-}
-
-resource "gitlab_group" "bar" {
-	name             = "bar-group %[1]d"
-	path             = "bar-group-%[1]d"
-	description      = "Terraform acceptance tests - Approval Rule"
-	visibility_level = "public"
-}
-
-resource "gitlab_group_membership" "foo" {
-  group_id         = gitlab_group.foo.id
-  user_id          = gitlab_user.foo.id
-  access_level     = "developer"
-}
-
-resource "gitlab_group_membership" "bar" {
-  group_id        = gitlab_group.bar.id
-  user_id         = gitlab_user.bar.id
-  access_level    = "developer"
-}
-
 resource "gitlab_project_approval_rule" "foo" {
-	project            = gitlab_project.foo.id
-	name               = "foo rule %[1]d"
-	approvals_required = %d
-	user_ids           = [%s]
-	group_ids          = [%s]
-}
-	`,
-		randomInt,
-		approvals,
-		userIDs,
-		groupIDs,
-	)
+  project              = %d
+  name                 = "foo"
+  approvals_required   = %d
+  user_ids             = [%d]
+  group_ids            = [%d]
+  protected_branch_ids = [%d]
+}`, project, approvals, userID, groupID, protectedBranchID)
 }
 
 func testAccCheckGitlabProjectApprovalRuleExists(n string, projectApprovalRule *gitlab.ProjectApprovalRule) resource.TestCheckFunc {
@@ -291,25 +159,16 @@ func testAccCheckGitlabProjectApprovalRuleExists(n string, projectApprovalRule *
 			}
 		}
 
-		return fmt.Errorf("Rule %d not found", ruleIDInt)
+		return fmt.Errorf("rule %d not found", ruleIDInt)
 	}
 }
 
-func testAccCheckGitlabProjectApprovalRuleDestroy(s *terraform.State) error {
-	err := testAccCheckGitlabProjectDestroy(s)
-	if err != nil {
-		return err
+func testAccCheckGitlabProjectApprovalRuleDestroy(client *gitlab.Client, pid interface{}) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return InterceptGomegaFailure(func() {
+			rules, _, err := client.Projects.GetProjectApprovalRules(pid)
+			Expect(err).To(BeNil())
+			Expect(rules).To(BeEmpty())
+		})
 	}
-
-	err = testAccCheckGitlabGroupDestroy(s)
-	if err != nil {
-		return err
-	}
-
-	err = testAccCheckGitlabUserDestroy(s)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -145,8 +145,8 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	d.SetId(fmt.Sprintf("%d", service.ID))
 	d.Set("webhook", service.Properties.WebHook)
 	d.Set("username", service.Properties.Username)
-	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON)
-	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)
+	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)     // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
 	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
 	d.Set("push_events", service.PushEvents)
 	d.Set("push_channel", service.Properties.PushChannel)

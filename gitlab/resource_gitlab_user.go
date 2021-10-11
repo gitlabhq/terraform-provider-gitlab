@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -16,23 +18,7 @@ func resourceGitlabUser() *schema.Resource {
 		Update: resourceGitlabUserUpdate,
 		Delete: resourceGitlabUserDelete,
 		Importer: &schema.ResourceImporter{
-			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-				client := meta.(*gitlab.Client)
-				log.Printf("[DEBUG] read gitlab user %s", d.Id())
-
-				id, _ := strconv.Atoi(d.Id())
-
-				user, _, err := client.Users.GetUser(id)
-				if err != nil {
-					return nil, err
-				}
-
-				resourceGitlabUserSetToState(d, user)
-				d.Set("email", user.Email)
-				d.Set("is_admin", user.IsAdmin)
-				d.Set("is_external", user.External)
-				return []*schema.ResourceData{d}, nil
-			},
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -82,6 +68,10 @@ func resourceGitlabUser() *schema.Resource {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},
+			"note": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -94,7 +84,8 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("email", user.Email)
 	d.Set("is_admin", user.IsAdmin)
 	d.Set("is_external", user.External)
-	d.Set("skip_confirmation", !user.ConfirmedAt.IsZero())
+	d.Set("note", user.Note)
+	d.Set("skip_confirmation", user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero())
 }
 
 func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
@@ -110,6 +101,7 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 		SkipConfirmation: gitlab.Bool(d.Get("skip_confirmation").(bool)),
 		External:         gitlab.Bool(d.Get("is_external").(bool)),
 		ResetPassword:    gitlab.Bool(d.Get("reset_password").(bool)),
+		Note:             gitlab.String(d.Get("note").(string)),
 	}
 
 	if *options.Password == "" && !*options.ResetPassword {
@@ -134,7 +126,7 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	id, _ := strconv.Atoi(d.Id())
 
-	user, _, err := client.Users.GetUser(id)
+	user, _, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab user not found %d", id)
@@ -182,6 +174,10 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.External = gitlab.Bool(d.Get("is_external").(bool))
 	}
 
+	if d.HasChange("note") {
+		options.Note = gitlab.String(d.Get("note").(string))
+	}
+
 	log.Printf("[DEBUG] update gitlab user %s", d.Id())
 
 	id, _ := strconv.Atoi(d.Id())
@@ -200,8 +196,28 @@ func resourceGitlabUserDelete(d *schema.ResourceData, meta interface{}) error {
 
 	id, _ := strconv.Atoi(d.Id())
 
-	_, err := client.Users.DeleteUser(id)
-	// Ignoring error due to some bug in library
-	log.Printf("[DEBUG] Delete gitlab user %s", err)
+	if _, err := client.Users.DeleteUser(id); err != nil {
+		return err
+	}
+
+	stateConf := &resource.StateChangeConf{
+		Timeout: 5 * time.Minute,
+		Target:  []string{"Deleted"},
+		Refresh: func() (interface{}, string, error) {
+			user, resp, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
+			if resp != nil && resp.StatusCode == 404 {
+				return user, "Deleted", nil
+			}
+			if err != nil {
+				return user, "Error", err
+			}
+			return user, "Deleting", nil
+		},
+	}
+
+	if _, err := stateConf.WaitForState(); err != nil {
+		return fmt.Errorf("Could not finish deleting user %d: %w", id, err)
+	}
+
 	return nil
 }

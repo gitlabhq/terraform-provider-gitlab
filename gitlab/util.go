@@ -35,6 +35,7 @@ var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
 
 // copied from ../github/util.go
 func validateValueFunc(values []string) schema.SchemaValidateFunc {
+	// lintignore: V013 // TODO: Resolve this tfproviderlint issue
 	return func(v interface{}, k string) (we []string, errors []error) {
 		value := v.(string)
 		valid := false
@@ -142,6 +143,22 @@ func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
 	return &value
 }
 
+func stringToAccessControlValue(s string) *gitlab.AccessControlValue {
+	lookup := map[string]gitlab.AccessControlValue{
+		"disabled": gitlab.DisabledAccessControl,
+		"enabled":  gitlab.EnabledAccessControl,
+		"private":  gitlab.PrivateAccessControl,
+		"public":   gitlab.PublicAccessControl,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
+// lintignore: V011 // TODO: Resolve this tfproviderlint issue
 var StringIsGitlabVariableName = func(v interface{}, k string) (s []string, es []error) {
 	value, ok := v.(string)
 	if !ok {

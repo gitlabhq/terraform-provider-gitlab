@@ -19,7 +19,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		CheckDestroy: testAccCheckGitlabUserDestroy,
 		Steps: []resource.TestStep{
 			// Create a user
 			{
@@ -54,6 +54,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						CanCreateGroup:   true,
 						SkipConfirmation: false,
 						External:         false,
+						Note:             fmt.Sprintf("note%d", rInt),
 					}),
 				),
 			},
@@ -81,7 +82,6 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
-					"skip_confirmation",
 				},
 			},
 		},
@@ -126,7 +126,7 @@ func testAccCheckGitlabUserExists(n string, user *gitlab.User) resource.TestChec
 
 		id, _ := strconv.Atoi(userID)
 
-		gotUser, _, err := conn.Users.GetUser(id)
+		gotUser, _, err := conn.Users.GetUser(id, gitlab.GetUsersOptions{})
 		if err != nil {
 			return err
 		}
@@ -145,6 +145,7 @@ type testAccGitlabUserExpectedAttributes struct {
 	CanCreateGroup   bool
 	SkipConfirmation bool
 	External         bool
+	Note             string
 }
 
 func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUserExpectedAttributes) resource.TestCheckFunc {
@@ -169,6 +170,10 @@ func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUser
 			return fmt.Errorf("got is_external %t; want %t", user.External, want.External)
 		}
 
+		if user.Note != want.Note {
+			return fmt.Errorf("got note %q; want %q", user.Note, want.Note)
+		}
+
 		if user.IsAdmin != want.Admin {
 			return fmt.Errorf("got is_admin %t; want %t", user.IsAdmin, want.Admin)
 		}
@@ -191,7 +196,7 @@ func testAccCheckGitlabUserDestroy(s *terraform.State) error {
 
 		id, _ := strconv.Atoi(rs.Primary.ID)
 
-		user, _, err := conn.Users.GetUser(id)
+		user, _, err := conn.Users.GetUser(id, gitlab.GetUsersOptions{})
 		if err == nil {
 			if user != nil && fmt.Sprintf("%d", user.ID) == rs.Primary.ID {
 				return fmt.Errorf("User still exists")
@@ -231,8 +236,9 @@ resource "gitlab_user" "foo" {
   projects_limit   = 10
   can_create_group = true
   is_external      = false
+  note             = "note%d"
 }
-  `, rInt, rInt, rInt, rInt)
+  `, rInt, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabUserConfigPasswordReset(rInt int) string {

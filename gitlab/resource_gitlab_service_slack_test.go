@@ -74,6 +74,7 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabServiceSlack_import(t *testing.T) {
 	slackResourceName := "gitlab_service_slack.slack"
 	rInt := acctest.RandInt()

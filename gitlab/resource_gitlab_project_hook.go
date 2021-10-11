@@ -10,6 +10,7 @@ import (
 )
 
 func resourceGitlabProjectHook() *schema.Resource {
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabProjectHookCreate,
 		Read:   resourceGitlabProjectHookRead,
@@ -35,7 +36,16 @@ func resourceGitlabProjectHook() *schema.Resource {
 				Optional: true,
 				Default:  true,
 			},
+			"push_events_branch_filter": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"issues_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"confidential_issues_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
@@ -55,6 +65,11 @@ func resourceGitlabProjectHook() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"confidential_note_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"job_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -66,6 +81,11 @@ func resourceGitlabProjectHook() *schema.Resource {
 				Default:  false,
 			},
 			"wiki_page_events": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"deployment_events": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
@@ -83,16 +103,20 @@ func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) e
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.AddProjectHookOptions{
-		URL:                   gitlab.String(d.Get("url").(string)),
-		PushEvents:            gitlab.Bool(d.Get("push_events").(bool)),
-		IssuesEvents:          gitlab.Bool(d.Get("issues_events").(bool)),
-		MergeRequestsEvents:   gitlab.Bool(d.Get("merge_requests_events").(bool)),
-		TagPushEvents:         gitlab.Bool(d.Get("tag_push_events").(bool)),
-		NoteEvents:            gitlab.Bool(d.Get("note_events").(bool)),
-		JobEvents:             gitlab.Bool(d.Get("job_events").(bool)),
-		PipelineEvents:        gitlab.Bool(d.Get("pipeline_events").(bool)),
-		WikiPageEvents:        gitlab.Bool(d.Get("wiki_page_events").(bool)),
-		EnableSSLVerification: gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
+		URL:                      gitlab.String(d.Get("url").(string)),
+		PushEvents:               gitlab.Bool(d.Get("push_events").(bool)),
+		PushEventsBranchFilter:   gitlab.String(d.Get("push_events_branch_filter").(string)),
+		IssuesEvents:             gitlab.Bool(d.Get("issues_events").(bool)),
+		ConfidentialIssuesEvents: gitlab.Bool(d.Get("confidential_issues_events").(bool)),
+		MergeRequestsEvents:      gitlab.Bool(d.Get("merge_requests_events").(bool)),
+		TagPushEvents:            gitlab.Bool(d.Get("tag_push_events").(bool)),
+		NoteEvents:               gitlab.Bool(d.Get("note_events").(bool)),
+		ConfidentialNoteEvents:   gitlab.Bool(d.Get("confidential_note_events").(bool)),
+		JobEvents:                gitlab.Bool(d.Get("job_events").(bool)),
+		PipelineEvents:           gitlab.Bool(d.Get("pipeline_events").(bool)),
+		WikiPageEvents:           gitlab.Bool(d.Get("wiki_page_events").(bool)),
+		DeploymentEvents:         gitlab.Bool(d.Get("deployment_events").(bool)),
+		EnableSSLVerification:    gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
 	}
 
 	if v, ok := d.GetOk("token"); ok {
@@ -132,13 +156,17 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 
 	d.Set("url", hook.URL)
 	d.Set("push_events", hook.PushEvents)
+	d.Set("push_events_branch_filter", hook.PushEventsBranchFilter)
 	d.Set("issues_events", hook.IssuesEvents)
+	d.Set("confidential_issues_events", hook.ConfidentialIssuesEvents)
 	d.Set("merge_requests_events", hook.MergeRequestsEvents)
 	d.Set("tag_push_events", hook.TagPushEvents)
 	d.Set("note_events", hook.NoteEvents)
+	d.Set("confidential_note_events", hook.ConfidentialNoteEvents)
 	d.Set("job_events", hook.JobEvents)
 	d.Set("pipeline_events", hook.PipelineEvents)
 	d.Set("wiki_page_events", hook.WikiPageEvents)
+	d.Set("deployment_events", hook.DeploymentEvents)
 	d.Set("enable_ssl_verification", hook.EnableSSLVerification)
 	return nil
 }
@@ -151,16 +179,20 @@ func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 	options := &gitlab.EditProjectHookOptions{
-		URL:                   gitlab.String(d.Get("url").(string)),
-		PushEvents:            gitlab.Bool(d.Get("push_events").(bool)),
-		IssuesEvents:          gitlab.Bool(d.Get("issues_events").(bool)),
-		MergeRequestsEvents:   gitlab.Bool(d.Get("merge_requests_events").(bool)),
-		TagPushEvents:         gitlab.Bool(d.Get("tag_push_events").(bool)),
-		NoteEvents:            gitlab.Bool(d.Get("note_events").(bool)),
-		JobEvents:             gitlab.Bool(d.Get("job_events").(bool)),
-		PipelineEvents:        gitlab.Bool(d.Get("pipeline_events").(bool)),
-		WikiPageEvents:        gitlab.Bool(d.Get("wiki_page_events").(bool)),
-		EnableSSLVerification: gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
+		URL:                      gitlab.String(d.Get("url").(string)),
+		PushEvents:               gitlab.Bool(d.Get("push_events").(bool)),
+		PushEventsBranchFilter:   gitlab.String(d.Get("push_events_branch_filter").(string)),
+		IssuesEvents:             gitlab.Bool(d.Get("issues_events").(bool)),
+		ConfidentialIssuesEvents: gitlab.Bool(d.Get("confidential_issues_events").(bool)),
+		MergeRequestsEvents:      gitlab.Bool(d.Get("merge_requests_events").(bool)),
+		TagPushEvents:            gitlab.Bool(d.Get("tag_push_events").(bool)),
+		NoteEvents:               gitlab.Bool(d.Get("note_events").(bool)),
+		ConfidentialNoteEvents:   gitlab.Bool(d.Get("confidential_note_events").(bool)),
+		JobEvents:                gitlab.Bool(d.Get("job_events").(bool)),
+		PipelineEvents:           gitlab.Bool(d.Get("pipeline_events").(bool)),
+		WikiPageEvents:           gitlab.Bool(d.Get("wiki_page_events").(bool)),
+		DeploymentEvents:         gitlab.Bool(d.Get("deployment_events").(bool)),
+		EnableSSLVerification:    gitlab.Bool(d.Get("enable_ssl_verification").(bool)),
 	}
 
 	if d.HasChange("token") {

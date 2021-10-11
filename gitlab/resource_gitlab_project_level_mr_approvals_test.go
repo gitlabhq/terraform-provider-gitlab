@@ -63,6 +63,7 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
 	resourceName := "gitlab_project_level_mr_approvals.foo"
 	rInt := acctest.RandInt()

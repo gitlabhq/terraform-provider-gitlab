@@ -46,7 +46,7 @@ func resourceGitlabServicePipelinesEmail() *schema.Resource {
 }
 
 func resourceGitlabServicePipelinesEmailSetToState(d *schema.ResourceData, service *gitlab.PipelinesEmailService) {
-	d.Set("recipients", strings.Split(service.Properties.Recipients, ","))
+	d.Set("recipients", strings.Split(service.Properties.Recipients, ",")) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines)
 	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
 }

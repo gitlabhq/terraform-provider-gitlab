@@ -17,7 +17,7 @@ func resourceGitlabPipelineSchedule() *schema.Resource {
 		Update: resourceGitlabPipelineScheduleUpdate,
 		Delete: resourceGitlabPipelineScheduleDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabPipelineScheduleImporter,
+			State: resourceGitlabPipelineScheduleStateImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -188,10 +188,11 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 	return err
 }
 
-func resourceGitlabPipelineScheduleImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabPipelineScheduleStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 2 {
-		return nil, fmt.Errorf("invalid pipeline schedule import format; expected '{project_id}:{pipeline_schedule_id}'")
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Pipeline Schedule import format; expected '{project_id}:{pipeline_schedule_id}'")
 	}
 	project, id := s[0], s[1]
 
