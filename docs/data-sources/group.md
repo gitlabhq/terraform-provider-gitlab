@@ -1,10 +1,10 @@
 # gitlab\_group
 
-Provides details about a specific group in the gitlab provider.
+Provide details about a specific group in the gitlab provider.
 
 ## Example Usage
 
-**By group's ID**
+### By group's ID
 
 ```hcl
 data "gitlab_group" "foo" {
@@ -12,7 +12,7 @@ data "gitlab_group" "foo" {
 }
 ```
 
-**By group's full path**
+### By group's full path
 
 ```hcl
 data "gitlab_group" "foo" {
@@ -28,7 +28,7 @@ The following arguments are supported:
 
 * `full_path` - (Optional) The full path of the group.
 
-**Note**: exactly one of group_id or full_path must be provided.
+> **Note**: exactly one of group_id or full_path must be provided.
 
 ## Attributes Reference
 
@@ -57,5 +57,7 @@ The resource exports the following attributes:
 * `web_url` - Web URL of the group.
 
 * `runners_token` - The group level registration token to use during runner setup.
+
+* `default_branch_protection` - Whether developers and maintainers can push to the applicable default branch.
 
 [doc]: https://docs.gitlab.com/ee/api/groups.html#details-of-a-group

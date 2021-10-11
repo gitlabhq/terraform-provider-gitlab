@@ -100,6 +100,7 @@ func TestAccGitlabProjectCluster_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabProjectCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
@@ -247,7 +248,7 @@ resource gitlab_project_cluster "foo" {
   managed                       = "%s"
   kubernetes_api_url            = "https://123.123.123"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "abac"
 }
 `, projectClusterFakeCert, rInt, rInt, m)
@@ -276,7 +277,7 @@ resource gitlab_project_cluster "foo" {
   domain                        = "example-new.com"
   kubernetes_api_url            = "https://124.124.124"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_namespace          = "changed-namespace"
   kubernetes_authorization_type = "%s"
 }
@@ -317,7 +318,7 @@ resource gitlab_project_cluster "foo" {
   managed                       = "%s"
   kubernetes_api_url            = "https://123.123.123"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "abac"
   management_project_id         = "${gitlab_project.cluster-management.id}"
 }

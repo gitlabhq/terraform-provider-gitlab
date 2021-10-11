@@ -84,6 +84,7 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabGroupLabel_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resourceName := "gitlab_group_label.fixme"
@@ -186,7 +187,7 @@ func testAccCheckGitlabGroupLabelDestroy(s *terraform.State) error {
 			continue
 		}
 
-		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID)
+		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {

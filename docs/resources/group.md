@@ -12,11 +12,11 @@ resource "gitlab_group" "example" {
   description = "An example group"
 }
 
-// Create a project in the example group
+# Create a project in the example group
 resource "gitlab_project" "example" {
   name         = "example"
   description  = "An example project"
-  namespace_id = "${gitlab_group.example.id}"
+  namespace_id = gitlab_group.example.id
 }
 ```
 
@@ -81,12 +81,19 @@ The resource exports the following attributes:
 
 * `runners_token` - The group level registration token to use during runner setup.
 
-## Importing groups
+* `default_branch_protection` - (Optional) Int, defaults to 2.
+Whether developers and maintainers can push to the applicable default branch.
+0 no protection, 1 partial protection, 2 full protection
+https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection
+
+## Import
 
 You can import a group state using `terraform import <resource> <id>`.  The
 `id` can be whatever the [details of a group][details_of_a_group] api takes for
 its `:id` value, so for example:
 
-    terraform import gitlab_group.example example
+```shell
+$ terraform import gitlab_group.example example
+```
 
 [details_of_a_group]: https://docs.gitlab.com/ee/api/groups.html#details-of-a-group

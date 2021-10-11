@@ -3,7 +3,7 @@
 This resource allows you to create and manage GitLab users.
 Note your provider will need to be configured with admin-level access for this resource to work.
 
--> **Note:** You must specify either `password` or `reset_password`.
+-> You must specify either `password` or `reset_password`.
 
 ## Example Usage
 
@@ -33,7 +33,7 @@ The following arguments are supported:
 
 * `password` - (Optional) The password of the user.
 
-* `is_admin` - (Optional) Boolean, defaults to false.  Whether to enable administrative priviledges
+* `is_admin` - (Optional) Boolean, defaults to false.  Whether to enable administrative privileges
 for the user.
 
 * `projects_limit` - (Optional) Integer, defaults to 0.  Number of projects user can create.
@@ -54,10 +54,12 @@ The resource exports the following attributes:
 
 * `id` - The unique id assigned to the user by the GitLab server.
 
-## Importing users
+## Import
 
 You can import a user to terraform state using `terraform import <resource> <id>`.
 The `id` must be an integer for the id of the user you want to import,
 for example:
 
-    terraform import gitlab_user.example 42
+```shell
+$ terraform import gitlab_user.example 42
+```

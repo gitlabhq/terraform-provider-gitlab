@@ -15,6 +15,7 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 	for k := range accessLevelID {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
+	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabGroupLdapLinkCreate,
 		Read:   resourceGitlabGroupLdapLinkRead,
@@ -59,7 +60,7 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
-	group_access := int(accessLevelNameToValue[d.Get("access_level").(string)])
+	group_access := gitlab.AccessLevelValue(accessLevelNameToValue[d.Get("access_level").(string)])
 	ldap_provider := d.Get("ldap_provider").(string)
 	force := d.Get("force").(bool)
 
@@ -70,7 +71,7 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	if force {
-		resourceGitlabGroupLdapLinkDelete(d, meta)
+		resourceGitlabGroupLdapLinkDelete(d, meta) // nolint // TODO: Resolve this golangci-lint issue: Error return value is not checked (errcheck)
 	}
 
 	log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
@@ -94,9 +95,9 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 	if err != nil {
 		// The read/GET API wasn't implemented in GitLab until version 12.8 (March 2020, well after the add and delete APIs).
 		// If we 404, assume GitLab is at an older version and take things on faith.
-		switch err.(type) {
+		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
-			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 {
+			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 { // nolint // TODO: Resolve this golangci-lint issue: S1034(related information): could eliminate this type assertion (gosimple)
 				log.Printf("[WARNING] This GitLab instance doesn't have the GET API for group_ldap_sync.  Please upgrade to 12.8 or later for best results.")
 			} else {
 				return err
@@ -123,7 +124,7 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 
 		if !found {
 			d.SetId("")
-			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", d.Id()))
+			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", d.Id())) // nolint // TODO: Resolve this golangci-lint issue: S1028: should use fmt.Errorf(...) instead of errors.New(fmt.Sprintf(...)) (gosimple)
 		}
 	}
 
@@ -139,10 +140,10 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
 	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn)
 	if err != nil {
-		switch err.(type) {
+		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
 			// Ignore LDAP links that don't exist
-			if strings.Contains(string(err.(*gitlab.ErrorResponse).Message), "Linked LDAP group not found") {
+			if strings.Contains(string(err.(*gitlab.ErrorResponse).Message), "Linked LDAP group not found") { // nolint // TODO: Resolve this golangci-lint issue: S1034(related information): could eliminate this type assertion (gosimple)
 				log.Printf("[WARNING] %s", err)
 			} else {
 				return err

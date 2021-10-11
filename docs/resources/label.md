@@ -4,7 +4,6 @@ This resource allows you to create and manage labels for your GitLab projects.
 For further information on labels, consult the [gitlab
 documentation](https://docs.gitlab.com/ee/user/project/labels.html#project-labels).
 
-
 ## Example Usage
 
 ```hcl
@@ -14,6 +13,15 @@ resource "gitlab_label" "fixme" {
   description = "issue with failing tests"
   color       = "#ffcc00"
 }
+
+# Scoped label
+resource "gitlab_label" "devops_create" {
+  project     = gitlab_project.example.id
+  name        = "devops::create"
+  description = "issue for creating infrastructure resources"
+  color       = "#ffa500"
+}
+
 ```
 
 ## Argument Reference

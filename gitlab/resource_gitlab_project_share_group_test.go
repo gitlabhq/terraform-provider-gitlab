@@ -14,6 +14,7 @@ import (
 func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
+	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
@@ -46,7 +47,7 @@ func testAccCheckGitlabProjectSharedWithGroup(projectName, groupName string, acc
 			return err
 		}
 
-		group, _, err := client.Groups.GetGroup(groupName)
+		group, _, err := client.Groups.GetGroup(groupName, nil)
 		if err != nil {
 			return err
 		}

@@ -64,6 +64,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabServiceJira_import(t *testing.T) {
 	jiraResourceName := "gitlab_service_jira.jira"
 	rInt := acctest.RandInt()

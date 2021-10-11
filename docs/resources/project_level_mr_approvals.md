@@ -1,9 +1,7 @@
 # gitlab\_project\_level\_mr\_approvals
 
 This resource allows you to configure project-level MR approvals. for your GitLab projects.
-For further information on merge request approvals, consult the [GitLab API
-documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
-
+For further information on merge request approvals, consult the [GitLab API documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
 
 ## Example Usage
 
@@ -38,12 +36,12 @@ also need to be included in the approvers list in order to be able to approve th
 
 * `merge_requests_disable_committers_approval` - (Optional) Set to `true` if you want to prevent approval of merge requests by merge request committers. Default is `false`.
 
-## Importing approval configuration
+## Import
 
-You can import an approval configuration state using `terraform import <resource> <project_id>`.
+You can import an approval configuration state using `terraform import <resource> <project_id>:<approval_rule_id>`.
 
 For example:
 
-```bash
-$ terraform import gitlab_project_level_mr_approvals.foo 53
+```
+$ terraform import gitlab_project_level_mr_approvals.foo 1234:53
 ```
