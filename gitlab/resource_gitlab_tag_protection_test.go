@@ -106,6 +106,7 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabTagProtection_import(t *testing.T) {
 	rInt := acctest.RandInt()
 

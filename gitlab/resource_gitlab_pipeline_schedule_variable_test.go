@@ -54,6 +54,7 @@ func TestAccGitlabPipelineScheduleVariable_basic(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
 func TestAccGitlabPipelineScheduleVariable_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resourceName := "gitlab_pipeline_schedule_variable.schedule_var"
