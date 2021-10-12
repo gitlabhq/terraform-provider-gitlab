@@ -143,6 +143,21 @@ func stringToMergeMethod(s string) *gitlab.MergeMethodValue {
 	return &value
 }
 
+func stringToSquashOptionValue(s string) *gitlab.SquashOptionValue {
+	lookup := map[string]gitlab.SquashOptionValue{
+		"never":       gitlab.SquashOptionNever,
+		"always":      gitlab.SquashOptionAlways,
+		"default_on":  gitlab.SquashOptionDefaultOn,
+		"default_off": gitlab.SquashOptionDefaultOff,
+	}
+
+	value, ok := lookup[s]
+	if !ok {
+		return nil
+	}
+	return &value
+}
+
 func stringToAccessControlValue(s string) *gitlab.AccessControlValue {
 	lookup := map[string]gitlab.AccessControlValue{
 		"disabled": gitlab.DisabledAccessControl,
