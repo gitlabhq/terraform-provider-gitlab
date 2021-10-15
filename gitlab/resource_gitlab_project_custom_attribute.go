@@ -17,6 +17,5 @@ func resourceGitlabProjectCustomAttribute() *schema.Resource {
 		func(client *gitlab.Client) CustomAttributeDeleter {
 			return client.CustomAttribute.DeleteCustomProjectAttribute
 		},
-		"This resource allows you to set custom attributes for a project.",
 	)
 }

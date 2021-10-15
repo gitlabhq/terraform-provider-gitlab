@@ -18,7 +18,7 @@ type CreateGetter func(*gitlab.Client) CustomAttributeGetter
 type CreateSetter func(*gitlab.Client) CustomAttributeSetter
 type CreateDeleter func(*gitlab.Client) CustomAttributeDeleter
 
-func CreateCustomAttributeResource(idName string, createGetter CreateGetter, createSetter CreateSetter, createDeleter CreateDeleter, description string) *schema.Resource {
+func CreateCustomAttributeResource(idName string, createGetter CreateGetter, createSetter CreateSetter, createDeleter CreateDeleter) *schema.Resource {
 	setToState := func(d *schema.ResourceData, userId int, customAttribute *gitlab.CustomAttribute) {
 		// lintignore:R001
 		d.Set(idName, userId)
@@ -85,30 +85,26 @@ func CreateCustomAttributeResource(idName string, createGetter CreateGetter, cre
 	}
 
 	return &schema.Resource{
-		Description: description,
-		Create:      setFunc,
-		Read:        readFunc,
-		Update:      setFunc,
-		Delete:      deleteFunc,
+		Create: setFunc,
+		Read:   readFunc,
+		Update: setFunc,
+		Delete: deleteFunc,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
 			idName: {
-				Description: fmt.Sprintf("The id of the %s.", idName),
-				Type:        schema.TypeInt,
-				Required:    true,
+				Type:     schema.TypeInt,
+				Required: true,
 			},
 			"key": {
-				Description: "Key for the Custom Attribute.",
-				Type:        schema.TypeString,
-				Required:    true,
+				Type:     schema.TypeString,
+				Required: true,
 			},
 			"value": {
-				Description: "Value for the Custom Attribute.",
-				Type:        schema.TypeString,
-				Required:    true,
+				Type:     schema.TypeString,
+				Required: true,
 			},
 		},
 	}
