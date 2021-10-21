@@ -53,6 +53,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		IssuesTemplate:              "",
 		MergeRequestsTemplate:       "",
 		CIConfigPath:                ".gitlab-ci.yml@mynamespace/myproject",
+		CIForwardDeploymentEnabled:  true,
 	}
 
 	defaultsMainBranch = defaults
@@ -98,6 +99,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						PackagesEnabled:             false,
 						PagesAccessLevel:            gitlab.DisabledAccessControl,
 						BuildCoverageRegex:          "bar",
+						CIForwardDeploymentEnabled:  false,
 					}, &received),
 				),
 			},
@@ -465,11 +467,12 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		SquashOption:       gitlab.SquashOptionDefaultOff,
-		PackagesEnabled:    true,
-		PagesAccessLevel:   gitlab.PublicAccessControl,
-		BuildCoverageRegex: "foo",
-		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
+		SquashOption:               gitlab.SquashOptionDefaultOff,
+		PackagesEnabled:            true,
+		PagesAccessLevel:           gitlab.PublicAccessControl,
+		BuildCoverageRegex:         "foo",
+		CIConfigPath:               ".gitlab-ci.yml@mynamespace/myproject",
+		CIForwardDeploymentEnabled: true,
 	}
 	willError := defaults
 	willError.TagList = []string{"notatag"}
@@ -569,10 +572,11 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-		SquashOption:       gitlab.SquashOptionDefaultOff,
-		PackagesEnabled:    true,
-		PagesAccessLevel:   gitlab.PrivateAccessControl,
-		BuildCoverageRegex: "foo",
+		SquashOption:               gitlab.SquashOptionDefaultOff,
+		PackagesEnabled:            true,
+		PagesAccessLevel:           gitlab.PrivateAccessControl,
+		BuildCoverageRegex:         "foo",
+		CIForwardDeploymentEnabled: true,
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -1200,6 +1204,7 @@ resource "gitlab_project" "foo" {
   packages_enabled = false
   pages_access_level = "disabled"
   build_coverage_regex = "bar"
+  ci_forward_deployment_enabled = false
 }
 	`, rInt, rInt)
 }

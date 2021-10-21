@@ -48,6 +48,7 @@ resource "gitlab_project" "example-two" {
 - **archived** (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 - **build_coverage_regex** (String) Test coverage parsing for the project.
 - **ci_config_path** (String) Custom Path to CI config file.
+- **ci_forward_deployment_enabled** (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
 - **container_registry_enabled** (Boolean) Enable container registry for the project.
 - **default_branch** (String) The default branch for the project.
 - **description** (String) A description of the project.

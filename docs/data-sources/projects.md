@@ -82,6 +82,7 @@ Read-Only:
 - **avatar_url** (String)
 - **build_coverage_regex** (String)
 - **ci_config_path** (String)
+- **ci_forward_deployment_enabled** (Boolean)
 - **container_registry_enabled** (Boolean)
 - **created_at** (String)
 - **creator_id** (Number)

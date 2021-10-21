@@ -164,6 +164,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"custom_attributes":                                project.CustomAttributes,
 				"packages_enabled":                                 project.PackagesEnabled,
 				"build_coverage_regex":                             project.BuildCoverageRegex,
+				"ci_forward_deployment_enabled":                    project.CIForwardDeploymentEnabled,
 			}
 			values = append(values, v)
 		}
@@ -769,6 +770,11 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 						"build_coverage_regex": {
 							Description: "Build coverage regex for the project.",
 							Type:        schema.TypeString,
+							Computed:    true,
+						},
+						"ci_forward_deployment_enabled": {
+							Description: "When a new deployment job starts, skip older deployment jobs that are still pending.",
+							Type:        schema.TypeBool,
 							Computed:    true,
 						},
 					},
