@@ -118,6 +118,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional: true,
 		Default:  false,
 	},
+	"allow_merge_on_skipped_pipeline": {
+		Type:     schema.TypeBool,
+		Optional: true,
+		Default:  false,
+	},
 	"ssh_url_to_repo": {
 		Type:     schema.TypeString,
 		Computed: true,
@@ -156,6 +161,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"initialize_with_readme": {
 		Type:     schema.TypeBool,
 		Optional: true,
+	},
+	"squash_option": {
+		Type:         schema.TypeString,
+		Optional:     true,
+		Default:      "default_off",
+		ValidateFunc: validation.StringInSlice([]string{"never", "default_on", "always", "default_off"}, true),
 	},
 	"remove_source_branch_after_merge": {
 		Type:     schema.TypeBool,
@@ -316,6 +327,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("merge_method", string(project.MergeMethod))
 	d.Set("only_allow_merge_if_pipeline_succeeds", project.OnlyAllowMergeIfPipelineSucceeds)
 	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
+	d.Set("allow_merge_on_skipped_pipeline", project.AllowMergeOnSkippedPipeline)
 	d.Set("namespace_id", project.Namespace.ID)
 	d.Set("ssh_url_to_repo", project.SSHURLToRepo)
 	d.Set("http_url_to_repo", project.HTTPURLToRepo)
@@ -326,6 +338,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 		return err
 	}
 	d.Set("archived", project.Archived)
+	d.Set("squash_option", project.SquashOption)
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
@@ -356,7 +369,9 @@ func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error
 		MergeMethod:                      stringToMergeMethod(d.Get("merge_method").(string)),
 		OnlyAllowMergeIfPipelineSucceeds: gitlab.Bool(d.Get("only_allow_merge_if_pipeline_succeeds").(bool)),
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
+		AllowMergeOnSkippedPipeline:               gitlab.Bool(d.Get("allow_merge_on_skipped_pipeline").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
+		SquashOption:                              stringToSquashOptionValue(d.Get("squash_option").(string)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
@@ -616,6 +631,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		options.OnlyAllowMergeIfAllDiscussionsAreResolved = gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool))
 	}
 
+	if d.HasChange("allow_merge_on_skipped_pipeline") {
+		options.AllowMergeOnSkippedPipeline = gitlab.Bool(d.Get("allow_merge_on_skipped_pipeline").(bool))
+	}
+
 	if d.HasChange("request_access_enabled") {
 		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
 	}
@@ -658,6 +677,10 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 
 	if d.HasChange("lfs_enabled") {
 		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
+	}
+
+	if d.HasChange("squash_option") {
+		options.SquashOption = stringToSquashOptionValue(d.Get("squash_option").(string))
 	}
 
 	if d.HasChange("remove_source_branch_after_merge") {

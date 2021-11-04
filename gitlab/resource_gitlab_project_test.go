@@ -44,11 +44,13 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		Archived:           false, // needless, but let's make this explicit
-		PackagesEnabled:    true,
-		PagesAccessLevel:   gitlab.PublicAccessControl,
-		BuildCoverageRegex: "foo",
-		CIConfigPath:       ".gitlab-ci.yml@mynamespace/myproject",
+		SquashOption:                gitlab.SquashOptionDefaultOff,
+		AllowMergeOnSkippedPipeline: false,
+		Archived:                    false, // needless, but let's make this explicit
+		PackagesEnabled:             true,
+		PagesAccessLevel:            gitlab.PublicAccessControl,
+		BuildCoverageRegex:          "foo",
+		CIConfigPath:                ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
 	defaultsMainBranch = defaults
@@ -88,10 +90,12 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						Archived:           true,
-						PackagesEnabled:    false,
-						PagesAccessLevel:   gitlab.DisabledAccessControl,
-						BuildCoverageRegex: "bar",
+						SquashOption:                gitlab.SquashOptionDefaultOn,
+						AllowMergeOnSkippedPipeline: true,
+						Archived:                    true,
+						PackagesEnabled:             false,
+						PagesAccessLevel:            gitlab.DisabledAccessControl,
+						BuildCoverageRegex:          "bar",
 					}, &received),
 				),
 			},
@@ -360,6 +364,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
+		SquashOption:       gitlab.SquashOptionDefaultOff,
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PublicAccessControl,
 		BuildCoverageRegex: "foo",
@@ -463,6 +468,7 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
+		SquashOption:       gitlab.SquashOptionDefaultOff,
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PrivateAccessControl,
 		BuildCoverageRegex: "foo",
@@ -997,8 +1003,10 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  squash_option = "default_off"
   pages_access_level = "public"
   build_coverage_regex = "foo"
+  allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
 }
 	`, rInt, rInt, defaultBranchStatement)
@@ -1053,6 +1061,8 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  squash_option = "default_on"
+  allow_merge_on_skipped_pipeline = true
 
   request_access_enabled = false
   issues_enabled = false
