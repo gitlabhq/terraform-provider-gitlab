@@ -1,4 +1,4 @@
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
+<img src="https://www.datocms-assets.com/2885/1629941242-logo-terraform-main.svg" width="600px">
 
 Terraform Provider for Gitlab
 =============================
