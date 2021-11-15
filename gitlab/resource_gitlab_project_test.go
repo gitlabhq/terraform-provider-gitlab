@@ -335,6 +335,46 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectDefaultBranch(&project, nil),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+						_, _, err := client.RepositoryFiles.GetFile(project.ID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get 'README.md' file from project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigInitializeWithoutReadme(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+						branches, _, err := client.Branches.ListBranches(project.ID, nil)
+						if err != nil {
+							return fmt.Errorf("failed to list branches: %w", err)
+						}
+
+						if len(branches) != 0 {
+							return fmt.Errorf("expected no branch for new project when initialized without README; found %d", len(branches))
+						}
+						return nil
+					},
 				),
 			},
 		},
@@ -583,6 +623,18 @@ resource "gitlab_project" "foo" {
 					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
 						DefaultBranch: "foo",
 					}),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+
+						projectID := state.RootModule().Resources["gitlab_project.foo"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("foo")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get 'README.md' file from project: %w", err)
+						}
+
+						return nil
+					},
 				),
 			},
 		},
@@ -1089,6 +1141,17 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = true
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigInitializeWithoutReadme(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  initialize_with_readme = false
 }
 	`, rInt, rInt)
 }
