@@ -168,6 +168,9 @@ func testAccCheckGitlabProjectEnvironmentDestroy(s *terraform.State) error {
 			project = rs.Primary.ID
 		} else if rs.Type == "gitlab_project_environment" {
 			environment, err = strconv.Atoi(rs.Primary.ID)
+			if err != nil {
+				return fmt.Errorf("error converting environment ID to int: %v", err)
+			}
 		}
 	}
 
