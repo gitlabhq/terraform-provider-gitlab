@@ -1,3 +1,22 @@
+## 3.8.0 (Nov 19, 2021)
+
+ENHANCEMENTS:
+
+* More examples and better documentation #654
+* Adding a first complete example code #670
+* Support running the provider using an OAuth token #686
+* Allow merge on skipped pipeline #705
+* support default_branch_protection on group #706
+* Bump github.com/xanzy/go-gitlab from 0.50.0 to 0.51.1 #718
+* Add squash option #719
+
+BUGFIXES:
+
+* Suppress whitespace diffs for kubernetes_ca_cert attribute #665
+* Fix GitLab project membership example #684
+* Improve tests for initializing a project without README #730
+
+
 ## 3.7.0 (July 20, 2021)
 
 FEATURES:
