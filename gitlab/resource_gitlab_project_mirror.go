@@ -41,11 +41,10 @@ func resourceGitlabProjectMirror() *schema.Resource {
 				Computed:    true,
 			},
 			"url": {
-				Description: "The URL of the remote repository to be mirrored.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-				Sensitive:   true, // Username and password must be provided in the URL for https.
+				Type:      schema.TypeString,
+				ForceNew:  true,
+				Required:  true,
+				Sensitive: true, // Username and password must be provided in the URL for https.
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					oldURL, err := url.Parse(old)
 					if err != nil {
@@ -185,9 +184,9 @@ func resourceGitlabProjectMirrorRead(ctx context.Context, d *schema.ResourceData
 	}
 
 	for {
-		mirrors, response, err := client.ProjectMirrors.ListProjectMirror(projectID, opts, gitlab.WithContext(ctx))
+		mirrors, response, err := client.ProjectMirrors.ListProjectMirror(projectID, opts)
 		if err != nil {
-			return diag.FromErr(err)
+			return err
 		}
 
 		for _, m := range mirrors {
