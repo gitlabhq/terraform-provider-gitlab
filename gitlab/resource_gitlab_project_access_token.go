@@ -104,19 +104,31 @@ func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interfa
 
 	log.Printf("[DEBUG] created gitlab ProjectAccessToken %d - %s for project ID %d", projectAccessToken.ID, *options.Name, project)
 
-	d.SetId(strconv.Itoa(projectAccessToken.ID))
+	projectString := strconv.Itoa(project)
+	PATstring := strconv.Itoa(projectAccessToken.ID)
+	d.SetId(buildTwoPartID(&projectString, &PATstring))
 	d.Set("token", projectAccessToken.Token)
 
 	return resourceGitlabProjectAccessTokenRead(d, meta)
 }
 
 func resourceGitlabProjectAccessTokenRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gitlab.Client)
-	project := d.Get("project").(int)
-	projectAccessTokenID, err := strconv.Atoi(d.Id())
 
+	projectString, PATstring, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return fmt.Errorf("Error parsing ID: %s", d.Id())
+	}
+
+	client := meta.(*gitlab.Client)
+
+	project, err := strconv.Atoi(projectString)
+	if err != nil {
+		return fmt.Errorf("%s cannot be converted to int", projectString)
+	}
+
+	projectAccessTokenID, err := strconv.Atoi(PATstring)
+	if err != nil {
+		return fmt.Errorf("%s cannot be converted to int", PATstring)
 	}
 
 	log.Printf("[DEBUG] read gitlab ProjectAccessToken %d, project ID %d", projectAccessTokenID, project)
@@ -163,16 +175,25 @@ func resourceGitlabProjectAccessTokenRead(d *schema.ResourceData, meta interface
 }
 
 func resourceGitlabProjectAccessTokenDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gitlab.Client)
-	project := d.Get("project").(int)
-	log.Printf("[DEBUG] Delete gitlab ProjectAccessToken %s", d.Id())
 
-	projectAccessTokenID, err := strconv.Atoi(d.Id())
-
+	projectString, PATstring, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return fmt.Errorf("Error parsing ID: %s", d.Id())
 	}
 
+	client := meta.(*gitlab.Client)
+
+	project, err := strconv.Atoi(projectString)
+	if err != nil {
+		return fmt.Errorf("%s cannot be converted to int", projectString)
+	}
+
+	projectAccessTokenID, err := strconv.Atoi(PATstring)
+	if err != nil {
+		return fmt.Errorf("%s cannot be converted to int", PATstring)
+	}
+
+	log.Printf("[DEBUG] Delete gitlab ProjectAccessToken %s", d.Id())
 	_, err = client.ProjectAccessTokens.DeleteProjectAccessToken(project, projectAccessTokenID)
 	return err
 }
