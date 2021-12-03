@@ -20,6 +20,9 @@ var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
 		CreateContext: resourceGitlabGroupLdapLinkCreate,
 		ReadContext:   resourceGitlabGroupLdapLinkRead,
 		DeleteContext: resourceGitlabGroupLdapLinkDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabGroupLdapLinkImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group_id": {
@@ -179,4 +182,19 @@ func resourceGitlabGroupLdapLinkDelete(ctx context.Context, d *schema.ResourceDa
 	}
 
 	return nil
+}
+
+func resourceGitlabGroupLdapLinkImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, diag.Diagnostics) {
+	parts := strings.SplitN(d.Id(), ":", 3)
+	if len(parts) != 3 {
+		return nil, diag.FromErr(fmt.Errorf("invalid ldap link import id (should be <group id>:<ldap provider>:<ladp cn>): %s", d.Id()))
+	}
+
+	groupId, ldapProvider, ldapCN := parts[0], parts[1], parts[2]
+	d.SetId(buildTwoPartID(&ldapProvider, &ldapCN))
+	d.Set("group_id", groupId)
+	d.Set("force", false)
+
+	diag := resourceGitlabGroupLdapLinkRead(ctx, d, meta)
+	return []*schema.ResourceData{d}, diag
 }
