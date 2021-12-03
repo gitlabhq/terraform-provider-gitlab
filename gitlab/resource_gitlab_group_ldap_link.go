@@ -20,6 +20,9 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 		Create: resourceGitlabGroupLdapLinkCreate,
 		Read:   resourceGitlabGroupLdapLinkRead,
 		Delete: resourceGitlabGroupLdapLinkDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabGroupLdapLinkImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group_id": {
@@ -115,7 +118,7 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 			if buildTwoPartID(&ldapLink.Provider, &ldapLink.CN) == d.Id() {
 				d.Set("group_id", groupId)
 				d.Set("cn", ldapLink.CN)
-				d.Set("group_access", ldapLink.GroupAccess)
+				d.Set("access_level", accessLevelValueToName[ldapLink.GroupAccess])
 				d.Set("ldap_provider", ldapLink.Provider)
 				found = true
 				break
@@ -154,4 +157,19 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	}
 
 	return nil
+}
+
+func resourceGitlabGroupLdapLinkImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), ":", 3)
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid ldap link import id (should be <group ID>:<ldap provider>:<ladp cn>): %s", d.Id())
+	}
+
+	groupId, ldapProvider, ldapCN := parts[0], parts[1], parts[2]
+	d.SetId(buildTwoPartID(&ldapProvider, &ldapCN))
+	d.Set("group_id", groupId)
+	d.Set("force", false)
+
+	err := resourceGitlabGroupLdapLinkRead(d, meta)
+	return []*schema.ResourceData{d}, err
 }
