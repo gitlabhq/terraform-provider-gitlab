@@ -599,10 +599,19 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 			return diag.Errorf("Failed to protect default branch %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
 
-		log.Printf("[DEBUG] unprotect old default branch %q for project %q", oldDefaultBranch, d.Id())
-		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.Errorf("Failed to unprotect undesired default branch %q for project %q: %s", oldDefaultBranch, d.Id(), err)
+		log.Printf("[DEBUG] check for protection on old default branch %q for project %q", oldDefaultBranch, d.Id())
+		branch, resp, err := client.ProtectedBranches.GetProtectedBranch(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
+		if err != nil && resp.StatusCode != http.StatusNotFound {
+			return diag.Errorf("Failed to check for protected default branch %q for project %q: %v", oldDefaultBranch, d.Id(), err)
+		}
+		if branch == nil {
+			log.Printf("[DEBUG] Default protected branch %q for project %q does not exist", oldDefaultBranch, d.Id())
+		} else {
+			log.Printf("[DEBUG] unprotect old default branch %q for project %q", oldDefaultBranch, d.Id())
+			_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
+			if err != nil {
+				return diag.Errorf("Failed to unprotect undesired default branch %q for project %q: %v", oldDefaultBranch, d.Id(), err)
+			}
 		}
 
 		log.Printf("[DEBUG] delete old default branch %q for project %q", oldDefaultBranch, d.Id())
