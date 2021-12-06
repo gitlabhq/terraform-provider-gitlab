@@ -215,6 +215,7 @@ type testAccGitlabUserExpectedAttributes struct {
 	CanCreateGroup bool
 	External       bool
 	Note           string
+	State          string
 }
 
 func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUserExpectedAttributes) resource.TestCheckFunc {
