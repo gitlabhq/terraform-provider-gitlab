@@ -1,11 +1,11 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -16,7 +16,7 @@ func resourceGitlabTopic() *schema.Resource {
 		Update: resourceGitlabTopicUpdate,
 		Delete: resourceGitlabTopicDelete,
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -44,24 +44,20 @@ func resourceGitlabTopicCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] create gitlab topic %s", *options.Name)
 
-	topic, _, err := client.Topics.CreateTopic(options)
+	label, _, err := client.Topics.CreateTopic(options)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
+	d.SetId(label.Name)
 
 	return resourceGitlabTopicRead(d, meta)
 }
 
 func resourceGitlabTopicRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-
-	topicID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
-	log.Printf("[DEBUG] read gitlab topic %d", topicID)
+	topicID := d.Id()
+	log.Printf("[DEBUG] read gitlab topic %s", topicID)
 
 	topic, resp, err := client.Topics.GetTopic(topicID, nil)
 	if err != nil {
@@ -73,7 +69,7 @@ func resourceGitlabTopicRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
+	d.SetId(fmt.Sprintf("%d", topic.ID))
 	d.Set("name", topic.Name)
 	d.Set("description", topic.Description)
 
@@ -94,11 +90,7 @@ func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] update gitlab topic %s", d.Id())
 
-	topicID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
-	_, _, err = client.Topics.UpdateTopic(topicID, options)
+	_, _, err := client.Topics.UpdateTopic(d.Id(), options)
 	if err != nil {
 		return err
 	}
@@ -107,18 +99,9 @@ func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceGitlabTopicDelete(d *schema.ResourceData, meta interface{}) error {
-
-	log.Printf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics. Instead emptying its description", d.Id())
-
 	client := meta.(*gitlab.Client)
-	options := &gitlab.UpdateTopicOptions{
-		Description: gitlab.String(""),
-	}
+	log.Printf("[DEBUG] Delete gitlab topic %s", d.Id())
 
-	topicID, err := strconv.Atoi(d.Id())
-	if err != nil {
-		return err
-	}
-	_, _, err = client.Topics.UpdateTopic(topicID, options)
+	_, err := client.Topics.DeleteTopic(d.Id())
 	return err
 }
