@@ -60,12 +60,14 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
+	filter := d.Get("filter").(string)
 	group_access := gitlab.AccessLevelValue(accessLevelNameToValue[d.Get("access_level").(string)])
 	ldap_provider := d.Get("ldap_provider").(string)
 	force := d.Get("force").(bool)
 
 	options := &gitlab.AddGroupLDAPLinkOptions{
 		CN:          &cn,
+		Filter:      &filter,
 		GroupAccess: &group_access,
 		Provider:    &ldap_provider,
 	}
@@ -115,6 +117,7 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 			if buildTwoPartID(&ldapLink.Provider, &ldapLink.CN) == d.Id() {
 				d.Set("group_id", groupId)
 				d.Set("cn", ldapLink.CN)
+				d.Set("filter", ldapLink.Filter)
 				d.Set("group_access", ldapLink.GroupAccess)
 				d.Set("ldap_provider", ldapLink.Provider)
 				found = true
@@ -135,10 +138,11 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	client := meta.(*gitlab.Client)
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
+	filter := d.Get("filter").(string)
 	ldap_provider := d.Get("ldap_provider").(string)
 
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
-	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn)
+	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn, filter)
 	if err != nil {
 		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
