@@ -103,6 +103,7 @@ func Provider() *schema.Provider {
 			"gitlab_project_badge":              resourceGitlabProjectBadge(),
 			"gitlab_topic":                      resourceGitlabTopic(),
 			"gitlab_group_badge":                resourceGitlabGroupBadge(),
+			"gitlab_topic":                      resourceGitlabTopic(),
 		},
 	}
 

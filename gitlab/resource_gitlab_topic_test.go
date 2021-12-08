@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
@@ -91,6 +90,7 @@ func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.Test
 		*assign = *topic
 
 		return err
+
 	}
 }
 
