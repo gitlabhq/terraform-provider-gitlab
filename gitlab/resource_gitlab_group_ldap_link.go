@@ -142,7 +142,7 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	ldap_provider := d.Get("ldap_provider").(string)
 
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
-	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn, filter)
+	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn)
 	if err != nil {
 		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
