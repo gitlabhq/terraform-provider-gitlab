@@ -138,7 +138,6 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 	client := meta.(*gitlab.Client)
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
-	filter := d.Get("filter").(string)
 	ldap_provider := d.Get("ldap_provider").(string)
 
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
