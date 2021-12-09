@@ -51,6 +51,17 @@ func TestAccGitlabTopic(t *testing.T) {
 					}),
 				),
 			},
+			// Updating the topic to have a description before it is deleted
+			{
+				Config: testAccGitlabTopicFullConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTopicExists("gitlab_topic.foo", &topic),
+					testAccCheckGitlabTopicAttributes(&topic, &testAccGitlabTopicExpectedAttributes{
+						Name:        fmt.Sprintf("foo-full-%d", rInt),
+						Description: "Terraform acceptance tests",
+					}),
+				),
+			},
 		},
 	})
 }
@@ -102,9 +113,12 @@ func testAccCheckGitlabTopicDestroy(s *terraform.State) error {
 		topic, resp, err := conn.Topics.GetTopic(rs.Primary.ID)
 		if err == nil {
 			if topic != nil && fmt.Sprintf("%d", topic.ID) == rs.Primary.ID {
+
+				if topic.Description != "" {
+					return fmt.Errorf("topic still has a description")
+				}
 				// TODO: Return error as soon as deleting a topic is supported
 				return nil
-				//				return fmt.Errorf("topic still exists")
 			}
 		}
 		if resp.StatusCode != 404 {
