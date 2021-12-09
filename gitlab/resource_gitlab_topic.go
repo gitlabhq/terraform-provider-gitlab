@@ -1,9 +1,9 @@
 package gitlab
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -44,12 +44,12 @@ func resourceGitlabTopicCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] create gitlab topic %s", *options.Name)
 
-	label, _, err := client.Topics.CreateTopic(options)
+	topic, _, err := client.Topics.CreateTopic(options)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(label.Name)
+	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
 
 	return resourceGitlabTopicRead(d, meta)
 }
@@ -69,7 +69,7 @@ func resourceGitlabTopicRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.SetId(fmt.Sprintf("%d", topic.ID))
+	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
 	d.Set("name", topic.Name)
 	d.Set("description", topic.Description)
 
@@ -99,9 +99,16 @@ func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceGitlabTopicDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] Delete gitlab topic %s", d.Id())
 
-	_, err := client.Topics.DeleteTopic(d.Id())
-	return err
+	// TODO: Use outcommented code below as soon as deleting a topic is supported
+	log.Printf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics", d.Id())
+	return nil
+	/*
+		client := meta.(*gitlab.Client)
+		log.Printf("[DEBUG] Delete gitlab topic %s", d.Id())
+
+		_, err := client.Topics.DeleteTopic(d.Id())
+		return err
+
+	*/
 }
