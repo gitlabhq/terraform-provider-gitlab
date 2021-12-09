@@ -6,12 +6,13 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
-func TestAccGitlabTopic_basic(t *testing.T) {
+func TestAccGitlabTopic(t *testing.T) {
 	var topic gitlab.Topic
 	rInt := acctest.RandInt()
 
@@ -90,7 +91,6 @@ func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.Test
 		*assign = *topic
 
 		return err
-
 	}
 }
 
