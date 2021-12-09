@@ -100,15 +100,13 @@ func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGitlabTopicDelete(d *schema.ResourceData, meta interface{}) error {
 
-	// TODO: Use outcommented code below as soon as deleting a topic is supported
-	log.Printf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics", d.Id())
-	return nil
-	/*
-		client := meta.(*gitlab.Client)
-		log.Printf("[DEBUG] Delete gitlab topic %s", d.Id())
+	log.Printf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics. Instead emptying its description", d.Id())
 
-		_, err := client.Topics.DeleteTopic(d.Id())
-		return err
+	client := meta.(*gitlab.Client)
+	options := &gitlab.UpdateTopicOptions{
+		Description: gitlab.String(""),
+	}
 
-	*/
+	_, _, err := client.Topics.UpdateTopic(d.Id(), options)
+	return err
 }
