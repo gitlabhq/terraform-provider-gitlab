@@ -161,6 +161,9 @@ resource "gitlab_deploy_token" "foo" {
   scopes = [
 	"read_registry",
 	"read_repository",
+	"read_package_registry",
+	"write_registry",
+	"write_package_registry",
   ]
 }
   `, rInt, rInt)
