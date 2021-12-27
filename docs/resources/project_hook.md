@@ -46,6 +46,7 @@ resource "gitlab_project_hook" "example" {
 - **pipeline_events** (Boolean) Invoke the hook for pipeline events.
 - **push_events** (Boolean) Invoke the hook for push events.
 - **push_events_branch_filter** (String) Invoke the hook for push events on matching branches only.
+- **releases_events** (Boolean) Invoke the hook for releases events.
 - **tag_push_events** (Boolean) Invoke the hook for tag push events.
 - **token** (String, Sensitive) A token to present when invoking the hook.
 - **wiki_page_events** (Boolean) Invoke the hook for wiki page events.

@@ -51,6 +51,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 						PipelineEvents:           true,
 						WikiPageEvents:           true,
 						DeploymentEvents:         true,
+						ReleasesEvents:           true,
 						EnableSSLVerification:    false,
 					}),
 				),
@@ -110,6 +111,7 @@ type testAccGitlabProjectHookExpectedAttributes struct {
 	PipelineEvents           bool
 	WikiPageEvents           bool
 	DeploymentEvents         bool
+	ReleasesEvents           bool
 	EnableSSLVerification    bool
 }
 
@@ -169,6 +171,10 @@ func testAccCheckGitlabProjectHookAttributes(hook *gitlab.ProjectHook, want *tes
 
 		if hook.DeploymentEvents != want.DeploymentEvents {
 			return fmt.Errorf("got deployment_events %t; want %t", hook.DeploymentEvents, want.DeploymentEvents)
+		}
+
+		if hook.ReleasesEvents != want.ReleasesEvents {
+			return fmt.Errorf("got releases_events %t; want %t", hook.ReleasesEvents, want.ReleasesEvents)
 		}
 
 		return nil
@@ -242,6 +248,7 @@ resource "gitlab_project_hook" "foo" {
   pipeline_events = true
   wiki_page_events = true
   deployment_events = true
+  releases_events = true
 }
 	`, rInt, rInt)
 }
