@@ -219,7 +219,7 @@ func resourceGitlabUserUpdate(ctx context.Context, d *schema.ResourceData, meta 
 			if err != nil {
 				return err
 			}
-		} else {
+		} else if d.Get("state") == "deactivated" {
 			err := client.Users.BlockUser(id)
 
 			if err != nil {
