@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
@@ -73,8 +74,12 @@ func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.Test
 			return fmt.Errorf("not Found: %s", n)
 		}
 
-		topicID := rs.Primary.ID
 		conn := testAccProvider.Meta().(*gitlab.Client)
+
+		topicID, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
 
 		topic, _, err := conn.Topics.GetTopic(topicID)
 		*assign = *topic
@@ -110,7 +115,12 @@ func testAccCheckGitlabTopicDestroy(s *terraform.State) error {
 			continue
 		}
 
-		topic, resp, err := conn.Topics.GetTopic(rs.Primary.ID)
+		topicID, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		topic, resp, err := conn.Topics.GetTopic(topicID)
 		if err == nil {
 			if topic != nil && fmt.Sprintf("%d", topic.ID) == rs.Primary.ID {
 
