@@ -56,8 +56,12 @@ func resourceGitlabTopicCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceGitlabTopicRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	topicID := d.Id()
-	log.Printf("[DEBUG] read gitlab topic %s", topicID)
+
+	topicID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return err
+	}
+	log.Printf("[DEBUG] read gitlab topic %d", topicID)
 
 	topic, resp, err := client.Topics.GetTopic(topicID, nil)
 	if err != nil {
@@ -90,7 +94,11 @@ func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] update gitlab topic %s", d.Id())
 
-	_, _, err := client.Topics.UpdateTopic(d.Id(), options)
+	topicID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return err
+	}
+	_, _, err = client.Topics.UpdateTopic(topicID, options)
 	if err != nil {
 		return err
 	}
@@ -107,6 +115,10 @@ func resourceGitlabTopicDelete(d *schema.ResourceData, meta interface{}) error {
 		Description: gitlab.String(""),
 	}
 
-	_, _, err := client.Topics.UpdateTopic(d.Id(), options)
+	topicID, err := strconv.Atoi(d.Id())
+	if err != nil {
+		return err
+	}
+	_, _, err = client.Topics.UpdateTopic(topicID, options)
 	return err
 }
