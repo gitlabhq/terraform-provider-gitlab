@@ -112,8 +112,8 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 		Name:                      &branch,
 		PushAccessLevel:           &pushAccessLevel,
 		MergeAccessLevel:          &mergeAccessLevel,
-		AllowedToPush:             allowedToPush,
-		AllowedToMerge:            allowedToMerge,
+		AllowedToPush:             &allowedToPush,
+		AllowedToMerge:            &allowedToMerge,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	})
 	if err != nil {

@@ -238,22 +238,22 @@ func flattenProtectedBranchIDs(protectedBranches []*gitlab.ProtectedBranch) []in
 }
 
 // expandApproverIds Expands an interface into a list of ints to read from state.
-func expandApproverIds(ids interface{}) []int {
+func expandApproverIds(ids interface{}) *[]int {
 	var approverIDs []int
 
 	for _, id := range ids.(*schema.Set).List() {
 		approverIDs = append(approverIDs, id.(int))
 	}
 
-	return approverIDs
+	return &approverIDs
 }
 
-func expandProtectedBranchIDs(ids interface{}) []int {
+func expandProtectedBranchIDs(ids interface{}) *[]int {
 	var protectedBranchIDs []int
 
 	for _, id := range ids.(*schema.Set).List() {
 		protectedBranchIDs = append(protectedBranchIDs, id.(int))
 	}
 
-	return protectedBranchIDs
+	return &protectedBranchIDs
 }
