@@ -54,9 +54,9 @@ The following arguments are supported:
 
 * `branch` - (Required) Name of the branch.
 
-* `push_access_level` - (Optional) One of five levels of access to the project. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
+* `push_access_level` - (Optional) One of five levels of access to the project. Valid values are: `no one`, `guest`, `developer`, `maintainer`, `admin`.
 
-* `merge_access_level` - (Optional) One of five levels of access to the project. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
+* `merge_access_level` - (Optional) One of five levels of access to the project. Valid values are: `no one`, `guest`, `developer`, `maintainer`, `admin`.
 
 * `allowed_to_push`, `allowed_to_merge` - (Optional) One or more `allowed_to_push`, `allowed_to_merge` blocks as defined below.
 
