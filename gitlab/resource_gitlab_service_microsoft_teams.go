@@ -25,10 +25,6 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"title": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"created_at": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -144,23 +140,21 @@ func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	d.Set("webhook", teamsService.Properties.WebHook)
-	d.Set("branches_to_be_notified", teamsService.Properties.BranchesToBeNotified)
-	d.Set("notify_only_broken_pipelines", teamsService.Properties.NotifyOnlyBrokenPipelines)
-
 	d.Set("project", project)
-	d.Set("title", teamsService.Title)
 	d.Set("created_at", teamsService.CreatedAt.String())
 	d.Set("updated_at", teamsService.UpdatedAt.String())
 	d.Set("active", teamsService.Active)
+	d.Set("webhook", teamsService.Properties.WebHook)
+	d.Set("notify_only_broken_pipelines", teamsService.Properties.NotifyOnlyBrokenPipelines)
+	d.Set("branches_to_be_notified", teamsService.Properties.BranchesToBeNotified)
 	d.Set("push_events", teamsService.PushEvents)
 	d.Set("issues_events", teamsService.IssuesEvents)
+	d.Set("confidential_issues_events", teamsService.ConfidentialIssuesEvents)
 	d.Set("merge_requests_events", teamsService.MergeRequestsEvents)
 	d.Set("tag_push_events", teamsService.TagPushEvents)
 	d.Set("note_events", teamsService.NoteEvents)
-	d.Set("pipeline_events", teamsService.PipelineEvents)
-	d.Set("confidential_issues_events", teamsService.ConfidentialIssuesEvents)
 	d.Set("confidential_note_events", teamsService.ConfidentialNoteEvents)
+	d.Set("pipeline_events", teamsService.PipelineEvents)
 	d.Set("wiki_page_events", teamsService.WikiPageEvents)
 
 	return nil
