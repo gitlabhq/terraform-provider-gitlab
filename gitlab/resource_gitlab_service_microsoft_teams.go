@@ -96,21 +96,29 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 
 func resourceGitlabServiceMicrosoftTeamsCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-
 	project := d.Get("project").(string)
+	d.SetId(project)
 
-	teamsOptions, err := expandMicrosoftTeamsOptions(d)
-	if err != nil {
-		return err
+	options := &gitlab.SetMicrosoftTeamsServiceOptions{
+		WebHook:                   gitlab.String(d.Get("webhook").(string)),
+		NotifyOnlyBrokenPipelines: gitlab.Bool(d.Get("notify_only_broken_pipelines").(bool)),
+		BranchesToBeNotified:      gitlab.String(d.Get("branches_to_be_notified").(string)),
+		PushEvents:                gitlab.Bool(d.Get("push_events").(bool)),
+		IssuesEvents:              gitlab.Bool(d.Get("issues_events").(bool)),
+		ConfidentialIssuesEvents:  gitlab.Bool(d.Get("confidential_issues_events").(bool)),
+		MergeRequestsEvents:       gitlab.Bool(d.Get("merge_requests_events").(bool)),
+		TagPushEvents:             gitlab.Bool(d.Get("tag_push_events").(bool)),
+		NoteEvents:                gitlab.Bool(d.Get("note_events").(bool)),
+		ConfidentialNoteEvents:    gitlab.Bool(d.Get("confidential_note_events").(bool)),
+		PipelineEvents:            gitlab.Bool(d.Get("pipeline_events").(bool)),
+		WikiPageEvents:            gitlab.Bool(d.Get("wiki_page_events").(bool)),
 	}
 
 	log.Printf("[DEBUG] Create Gitlab Microsoft Teams service")
 
-	if _, err := client.Services.SetMicrosoftTeamsService(project, teamsOptions); err != nil {
+	if _, err := client.Services.SetMicrosoftTeamsService(project, options); err != nil {
 		return fmt.Errorf("couldn't create Gitlab Microsoft Teams service: %w", err)
 	}
-
-	d.SetId(project)
 
 	return resourceGitlabServiceMicrosoftTeamsRead(d, meta)
 }
@@ -136,12 +144,8 @@ func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	if v := teamsService.Properties.WebHook; v != "" {
-		d.Set("webhook", v)
-	}
-	if v := teamsService.Properties.BranchesToBeNotified; v != "" {
-		d.Set("branches_to_be_notified", v)
-	}
+	d.Set("webhook", teamsService.Properties.WebHook)
+	d.Set("branches_to_be_notified", teamsService.Properties.BranchesToBeNotified)
 	d.Set("notify_only_broken_pipelines", teamsService.Properties.NotifyOnlyBrokenPipelines)
 
 	d.Set("project", project)
@@ -168,56 +172,10 @@ func resourceGitlabServiceMicrosoftTeamsUpdate(d *schema.ResourceData, meta inte
 
 func resourceGitlabServiceMicrosoftTeamsDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
+	project := d.Id()
 
-	project := d.Get("project").(string)
-
-	log.Printf("[DEBUG] Delete Gitlab Teams service %s", d.Id())
+	log.Printf("[DEBUG] Delete Gitlab Microsoft Teams service for project %s", d.Id())
 
 	_, err := client.Services.DeleteMicrosoftTeamsService(project)
-
 	return err
-}
-
-func expandMicrosoftTeamsOptions(d *schema.ResourceData) (*gitlab.SetMicrosoftTeamsServiceOptions, error) {
-	setTeamsServiceOptions := gitlab.SetMicrosoftTeamsServiceOptions{}
-
-	// Set required properties
-	setTeamsServiceOptions.WebHook = gitlab.String(d.Get("webhook").(string))
-
-	// Set optional properties
-	if val := d.Get("branches_to_be_notified"); val != nil {
-		setTeamsServiceOptions.BranchesToBeNotified = gitlab.String(val.(string))
-	}
-	if val := d.Get("notify_only_broken_pipelines"); val != nil {
-		setTeamsServiceOptions.NotifyOnlyBrokenPipelines = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("push_events"); val != nil {
-		setTeamsServiceOptions.PushEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("issues_events"); val != nil {
-		setTeamsServiceOptions.IssuesEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("merge_requests_events"); val != nil {
-		setTeamsServiceOptions.MergeRequestsEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("tag_push_events"); val != nil {
-		setTeamsServiceOptions.TagPushEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("note_events"); val != nil {
-		setTeamsServiceOptions.NoteEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("pipeline_events"); val != nil {
-		setTeamsServiceOptions.PipelineEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("confidential_issues_events"); val != nil {
-		setTeamsServiceOptions.ConfidentialIssuesEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("confidential_note_events"); val != nil {
-		setTeamsServiceOptions.ConfidentialNoteEvents = gitlab.Bool(val.(bool))
-	}
-	if val := d.Get("wiki_page_events"); val != nil {
-		setTeamsServiceOptions.WikiPageEvents = gitlab.Bool(val.(bool))
-	}
-
-	return &setTeamsServiceOptions, nil
 }
