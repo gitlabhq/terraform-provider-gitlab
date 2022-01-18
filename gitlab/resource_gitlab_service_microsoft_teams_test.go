@@ -77,23 +77,6 @@ func TestAccGitlabServiceMicrosoftTeams_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(teamsResourceName, "wiki_page_events", "false"),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabServiceMicrosoftTeams_import(t *testing.T) {
-	teamsResourceName := "gitlab_service_microsoft_teams.teams"
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceMicrosoftTeamsDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabServiceMicrosoftTeamsConfig(rInt),
-			},
 			{
 				ResourceName:      teamsResourceName,
 				ImportState:       true,
