@@ -16,7 +16,7 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 		Update: resourceGitlabServiceMicrosoftTeamsUpdate,
 		Delete: resourceGitlabServiceMicrosoftTeamsDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabServiceMicrosoftTeamsImportState,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -117,7 +117,7 @@ func resourceGitlabServiceMicrosoftTeamsCreate(d *schema.ResourceData, meta inte
 
 func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
+	project := d.Id()
 
 	p, resp, err := client.Projects.GetProject(project, nil)
 	if err != nil {
@@ -129,7 +129,7 @@ func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interf
 		return err
 	}
 
-	log.Printf("[DEBUG] Read Gitlab Microsoft Teams service %s", d.Id())
+	log.Printf("[DEBUG] Read Gitlab Microsoft Teams service for project %s", d.Id())
 
 	teamsService, _, err := client.Services.GetMicrosoftTeamsService(project)
 	if err != nil {
@@ -144,6 +144,7 @@ func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interf
 	}
 	d.Set("notify_only_broken_pipelines", teamsService.Properties.NotifyOnlyBrokenPipelines)
 
+	d.Set("project", project)
 	d.Set("title", teamsService.Title)
 	d.Set("created_at", teamsService.CreatedAt.String())
 	d.Set("updated_at", teamsService.UpdatedAt.String())
@@ -219,10 +220,4 @@ func expandMicrosoftTeamsOptions(d *schema.ResourceData) (*gitlab.SetMicrosoftTe
 	}
 
 	return &setTeamsServiceOptions, nil
-}
-
-func resourceGitlabServiceMicrosoftTeamsImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	d.Set("project", d.Id())
-
-	return []*schema.ResourceData{d}, nil
 }
