@@ -96,7 +96,6 @@ func TestAccGitlabServiceMicrosoftTeams_import(t *testing.T) {
 			},
 			{
 				ResourceName:      teamsResourceName,
-				ImportStateIdFunc: getTeamsProjectID(teamsResourceName),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -149,22 +148,6 @@ func testAccCheckGitlabServiceMicrosoftTeamsDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
-}
-
-func getTeamsProjectID(n string) resource.ImportStateIdFunc {
-	return func(s *terraform.State) (string, error) {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return "", fmt.Errorf("Not Found: %s", n)
-		}
-
-		project := rs.Primary.Attributes["project"]
-		if project == "" {
-			return "", fmt.Errorf("No project ID is set")
-		}
-
-		return project, nil
-	}
 }
 
 func testAccGitlabServiceMicrosoftTeamsConfig(rInt int) string {
