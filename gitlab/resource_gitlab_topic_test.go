@@ -63,6 +63,12 @@ func TestAccGitlabTopic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_topic.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
