@@ -12,7 +12,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func TestAccGitlabTopic(t *testing.T) {
+func TestAccGitlabTopic_basic(t *testing.T) {
 	var topic gitlab.Topic
 	rInt := acctest.RandInt()
 
