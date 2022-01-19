@@ -64,12 +64,9 @@ resource "gitlab_branch_protection" "main" {
 
 ### Optional
 
-- **allowed_to_merge** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_merge))
-- **allowed_to_push** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_push))
-- **code_owner_approval_required** (Boolean) Can be set to true to require code owner approval before merging.
-- **id** (String) The ID of this resource.
+* `push_access_level` - (Optional) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 
-### Read-Only
+* `merge_access_level` - (Optional) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 
 - **branch_protection_id** (Number) The ID of the branch protection (not the branch name).
 
