@@ -28,13 +28,13 @@ var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
 }
 
 var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
-	gitlab.NoPermissions:            "no one",
-	gitlab.MinimalAccessPermissions: "minimal",
-	gitlab.GuestPermissions:         "guest",
-	gitlab.ReporterPermissions:      "reporter",
-	gitlab.DeveloperPermissions:     "developer",
-	gitlab.MaintainerPermissions:    "maintainer",
-	gitlab.OwnerPermissions:         "owner",
+	gitlab.NoPermissions:         		"no one",
+	gitlab.MinimalAccessPermissions: 	"minimal",
+	gitlab.GuestPermissions:      		"guest",
+	gitlab.ReporterPermissions:   		"reporter",
+	gitlab.DeveloperPermissions:  		"developer",
+	gitlab.MaintainerPermissions: 		"maintainer",
+	gitlab.OwnerPermissions:      		"owner",
 }
 
 // copied from ../github/util.go

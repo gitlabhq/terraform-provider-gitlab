@@ -31,7 +31,7 @@ resource "gitlab_group_ldap_link" "test" {
 - **group_id** (String) The id of the GitLab group.
 - **ldap_provider** (String) The name of the LDAP provider as stored in the GitLab database.
 
-### Optional
+* `access_level` - (Required) Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.
 
 - **force** (Boolean) If true, then delete and replace an existing LDAP link if one exists.
 - **id** (String) The ID of this resource.

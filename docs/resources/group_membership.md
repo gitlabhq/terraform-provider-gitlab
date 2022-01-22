@@ -30,7 +30,7 @@ resource "gitlab_group_membership" "test" {
 - **group_id** (String) The id of the group.
 - **user_id** (Number) The id of the user.
 
-### Optional
+* `access_level` - (Required)  Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.
 
 - **expires_at** (String) Expiration date for the group membership. Format: `YYYY-MM-DD`
 - **id** (String) The ID of this resource.
