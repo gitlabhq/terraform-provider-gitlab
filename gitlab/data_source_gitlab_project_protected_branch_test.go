@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
-func TestAccDataGitlabProjectProtectedBranchSearch(t *testing.T) {
+func TestAccDataGitlabProjectProtectedBranch_search(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
@@ -21,7 +21,7 @@ func TestAccDataGitlabProjectProtectedBranchSearch(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"data.gitlab_project_protected_branch.test",
 						"name",
-						"master",
+						"main",
 					),
 					resource.TestCheckResourceAttr(
 						"data.gitlab_project_protected_branch.test",
@@ -39,26 +39,19 @@ func testAccDataGitlabProjectProtectedBranchConfigGetProjectSearch(projectName s
 resource "gitlab_project" "test" {
   name           = "%s"
   path           = "%s"
-  default_branch = "master"
-}
-
-resource "gitlab_branch_protection" "master" {
-  project            = gitlab_project.test.id
-  branch             = "master"
-  push_access_level  = "maintainer"
-  merge_access_level = "developer"
+  default_branch = "main"
 }
 
 resource "gitlab_branch_protection" "test" {
   project            = gitlab_project.test.id
-  branch             = "master"
+  branch             = "main"
   push_access_level  = "maintainer"
   merge_access_level = "developer"
 }
 
 data "gitlab_project_protected_branch" "test" {
   project_id = gitlab_project.test.id
-  name       = gitlab_branch_protection.master.branch
+  name       = gitlab_branch_protection.test.branch
 }
 `, projectName, projectName)
 }

@@ -29,9 +29,12 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
-			"push_access_levels":      dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
-			"merge_access_levels":     dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
-			"unprotect_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+			"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+			"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+			"allow_force_push": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 			"code_owner_approval_required": {
 				Type:     schema.TypeBool,
 				Computed: true,
@@ -81,13 +84,15 @@ func dataSourceGitlabProjectProtectedBranchRead(d *schema.ResourceData, meta int
 		return fmt.Errorf("error getting protected branch (Project: %v / Name %v): %v", project, name, err)
 	}
 
+	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("push_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
 		return err
 	}
+	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("merge_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return err
 	}
-	if err := d.Set("unprotect_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.UnprotectAccessLevels)); err != nil {
+	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
 		return err
 	}
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
@@ -102,8 +107,8 @@ func dataSourceGitlabProjectProtectedBranchRead(d *schema.ResourceData, meta int
 type stateBranchAccessDescription struct {
 	AccessLevel            string `json:"access_level" mapstructure:"access_level"`
 	AccessLevelDescription string `json:"access_level_description" mapstructure:"access_level_description"`
-	GroupID                *int   `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
-	UserID                 *int   `json:"user_id,omitempty" mapstructure:"user_id,omitempty"`
+	GroupID                int    `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
+	UserID                 int    `json:"user_id,omitempty" mapstructure:"user_id,omitempty"`
 }
 
 func convertBranchAccessDescriptionsToStateBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
@@ -122,10 +127,10 @@ func convertBranchAccessDescriptionToStateBranchAccessDescription(description *g
 		AccessLevelDescription: description.AccessLevelDescription,
 	}
 	if description.UserID != 0 {
-		stateDescription.UserID = &description.UserID
+		stateDescription.UserID = description.UserID
 	}
 	if description.GroupID != 0 {
-		stateDescription.GroupID = &description.GroupID
+		stateDescription.GroupID = description.GroupID
 	}
 	return stateDescription
 }
