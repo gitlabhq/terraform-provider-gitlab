@@ -32,9 +32,12 @@ func dataSourceGitlabProjectProtectedBranches() *schema.Resource {
 							Type:     schema.TypeInt,
 							Computed: true,
 						},
-						"push_access_levels":      dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
-						"merge_access_levels":     dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
-						"unprotect_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+						"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+						"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
+						"allow_force_push": {
+							Type:     schema.TypeBool,
+							Computed: true,
+						},
 						"code_owner_approval_required": {
 							Type:     schema.TypeBool,
 							Computed: true,
@@ -51,7 +54,7 @@ type stateProtectedBranch struct {
 	Name                      string                         `json:"name,omitempty" mapstructure:"name,omitempty"`
 	PushAccessLevels          []stateBranchAccessDescription `json:"push_access_levels,omitempty" mapstructure:"push_access_levels,omitempty"`
 	MergeAccessLevels         []stateBranchAccessDescription `json:"merge_access_levels,omitempty" mapstructure:"merge_access_levels,omitempty"`
-	UnprotectAccessLevels     []stateBranchAccessDescription `json:"unprotect_access_levels,omitempty" mapstructure:"unprotect_access_levels,omitempty"`
+	AllowForcePush            bool                           `json:"allow_force_push,omitempty" mapstructure:"allow_force_push,omitempty"`
 	CodeOwnerApprovalRequired bool                           `json:"code_owner_approval_required,omitempty" mapstructure:"code_owner_approval_required,omitempty"`
 }
 
@@ -83,12 +86,13 @@ func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta i
 				Name:                      pb.Name,
 				PushAccessLevels:          convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels),
 				MergeAccessLevels:         convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.MergeAccessLevels),
-				UnprotectAccessLevels:     convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.UnprotectAccessLevels),
+				AllowForcePush:            pb.AllowForcePush,
 				CodeOwnerApprovalRequired: pb.CodeOwnerApprovalRequired,
 			})
 		}
 	}
 
+	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("protected_branches", allProtectedBranches); err != nil {
 		return err
 	}

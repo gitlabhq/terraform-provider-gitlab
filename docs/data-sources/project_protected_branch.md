@@ -30,13 +30,14 @@ The following arguments are supported:
 
 The following attributes are exported:
 
-* `push_access_levels`, `merge_access_levels`, `unprotect_access_levels` - Each block contains a list of which access levels, users or groups are allowed to perform the respective actions (documented below).
+* `push_access_levels`, `merge_access_levels` - Each block contains a list of which access levels, users or groups are allowed to perform the respective actions (documented below).
 
+* `allow_force_push` - Whether force push is allowed.
 * `code_owner_approval_required` - Reject code pushes that change files listed in the CODEOWNERS file.
 
 ## Nested Blocks
 
-### `push_access_levels`, `merge_access_levels`, `unprotect_access_levels`
+### `push_access_levels`, `merge_access_levels`
 
 #### Attributes
 

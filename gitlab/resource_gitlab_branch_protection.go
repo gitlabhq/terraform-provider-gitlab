@@ -255,13 +255,6 @@ func schemaAllowedTo() *schema.Schema {
 	}
 }
 
-type stateBranchAccessDescription struct {
-	AccessLevel            string `mapstructure:"access_level"`
-	AccessLevelDescription string `mapstructure:"access_level_description"`
-	GroupID                int    `mapstructure:"group_id,omitempty"`
-	UserID                 int    `mapstructure:"user_id,omitempty"`
-}
-
 func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
 	result := make([]stateBranchAccessDescription, 0)
 
