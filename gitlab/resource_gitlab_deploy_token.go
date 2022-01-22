@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -166,30 +166,23 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
+	var scopes []string
+
 	for _, token := range deployTokens {
 		if token.ID == deployTokenID {
 			d.Set("name", token.Name)
 			d.Set("username", token.Username)
 
 			if token.ExpiresAt != nil {
-				d.Set("expires_at", token.ExpiresAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+				d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
 			}
 
-			for _, scope := range token.Scopes {
-				switch scope {
-				case "read_repository":
-					d.Set("scopes.read_repository", true)
-				case "read_registry":
-					d.Set("scopes.read_registry", true)
-				case "read_package_registry":
-					d.Set("scopes.read_package_registry", true)
-				case "write_registry":
-					d.Set("scopes.write_registry", true)
-				case "write_package_registry":
-					d.Set("scopes.write_package_registry", true)
-				}
-			}
+			scopes = append(scopes, token.Scopes...)
 		}
+	}
+
+	if err := d.Set("scopes", scopes); err != nil {
+		return err
 	}
 
 	return nil

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -23,7 +23,7 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 		Read:   resourceGitlabGroupShareGroupRead,
 		Delete: resourceGitlabGroupShareGroupDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"group_id": {
@@ -37,10 +37,10 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 				Required: true,
 			},
 			"group_access": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				ForceNew:     true,
-				Required:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ForceNew:         true,
+				Required:         true,
 			},
 			"expires_at": {
 				Type:         schema.TypeString, // Format YYYY-MM-DD
