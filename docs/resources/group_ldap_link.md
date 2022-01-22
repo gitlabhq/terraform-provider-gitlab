@@ -21,7 +21,7 @@ The following arguments are supported:
 
 * `cn` - (Required) The CN of the LDAP group to link with.
 
-* `access_level` - (Required) Acceptable values are: guest, reporter, developer, maintainer, owner.
+* `access_level` - (Required) Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.
 
 * `ldap_provider` - (Required) The name of the LDAP provider as stored in the GitLab database.
 
