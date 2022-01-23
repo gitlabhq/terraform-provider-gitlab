@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -16,7 +18,7 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
-		Read: dataSourceGitlabGroupMembershipRead,
+		ReadContext: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{
 			"group_id": {
 				Type:     schema.TypeInt,
@@ -84,7 +86,7 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 	}
 }
 
-func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	var gm []*gitlab.GroupMember
@@ -98,26 +100,26 @@ func dataSourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{
 
 	if groupIDOk {
 		// Get group by id
-		group, _, err = client.Groups.GetGroup(groupIDData.(int), nil)
+		group, _, err = client.Groups.GetGroup(groupIDData.(int), nil, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	} else if fullPathOk {
 		// Get group by full path
 		group, _, err = client.Groups.GetGroup(fullPathData.(string), nil)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	} else {
-		return fmt.Errorf("one and only one of group_id or full_path must be set")
+		return diag.Errorf("one and only one of group_id or full_path must be set")
 	}
 
 	log.Printf("[INFO] Reading Gitlab group memberships")
 
 	// Get group memberships
-	gm, _, err = client.Groups.ListGroupMembers(group.ID, &gitlab.ListGroupMembersOptions{})
+	gm, _, err = client.Groups.ListGroupMembers(group.ID, &gitlab.ListGroupMembersOptions{}, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("group_id", group.ID)
