@@ -1,10 +1,11 @@
 package gitlab
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -39,10 +40,10 @@ func resourceGitlabBranchProtection() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
-		Create: resourceGitlabBranchProtectionCreate,
-		Read:   resourceGitlabBranchProtectionRead,
-		Update: resourceGitlabBranchProtectionUpdate,
-		Delete: resourceGitlabBranchProtectionDelete,
+		CreateContext: resourceGitlabBranchProtectionCreate,
+		ReadContext:   resourceGitlabBranchProtectionRead,
+		UpdateContext: resourceGitlabBranchProtectionUpdate,
+		DeleteContext: resourceGitlabBranchProtectionDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -84,7 +85,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 	}
 }
 
-func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	branch := d.Get("branch").(string)
@@ -92,12 +93,12 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 	log.Printf("[DEBUG] create gitlab branch protection on branch %q for project %s", branch, project)
 
 	if d.IsNewResource() {
-		existing, resp, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
+		existing, resp, err := client.ProtectedBranches.GetProtectedBranch(project, branch, gitlab.WithContext(ctx))
 		if err != nil && resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("error looking up protected branch %q on project %q: %v", branch, project, err)
+			return diag.Errorf("error looking up protected branch %q on project %q: %v", branch, project, err)
 		}
 		if resp.StatusCode != http.StatusNotFound {
-			return fmt.Errorf("protected branch %q on project %q already exists: %+v", branch, project, *existing)
+			return diag.Errorf("protected branch %q on project %q already exists: %+v", branch, project, *existing)
 		}
 	}
 
@@ -115,31 +116,31 @@ func resourceGitlabBranchProtectionCreate(d *schema.ResourceData, meta interface
 		AllowedToPush:             allowedToPush,
 		AllowedToMerge:            allowedToMerge,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
-	})
+	}, gitlab.WithContext(ctx))
 	if err != nil {
-		return fmt.Errorf("error protecting branch %q on project %q: %v", branch, project, err)
+		return diag.Errorf("error protecting branch %q on project %q: %v", branch, project, err)
 	}
 
 	if !pb.CodeOwnerApprovalRequired && codeOwnerApprovalRequired {
-		return fmt.Errorf("feature unavailable: code owner approvals")
+		return diag.Errorf("feature unavailable: code owner approvals")
 	}
 
 	d.SetId(buildTwoPartID(&project, &pb.Name))
 
-	return resourceGitlabBranchProtectionRead(d, meta)
+	return resourceGitlabBranchProtectionRead(ctx, d, meta)
 }
 
-func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchProtectionRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, branch, err := projectAndBranchFromID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab branch protection for project %s, branch %s", project, branch)
 
 	// Get protected branch by project ID/path and branch name
-	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch)
+	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch, gitlab.WithContext(ctx))
 	if err != nil {
 		log.Printf("[DEBUG] failed to read gitlab branch protection for project %s, branch %s: %s", project, branch, err)
 		d.SetId("")
@@ -152,28 +153,28 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	pushAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.PushAccessLevels)
 	if len(pushAccessLevels) > 0 {
 		if err := d.Set("push_access_level", pushAccessLevels[0].AccessLevel); err != nil {
-			return fmt.Errorf("error setting push_access_level: %v", err)
+			return diag.Errorf("error setting push_access_level: %v", err)
 		}
 	}
 
 	mergeAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.MergeAccessLevels)
 	if len(mergeAccessLevels) > 0 {
 		if err := d.Set("merge_access_level", mergeAccessLevels[0].AccessLevel); err != nil {
-			return fmt.Errorf("error setting merge_access_level: %v", err)
+			return diag.Errorf("error setting merge_access_level: %v", err)
 		}
 	}
 
 	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("allowed_to_push", convertAllowedToToBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
-		return fmt.Errorf("error setting allowed_to_push: %v", err)
+		return diag.Errorf("error setting allowed_to_push: %v", err)
 	}
 	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("allowed_to_merge", convertAllowedToToBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
-		return fmt.Errorf("error setting allowed_to_merge: %v", err)
+		return diag.Errorf("error setting allowed_to_merge: %v", err)
 	}
 
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
-		return fmt.Errorf("error setting code_owner_approval_required: %v", err)
+		return diag.Errorf("error setting code_owner_approval_required: %v", err)
 	}
 
 	d.Set("branch_protection_id", pb.ID)
@@ -183,7 +184,7 @@ func resourceGitlabBranchProtectionRead(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchProtectionUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// NOTE: At the time of writing, the only value that does not force re-creation is code_owner_approval_required,
 	// so therefore that is the only update that needs to be handled.
 
@@ -198,28 +199,32 @@ func resourceGitlabBranchProtectionUpdate(d *schema.ResourceData, meta interface
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	}
 
-	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options); err != nil {
+	if _, err := client.ProtectedBranches.RequireCodeOwnerApprovals(project, branch, options, gitlab.WithContext(ctx)); err != nil {
 		// The user might be running a version of GitLab that does not support this feature.
 		// We enhance the generic 404 error with a more informative message.
 		if errResponse, ok := err.(*gitlab.ErrorResponse); ok && errResponse.Response.StatusCode == 404 {
-			return fmt.Errorf("feature unavailable: code owner approvals: %w", err)
+			return diag.Errorf("feature unavailable: code owner approvals: %v", err)
 		}
 
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabBranchProtectionRead(d, meta)
+	return resourceGitlabBranchProtectionRead(ctx, d, meta)
 }
 
-func resourceGitlabBranchProtectionDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchProtectionDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	branch := d.Get("branch").(string)
 
 	log.Printf("[DEBUG] Delete gitlab protected branch %s for project %s", branch, project)
 
-	_, err := client.ProtectedBranches.UnprotectRepositoryBranches(project, branch)
-	return err
+	_, err := client.ProtectedBranches.UnprotectRepositoryBranches(project, branch, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func projectAndBranchFromID(id string) (string, string, error) {
