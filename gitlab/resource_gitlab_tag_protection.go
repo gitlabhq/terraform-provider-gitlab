@@ -1,16 +1,17 @@
 package gitlab
 
 import (
+	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabTagProtection() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
+	acceptedAccessLevels := make([]string, 0, len(tagProtectionAccessLevelID))
 
-	for k := range accessLevelID {
+	for k := range tagProtectionAccessLevelID {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
@@ -34,10 +35,10 @@ func resourceGitlabTagProtection() *schema.Resource {
 				Required: true,
 			},
 			"create_access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				Required:         true,
+				ForceNew:         true,
 			},
 		},
 	}
@@ -47,7 +48,7 @@ func resourceGitlabTagProtectionCreate(d *schema.ResourceData, meta interface{})
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	tag := gitlab.String(d.Get("tag").(string))
-	createAccessLevel := accessLevelID[d.Get("create_access_level").(string)]
+	createAccessLevel := tagProtectionAccessLevelID[d.Get("create_access_level").(string)]
 
 	options := &gitlab.ProtectRepositoryTagsOptions{
 		Name:              tag,
@@ -94,9 +95,14 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 		return err
 	}
 
+	accessLevel, ok := tagProtectionAccessLevelNames[pt.CreateAccessLevels[0].AccessLevel]
+	if !ok {
+		return fmt.Errorf("tag protection access level %d is not supported. Supported are: %v", pt.CreateAccessLevels[0].AccessLevel, tagProtectionAccessLevelNames)
+	}
+
 	d.Set("project", project)
 	d.Set("tag", pt.Name)
-	d.Set("create_access_level", pt.CreateAccessLevels[0].AccessLevel)
+	d.Set("create_access_level", accessLevel)
 
 	d.SetId(buildTwoPartID(&project, &pt.Name))
 

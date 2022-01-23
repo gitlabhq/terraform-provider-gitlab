@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -55,8 +55,15 @@ func resourceGitlabDeployToken() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 				Elem: &schema.Schema{
-					Type:         schema.TypeString,
-					ValidateFunc: validation.StringInSlice([]string{"read_registry", "read_repository"}, false),
+					Type: schema.TypeString,
+					ValidateFunc: validation.StringInSlice(
+						[]string{
+							"read_registry",
+							"read_repository",
+							"read_package_registry",
+							"write_registry",
+							"write_package_registry",
+						}, false),
 				},
 			},
 
@@ -159,30 +166,30 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
+	var scopes []string
+
 	for _, token := range deployTokens {
 		if token.ID == deployTokenID {
 			d.Set("name", token.Name)
 			d.Set("username", token.Username)
 
 			if token.ExpiresAt != nil {
-				d.Set("expires_at", token.ExpiresAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+				d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
 			}
 
-			for _, scope := range token.Scopes {
-				if scope == "read_repository" {
-					d.Set("scopes.read_repository", true)
-				}
+			if err := d.Set("scopes", token.Scopes); err != nil {
+        return err
+      }
 
-				if scope == "read_registry" {
-					d.Set("scopes.read_registry", true)
-				}
-			}
-			return nil
-		}
+      return nil
+    }
 	}
+
 	log.Printf("[DEBUG] GitLab deploy token %d in group %s was not found", deployTokenID, group.(string))
+
 	d.SetId("")
-	return nil
+
+  return nil
 }
 
 func resourceGitlabDeployTokenDelete(d *schema.ResourceData, meta interface{}) error {

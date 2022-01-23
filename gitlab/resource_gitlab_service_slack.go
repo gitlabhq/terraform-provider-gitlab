@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -141,12 +141,12 @@ func resourceGitlabServiceSlack() *schema.Resource {
 	}
 }
 
-func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitlab.SlackService) {
+func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitlab.SlackService) error {
 	d.SetId(fmt.Sprintf("%d", service.ID))
 	d.Set("webhook", service.Properties.WebHook)
 	d.Set("username", service.Properties.Username)
-	d.Set("notify_only_broken_pipelines", service.Properties.NotifyOnlyBrokenPipelines.UnmarshalJSON) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
-	d.Set("notify_only_default_branch", service.Properties.NotifyOnlyDefaultBranch.UnmarshalJSON)     // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+	d.Set("notify_only_broken_pipelines", bool(service.Properties.NotifyOnlyBrokenPipelines))
+	d.Set("notify_only_default_branch", bool(service.Properties.NotifyOnlyDefaultBranch))
 	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
 	d.Set("push_events", service.PushEvents)
 	d.Set("push_channel", service.Properties.PushChannel)
@@ -168,6 +168,8 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	d.Set("wiki_page_events", service.WikiPageEvents)
 	d.Set("wiki_page_channel", service.Properties.WikiPageChannel)
 	d.Set("job_events", service.JobEvents)
+
+	return nil
 }
 
 func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) error {
@@ -226,7 +228,9 @@ func resourceGitlabServiceSlackRead(d *schema.ResourceData, meta interface{}) er
 		return err
 	}
 
-	resourceGitlabServiceSlackSetToState(d, service)
+	if err = resourceGitlabServiceSlackSetToState(d, service); err != nil {
+		return err
+	}
 
 	return nil
 }

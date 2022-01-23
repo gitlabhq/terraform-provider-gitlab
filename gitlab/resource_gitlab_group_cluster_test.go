@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -242,7 +242,7 @@ resource gitlab_group_cluster "foo" {
   managed                       = "%s"
   kubernetes_api_url            = "https://123.123.123"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "abac"
 }
 `, groupClusterFakeCert, rInt, rInt, rInt, m)
@@ -272,7 +272,7 @@ resource gitlab_group_cluster "foo" {
   domain                        = "example-new.com"
   kubernetes_api_url            = "https://124.124.124"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "%s"
 }
 `, groupClusterFakeCert, rInt, rInt, rInt, authType)
@@ -313,7 +313,7 @@ resource gitlab_group_cluster "foo" {
   managed                       = "%s"
   kubernetes_api_url            = "https://123.123.123"
   kubernetes_token              = "some-token"
-  kubernetes_ca_cert            = "${trimspace(var.cert)}"
+  kubernetes_ca_cert            = var.cert
   kubernetes_authorization_type = "abac"
   management_project_id         = "${gitlab_project.cluster-management.id}"
 }

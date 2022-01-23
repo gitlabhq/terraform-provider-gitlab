@@ -38,10 +38,10 @@ also need to be included in the approvers list in order to be able to approve th
 
 ## Import
 
-You can import an approval configuration state using `terraform import <resource> <project_id>:<approval_rule_id>`.
+You can import an approval configuration state using `terraform import <resource> <project_id>`.
 
 For example:
 
 ```
-$ terraform import gitlab_project_level_mr_approvals.foo 1234:53
+$ terraform import gitlab_project_level_mr_approvals.foo 1234
 ```

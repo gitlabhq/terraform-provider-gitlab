@@ -1,18 +1,15 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/httpclient"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-// Provider returns a terraform.ResourceProvider.
-func Provider() terraform.ResourceProvider {
-
-	// The actual provider
+func Provider() *schema.Provider {
 	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"token": {
@@ -55,19 +52,23 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"gitlab_group":            dataSourceGitlabGroup(),
-			"gitlab_group_membership": dataSourceGitlabGroupMembership(),
-			"gitlab_project":          dataSourceGitlabProject(),
-			"gitlab_projects":         dataSourceGitlabProjects(),
-			"gitlab_user":             dataSourceGitlabUser(),
-			"gitlab_users":            dataSourceGitlabUsers(),
+			"gitlab_group":                      dataSourceGitlabGroup(),
+			"gitlab_group_membership":           dataSourceGitlabGroupMembership(),
+			"gitlab_project":                    dataSourceGitlabProject(),
+			"gitlab_project_protected_branch":   dataSourceGitlabProjectProtectedBranch(),
+			"gitlab_project_protected_branches": dataSourceGitlabProjectProtectedBranches(),
+			"gitlab_projects":                   dataSourceGitlabProjects(),
+			"gitlab_user":                       dataSourceGitlabUser(),
+			"gitlab_users":                      dataSourceGitlabUsers(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
 			"gitlab_branch_protection":          resourceGitlabBranchProtection(),
 			"gitlab_tag_protection":             resourceGitlabTagProtection(),
 			"gitlab_group":                      resourceGitlabGroup(),
+			"gitlab_group_custom_attribute":     resourceGitlabGroupCustomAttribute(),
 			"gitlab_project":                    resourceGitlabProject(),
+			"gitlab_project_custom_attribute":   resourceGitlabProjectCustomAttribute(),
 			"gitlab_label":                      resourceGitlabLabel(),
 			"gitlab_group_label":                resourceGitlabGroupLabel(),
 			"gitlab_pipeline_schedule":          resourceGitlabPipelineSchedule(),
@@ -78,6 +79,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_deploy_key_enable":          resourceGitlabDeployEnableKey(),
 			"gitlab_deploy_token":               resourceGitlabDeployToken(),
 			"gitlab_user":                       resourceGitlabUser(),
+			"gitlab_user_custom_attribute":      resourceGitlabUserCustomAttribute(),
 			"gitlab_project_membership":         resourceGitlabProjectMembership(),
 			"gitlab_group_membership":           resourceGitlabGroupMembership(),
 			"gitlab_project_variable":           resourceGitlabProjectVariable(),
@@ -85,6 +87,7 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_cluster":            resourceGitlabProjectCluster(),
 			"gitlab_service_slack":              resourceGitlabServiceSlack(),
 			"gitlab_service_jira":               resourceGitlabServiceJira(),
+			"gitlab_service_microsoft_teams":    resourceGitlabServiceMicrosoftTeams(),
 			"gitlab_service_github":             resourceGitlabServiceGithub(),
 			"gitlab_service_pipelines_email":    resourceGitlabServicePipelinesEmail(),
 			"gitlab_project_share_group":        resourceGitlabProjectShareGroup(),
@@ -98,11 +101,12 @@ func Provider() terraform.ResourceProvider {
 			"gitlab_project_freeze_period":      resourceGitlabProjectFreezePeriod(),
 			"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
 			"gitlab_project_badge":              resourceGitlabProjectBadge(),
+			"gitlab_group_badge":                resourceGitlabGroupBadge(),
 		},
 	}
 
-	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
-		return providerConfigure(provider, d)
+	provider.ConfigureContextFunc = func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+		return providerConfigure(ctx, provider, d)
 	}
 
 	return provider
@@ -126,7 +130,7 @@ func init() {
 	}
 }
 
-func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{}, error) {
+func providerConfigure(ctx context.Context, p *schema.Provider, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	config := Config{
 		Token:      d.Get("token").(string),
 		BaseURL:    d.Get("base_url").(string),
@@ -138,14 +142,13 @@ func providerConfigure(p *schema.Provider, d *schema.ResourceData) (interface{},
 
 	client, err := config.Client()
 	if err != nil {
-		return nil, err
+		return nil, diag.FromErr(err)
 	}
 
-	// NOTE: httpclient.TerraformUserAgent is deprecated and removed in Terraform SDK v2
-	// After upgrading the SDK to v2 replace with p.UserAgent("terraform-provider-gitlab")
-	client.UserAgent = httpclient.TerraformUserAgent(p.TerraformVersion) + " terraform-provider-gitlab" // nolint // TODO: Resolve this golangci-lint issue: SA1019: httpclient.TerraformUserAgent is deprecated: This will be removed in v2 without replacement. If you need its functionality, you can copy it or reference the v1 package. (staticcheck)
+	userAgent := p.UserAgent("terraform-provider-gitlab", "")
+	client.UserAgent = userAgent
 
-	return client, err
+	return client, nil
 }
 
 func validateApiURLVersion(value interface{}, key string) (ws []string, es []error) {

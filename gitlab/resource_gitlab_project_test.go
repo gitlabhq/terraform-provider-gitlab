@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -44,12 +44,13 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		AllowMergeOnSkippedPipeline:               false,
-		Archived:                                  false, // needless, but let's make this explicit
-		PackagesEnabled:                           true,
-		PagesAccessLevel:                          gitlab.PublicAccessControl,
-		BuildCoverageRegex:                        "foo",
-		CIConfigPath:                              ".gitlab-ci.yml@mynamespace/myproject",
+		SquashOption:                gitlab.SquashOptionDefaultOff,
+		AllowMergeOnSkippedPipeline: false,
+		Archived:                    false, // needless, but let's make this explicit
+		PackagesEnabled:             true,
+		PagesAccessLevel:            gitlab.PublicAccessControl,
+		BuildCoverageRegex:          "foo",
+		CIConfigPath:                ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
 	defaultsMainBranch = defaults
@@ -89,11 +90,12 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						MergeMethod:                      gitlab.FastForwardMerge,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						AllowMergeOnSkippedPipeline:               true,
-						Archived:                                  true,
-						PackagesEnabled:                           false,
-						PagesAccessLevel:                          gitlab.DisabledAccessControl,
-						BuildCoverageRegex:                        "bar",
+						SquashOption:                gitlab.SquashOptionDefaultOn,
+						AllowMergeOnSkippedPipeline: true,
+						Archived:                    true,
+						PackagesEnabled:             false,
+						PagesAccessLevel:            gitlab.DisabledAccessControl,
+						BuildCoverageRegex:          "bar",
 					}, &received),
 				),
 			},
@@ -333,6 +335,46 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectDefaultBranch(&project, nil),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+						_, _, err := client.RepositoryFiles.GetFile(project.ID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get 'README.md' file from project: %w", err)
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigInitializeWithoutReadme(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+						branches, _, err := client.Branches.ListBranches(project.ID, nil)
+						if err != nil {
+							return fmt.Errorf("failed to list branches: %w", err)
+						}
+
+						if len(branches) != 0 {
+							return fmt.Errorf("expected no branch for new project when initialized without README; found %d", len(branches))
+						}
+						return nil
+					},
 				),
 			},
 		},
@@ -362,6 +404,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
+		SquashOption:       gitlab.SquashOptionDefaultOff,
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PublicAccessControl,
 		BuildCoverageRegex: "foo",
@@ -465,6 +508,7 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
+		SquashOption:       gitlab.SquashOptionDefaultOff,
 		PackagesEnabled:    true,
 		PagesAccessLevel:   gitlab.PrivateAccessControl,
 		BuildCoverageRegex: "foo",
@@ -579,6 +623,18 @@ resource "gitlab_project" "foo" {
 					testAccCheckGitlabProjectDefaultBranch(&project, &testAccGitlabProjectExpectedAttributes{
 						DefaultBranch: "foo",
 					}),
+					func(state *terraform.State) error {
+						client := testAccProvider.Meta().(*gitlab.Client)
+
+						projectID := state.RootModule().Resources["gitlab_project.foo"].Primary.ID
+
+						_, _, err := client.RepositoryFiles.GetFile(projectID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("foo")}, nil)
+						if err != nil {
+							return fmt.Errorf("failed to get 'README.md' file from project: %w", err)
+						}
+
+						return nil
+					},
 				),
 			},
 		},
@@ -999,6 +1055,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  squash_option = "default_off"
   pages_access_level = "public"
   build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
@@ -1056,6 +1113,7 @@ resource "gitlab_project" "foo" {
   merge_method = "ff"
   only_allow_merge_if_pipeline_succeeds = true
   only_allow_merge_if_all_discussions_are_resolved = true
+  squash_option = "default_on"
   allow_merge_on_skipped_pipeline = true
 
   request_access_enabled = false
@@ -1083,6 +1141,17 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = true
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigInitializeWithoutReadme(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  initialize_with_readme = false
 }
 	`, rInt, rInt)
 }

@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -34,10 +34,10 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 			},
 			// Using the friendlier "access_level" here instead of the GitLab API "group_access".
 			"access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				Required:         true,
+				ForceNew:         true,
 			},
 			// Changing GitLab API parameter "provider" to "ldap_provider" to avoid clashing with the Terraform "provider" key word
 			"ldap_provider": {

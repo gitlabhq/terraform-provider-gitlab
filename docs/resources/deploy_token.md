@@ -48,7 +48,7 @@ The following arguments are supported:
 
 * `expires_at` - (Optional, string) Time the token will expire it, RFC3339 format. Will not expire per default.
 
-* `scopes` - (Required, set of strings) Valid values: `read_repository`, `read_registry`.
+* `scopes` - (Required, set of strings) Valid values: `read_repository`, `read_registry`, `read_package_registry`, `write_registry`, `write_package_registry`.
 
 ## Attributes Reference
 

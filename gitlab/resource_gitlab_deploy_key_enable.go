@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -86,7 +86,7 @@ func resourceGitlabDeployKeyEnableRead(d *schema.ResourceData, meta interface{})
 	}
 
 	d.Set("title", deployKey.Title)
-	d.Set("key_id", deployKey.ID)
+	d.Set("key_id", strconv.Itoa(deployKey.ID))
 	d.Set("key", deployKey.Key)
 	d.Set("can_push", deployKey.CanPush)
 	d.Set("project", project)

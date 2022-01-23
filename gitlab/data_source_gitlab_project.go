@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -102,7 +102,6 @@ func dataSourceGitlabProject() *schema.Resource {
 			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
 				Type:     schema.TypeList,
-				MaxItems: 1,
 				Computed: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{

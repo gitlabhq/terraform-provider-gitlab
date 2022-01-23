@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -17,7 +18,7 @@ func resourceGitlabInstanceCluster() *schema.Resource {
 		Update: resourceGitlabInstanceClusterUpdate,
 		Delete: resourceGitlabInstanceClusterDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -74,6 +75,9 @@ func resourceGitlabInstanceCluster() *schema.Resource {
 			"kubernetes_ca_cert": {
 				Type:     schema.TypeString,
 				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return strings.TrimSpace(old) == strings.TrimSpace(new)
+				},
 			},
 			"kubernetes_namespace": {
 				Type:     schema.TypeString,
