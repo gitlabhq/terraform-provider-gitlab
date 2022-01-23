@@ -1,8 +1,10 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -10,10 +12,10 @@ import (
 func resourceGitlabLabel() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Create: resourceGitlabLabelCreate,
-		Read:   resourceGitlabLabelRead,
-		Update: resourceGitlabLabelUpdate,
-		Delete: resourceGitlabLabelDelete,
+		CreateContext: resourceGitlabLabelCreate,
+		ReadContext:   resourceGitlabLabelRead,
+		UpdateContext: resourceGitlabLabelUpdate,
+		DeleteContext: resourceGitlabLabelDelete,
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -37,7 +39,7 @@ func resourceGitlabLabel() *schema.Resource {
 	}
 }
 
-func resourceGitlabLabelCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabLabelCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.CreateLabelOptions{
@@ -51,17 +53,17 @@ func resourceGitlabLabelCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] create gitlab label %s", *options.Name)
 
-	label, _, err := client.Labels.CreateLabel(project, options)
+	label, _, err := client.Labels.CreateLabel(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(label.Name)
 
-	return resourceGitlabLabelRead(d, meta)
+	return resourceGitlabLabelRead(ctx, d, meta)
 }
 
-func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabLabelRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	labelName := d.Id()
@@ -70,9 +72,9 @@ func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
 	page := 1
 	labelsLen := 0
 	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}})
+		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}}, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		for _, label := range labels {
 			if label.Name == labelName {
@@ -91,7 +93,7 @@ func resourceGitlabLabelRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceGitlabLabelUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabLabelUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.UpdateLabelOptions{
@@ -105,15 +107,15 @@ func resourceGitlabLabelUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] update gitlab label %s", d.Id())
 
-	_, _, err := client.Labels.UpdateLabel(project, options)
+	_, _, err := client.Labels.UpdateLabel(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabLabelRead(d, meta)
+	return resourceGitlabLabelRead(ctx, d, meta)
 }
 
-func resourceGitlabLabelDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabLabelDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	log.Printf("[DEBUG] Delete gitlab label %s", d.Id())
@@ -121,6 +123,10 @@ func resourceGitlabLabelDelete(d *schema.ResourceData, meta interface{}) error {
 		Name: gitlab.String(d.Id()),
 	}
 
-	_, err := client.Labels.DeleteLabel(project, options)
-	return err
+	_, err := client.Labels.DeleteLabel(project, options, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
