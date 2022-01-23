@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -13,7 +15,7 @@ import (
 
 func dataSourceGitlabUsers() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabUsersRead,
+		ReadContext: dataSourceGitlabUsersRead,
 
 		Schema: map[string]*schema.Schema{
 			"order_by": {
@@ -173,21 +175,21 @@ func dataSourceGitlabUsers() *schema.Resource {
 	}
 }
 
-func dataSourceGitlabUsersRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabUsersRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	listUsersOptions, id, err := expandGitlabUsersOptions(d)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	page := 1
 	userslen := 0
 	var users []*gitlab.User
 	for page == 1 || userslen != 0 {
 		listUsersOptions.Page = page
-		paginatedUsers, _, err := client.Users.ListUsers(listUsersOptions)
+		paginatedUsers, _, err := client.Users.ListUsers(listUsersOptions, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		users = append(users, paginatedUsers...)
 		userslen = len(paginatedUsers)
