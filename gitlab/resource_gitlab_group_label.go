@@ -1,23 +1,25 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupLabel() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabGroupLabelCreate,
-		Read:   resourceGitlabGroupLabelRead,
-		Update: resourceGitlabGroupLabelUpdate,
-		Delete: resourceGitlabGroupLabelDelete,
+		CreateContext: resourceGitlabGroupLabelCreate,
+		ReadContext:   resourceGitlabGroupLabelRead,
+		UpdateContext: resourceGitlabGroupLabelUpdate,
+		DeleteContext: resourceGitlabGroupLabelDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabGroupLabelImporter,
+			StateContext: resourceGitlabGroupLabelImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -42,7 +44,7 @@ func resourceGitlabGroupLabel() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupLabelCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLabelCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 	options := &gitlab.CreateGroupLabelOptions{
@@ -56,17 +58,17 @@ func resourceGitlabGroupLabelCreate(d *schema.ResourceData, meta interface{}) er
 
 	log.Printf("[DEBUG] create gitlab group label %s", *options.Name)
 
-	label, _, err := client.GroupLabels.CreateGroupLabel(group, options)
+	label, _, err := client.GroupLabels.CreateGroupLabel(group, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(label.Name)
 
-	return resourceGitlabGroupLabelRead(d, meta)
+	return resourceGitlabGroupLabelRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLabelRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 	labelName := d.Id()
@@ -75,9 +77,9 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 	page := 1
 	labelsLen := 0
 	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.GroupLabels.ListGroupLabels(group, &gitlab.ListGroupLabelsOptions{Page: page})
+		labels, _, err := client.GroupLabels.ListGroupLabels(group, &gitlab.ListGroupLabelsOptions{Page: page}, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		for _, label := range labels {
 			if label.Name == labelName {
@@ -96,7 +98,7 @@ func resourceGitlabGroupLabelRead(d *schema.ResourceData, meta interface{}) erro
 	return nil
 }
 
-func resourceGitlabGroupLabelUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLabelUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 	options := &gitlab.UpdateGroupLabelOptions{
@@ -110,15 +112,15 @@ func resourceGitlabGroupLabelUpdate(d *schema.ResourceData, meta interface{}) er
 
 	log.Printf("[DEBUG] update gitlab group label %s", d.Id())
 
-	_, _, err := client.GroupLabels.UpdateGroupLabel(group, options)
+	_, _, err := client.GroupLabels.UpdateGroupLabel(group, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabGroupLabelRead(d, meta)
+	return resourceGitlabGroupLabelRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupLabelDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLabelDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 	log.Printf("[DEBUG] Delete gitlab group label %s", d.Id())
@@ -126,11 +128,11 @@ func resourceGitlabGroupLabelDelete(d *schema.ResourceData, meta interface{}) er
 		Name: gitlab.String(d.Id()),
 	}
 
-	_, err := client.GroupLabels.DeleteGroupLabel(group, options)
-	return err
+	_, err := client.GroupLabels.DeleteGroupLabel(group, options, gitlab.WithContext(ctx))
+	return diag.FromErr(err)
 }
 
-func resourceGitlabGroupLabelImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabGroupLabelImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	client := meta.(*gitlab.Client)
 	parts := strings.SplitN(d.Id(), ":", 2)
 	if len(parts) != 2 {
@@ -147,7 +149,10 @@ func resourceGitlabGroupLabelImporter(d *schema.ResourceData, meta interface{}) 
 		return nil, err
 	}
 
-	err = resourceGitlabGroupLabelRead(d, meta)
+	diagnostic := resourceGitlabGroupLabelRead(ctx, d, meta)
+	if diagnostic.HasError() {
+		return nil, fmt.Errorf("failed to read group label %s: %s", d.Id(), diagnostic[0].Summary)
+	}
 
-	return []*schema.ResourceData{d}, err
+	return []*schema.ResourceData{d}, nil
 }
