@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
@@ -13,10 +15,10 @@ import (
 
 func resourceGitlabProjectCluster() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectClusterCreate,
-		Read:   resourceGitlabProjectClusterRead,
-		Update: resourceGitlabProjectClusterUpdate,
-		Delete: resourceGitlabProjectClusterDelete,
+		CreateContext: resourceGitlabProjectClusterCreate,
+		ReadContext:   resourceGitlabProjectClusterRead,
+		UpdateContext: resourceGitlabProjectClusterUpdate,
+		DeleteContext: resourceGitlabProjectClusterDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -103,7 +105,7 @@ func resourceGitlabProjectCluster() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectClusterCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
@@ -145,36 +147,36 @@ func resourceGitlabProjectClusterCreate(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] create gitlab project cluster %q/%q", project, *options.Name)
 
-	cluster, _, err := client.ProjectCluster.AddCluster(project, options)
+	cluster, _, err := client.ProjectCluster.AddCluster(project, options, gitlab.WithContext(ctx))
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	clusterIdString := fmt.Sprintf("%d", cluster.ID)
 	d.SetId(buildTwoPartID(&project, &clusterIdString))
 
-	return resourceGitlabProjectClusterRead(d, meta)
+	return resourceGitlabProjectClusterRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectClusterRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectClusterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	project, clusterId, err := projectIdAndClusterIdFromId(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab project cluster %q/%d", project, clusterId)
 
-	cluster, _, err := client.ProjectCluster.GetCluster(project, clusterId)
+	cluster, _, err := client.ProjectCluster.GetCluster(project, clusterId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab project cluster not found %s/%d", project, clusterId)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("project", project)
@@ -200,12 +202,12 @@ func resourceGitlabProjectClusterRead(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceGitlabProjectClusterUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectClusterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	project, clusterId, err := projectIdAndClusterIdFromId(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	options := &gitlab.EditClusterOptions{}
@@ -250,27 +252,30 @@ func resourceGitlabProjectClusterUpdate(d *schema.ResourceData, meta interface{}
 
 	if *options != (gitlab.EditClusterOptions{}) {
 		log.Printf("[DEBUG] update gitlab project cluster %q/%d", project, clusterId)
-		_, _, err := client.ProjectCluster.EditCluster(project, clusterId, options)
+		_, _, err := client.ProjectCluster.EditCluster(project, clusterId, options, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceGitlabProjectClusterRead(d, meta)
+	return resourceGitlabProjectClusterRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectClusterDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectClusterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, clusterId, err := projectIdAndClusterIdFromId(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] delete gitlab project cluster %q/%d", project, clusterId)
 
-	_, err = client.ProjectCluster.DeleteCluster(project, clusterId)
+	_, err = client.ProjectCluster.DeleteCluster(project, clusterId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return err
+	return nil
 }
 
 func projectIdAndClusterIdFromId(id string) (string, int, error) {
