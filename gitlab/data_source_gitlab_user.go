@@ -1,17 +1,19 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabUser() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabUserRead,
+		ReadContext: dataSourceGitlabUserRead,
 		Schema: map[string]*schema.Schema{
 			"user_id": {
 				Type:     schema.TypeInt,
@@ -140,7 +142,7 @@ func dataSourceGitlabUser() *schema.Resource {
 	}
 }
 
-func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabUserRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	var user *gitlab.User
@@ -154,9 +156,9 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	if userIDOk {
 		// Get user by id
-		user, _, err = client.Users.GetUser(userIDData.(int), gitlab.GetUsersOptions{})
+		user, _, err = client.Users.GetUser(userIDData.(int), gitlab.GetUsersOptions{}, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	} else if usernameOk || emailOk {
 		username := strings.ToLower(usernameData.(string))
@@ -172,20 +174,20 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 		}
 
 		var users []*gitlab.User
-		users, _, err = client.Users.ListUsers(listUsersOptions)
+		users, _, err = client.Users.ListUsers(listUsersOptions, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		if len(users) == 0 {
-			return fmt.Errorf("couldn't find a user matching: %s%s", username, email)
+			return diag.Errorf("couldn't find a user matching: %s%s", username, email)
 		} else if len(users) != 1 {
-			return fmt.Errorf("more than one user found matching: %s%s", username, email)
+			return diag.Errorf("more than one user found matching: %s%s", username, email)
 		}
 
 		user = users[0]
 	} else {
-		return fmt.Errorf("one and only one of user_id, username or email must be set")
+		return diag.Errorf("one and only one of user_id, username or email must be set")
 	}
 
 	d.Set("user_id", user.ID)
