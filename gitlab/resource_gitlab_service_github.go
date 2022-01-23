@@ -1,21 +1,23 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceGithub() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabServiceGithubCreate,
-		Read:   resourceGitlabServiceGithubRead,
-		Update: resourceGitlabServiceGithubUpdate,
-		Delete: resourceGitlabServiceGithubDelete,
+		CreateContext: resourceGitlabServiceGithubCreate,
+		ReadContext:   resourceGitlabServiceGithubRead,
+		UpdateContext: resourceGitlabServiceGithubUpdate,
+		DeleteContext: resourceGitlabServiceGithubDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabServiceGithubImportState,
+			StateContext: resourceGitlabServiceGithubImportState,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -71,7 +73,7 @@ func resourceGitlabServiceGithubSetToState(d *schema.ResourceData, service *gitl
 	d.Set("active", service.Active)
 }
 
-func resourceGitlabServiceGithubCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceGithubCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
@@ -83,21 +85,21 @@ func resourceGitlabServiceGithubCreate(d *schema.ResourceData, meta interface{})
 		StaticContext: gitlab.Bool(d.Get("static_context").(bool)),
 	}
 
-	_, err := client.Services.SetGithubService(project, opts)
+	_, err := client.Services.SetGithubService(project, opts, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabServiceGithubRead(d, meta)
+	return resourceGitlabServiceGithubRead(ctx, d, meta)
 }
 
-func resourceGitlabServiceGithubRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceGithubRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] read gitlab github service for project %s", project)
 
-	service, _, err := client.Services.GetGithubService(project)
+	service, _, err := client.Services.GetGithubService(project, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab service github not found %s / %s / %s",
@@ -107,7 +109,7 @@ func resourceGitlabServiceGithubRead(d *schema.ResourceData, meta interface{}) e
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	resourceGitlabServiceGithubSetToState(d, service)
@@ -115,21 +117,25 @@ func resourceGitlabServiceGithubRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceGitlabServiceGithubUpdate(d *schema.ResourceData, meta interface{}) error {
-	return resourceGitlabServiceGithubCreate(d, meta)
+func resourceGitlabServiceGithubUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	return resourceGitlabServiceGithubCreate(ctx, d, meta)
 }
 
-func resourceGitlabServiceGithubDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceGithubDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] delete gitlab github service for project %s", project)
 
-	_, err := client.Services.DeleteGithubService(project)
-	return err
+	_, err := client.Services.DeleteGithubService(project, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
-func resourceGitlabServiceGithubImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabServiceGithubImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	d.Set("project", d.Id())
 
 	return []*schema.ResourceData{d}, nil

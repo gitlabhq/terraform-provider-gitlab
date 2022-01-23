@@ -84,7 +84,7 @@ func resourceGitlabProjectLevelMRApprovalsRead(ctx context.Context, d *schema.Re
 			d.SetId("")
 			return nil
 		}
-		return diag.Errorf("couldn't read approval configuration: %w", err)
+		return diag.Errorf("couldn't read approval configuration: %v", err)
 	}
 
 	d.Set("project_id", projectId)
