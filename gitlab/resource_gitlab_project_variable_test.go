@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -66,7 +67,7 @@ func testAccCheckGitlabProjectVariableExists(client *gitlab.Client, name string)
 		func(state *terraform.State) error {
 			attributes := state.RootModule().Resources[name].Primary.Attributes
 
-			got, err := getProjectVariable(client, attributes["project"], attributes["key"], attributes["environment_scope"])
+			got, err := getProjectVariable(context.Background(), client, attributes["project"], attributes["key"], attributes["environment_scope"])
 			if err != nil {
 				return err
 			}
