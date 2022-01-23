@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
@@ -13,10 +15,10 @@ import (
 
 func resourceGitlabGroupCluster() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabGroupClusterCreate,
-		Read:   resourceGitlabGroupClusterRead,
-		Update: resourceGitlabGroupClusterUpdate,
-		Delete: resourceGitlabGroupClusterDelete,
+		CreateContext: resourceGitlabGroupClusterCreate,
+		ReadContext:   resourceGitlabGroupClusterRead,
+		UpdateContext: resourceGitlabGroupClusterUpdate,
+		DeleteContext: resourceGitlabGroupClusterDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -99,7 +101,7 @@ func resourceGitlabGroupCluster() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupClusterCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 
@@ -137,36 +139,36 @@ func resourceGitlabGroupClusterCreate(d *schema.ResourceData, meta interface{}) 
 
 	log.Printf("[DEBUG] create gitlab group cluster %q/%q", group, *options.Name)
 
-	cluster, _, err := client.GroupCluster.AddCluster(group, options)
+	cluster, _, err := client.GroupCluster.AddCluster(group, options, gitlab.WithContext(ctx))
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	clusterIdString := fmt.Sprintf("%d", cluster.ID)
 	d.SetId(buildTwoPartID(&group, &clusterIdString))
 
-	return resourceGitlabGroupClusterRead(d, meta)
+	return resourceGitlabGroupClusterRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupClusterRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupClusterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	group, clusterId, err := groupIdAndClusterIdFromId(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab group cluster %q/%d", group, clusterId)
 
-	cluster, _, err := client.GroupCluster.GetCluster(group, clusterId)
+	cluster, _, err := client.GroupCluster.GetCluster(group, clusterId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab group cluster not found %s/%d", group, clusterId)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("group", group)
@@ -191,12 +193,12 @@ func resourceGitlabGroupClusterRead(d *schema.ResourceData, meta interface{}) er
 	return nil
 }
 
-func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupClusterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	group, clusterId, err := groupIdAndClusterIdFromId(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	options := &gitlab.EditGroupClusterOptions{}
@@ -237,27 +239,30 @@ func resourceGitlabGroupClusterUpdate(d *schema.ResourceData, meta interface{}) 
 
 	if *options != (gitlab.EditGroupClusterOptions{}) {
 		log.Printf("[DEBUG] update gitlab group cluster %q/%d", group, clusterId)
-		_, _, err := client.GroupCluster.EditCluster(group, clusterId, options)
+		_, _, err := client.GroupCluster.EditCluster(group, clusterId, options, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceGitlabGroupClusterRead(d, meta)
+	return resourceGitlabGroupClusterRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupClusterDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupClusterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group, clusterId, err := groupIdAndClusterIdFromId(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] delete gitlab group cluster %q/%d", group, clusterId)
 
-	_, err = client.GroupCluster.DeleteCluster(group, clusterId)
+	_, err = client.GroupCluster.DeleteCluster(group, clusterId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return err
+	return nil
 }
 
 func groupIdAndClusterIdFromId(id string) (string, int, error) {
