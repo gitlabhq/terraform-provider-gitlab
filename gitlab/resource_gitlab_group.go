@@ -17,9 +17,9 @@ import (
 
 func resourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceGitlabGroupCreate,
-		Read:          resourceGitlabGroupRead,
-		Update:        resourceGitlabGroupUpdate,
+		CreateContext: resourceGitlabGroupCreate,
+		ReadContext:   resourceGitlabGroupRead,
+		UpdateContext: resourceGitlabGroupUpdate,
 		DeleteContext: resourceGitlabGroupDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
@@ -129,7 +129,7 @@ func resourceGitlabGroup() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.CreateGroupOptions{
 		Name:                 gitlab.String(d.Get("name").(string)),
@@ -191,28 +191,28 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
 
-	group, _, err := client.Groups.CreateGroup(options)
+	group, _, err := client.Groups.CreateGroup(options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
-	return resourceGitlabGroupRead(d, meta)
+	return resourceGitlabGroupRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab group %s", d.Id())
 
-	group, resp, err := client.Groups.GetGroup(d.Id(), nil)
+	group, resp, err := client.Groups.GetGroup(d.Id(), nil, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 	if group.MarkedForDeletionOn != nil {
 		log.Printf("[DEBUG] gitlab group %s is marked for deletion", d.Id())
@@ -245,7 +245,7 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	options := &gitlab.UpdateGroupOptions{}
@@ -314,19 +314,19 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
 
-	_, _, err := client.Groups.UpdateGroup(d.Id(), options)
+	_, _, err := client.Groups.UpdateGroup(d.Id(), options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabGroupRead(d, meta)
+	return resourceGitlabGroupRead(ctx, d, meta)
 }
 
 func resourceGitlabGroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] Delete gitlab group %s", d.Id())
 
-	_, err := client.Groups.DeleteGroup(d.Id())
+	_, err := client.Groups.DeleteGroup(d.Id(), gitlab.WithContext(ctx))
 	if err != nil && !strings.Contains(err.Error(), "Group has been already marked for deletion") {
 		return diag.Errorf("error deleting group %s: %s", d.Id(), err)
 	}
@@ -337,7 +337,7 @@ func resourceGitlabGroupDelete(ctx context.Context, d *schema.ResourceData, meta
 		Pending: []string{"Deleting"},
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Groups.GetGroup(d.Id(), nil)
+			out, response, err := client.Groups.GetGroup(d.Id(), nil, gitlab.WithContext(ctx))
 			if err != nil {
 				if response != nil && response.StatusCode == 404 {
 					return out, "Deleted", nil
