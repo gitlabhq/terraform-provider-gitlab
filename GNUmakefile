@@ -45,4 +45,7 @@ tfproviderlint:
 	-XAT001=false -XR003=false -XR005=false -XS001=false -XS002=false \
 	./...
 
-.PHONY: default build test testacc-up testacc-down testacc vet fmt tfproviderlint
+lint:
+	./scripts/lint.sh
+
+.PHONY: default build test testacc-up testacc-down testacc vet fmt tfproviderlint lint
