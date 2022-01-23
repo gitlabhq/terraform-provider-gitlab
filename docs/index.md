@@ -74,3 +74,8 @@ The following arguments are supported in the `provider` block:
 * `client_cert` - (Optional) File path to client certificate when GitLab instance is behind company proxy. File  must contain PEM encoded data.
 
 * `client_key` - (Optional) File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data. Required when `client_cert` is set.
+
+* `early_auth_check` - (Optional) (experimental) By default the provider does a dummy request to get the current user in order
+  to verify that the provider configuration is correct and the GitLab API is reachable.
+  Turn it off, to skip this check. This may be useful if the GitLab instance does not yet exist and is created within the same terraform module.
+  This is an experimental feature and may change in the future. Please make sure to always keep backups of your state.

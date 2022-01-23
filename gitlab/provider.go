@@ -49,6 +49,12 @@ func Provider() *schema.Provider {
 				Default:     "",
 				Description: descriptions["client_key"],
 			},
+			"early_auth_check": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: descriptions["early_auth_check"],
+			},
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
@@ -124,17 +130,20 @@ func init() {
 		"client_cert": "File path to client certificate when GitLab instance is behind company proxy. File  must contain PEM encoded data.",
 
 		"client_key": "File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data.",
+
+		"early_auth_check": "Try to authenticate with the `CurrentUser` endpoint during the provider initialization. (experimental, see docs)",
 	}
 }
 
 func providerConfigure(ctx context.Context, p *schema.Provider, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	config := Config{
-		Token:      d.Get("token").(string),
-		BaseURL:    d.Get("base_url").(string),
-		CACertFile: d.Get("cacert_file").(string),
-		Insecure:   d.Get("insecure").(bool),
-		ClientCert: d.Get("client_cert").(string),
-		ClientKey:  d.Get("client_key").(string),
+		Token:         d.Get("token").(string),
+		BaseURL:       d.Get("base_url").(string),
+		CACertFile:    d.Get("cacert_file").(string),
+		Insecure:      d.Get("insecure").(bool),
+		ClientCert:    d.Get("client_cert").(string),
+		ClientKey:     d.Get("client_key").(string),
+		EarlyAuthFail: d.Get("early_auth_check").(bool),
 	}
 
 	client, err := config.Client()

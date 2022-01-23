@@ -12,12 +12,13 @@ import (
 
 // Config is per-provider, specifies where to connect to gitlab
 type Config struct {
-	Token      string
-	BaseURL    string
-	Insecure   bool
-	CACertFile string
-	ClientCert string
-	ClientKey  string
+	Token         string
+	BaseURL       string
+	Insecure      bool
+	CACertFile    string
+	ClientCert    string
+	ClientKey     string
+	EarlyAuthFail bool
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
@@ -75,7 +76,9 @@ func (c *Config) Client() (*gitlab.Client, error) {
 	}
 
 	// Test the credentials by checking we can get information about the authenticated user.
-	_, _, err = client.Users.CurrentUser()
+	if c.EarlyAuthFail {
+		_, _, err = client.Users.CurrentUser()
+	}
 
 	return client, err
 }
