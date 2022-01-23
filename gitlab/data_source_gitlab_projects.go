@@ -3,9 +3,11 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/hashstructure"
@@ -172,7 +174,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 func dataSourceGitlabProjects() *schema.Resource {
 	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Read: dataSourceGitlabProjectsRead,
+		ReadContext: dataSourceGitlabProjectsRead,
 
 		// lintignore: S006 // TODO: Resolve this tfproviderlint issue
 		Schema: map[string]*schema.Schema{
@@ -673,7 +675,7 @@ func dataSourceGitlabProjects() *schema.Resource {
 
 // CRUD methods
 
-func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) (err error) {
+func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	var projectList []*gitlab.Project
 
@@ -797,9 +799,9 @@ func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) (err
 		}
 
 		for {
-			projects, response, err := client.Groups.ListGroupProjects(groupId.(int), opts, nil)
+			projects, response, err := client.Groups.ListGroupProjects(groupId.(int), opts, gitlab.WithContext(ctx))
 			if err != nil {
-				return err
+				return diag.FromErr(err)
 			}
 			projectList = append(projectList, projects...)
 			opts.ListOptions.Page++
@@ -811,11 +813,11 @@ func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) (err
 		}
 		h, err := hashstructure.Hash(*opts, nil)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		d.SetId(fmt.Sprintf("%d-%d", groupId.(int), h))
 		if err := d.Set("projects", flattenProjects(projectList)); err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 	// Project case
@@ -843,9 +845,9 @@ func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) (err
 		}
 
 		for {
-			projects, response, err := client.Projects.ListProjects(opts, nil)
+			projects, response, err := client.Projects.ListProjects(opts, nil, gitlab.WithContext(ctx))
 			if err != nil {
-				return err
+				return diag.FromErr(err)
 			}
 			projectList = append(projectList, projects...)
 			opts.ListOptions.Page++
@@ -857,14 +859,15 @@ func dataSourceGitlabProjectsRead(d *schema.ResourceData, meta interface{}) (err
 		}
 		h, err := hashstructure.Hash(*opts, nil)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		d.SetId(fmt.Sprintf("%d", h))
 		if err := d.Set("projects", flattenProjects(projectList)); err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
-	return err
+
+	return nil
 }
 
 func flattenSharedWithGroupsOptions(project *gitlab.Project) []interface{} {
