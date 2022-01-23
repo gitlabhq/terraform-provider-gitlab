@@ -1,10 +1,12 @@
 package gitlab
 
 import (
+	"context"
 	"errors"
 	"log"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -14,10 +16,10 @@ var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 func resourceGitlabProjectApprovalRule() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectApprovalRuleCreate,
-		Read:   resourceGitlabProjectApprovalRuleRead,
-		Update: resourceGitlabProjectApprovalRuleUpdate,
-		Delete: resourceGitlabProjectApprovalRuleDelete,
+		CreateContext: resourceGitlabProjectApprovalRuleCreate,
+		ReadContext:   resourceGitlabProjectApprovalRuleRead,
+		UpdateContext: resourceGitlabProjectApprovalRuleUpdate,
+		DeleteContext: resourceGitlabProjectApprovalRuleDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -57,7 +59,7 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectApprovalRuleCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	options := gitlab.CreateProjectLevelRuleOptions{
 		Name:               gitlab.String(d.Get("name").(string)),
 		ApprovalsRequired:  gitlab.Int(d.Get("approvals_required").(int)),
@@ -72,63 +74,63 @@ func resourceGitlabProjectApprovalRuleCreate(d *schema.ResourceData, meta interf
 
 	client := meta.(*gitlab.Client)
 
-	rule, _, err := client.Projects.CreateProjectApprovalRule(project, &options)
+	rule, _, err := client.Projects.CreateProjectApprovalRule(project, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	ruleIDString := strconv.Itoa(rule.ID)
 
 	d.SetId(buildTwoPartID(&project, &ruleIDString))
 
-	return resourceGitlabProjectApprovalRuleRead(d, meta)
+	return resourceGitlabProjectApprovalRuleRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectApprovalRuleRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectApprovalRuleRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] read gitlab project-level rule %s", d.Id())
 
 	projectID, _, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("project", projectID)
 
-	rule, err := getApprovalRuleByID(meta.(*gitlab.Client), d.Id())
+	rule, err := getApprovalRuleByID(ctx, meta.(*gitlab.Client), d.Id())
 	if err != nil {
 		if errors.Is(err, errApprovalRuleNotFound) {
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("name", rule.Name)
 	d.Set("approvals_required", rule.ApprovalsRequired)
 
 	if err := d.Set("group_ids", flattenApprovalRuleGroupIDs(rule.Groups)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := d.Set("user_ids", flattenApprovalRuleUserIDs(rule.Users)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err := d.Set("protected_branch_ids", flattenProtectedBranchIDs(rule.ProtectedBranches)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	return nil
 }
 
-func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectApprovalRuleUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	projectID, ruleID, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	ruleIDInt, err := strconv.Atoi(ruleID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	options := gitlab.UpdateProjectLevelRuleOptions{
@@ -143,39 +145,39 @@ func resourceGitlabProjectApprovalRuleUpdate(d *schema.ResourceData, meta interf
 
 	client := meta.(*gitlab.Client)
 
-	_, _, err = client.Projects.UpdateProjectApprovalRule(projectID, ruleIDInt, &options)
+	_, _, err = client.Projects.UpdateProjectApprovalRule(projectID, ruleIDInt, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabProjectApprovalRuleRead(d, meta)
+	return resourceGitlabProjectApprovalRuleRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectApprovalRuleDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectApprovalRuleDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	project, ruleID, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	ruleIDInt, err := strconv.Atoi(ruleID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Project %s delete gitlab project-level approval rule %d", project, ruleIDInt)
 
 	client := meta.(*gitlab.Client)
 
-	_, err = client.Projects.DeleteProjectApprovalRule(project, ruleIDInt)
+	_, err = client.Projects.DeleteProjectApprovalRule(project, ruleIDInt, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	return nil
 }
 
 // getApprovalRuleByID checks the list of rules and finds the one that matches our rule ID.
-func getApprovalRuleByID(client *gitlab.Client, id string) (*gitlab.ProjectApprovalRule, error) {
+func getApprovalRuleByID(ctx context.Context, client *gitlab.Client, id string) (*gitlab.ProjectApprovalRule, error) {
 	projectID, ruleID, err := parseTwoPartID(id)
 	if err != nil {
 		return nil, err
@@ -188,7 +190,7 @@ func getApprovalRuleByID(client *gitlab.Client, id string) (*gitlab.ProjectAppro
 
 	log.Printf("[DEBUG] read approval rules for project %s", projectID)
 
-	rules, _, err := client.Projects.GetProjectApprovalRules(projectID)
+	rules, _, err := client.Projects.GetProjectApprovalRules(projectID, gitlab.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
