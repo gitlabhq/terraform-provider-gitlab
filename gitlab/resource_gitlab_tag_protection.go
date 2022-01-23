@@ -14,13 +14,12 @@ func resourceGitlabTagProtection() *schema.Resource {
 	for k := range tagProtectionAccessLevelID {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabTagProtectionCreate,
 		Read:   resourceGitlabTagProtectionRead,
 		Delete: resourceGitlabTagProtectionDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{

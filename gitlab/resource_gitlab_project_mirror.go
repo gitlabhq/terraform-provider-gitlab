@@ -170,7 +170,7 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 	for {
 		mirrors, response, err := client.ProjectMirrors.ListProjectMirror(projectID, opts)
 		if err != nil {
-		  return err
+			return err
 		}
 
 		for _, m := range mirrors {
