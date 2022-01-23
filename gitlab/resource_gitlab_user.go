@@ -15,9 +15,9 @@ import (
 
 func resourceGitlabUser() *schema.Resource {
 	return &schema.Resource{
-		Create:        resourceGitlabUserCreate,
-		Read:          resourceGitlabUserRead,
-		Update:        resourceGitlabUserUpdate,
+		CreateContext: resourceGitlabUserCreate,
+		ReadContext:   resourceGitlabUserRead,
+		UpdateContext: resourceGitlabUserUpdate,
 		DeleteContext: resourceGitlabUserDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
@@ -90,7 +90,7 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("skip_confirmation", user.ConfirmedAt != nil && !user.ConfirmedAt.IsZero())
 }
 
-func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.CreateUserOptions{
 		Email:            gitlab.String(d.Get("email").(string)),
@@ -107,42 +107,42 @@ func resourceGitlabUserCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if *options.Password == "" && !*options.ResetPassword {
-		return fmt.Errorf("At least one of either password or reset_password must be defined")
+		return diag.Errorf("At least one of either password or reset_password must be defined")
 	}
 
 	log.Printf("[DEBUG] create gitlab user %q", *options.Username)
 
-	user, _, err := client.Users.CreateUser(options)
+	user, _, err := client.Users.CreateUser(options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
 
-	return resourceGitlabUserRead(d, meta)
+	return resourceGitlabUserRead(ctx, d, meta)
 }
 
-func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabUserRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] import -- read gitlab user %s", d.Id())
 
 	id, _ := strconv.Atoi(d.Id())
 
-	user, _, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
+	user, _, err := client.Users.GetUser(id, gitlab.GetUsersOptions{}, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab user not found %d", id)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	resourceGitlabUserSetToState(d, user)
 	return nil
 }
 
-func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabUserUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	options := &gitlab.ModifyUserOptions{}
@@ -184,12 +184,12 @@ func resourceGitlabUserUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	id, _ := strconv.Atoi(d.Id())
 
-	_, _, err := client.Users.ModifyUser(id, options)
+	_, _, err := client.Users.ModifyUser(id, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabUserRead(d, meta)
+	return resourceGitlabUserRead(ctx, d, meta)
 }
 
 func resourceGitlabUserDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -198,7 +198,7 @@ func resourceGitlabUserDelete(ctx context.Context, d *schema.ResourceData, meta 
 
 	id, _ := strconv.Atoi(d.Id())
 
-	if _, err := client.Users.DeleteUser(id); err != nil {
+	if _, err := client.Users.DeleteUser(id, gitlab.WithContext(ctx)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -206,7 +206,7 @@ func resourceGitlabUserDelete(ctx context.Context, d *schema.ResourceData, meta 
 		Timeout: 5 * time.Minute,
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			user, resp, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
+			user, resp, err := client.Users.GetUser(id, gitlab.GetUsersOptions{}, gitlab.WithContext(ctx))
 			if resp != nil && resp.StatusCode == 404 {
 				return user, "Deleted", nil
 			}
