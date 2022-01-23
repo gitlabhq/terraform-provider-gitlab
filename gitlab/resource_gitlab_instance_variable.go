@@ -1,19 +1,21 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabInstanceVariable() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabInstanceVariableCreate,
-		Read:   resourceGitlabInstanceVariableRead,
-		Update: resourceGitlabInstanceVariableUpdate,
-		Delete: resourceGitlabInstanceVariableDelete,
+		CreateContext: resourceGitlabInstanceVariableCreate,
+		ReadContext:   resourceGitlabInstanceVariableRead,
+		UpdateContext: resourceGitlabInstanceVariableUpdate,
+		DeleteContext: resourceGitlabInstanceVariableDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -50,7 +52,7 @@ func resourceGitlabInstanceVariable() *schema.Resource {
 	}
 }
 
-func resourceGitlabInstanceVariableCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceVariableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	key := d.Get("key").(string)
@@ -68,31 +70,31 @@ func resourceGitlabInstanceVariableCreate(d *schema.ResourceData, meta interface
 	}
 	log.Printf("[DEBUG] create gitlab instance level CI variable %s", key)
 
-	_, _, err := client.InstanceVariables.CreateVariable(&options)
+	_, _, err := client.InstanceVariables.CreateVariable(&options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(key)
 
-	return resourceGitlabInstanceVariableRead(d, meta)
+	return resourceGitlabInstanceVariableRead(ctx, d, meta)
 }
 
-func resourceGitlabInstanceVariableRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceVariableRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	key := d.Id()
 
 	log.Printf("[DEBUG] read gitlab instance level CI variable %s", key)
 
-	v, resp, err := client.InstanceVariables.GetVariable(key)
+	v, resp, err := client.InstanceVariables.GetVariable(key, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab instance level CI variable for %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("key", v.Key)
@@ -103,7 +105,7 @@ func resourceGitlabInstanceVariableRead(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceGitlabInstanceVariableUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceVariableUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	key := d.Get("key").(string)
@@ -120,18 +122,22 @@ func resourceGitlabInstanceVariableUpdate(d *schema.ResourceData, meta interface
 	}
 	log.Printf("[DEBUG] update gitlab instance level CI variable %s", key)
 
-	_, _, err := client.InstanceVariables.UpdateVariable(key, options)
+	_, _, err := client.InstanceVariables.UpdateVariable(key, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceGitlabInstanceVariableRead(d, meta)
+	return resourceGitlabInstanceVariableRead(ctx, d, meta)
 }
 
-func resourceGitlabInstanceVariableDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceVariableDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	key := d.Get("key").(string)
 	log.Printf("[DEBUG] Delete gitlab instance level CI variable %s", key)
 
-	_, err := client.InstanceVariables.RemoveVariable(key)
-	return err
+	_, err := client.InstanceVariables.RemoveVariable(key, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
