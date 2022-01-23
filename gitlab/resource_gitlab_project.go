@@ -436,7 +436,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
 
-	project, _, err := client.Projects.CreateProject(options)
+	project, _, err := client.Projects.CreateProject(options, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -454,7 +454,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 			Target:  []string{"finished"},
 			Timeout: 10 * time.Minute,
 			Refresh: func() (interface{}, string, error) {
-				status, _, err := client.ProjectImportExport.ImportStatus(d.Id())
+				status, _, err := client.ProjectImportExport.ImportStatus(d.Id(), gitlab.WithContext(ctx))
 				if err != nil {
 					return nil, "", err
 				}
@@ -468,7 +468,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 
 		// Read the project again, so that we can detect the default branch.
-		project, _, err = client.Projects.GetProject(project.ID, nil)
+		project, _, err = client.Projects.GetProject(project.ID, nil, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.Errorf("Failed to get project %q after completing import: %s", d.Id(), err)
 		}
@@ -476,13 +476,13 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.Get("archived").(bool) {
 		// strange as it may seem, this project is created in archived state...
-		if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
+		if _, _, err := client.Projects.ArchiveProject(d.Id(), gitlab.WithContext(ctx)); err != nil {
 			return diag.Errorf("new project %q could not be archived: %s", d.Id(), err)
 		}
 	}
 
 	if _, ok := d.GetOk("push_rules"); ok {
-		err := editOrAddPushRules(client, d.Id(), d)
+		err := editOrAddPushRules(ctx, client, d.Id(), d)
 		var httpError *gitlab.ErrorResponse
 		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
@@ -505,7 +505,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		_, _, err := client.Branches.CreateBranch(project.ID, &gitlab.CreateBranchOptions{
 			Branch: gitlab.String(newDefaultBranch),
 			Ref:    gitlab.String(oldDefaultBranch),
-		})
+		}, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.Errorf("Failed to create branch %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
@@ -513,7 +513,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		log.Printf("[DEBUG] set new default branch to %q for project %q", newDefaultBranch, d.Id())
 		_, _, err = client.Projects.EditProject(project.ID, &gitlab.EditProjectOptions{
 			DefaultBranch: gitlab.String(newDefaultBranch),
-		})
+		}, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.Errorf("Failed to set default branch to %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
@@ -521,19 +521,19 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		log.Printf("[DEBUG] protect new default branch %q for project %q", newDefaultBranch, d.Id())
 		_, _, err = client.ProtectedBranches.ProtectRepositoryBranches(project.ID, &gitlab.ProtectRepositoryBranchesOptions{
 			Name: gitlab.String(newDefaultBranch),
-		})
+		}, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.Errorf("Failed to protect default branch %q for project %q: %s", newDefaultBranch, d.Id(), err)
 		}
 
 		log.Printf("[DEBUG] unprotect old default branch %q for project %q", oldDefaultBranch, d.Id())
-		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch)
+		_, err = client.ProtectedBranches.UnprotectRepositoryBranches(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.Errorf("Failed to unprotect undesired default branch %q for project %q: %s", oldDefaultBranch, d.Id(), err)
 		}
 
 		log.Printf("[DEBUG] delete old default branch %q for project %q", oldDefaultBranch, d.Id())
-		_, err = client.Branches.DeleteBranch(project.ID, oldDefaultBranch)
+		_, err = client.Branches.DeleteBranch(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.Errorf("Failed to clean up undesired default branch %q for project %q: %s", oldDefaultBranch, d.Id(), err)
 		}
@@ -552,7 +552,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 	}
 
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
-		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions); err != nil {
+		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions, gitlab.WithContext(ctx)); err != nil {
 			return diag.Errorf("Could not update project %q: %s", d.Id(), err)
 		}
 	}
@@ -564,7 +564,7 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab project %s", d.Id())
 
-	project, _, err := client.Projects.GetProject(d.Id(), nil)
+	project, _, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -580,7 +580,7 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 
 	log.Printf("[DEBUG] read gitlab project %q push rules", d.Id())
 
-	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id())
+	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id(), gitlab.WithContext(ctx))
 	var httpError *gitlab.ErrorResponse
 	if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 		log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
@@ -730,7 +730,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if *options != (gitlab.EditProjectOptions{}) {
 		log.Printf("[DEBUG] update gitlab project %s", d.Id())
-		_, _, err := client.Projects.EditProject(d.Id(), options)
+		_, _, err := client.Projects.EditProject(d.Id(), options, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -738,7 +738,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if *transferOptions != (gitlab.TransferProjectOptions{}) {
 		log.Printf("[DEBUG] transferring project %s to namespace %d", d.Id(), transferOptions.Namespace)
-		_, _, err := client.Projects.TransferProject(d.Id(), transferOptions)
+		_, _, err := client.Projects.TransferProject(d.Id(), transferOptions, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -746,18 +746,18 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("archived") {
 		if d.Get("archived").(bool) {
-			if _, _, err := client.Projects.ArchiveProject(d.Id()); err != nil {
+			if _, _, err := client.Projects.ArchiveProject(d.Id(), gitlab.WithContext(ctx)); err != nil {
 				return diag.Errorf("project %q could not be archived: %s", d.Id(), err)
 			}
 		} else {
-			if _, _, err := client.Projects.UnarchiveProject(d.Id()); err != nil {
+			if _, _, err := client.Projects.UnarchiveProject(d.Id(), gitlab.WithContext(ctx)); err != nil {
 				return diag.Errorf("project %q could not be unarchived: %s", d.Id(), err)
 			}
 		}
 	}
 
 	if d.HasChange("push_rules") {
-		err := editOrAddPushRules(client, d.Id(), d)
+		err := editOrAddPushRules(ctx, client, d.Id(), d)
 		var httpError *gitlab.ErrorResponse
 		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
@@ -775,7 +775,7 @@ func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, me
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
 
-	_, err := client.Projects.DeleteProject(d.Id())
+	_, err := client.Projects.DeleteProject(d.Id(), gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -786,7 +786,7 @@ func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, me
 		Pending: []string{"Deleting"},
 		Target:  []string{"Deleted"},
 		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Projects.GetProject(d.Id(), nil)
+			out, response, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
 			if err != nil {
 				if response.StatusCode == 404 {
 					return out, "Deleted", nil
@@ -813,11 +813,11 @@ func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, me
 	return nil
 }
 
-func editOrAddPushRules(client *gitlab.Client, projectID string, d *schema.ResourceData) error {
+func editOrAddPushRules(ctx context.Context, client *gitlab.Client, projectID string, d *schema.ResourceData) error {
 	log.Printf("[DEBUG] Editing push rules for project %q", projectID)
 
 	editOptions := expandEditProjectPushRuleOptions(d)
-	_, _, err := client.Projects.EditProjectPushRule(projectID, editOptions)
+	_, _, err := client.Projects.EditProjectPushRule(projectID, editOptions, gitlab.WithContext(ctx))
 	if err == nil {
 		return nil
 	}
@@ -833,7 +833,7 @@ func editOrAddPushRules(client *gitlab.Client, projectID string, d *schema.Resou
 	log.Printf("[DEBUG] Creating new push rules for project %q", projectID)
 
 	addOptions := expandAddProjectPushRuleOptions(d)
-	_, _, err = client.Projects.AddProjectPushRule(projectID, addOptions)
+	_, _, err = client.Projects.AddProjectPushRule(projectID, addOptions, gitlab.WithContext(ctx))
 	if err != nil {
 		return err
 	}
