@@ -1,10 +1,12 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -15,10 +17,10 @@ func resourceGitlabGroupMembership() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
-		Create: resourceGitlabGroupMembershipCreate,
-		Read:   resourceGitlabGroupMembershipRead,
-		Update: resourceGitlabGroupMembershipUpdate,
-		Delete: resourceGitlabGroupMembershipDelete,
+		CreateContext: resourceGitlabGroupMembershipCreate,
+		ReadContext:   resourceGitlabGroupMembershipRead,
+		UpdateContext: resourceGitlabGroupMembershipUpdate,
+		DeleteContext: resourceGitlabGroupMembershipDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -48,7 +50,7 @@ func resourceGitlabGroupMembership() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupMembershipCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupMembershipCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	userId := d.Get("user_id").(int)
@@ -63,33 +65,33 @@ func resourceGitlabGroupMembershipCreate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] create gitlab group groupMember for %d in %s", options.UserID, groupId)
 
-	groupMember, _, err := client.GroupMembers.AddGroupMember(groupId, options)
+	groupMember, _, err := client.GroupMembers.AddGroupMember(groupId, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	userIdString := strconv.Itoa(groupMember.ID)
 	d.SetId(buildTwoPartID(&groupId, &userIdString))
-	return resourceGitlabGroupMembershipRead(d, meta)
+	return resourceGitlabGroupMembershipRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupMembershipRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	id := d.Id()
 	log.Printf("[DEBUG] read gitlab group groupMember %s", id)
 
-	groupId, userId, e := groupIdAndUserIdFromId(id)
-	if e != nil {
-		return e
+	groupId, userId, err := groupIdAndUserIdFromId(id)
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
-	groupMember, _, err := client.GroupMembers.GetGroupMember(groupId, userId)
+	groupMember, _, err := client.GroupMembers.GetGroupMember(groupId, userId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab group membership for %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	resourceGitlabGroupMembershipSetToState(d, groupMember, &groupId)
@@ -108,7 +110,7 @@ func groupIdAndUserIdFromId(id string) (string, int, error) {
 	return groupId, userId, e
 }
 
-func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupMembershipUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	userId := d.Get("user_id").(int)
@@ -122,27 +124,31 @@ func resourceGitlabGroupMembershipUpdate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] update gitlab group membership %v for %s", userId, groupId)
 
-	_, _, err := client.GroupMembers.EditGroupMember(groupId, userId, &options)
+	_, _, err := client.GroupMembers.EditGroupMember(groupId, userId, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabGroupMembershipRead(d, meta)
+	return resourceGitlabGroupMembershipRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupMembershipDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupMembershipDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	id := d.Id()
-	groupId, userId, e := groupIdAndUserIdFromId(id)
-	if e != nil {
-		return e
+	groupId, userId, err := groupIdAndUserIdFromId(id)
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab group membership %v for %s", userId, groupId)
 
-	_, err := client.GroupMembers.RemoveGroupMember(groupId, userId)
-	return err
+	_, err = client.GroupMembers.RemoveGroupMember(groupId, userId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember *gitlab.GroupMember, groupId *string) {
