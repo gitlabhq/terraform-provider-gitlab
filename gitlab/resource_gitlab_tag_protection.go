@@ -1,9 +1,10 @@
 package gitlab
 
 import (
-	"fmt"
+	"context"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -15,9 +16,9 @@ func resourceGitlabTagProtection() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
-		Create: resourceGitlabTagProtectionCreate,
-		Read:   resourceGitlabTagProtectionRead,
-		Delete: resourceGitlabTagProtectionDelete,
+		CreateContext: resourceGitlabTagProtectionCreate,
+		ReadContext:   resourceGitlabTagProtectionRead,
+		DeleteContext: resourceGitlabTagProtectionDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -43,7 +44,7 @@ func resourceGitlabTagProtection() *schema.Resource {
 	}
 }
 
-func resourceGitlabTagProtectionCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTagProtectionCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	tag := gitlab.String(d.Get("tag").(string))
@@ -56,47 +57,47 @@ func resourceGitlabTagProtectionCreate(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] create gitlab tag protection on %v for project %s", options.Name, project)
 
-	tp, _, err := client.ProtectedTags.ProtectRepositoryTags(project, options)
+	tp, _, err := client.ProtectedTags.ProtectRepositoryTags(project, options, gitlab.WithContext(ctx))
 	if err != nil {
 		// Remove existing tag protection
-		_, err = client.ProtectedTags.UnprotectRepositoryTags(project, *tag)
+		_, err = client.ProtectedTags.UnprotectRepositoryTags(project, *tag, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		// Reprotect tag with updated values
-		tp, _, err = client.ProtectedTags.ProtectRepositoryTags(project, options)
+		tp, _, err = client.ProtectedTags.ProtectRepositoryTags(project, options, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
 	d.SetId(buildTwoPartID(&project, &tp.Name))
 
-	return resourceGitlabTagProtectionRead(d, meta)
+	return resourceGitlabTagProtectionRead(ctx, d, meta)
 }
 
-func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTagProtectionRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, tag, err := projectAndTagFromID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab tag protection for project %s, tag %s", project, tag)
 
-	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag)
+	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab tag protection not found %s/%s", project, tag)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	accessLevel, ok := tagProtectionAccessLevelNames[pt.CreateAccessLevels[0].AccessLevel]
 	if !ok {
-		return fmt.Errorf("tag protection access level %d is not supported. Supported are: %v", pt.CreateAccessLevels[0].AccessLevel, tagProtectionAccessLevelNames)
+		return diag.Errorf("tag protection access level %d is not supported. Supported are: %v", pt.CreateAccessLevels[0].AccessLevel, tagProtectionAccessLevelNames)
 	}
 
 	d.Set("project", project)
@@ -108,15 +109,19 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceGitlabTagProtectionDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTagProtectionDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	tag := d.Get("tag").(string)
 
 	log.Printf("[DEBUG] Delete gitlab protected tag %s for project %s", tag, project)
 
-	_, err := client.ProtectedTags.UnprotectRepositoryTags(project, tag)
-	return err
+	_, err := client.ProtectedTags.UnprotectRepositoryTags(project, tag, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func projectAndTagFromID(id string) (string, string, error) {
