@@ -1,20 +1,21 @@
 package gitlab
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectLevelMRApprovalsCreate,
-		Read:   resourceGitlabProjectLevelMRApprovalsRead,
-		Update: resourceGitlabProjectLevelMRApprovalsUpdate,
-		Delete: resourceGitlabProjectLevelMRApprovalsDelete,
+		CreateContext: resourceGitlabProjectLevelMRApprovalsCreate,
+		ReadContext:   resourceGitlabProjectLevelMRApprovalsRead,
+		UpdateContext: resourceGitlabProjectLevelMRApprovalsUpdate,
+		DeleteContext: resourceGitlabProjectLevelMRApprovalsDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -44,7 +45,7 @@ func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectLevelMRApprovalsCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectLevelMRApprovalsCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	projectId := d.Get("project_id").(int)
@@ -58,32 +59,32 @@ func resourceGitlabProjectLevelMRApprovalsCreate(d *schema.ResourceData, meta in
 
 	log.Printf("[DEBUG] Creating new MR approval configuration for project %d:", projectId)
 
-	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options); err != nil {
-		return fmt.Errorf("couldn't create approval configuration: %w", err)
+	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("couldn't create approval configuration: %v", err)
 	}
 
 	d.SetId(strconv.Itoa(projectId))
-	return resourceGitlabProjectLevelMRApprovalsRead(d, meta)
+	return resourceGitlabProjectLevelMRApprovalsRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectLevelMRApprovalsRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	projectId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return fmt.Errorf("project ID must be an integer (was %q): %w", d.Id(), err)
+		return diag.Errorf("project ID must be an integer (was %q): %v", d.Id(), err)
 	}
 
 	log.Printf("[DEBUG] Reading gitlab approval configuration for project %q", projectId)
 
-	approvalConfig, _, err := client.Projects.GetApprovalConfiguration(projectId)
+	approvalConfig, _, err := client.Projects.GetApprovalConfiguration(projectId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab project approval configuration not found for project %d", projectId)
 			d.SetId("")
 			return nil
 		}
-		return fmt.Errorf("couldn't read approval configuration: %w", err)
+		return diag.Errorf("couldn't read approval configuration: %w", err)
 	}
 
 	d.Set("project_id", projectId)
@@ -95,7 +96,7 @@ func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta inte
 	return nil
 }
 
-func resourceGitlabProjectLevelMRApprovalsUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectLevelMRApprovalsUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.ChangeApprovalConfigurationOptions{}
 
@@ -115,14 +116,14 @@ func resourceGitlabProjectLevelMRApprovalsUpdate(d *schema.ResourceData, meta in
 		options.MergeRequestsDisableCommittersApproval = gitlab.Bool(d.Get("merge_requests_disable_committers_approval").(bool))
 	}
 
-	if _, _, err := client.Projects.ChangeApprovalConfiguration(d.Id(), options); err != nil {
-		return fmt.Errorf("couldn't update approval configuration: %w", err)
+	if _, _, err := client.Projects.ChangeApprovalConfiguration(d.Id(), options, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("couldn't update approval configuration: %v", err)
 	}
 
-	return resourceGitlabProjectLevelMRApprovalsRead(d, meta)
+	return resourceGitlabProjectLevelMRApprovalsRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectLevelMRApprovalsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectLevelMRApprovalsDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	projectId := d.Id()
 
@@ -135,8 +136,8 @@ func resourceGitlabProjectLevelMRApprovalsDelete(d *schema.ResourceData, meta in
 
 	log.Printf("[DEBUG] Resetting approval configuration for project %s:", projectId)
 
-	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options); err != nil {
-		return fmt.Errorf("couldn't reset approval configuration: %w", err)
+	if _, _, err := client.Projects.ChangeApprovalConfiguration(projectId, options, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("couldn't reset approval configuration: %v", err)
 	}
 
 	return nil
