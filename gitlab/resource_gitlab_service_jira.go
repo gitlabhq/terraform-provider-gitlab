@@ -1,22 +1,23 @@
 package gitlab
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceJira() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabServiceJiraCreate,
-		Read:   resourceGitlabServiceJiraRead,
-		Update: resourceGitlabServiceJiraUpdate,
-		Delete: resourceGitlabServiceJiraDelete,
+		CreateContext: resourceGitlabServiceJiraCreate,
+		ReadContext:   resourceGitlabServiceJiraRead,
+		UpdateContext: resourceGitlabServiceJiraUpdate,
+		DeleteContext: resourceGitlabServiceJiraDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabServiceJiraImportState,
+			StateContext: resourceGitlabServiceJiraImportState,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -113,52 +114,51 @@ func resourceGitlabServiceJira() *schema.Resource {
 	}
 }
 
-func resourceGitlabServiceJiraCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceJiraCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	project := d.Get("project").(string)
 
 	jiraOptions, err := expandJiraOptions(d)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Create Gitlab Jira service")
 
-	_, err = client.Services.SetJiraService(project, jiraOptions)
-	if err != nil {
-		return fmt.Errorf("[ERROR] Couldn't create Gitlab Jira service: %s", err)
+	if _, err := client.Services.SetJiraService(project, jiraOptions, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("couldn't create Gitlab Jira service: %v", err)
 	}
 
 	d.SetId(project)
 
-	return resourceGitlabServiceJiraRead(d, meta)
+	return resourceGitlabServiceJiraRead(ctx, d, meta)
 }
 
-func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceJiraRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
-	p, resp, err := client.Projects.GetProject(project, nil)
+	p, resp, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Removing Gitlab Jira service %s because project %s not found", d.Id(), p.Name)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Read Gitlab Jira service %s", d.Id())
 
-	jiraService, _, err := client.Services.GetJiraService(project)
+	jiraService, _, err := client.Services.GetJiraService(project, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab jira service not found %s", project)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	if v := jiraService.Properties.URL; v != "" {
@@ -191,20 +191,23 @@ func resourceGitlabServiceJiraRead(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceGitlabServiceJiraUpdate(d *schema.ResourceData, meta interface{}) error {
-	return resourceGitlabServiceJiraCreate(d, meta)
+func resourceGitlabServiceJiraUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	return resourceGitlabServiceJiraCreate(ctx, d, meta)
 }
 
-func resourceGitlabServiceJiraDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceJiraDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] Delete Gitlab Jira service %s", d.Id())
 
-	_, err := client.Services.DeleteJiraService(project)
+	_, err := client.Services.DeleteJiraService(project, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return err
+	return nil
 }
 
 func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, error) {
@@ -227,7 +230,7 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 	return &setJiraServiceOptions, nil
 }
 
-func resourceGitlabServiceJiraImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabServiceJiraImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	d.Set("project", d.Id())
 
 	return []*schema.ResourceData{d}, nil
