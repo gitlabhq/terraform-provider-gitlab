@@ -1,20 +1,22 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectBadge() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectBadgeCreate,
-		Read:   resourceGitlabProjectBadgeRead,
-		Update: resourceGitlabProjectBadgeUpdate,
-		Delete: resourceGitlabProjectBadgeDelete,
+		CreateContext: resourceGitlabProjectBadgeCreate,
+		ReadContext:   resourceGitlabProjectBadgeRead,
+		UpdateContext: resourceGitlabProjectBadgeUpdate,
+		DeleteContext: resourceGitlabProjectBadgeDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -44,7 +46,7 @@ func resourceGitlabProjectBadge() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectBadgeCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectBadgeCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	projectID := d.Get("project").(string)
 	options := &gitlab.AddProjectBadgeOptions{
@@ -54,45 +56,45 @@ func resourceGitlabProjectBadgeCreate(d *schema.ResourceData, meta interface{}) 
 
 	log.Printf("[DEBUG] create gitlab project badge %q / %q", *options.LinkURL, *options.ImageURL)
 
-	badge, _, err := client.ProjectBadges.AddProjectBadge(projectID, options)
+	badge, _, err := client.ProjectBadges.AddProjectBadge(projectID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	badgeID := strconv.Itoa(badge.ID)
 
 	d.SetId(buildTwoPartID(&projectID, &badgeID))
 
-	return resourceGitlabProjectBadgeRead(d, meta)
+	return resourceGitlabProjectBadgeRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectBadgeRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectBadgeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	ids := strings.Split(d.Id(), ":")
 	projectID := ids[0]
 	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab project badge %s/%d", projectID, badgeID)
 
-	badge, _, err := client.ProjectBadges.GetProjectBadge(projectID, badgeID)
+	badge, _, err := client.ProjectBadges.GetProjectBadge(projectID, badgeID, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	resourceGitlabProjectBadgeSetToState(d, badge, &projectID)
 	return nil
 }
 
-func resourceGitlabProjectBadgeUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectBadgeUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	ids := strings.Split(d.Id(), ":")
 	projectID := ids[0]
 	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	options := &gitlab.EditProjectBadgeOptions{
@@ -102,27 +104,31 @@ func resourceGitlabProjectBadgeUpdate(d *schema.ResourceData, meta interface{}) 
 
 	log.Printf("[DEBUG] update gitlab project badge %s/%d", projectID, badgeID)
 
-	_, _, err = client.ProjectBadges.EditProjectBadge(projectID, badgeID, options)
+	_, _, err = client.ProjectBadges.EditProjectBadge(projectID, badgeID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabProjectBadgeRead(d, meta)
+	return resourceGitlabProjectBadgeRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectBadgeDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectBadgeDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	ids := strings.Split(d.Id(), ":")
 	projectID := ids[0]
 	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab project badge %s/%d", projectID, badgeID)
 
-	_, err = client.ProjectBadges.DeleteProjectBadge(projectID, badgeID)
-	return err
+	_, err = client.ProjectBadges.DeleteProjectBadge(projectID, badgeID, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func resourceGitlabProjectBadgeSetToState(d *schema.ResourceData, badge *gitlab.ProjectBadge, projectID *string) {
