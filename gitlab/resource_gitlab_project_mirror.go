@@ -1,21 +1,23 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"net/url"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectMirror() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectMirrorCreate,
-		Read:   resourceGitlabProjectMirrorRead,
-		Update: resourceGitlabProjectMirrorUpdate,
-		Delete: resourceGitlabProjectMirrorDelete,
+		CreateContext: resourceGitlabProjectMirrorCreate,
+		ReadContext:   resourceGitlabProjectMirrorRead,
+		UpdateContext: resourceGitlabProjectMirrorUpdate,
+		DeleteContext: resourceGitlabProjectMirrorDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -72,7 +74,7 @@ func resourceGitlabProjectMirror() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectMirrorCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	projectID := d.Get("project").(string)
@@ -90,18 +92,18 @@ func resourceGitlabProjectMirrorCreate(d *schema.ResourceData, meta interface{})
 
 	log.Printf("[DEBUG] create gitlab project mirror for project %v", projectID)
 
-	mirror, _, err := client.ProjectMirrors.AddProjectMirror(projectID, options)
+	mirror, _, err := client.ProjectMirrors.AddProjectMirror(projectID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("mirror_id", mirror.ID)
 
 	mirrorID := strconv.Itoa(mirror.ID)
 	d.SetId(buildTwoPartID(&projectID, &mirrorID))
-	return resourceGitlabProjectMirrorRead(d, meta)
+	return resourceGitlabProjectMirrorRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectMirrorUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	mirrorID := d.Get("mirror_id").(int)
@@ -117,15 +119,15 @@ func resourceGitlabProjectMirrorUpdate(d *schema.ResourceData, meta interface{})
 	}
 	log.Printf("[DEBUG] update gitlab project mirror %v for %s", mirrorID, projectID)
 
-	_, _, err := client.ProjectMirrors.EditProjectMirror(projectID, mirrorID, &options)
+	_, _, err := client.ProjectMirrors.EditProjectMirror(projectID, mirrorID, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceGitlabProjectMirrorRead(d, meta)
+	return resourceGitlabProjectMirrorRead(ctx, d, meta)
 }
 
 // Documented remote mirrors API does not support a delete method, instead mirror is disabled.
-func resourceGitlabProjectMirrorDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	enabled := false
@@ -142,12 +144,15 @@ func resourceGitlabProjectMirrorDelete(d *schema.ResourceData, meta interface{})
 	}
 	log.Printf("[DEBUG] Disable gitlab project mirror %v for %s", mirrorID, projectID)
 
-	_, _, err := client.ProjectMirrors.EditProjectMirror(projectID, mirrorID, &options)
+	_, _, err := client.ProjectMirrors.EditProjectMirror(projectID, mirrorID, &options, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return err
+	return nil
 }
 
-func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMirrorRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	ids := strings.Split(d.Id(), ":")
@@ -155,7 +160,7 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 	mirrorID := ids[1]
 	integerMirrorID, err := strconv.Atoi(mirrorID)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] read gitlab project mirror %s id %v", projectID, mirrorID)
 
@@ -168,9 +173,9 @@ func resourceGitlabProjectMirrorRead(d *schema.ResourceData, meta interface{}) e
 	}
 
 	for {
-		mirrors, response, err := client.ProjectMirrors.ListProjectMirror(projectID, opts)
+		mirrors, response, err := client.ProjectMirrors.ListProjectMirror(projectID, opts, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		for _, m := range mirrors {
