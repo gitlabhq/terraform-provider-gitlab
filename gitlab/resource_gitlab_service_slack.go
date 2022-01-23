@@ -1,21 +1,23 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceSlack() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabServiceSlackCreate,
-		Read:   resourceGitlabServiceSlackRead,
-		Update: resourceGitlabServiceSlackUpdate,
-		Delete: resourceGitlabServiceSlackDelete,
+		CreateContext: resourceGitlabServiceSlackCreate,
+		ReadContext:   resourceGitlabServiceSlackRead,
+		UpdateContext: resourceGitlabServiceSlackUpdate,
+		DeleteContext: resourceGitlabServiceSlackDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabServiceSlackImportState,
+			StateContext: resourceGitlabServiceSlackImportState,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -172,7 +174,7 @@ func resourceGitlabServiceSlackSetToState(d *schema.ResourceData, service *gitla
 	return nil
 }
 
-func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceSlackCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
@@ -204,52 +206,56 @@ func resourceGitlabServiceSlackCreate(d *schema.ResourceData, meta interface{}) 
 	opts.WikiPageEvents = gitlab.Bool(d.Get("wiki_page_events").(bool))
 	opts.WikiPageChannel = gitlab.String(d.Get("wiki_page_channel").(string))
 
-	_, err := client.Services.SetSlackService(project, opts)
+	_, err := client.Services.SetSlackService(project, opts, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabServiceSlackRead(d, meta)
+	return resourceGitlabServiceSlackRead(ctx, d, meta)
 }
 
-func resourceGitlabServiceSlackRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceSlackRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] read gitlab slack service for project %s", project)
 
-	service, _, err := client.Services.GetSlackService(project)
+	service, _, err := client.Services.GetSlackService(project, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab slack service not found %s", project)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	if err = resourceGitlabServiceSlackSetToState(d, service); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	return nil
 }
 
-func resourceGitlabServiceSlackUpdate(d *schema.ResourceData, meta interface{}) error {
-	return resourceGitlabServiceSlackCreate(d, meta)
+func resourceGitlabServiceSlackUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	return resourceGitlabServiceSlackCreate(ctx, d, meta)
 }
 
-func resourceGitlabServiceSlackDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceSlackDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] delete gitlab slack service for project %s", project)
 
-	_, err := client.Services.DeleteSlackService(project)
-	return err
+	_, err := client.Services.DeleteSlackService(project, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
-func resourceGitlabServiceSlackImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabServiceSlackImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	d.Set("project", d.Id())
 
 	return []*schema.ResourceData{d}, nil
