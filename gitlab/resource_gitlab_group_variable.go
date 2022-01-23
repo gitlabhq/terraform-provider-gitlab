@@ -1,18 +1,20 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupVariable() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabGroupVariableCreate,
-		Read:   resourceGitlabGroupVariableRead,
-		Update: resourceGitlabGroupVariableUpdate,
-		Delete: resourceGitlabGroupVariableDelete,
+		CreateContext: resourceGitlabGroupVariableCreate,
+		ReadContext:   resourceGitlabGroupVariableRead,
+		UpdateContext: resourceGitlabGroupVariableUpdate,
+		DeleteContext: resourceGitlabGroupVariableDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -54,7 +56,7 @@ func resourceGitlabGroupVariable() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupVariableCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupVariableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	group := d.Get("group").(string)
@@ -73,34 +75,34 @@ func resourceGitlabGroupVariableCreate(d *schema.ResourceData, meta interface{})
 	}
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", group, key)
 
-	_, _, err := client.GroupVariables.CreateVariable(group, &options)
+	_, _, err := client.GroupVariables.CreateVariable(group, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(buildTwoPartID(&group, &key))
 
-	return resourceGitlabGroupVariableRead(d, meta)
+	return resourceGitlabGroupVariableRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupVariableRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	group, key, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab group variable %s/%s", group, key)
 
-	v, _, err := client.GroupVariables.GetVariable(group, key)
+	v, _, err := client.GroupVariables.GetVariable(group, key, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab group variable not found %s/%s", group, key)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("key", v.Key)
@@ -112,7 +114,7 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceGitlabGroupVariableUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupVariableUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	group := d.Get("group").(string)
@@ -130,19 +132,23 @@ func resourceGitlabGroupVariableUpdate(d *schema.ResourceData, meta interface{})
 	}
 	log.Printf("[DEBUG] update gitlab group variable %s/%s", group, key)
 
-	_, _, err := client.GroupVariables.UpdateVariable(group, key, options)
+	_, _, err := client.GroupVariables.UpdateVariable(group, key, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceGitlabGroupVariableRead(d, meta)
+	return resourceGitlabGroupVariableRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupVariableDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupVariableDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 	key := d.Get("key").(string)
 	log.Printf("[DEBUG] Delete gitlab group variable %s/%s", group, key)
 
-	_, err := client.GroupVariables.RemoveVariable(group, key)
-	return err
+	_, err := client.GroupVariables.RemoveVariable(group, key, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
