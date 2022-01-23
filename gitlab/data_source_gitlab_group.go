@@ -1,16 +1,18 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabGroupRead,
+		ReadContext: dataSourceGitlabGroupRead,
 		Schema: map[string]*schema.Schema{
 			"group_id": {
 				Type:     schema.TypeInt,
@@ -77,7 +79,7 @@ func dataSourceGitlabGroup() *schema.Resource {
 	}
 }
 
-func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	var group *gitlab.Group
@@ -90,18 +92,18 @@ func dataSourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 
 	if groupIDOk {
 		// Get group by id
-		group, _, err = client.Groups.GetGroup(groupIDData.(int), nil)
+		group, _, err = client.Groups.GetGroup(groupIDData.(int), nil, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	} else if fullPathOk {
 		// Get group by full path
-		group, _, err = client.Groups.GetGroup(fullPathData.(string), nil)
+		group, _, err = client.Groups.GetGroup(fullPathData.(string), nil, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	} else {
-		return fmt.Errorf("one and only one of group_id or full_path must be set")
+		return diag.Errorf("one and only one of group_id or full_path must be set")
 	}
 
 	d.Set("group_id", group.ID)
