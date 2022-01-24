@@ -42,7 +42,7 @@ This makes it very easy to add import functionality, by using
 
 ```go
 Importer: &schema.ResourceImporter{
-    State: schema.ImportStatePassthrough,
+    StateContext: schema.ImportStatePassthroughContext,
 },
 ```
 
