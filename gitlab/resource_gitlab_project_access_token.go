@@ -1,26 +1,28 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectAccessToken() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Create: resourceGitlabProjectAccessTokenCreate,
-		Read:   resourceGitlabProjectAccessTokenRead,
-		Delete: resourceGitlabProjectAccessTokenDelete,
+		CreateContext: resourceGitlabProjectAccessTokenCreate,
+		ReadContext:   resourceGitlabProjectAccessTokenRead,
+		DeleteContext: resourceGitlabProjectAccessTokenDelete,
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
@@ -77,8 +79,9 @@ func resourceGitlabProjectAccessToken() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
+
 	project := d.Get("project").(int)
 	options := &gitlab.CreateProjectAccessTokenOptions{
 		Name:   gitlab.String(d.Get("name").(string)),
@@ -90,16 +93,16 @@ func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interfa
 	if v, ok := d.GetOk("expires_at"); ok {
 		parsedExpiresAt, err := time.Parse("2006-01-02", v.(string))
 		if err != nil {
-			return fmt.Errorf("Invalid expires_at date: %v", err)
+			return diag.Errorf("Invalid expires_at date: %v", err)
 		}
 		parsedExpiresAtISOTime := gitlab.ISOTime(parsedExpiresAt)
 		options.ExpiresAt = &parsedExpiresAtISOTime
 		log.Printf("[DEBUG] create gitlab ProjectAccessToken %s with expires_at %s for project ID %d", *options.Name, *options.ExpiresAt, project)
 	}
 
-	projectAccessToken, _, err := client.ProjectAccessTokens.CreateProjectAccessToken(project, options)
+	projectAccessToken, _, err := client.ProjectAccessTokens.CreateProjectAccessToken(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] created gitlab ProjectAccessToken %d - %s for project ID %d", projectAccessToken.ID, *options.Name, project)
@@ -109,26 +112,26 @@ func resourceGitlabProjectAccessTokenCreate(d *schema.ResourceData, meta interfa
 	d.SetId(buildTwoPartID(&projectString, &PATstring))
 	d.Set("token", projectAccessToken.Token)
 
-	return resourceGitlabProjectAccessTokenRead(d, meta)
+	return resourceGitlabProjectAccessTokenRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectAccessTokenRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	projectString, PATstring, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return fmt.Errorf("Error parsing ID: %s", d.Id())
+		return diag.Errorf("Error parsing ID: %s", d.Id())
 	}
 
 	client := meta.(*gitlab.Client)
 
 	project, err := strconv.Atoi(projectString)
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", projectString)
+		return diag.Errorf("%s cannot be converted to int", projectString)
 	}
 
 	projectAccessTokenID, err := strconv.Atoi(PATstring)
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", PATstring)
+		return diag.Errorf("%s cannot be converted to int", PATstring)
 	}
 
 	log.Printf("[DEBUG] read gitlab ProjectAccessToken %d, project ID %d", projectAccessTokenID, project)
@@ -143,9 +146,9 @@ func resourceGitlabProjectAccessTokenRead(d *schema.ResourceData, meta interface
 
 	page := 1
 	for page != 0 {
-		projectAccessTokens, response, err := client.ProjectAccessTokens.ListProjectAccessTokens(project, &gitlab.ListProjectAccessTokensOptions{Page: page, PerPage: 100})
+		projectAccessTokens, response, err := client.ProjectAccessTokens.ListProjectAccessTokens(project, &gitlab.ListProjectAccessTokensOptions{Page: page, PerPage: 100}, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		for _, projectAccessToken := range projectAccessTokens {
@@ -174,26 +177,26 @@ func resourceGitlabProjectAccessTokenRead(d *schema.ResourceData, meta interface
 	return nil
 }
 
-func resourceGitlabProjectAccessTokenDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectAccessTokenDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	projectString, PATstring, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return fmt.Errorf("Error parsing ID: %s", d.Id())
+		return diag.Errorf("Error parsing ID: %s", d.Id())
 	}
 
 	client := meta.(*gitlab.Client)
 
 	project, err := strconv.Atoi(projectString)
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", projectString)
+		return diag.Errorf("%s cannot be converted to int", projectString)
 	}
 
 	projectAccessTokenID, err := strconv.Atoi(PATstring)
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", PATstring)
+		return diag.Errorf("%s cannot be converted to int", PATstring)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab ProjectAccessToken %s", d.Id())
-	_, err = client.ProjectAccessTokens.DeleteProjectAccessToken(project, projectAccessTokenID)
-	return err
+	_, err = client.ProjectAccessTokens.DeleteProjectAccessToken(project, projectAccessTokenID, gitlab.WithContext(ctx))
+	return diag.FromErr(err)
 }
