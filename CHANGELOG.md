@@ -1,45 +1,45 @@
 ## 3.8.0 (Nov 19, 2021)
 
 ENHANCEMENTS:
-* More examples and better documentation #654
-* Adding a first complete example code #670
-* Support running the provider using an OAuth token #686
-* Allow merge on skipped pipeline #705
-* support default_branch_protection on group #706
-* Bump github.com/xanzy/go-gitlab from 0.50.0 to 0.51.1 #718
-* Add squash option #719
+* More examples and better documentation ([#654](https://github.com/gitlabhq/terraform-provider-gitlab/pull/654))
+* Adding a first complete example code ([#670](https://github.com/gitlabhq/terraform-provider-gitlab/pull/670))
+* Support running the provider using an OAuth token ([#686](https://github.com/gitlabhq/terraform-provider-gitlab/pull/686))
+* Allow merge on skipped pipeline ([#705](https://github.com/gitlabhq/terraform-provider-gitlab/pull/705))
+* support default_branch_protection on group ([#706](https://github.com/gitlabhq/terraform-provider-gitlab/pull/706))
+* Bump github.com/xanzy/go-gitlab from 0.50.0 to 0.51.1 ([#718](https://github.com/gitlabhq/terraform-provider-gitlab/pull/718))
+* Add squash option ([#719](https://github.com/gitlabhq/terraform-provider-gitlab/pull/719))
 
 BUGFIXES:
-* Suppress whitespace diffs for kubernetes_ca_cert attribute #665
-* Fix GitLab project membership example #684
-* Improve tests for initializing a project without README #730
+* Suppress whitespace diffs for kubernetes_ca_cert attribute ([#665](https://github.com/gitlabhq/terraform-provider-gitlab/pull/665))
+* Fix GitLab project membership example ([#684](https://github.com/gitlabhq/terraform-provider-gitlab/pull/684))
+* Improve tests for initializing a project without README ([#730](https://github.com/gitlabhq/terraform-provider-gitlab/pull/730))
 
 
 ## 3.7.0 (July 20, 2021)
 
 FEATURES:
 
-* Add protected_branch_ids to gitlab_project_approval_rule #542
-* Add most Premium features for gitlab_branch_protection #556
-* Adds support for gitlab project badges #648
+* Add protected_branch_ids to gitlab_project_approval_rule ([#542](https://github.com/gitlabhq/terraform-provider-gitlab/pull/542))
+* Add most Premium features for gitlab_branch_protection ([#556](https://github.com/gitlabhq/terraform-provider-gitlab/pull/556))
+* Adds support for gitlab project badges ([#648](https://github.com/gitlabhq/terraform-provider-gitlab/pull/648))
 
 ENHANCEMENTS:
 
-* Add CustomCIPath to resource gitlab_project #662
-* add build coverage regex #627
-* Add tfproviderlint linter to CI #653
-* Documentation improvements #642
-* chore: add error handling to resourceGitlabProjectSetToState #649
-* Missing documentation for gitlab_instance_variable #602
-* Add support for importing Pipeline Schedules and Triggers #618
-* update reference to master branch to main #612
+* Add CustomCIPath to resource gitlab_project ([#662](https://github.com/gitlabhq/terraform-provider-gitlab/pull/662))
+* add build coverage regex ([#627](https://github.com/gitlabhq/terraform-provider-gitlab/pull/627))
+* Add tfproviderlint linter to CI ([#653](https://github.com/gitlabhq/terraform-provider-gitlab/pull/653))
+* Documentation improvements ([#642](https://github.com/gitlabhq/terraform-provider-gitlab/pull/642))
+* chore: add error handling to resourceGitlabProjectSetToState ([#649](https://github.com/gitlabhq/terraform-provider-gitlab/pull/649))
+* Missing documentation for gitlab_instance_variable ([#602](https://github.com/gitlabhq/terraform-provider-gitlab/pull/602))
+* Add support for importing Pipeline Schedules and Triggers ([#618](https://github.com/gitlabhq/terraform-provider-gitlab/pull/618))
+* update reference to master branch to main ([#612](https://github.com/gitlabhq/terraform-provider-gitlab/pull/612))
 
 BUGFIXES:
 
-* Fix project approval rule tests #660
-* Fix markdown linter errors in branch_protection.md #656
-* fix: update default branch name to "main" #643
-* gitlab_project: Wait for template projects to be cloned/imported #621
+* Fix project approval rule tests ([#660](https://github.com/gitlabhq/terraform-provider-gitlab/pull/660))
+* Fix markdown linter errors in branch_protection.md ([#656](https://github.com/gitlabhq/terraform-provider-gitlab/pull/656))
+* fix: update default branch name to "main" ([#643](https://github.com/gitlabhq/terraform-provider-gitlab/pull/643))
+* gitlab_project: Wait for template projects to be cloned/imported ([#621](https://github.com/gitlabhq/terraform-provider-gitlab/pull/621))
 
 
 
