@@ -146,6 +146,11 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 
 	hook, _, err := client.Projects.GetProjectHook(project, hookId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab project hook not found %s/%d", project, hookId)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

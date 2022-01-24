@@ -156,13 +156,13 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		deployKeyID, err := strconv.Atoi(rs.Primary.ID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
 		project := rs.Primary.Attributes["project"]
 
-		gotDeployKey, resp, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
+		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
 		if err == nil {
 			if gotDeployKey != nil && fmt.Sprintf("%d", gotDeployKey.ID) == rs.Primary.ID {
 				return fmt.Errorf("Deploy key still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

@@ -166,8 +166,6 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 		return err
 	}
 
-	var scopes []string
-
 	for _, token := range deployTokens {
 		if token.ID == deployTokenID {
 			d.Set("name", token.Name)
@@ -177,13 +175,17 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 				d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
 			}
 
-			scopes = append(scopes, token.Scopes...)
+			if err := d.Set("scopes", token.Scopes); err != nil {
+				return err
+			}
+
+			return nil
 		}
 	}
 
-	if err := d.Set("scopes", scopes); err != nil {
-		return err
-	}
+	log.Printf("[DEBUG] GitLab deploy token %d in group %s was not found", deployTokenID, group.(string))
+
+	d.SetId("")
 
 	return nil
 }

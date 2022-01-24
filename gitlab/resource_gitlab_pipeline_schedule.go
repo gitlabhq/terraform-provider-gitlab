@@ -1,7 +1,6 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -117,7 +116,9 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 		opt.Page = resp.NextPage
 	}
 	if !found {
-		return errors.New(fmt.Sprintf("PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)) // nolint // TODO: Resolve this golangci-lint issue: S1028: should use fmt.Errorf(...) instead of errors.New(fmt.Sprintf(...)) (gosimple)
+		log.Printf("[DEBUG] PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
+		d.SetId("")
+		return nil
 	}
 
 	return nil
@@ -181,11 +182,10 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 		return fmt.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err = client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
-		return fmt.Errorf("failed to delete pipeline schedule %q: %w", d.Id(), err)
+	if _, err := client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
+		return fmt.Errorf("%s failed to delete pipeline schedule: %s", d.Id(), err.Error())
 	}
-
-	return nil
+	return err
 }
 
 func resourceGitlabPipelineScheduleStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {

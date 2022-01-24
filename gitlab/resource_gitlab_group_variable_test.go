@@ -121,7 +121,7 @@ func testAccCheckGitlabGroupVariableDestroy(s *terraform.State) error {
 			continue
 		}
 
-		_, resp, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
+		_, _, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil { // nolint // TODO: Resolve this golangci-lint issue: SA9003: empty branch (staticcheck)
 			//if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 			//	if gotRepo.MarkedForDeletionAt == nil {
@@ -129,7 +129,7 @@ func testAccCheckGitlabGroupVariableDestroy(s *terraform.State) error {
 			//	}
 			//}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

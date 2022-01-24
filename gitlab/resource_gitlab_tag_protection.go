@@ -14,11 +14,14 @@ func resourceGitlabTagProtection() *schema.Resource {
 	for k := range tagProtectionAccessLevelID {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Create: resourceGitlabTagProtectionCreate,
 		Read:   resourceGitlabTagProtectionRead,
 		Delete: resourceGitlabTagProtectionDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
+
 		Schema: map[string]*schema.Schema{
 			"project": {
 				Type:     schema.TypeString,
@@ -83,6 +86,11 @@ func resourceGitlabTagProtectionRead(d *schema.ResourceData, meta interface{}) e
 
 	pt, _, err := client.ProtectedTags.GetProtectedTag(project, tag)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab tag protection not found %s/%s", project, tag)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

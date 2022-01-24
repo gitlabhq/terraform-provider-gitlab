@@ -187,7 +187,7 @@ func testAccCheckGitlabGroupLabelDestroy(s *terraform.State) error {
 			continue
 		}
 
-		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
+		group, _, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {
@@ -195,7 +195,7 @@ func testAccCheckGitlabGroupLabelDestroy(s *terraform.State) error {
 				}
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

@@ -178,7 +178,7 @@ func testAccCheckGitlabInstanceClusterDestroy(s *terraform.State) error {
 				return fmt.Errorf("instance cluster still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if resp != nil && resp.StatusCode != 404 {
 			return err
 		}
 	}

@@ -159,6 +159,11 @@ func resourceGitlabInstanceClusterRead(d *schema.ResourceData, meta interface{})
 
 	cluster, _, err := client.InstanceCluster.GetCluster(clusterId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab instance cluster not found %d", clusterId)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

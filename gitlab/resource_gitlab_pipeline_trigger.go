@@ -69,6 +69,11 @@ func resourceGitlabPipelineTriggerRead(d *schema.ResourceData, meta interface{})
 
 	pipelineTrigger, _, err := client.PipelineTriggers.GetPipelineTrigger(project, pipelineTriggerID)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab pipeline trigger not found %s/%d", project, pipelineTriggerID)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

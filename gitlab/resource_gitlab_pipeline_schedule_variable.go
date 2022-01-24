@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -16,6 +17,9 @@ func resourceGitlabPipelineScheduleVariable() *schema.Resource {
 		Read:   resourceGitlabPipelineScheduleVariableRead,
 		Update: resourceGitlabPipelineScheduleVariableUpdate,
 		Delete: resourceGitlabPipelineScheduleVariableDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceGitlabPipelineScheduleVariableImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -89,7 +93,8 @@ func resourceGitlabPipelineScheduleVariableRead(d *schema.ResourceData, meta int
 		}
 	}
 	if !found {
-		return fmt.Errorf("PipelineScheduleVariable %s can not be found", pipelineVariableKey)
+		log.Printf("[DEBUG] pipeline schedule variable not found %s/%d/%s", project, scheduleID, pipelineVariableKey)
+		d.SetId("")
 	}
 
 	return nil
@@ -124,8 +129,30 @@ func resourceGitlabPipelineScheduleVariableDelete(d *schema.ResourceData, meta i
 	scheduleID := d.Get("pipeline_schedule_id").(int)
 
 	if _, _, err := client.PipelineSchedules.DeletePipelineScheduleVariable(project, scheduleID, variableKey); err != nil {
-		return fmt.Errorf("failed to delete pipeline schedule variable %q: %w", d.Id(), err)
+		return fmt.Errorf("%s failed to delete pipeline schedule variable: %s", d.Id(), err.Error())
 	}
-
 	return nil
+}
+
+func resourceGitlabPipelineScheduleVariableImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 3 {
+		return nil, fmt.Errorf("invalid pipeline schedule variable import format; expected '{project_id}:{pipeline_schedule_id}:{key}'")
+	}
+	project, pipelineScheduleId, key := s[0], s[1], s[2]
+	psid, err := strconv.Atoi(pipelineScheduleId)
+	if err != nil {
+		return nil, err
+	}
+	d.SetId(buildTwoPartID(&pipelineScheduleId, &key))
+	if err := d.Set("project", project); err != nil {
+		return nil, err
+	}
+	if err := d.Set("pipeline_schedule_id", psid); err != nil {
+		return nil, err
+	}
+	if err := d.Set("key", key); err != nil {
+		return nil, err
+	}
+	return []*schema.ResourceData{d}, nil
 }

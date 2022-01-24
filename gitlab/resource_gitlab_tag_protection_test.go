@@ -106,6 +106,27 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
+func TestAccGitlabTagProtection_import(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabTagProtectionDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabTagProtectionConfig(rInt, ""),
+			},
+			{
+				ResourceName:      "gitlab_tag_protection.TagProtect",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabTagProtectionExists(n string, pt *gitlab.ProtectedTag) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -164,13 +185,13 @@ func testAccCheckGitlabTagProtectionDestroy(s *terraform.State) error {
 		}
 	}
 
-	pt, response, err := conn.ProtectedTags.GetProtectedTag(project, tag)
+	pt, _, err := conn.ProtectedTags.GetProtectedTag(project, tag)
 	if err == nil {
 		if pt != nil {
 			return fmt.Errorf("project tag protection %s still exists", tag)
 		}
 	}
-	if response.StatusCode != 404 {
+	if !is404(err) {
 		return err
 	}
 	return nil

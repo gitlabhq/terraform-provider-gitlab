@@ -130,6 +130,11 @@ func resourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 
 	user, _, err := client.Users.GetUser(id, gitlab.GetUsersOptions{})
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab user not found %d", id)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

@@ -99,6 +99,14 @@ func resourceGitlabServiceGithubRead(d *schema.ResourceData, meta interface{}) e
 
 	service, _, err := client.Services.GetGithubService(project)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab service github not found %s / %s / %s",
+				project,
+				service.Title,
+				service.Properties.RepositoryURL)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

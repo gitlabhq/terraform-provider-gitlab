@@ -174,19 +174,22 @@ func testAccCheckGitlabPipelineScheduleDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
+		if rs.Type != "gitlab_pipeline_schedule" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		id, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("could not convert pipeline schedule id to integer: %s", err)
+		}
+
+		gotPS, _, err := conn.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], id)
 		if err == nil {
-			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
-				}
+			if gotPS != nil && fmt.Sprintf("%d", gotPS.ID) == rs.Primary.ID {
+				return fmt.Errorf("pipeline schedule still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

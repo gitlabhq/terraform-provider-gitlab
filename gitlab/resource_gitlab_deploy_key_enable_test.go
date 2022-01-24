@@ -103,13 +103,13 @@ func testAccCheckGitlabDeployKeyEnableDestroy(s *terraform.State) error {
 		}
 	}
 
-	gotDeployKey, resp, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
+	gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err == nil {
 		if gotDeployKey != nil {
 			return fmt.Errorf("Deploy key still exists: %d", deployKeyID)
 		}
 	}
-	if resp.StatusCode != 404 {
+	if !is404(err) {
 		return err
 	}
 	return nil

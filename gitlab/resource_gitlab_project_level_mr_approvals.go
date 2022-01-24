@@ -78,6 +78,11 @@ func resourceGitlabProjectLevelMRApprovalsRead(d *schema.ResourceData, meta inte
 
 	approvalConfig, _, err := client.Projects.GetApprovalConfiguration(projectId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab project approval configuration not found for project %d", projectId)
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("couldn't read approval configuration: %w", err)
 	}
 

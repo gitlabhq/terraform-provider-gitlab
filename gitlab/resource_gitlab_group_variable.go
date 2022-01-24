@@ -95,6 +95,11 @@ func resourceGitlabGroupVariableRead(d *schema.ResourceData, meta interface{}) e
 
 	v, _, err := client.GroupVariables.GetVariable(group, key)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab group variable not found %s/%s", group, key)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

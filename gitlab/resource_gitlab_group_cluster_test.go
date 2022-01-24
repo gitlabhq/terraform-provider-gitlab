@@ -168,13 +168,13 @@ func testAccCheckGitlabGroupClusterDestroy(s *terraform.State) error {
 			return err
 		}
 
-		gotCluster, resp, err := conn.GroupCluster.GetCluster(group, clusterID)
+		gotCluster, _, err := conn.GroupCluster.GetCluster(group, clusterID)
 		if err == nil {
 			if gotCluster != nil && fmt.Sprintf("%d", gotCluster.ID) == group {
 				return fmt.Errorf("group cluster still exists")
 			}
 		}
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 	}

@@ -401,13 +401,13 @@ func testAccCheckGitlabBranchProtectionDestroy(s *terraform.State) error {
 		}
 	}
 
-	pb, response, err := conn.ProtectedBranches.GetProtectedBranch(project, branch)
+	pb, _, err := conn.ProtectedBranches.GetProtectedBranch(project, branch)
 	if err == nil {
 		if pb != nil {
 			return fmt.Errorf("project branch protection %s still exists", branch)
 		}
 	}
-	if response.StatusCode != 404 {
+	if !is404(err) {
 		return err
 	}
 	return nil

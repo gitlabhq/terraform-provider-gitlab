@@ -161,6 +161,11 @@ func resourceGitlabGroupClusterRead(d *schema.ResourceData, meta interface{}) er
 
 	cluster, _, err := client.GroupCluster.GetCluster(group, clusterId)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab group cluster not found %s/%d", group, clusterId)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

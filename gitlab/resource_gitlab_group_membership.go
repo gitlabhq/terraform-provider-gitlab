@@ -2,7 +2,6 @@ package gitlab
 
 import (
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 
@@ -83,9 +82,9 @@ func resourceGitlabGroupMembershipRead(d *schema.ResourceData, meta interface{})
 		return e
 	}
 
-	groupMember, resp, err := client.GroupMembers.GetGroupMember(groupId, userId)
+	groupMember, _, err := client.GroupMembers.GetGroupMember(groupId, userId)
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab group membership for %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil

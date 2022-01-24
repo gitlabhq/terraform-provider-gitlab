@@ -220,6 +220,11 @@ func resourceGitlabServiceSlackRead(d *schema.ResourceData, meta interface{}) er
 
 	service, _, err := client.Services.GetSlackService(project)
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab slack service not found %s", project)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 

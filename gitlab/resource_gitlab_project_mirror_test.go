@@ -195,7 +195,7 @@ func testAccCheckGitlabProjectMirrorDestroy(s *terraform.State) error {
 				}
 			}
 		}
-		if resp.StatusCode != 404 {
+		if resp != nil && resp.StatusCode != 404 {
 			return err
 		}
 		return nil

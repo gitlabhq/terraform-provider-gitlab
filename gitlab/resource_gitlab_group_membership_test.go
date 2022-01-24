@@ -58,7 +58,7 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 
 		groupId := rs.Primary.Attributes["group_id"]
 		if groupId == "" {
-			return fmt.Errorf("No group ID is set")
+			return fmt.Errorf("no group ID is set")
 		}
 
 		userIdString := rs.Primary.Attributes["user_id"]
@@ -109,15 +109,15 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 
 		// GetGroupMember needs int type for userIdString
 		userId, err := strconv.Atoi(userIdString) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
-		groupMember, resp, err := conn.GroupMembers.GetGroupMember(groupId, userId)
+		groupMember, _, err := conn.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
-			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["accessLevel"] {
+			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["access_level"] {
 				return fmt.Errorf("Group still has member.")
 			}
 			return nil
 		}
 
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

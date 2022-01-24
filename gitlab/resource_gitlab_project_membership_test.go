@@ -107,7 +107,7 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 
 		// GetProjectMember needs int type for userID
 		userIDI, err := strconv.Atoi(userID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
-		gotMembership, resp, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
+		gotMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
 		if err != nil {
 			if gotMembership != nil && fmt.Sprintf("%d", gotMembership.AccessLevel) == rs.Primary.Attributes["access_level"] {
 				return fmt.Errorf("Project still has member.")
@@ -115,7 +115,7 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 			return nil
 		}
 
-		if resp.StatusCode != 404 {
+		if !is404(err) {
 			return err
 		}
 		return nil

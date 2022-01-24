@@ -71,7 +71,9 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	if force {
-		resourceGitlabGroupLdapLinkDelete(d, meta) // nolint // TODO: Resolve this golangci-lint issue: Error return value is not checked (errcheck)
+		if err := resourceGitlabGroupLdapLinkDelete(d, meta); err != nil {
+			return err
+		}
 	}
 
 	log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
