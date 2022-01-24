@@ -82,13 +82,13 @@ func resourceGitlabProjectAccessToken() *schema.Resource {
 func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	project := d.Get("project").(int)
+	project := d.Get("project").(string)
 	options := &gitlab.CreateProjectAccessTokenOptions{
 		Name:   gitlab.String(d.Get("name").(string)),
 		Scopes: *stringSetToStringSlice(d.Get("scopes").(*schema.Set)),
 	}
 
-	log.Printf("[DEBUG] create gitlab ProjectAccessToken %s %s for project ID %d", *options.Name, options.Scopes, project)
+	log.Printf("[DEBUG] create gitlab ProjectAccessToken %s %s for project ID %s", *options.Name, options.Scopes, project)
 
 	if v, ok := d.GetOk("expires_at"); ok {
 		parsedExpiresAt, err := time.Parse("2006-01-02", v.(string))
@@ -97,7 +97,7 @@ func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.Resou
 		}
 		parsedExpiresAtISOTime := gitlab.ISOTime(parsedExpiresAt)
 		options.ExpiresAt = &parsedExpiresAtISOTime
-		log.Printf("[DEBUG] create gitlab ProjectAccessToken %s with expires_at %s for project ID %d", *options.Name, *options.ExpiresAt, project)
+		log.Printf("[DEBUG] create gitlab ProjectAccessToken %s with expires_at %s for project ID %s", *options.Name, *options.ExpiresAt, project)
 	}
 
 	projectAccessToken, _, err := client.ProjectAccessTokens.CreateProjectAccessToken(project, options, gitlab.WithContext(ctx))
@@ -105,11 +105,10 @@ func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.Resou
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] created gitlab ProjectAccessToken %d - %s for project ID %d", projectAccessToken.ID, *options.Name, project)
+	log.Printf("[DEBUG] created gitlab ProjectAccessToken %d - %s for project ID %s", projectAccessToken.ID, *options.Name, project)
 
-	projectString := strconv.Itoa(project)
 	PATstring := strconv.Itoa(projectAccessToken.ID)
-	d.SetId(buildTwoPartID(&projectString, &PATstring))
+	d.SetId(buildTwoPartID(&project, &PATstring))
 	d.Set("token", projectAccessToken.Token)
 
 	return resourceGitlabProjectAccessTokenRead(ctx, d, meta)
@@ -117,24 +116,19 @@ func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.Resou
 
 func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
-	projectString, PATstring, err := parseTwoPartID(d.Id())
+	project, PATstring, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return diag.Errorf("Error parsing ID: %s", d.Id())
 	}
 
 	client := meta.(*gitlab.Client)
 
-	project, err := strconv.Atoi(projectString)
-	if err != nil {
-		return diag.Errorf("%s cannot be converted to int", projectString)
-	}
-
 	projectAccessTokenID, err := strconv.Atoi(PATstring)
 	if err != nil {
 		return diag.Errorf("%s cannot be converted to int", PATstring)
 	}
 
-	log.Printf("[DEBUG] read gitlab ProjectAccessToken %d, project ID %d", projectAccessTokenID, project)
+	log.Printf("[DEBUG] read gitlab ProjectAccessToken %d, project ID %s", projectAccessTokenID, project)
 
 	//there is a slight possibility to not find an existing item, for example
 	// 1. item is #101 (ie, in the 2nd page)
@@ -172,24 +166,19 @@ func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.Resourc
 		page = response.NextPage
 	}
 
-	log.Printf("[DEBUG] failed to read gitlab ProjectAccessToken %d, project ID %d", projectAccessTokenID, project)
+	log.Printf("[DEBUG] failed to read gitlab ProjectAccessToken %d, project ID %s", projectAccessTokenID, project)
 	d.SetId("")
 	return nil
 }
 
 func resourceGitlabProjectAccessTokenDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
-	projectString, PATstring, err := parseTwoPartID(d.Id())
+	project, PATstring, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return diag.Errorf("Error parsing ID: %s", d.Id())
 	}
 
 	client := meta.(*gitlab.Client)
-
-	project, err := strconv.Atoi(projectString)
-	if err != nil {
-		return diag.Errorf("%s cannot be converted to int", projectString)
-	}
 
 	projectAccessTokenID, err := strconv.Atoi(PATstring)
 	if err != nil {

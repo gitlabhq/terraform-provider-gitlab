@@ -110,7 +110,7 @@ func testAccCheckGitlabProjectAccessTokenExists(n string, pat *testAccGitlabProj
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		projectString, PATstring, err := parseTwoPartID(rs.Primary.ID)
+		project, PATstring, err := parseTwoPartID(rs.Primary.ID)
 		if err != nil {
 			return fmt.Errorf("Error parsing ID: %s", rs.Primary.ID)
 		}
@@ -123,8 +123,8 @@ func testAccCheckGitlabProjectAccessTokenExists(n string, pat *testAccGitlabProj
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		if repoName != projectString {
-			return fmt.Errorf("Project [%s] in project identifier [%s] it's different from project stored into the state [%s]", projectString, rs.Primary.ID, repoName)
+		if repoName != project {
+			return fmt.Errorf("Project [%s] in project identifier [%s] it's different from project stored into the state [%s]", project, rs.Primary.ID, repoName)
 		}
 
 		conn := testAccProvider.Meta().(*gitlab.Client)
