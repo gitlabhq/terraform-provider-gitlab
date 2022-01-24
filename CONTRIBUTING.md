@@ -1,0 +1,152 @@
+# Contributing to GitLab Terraform Provider
+
+Thank you for contributing to this provider! :tada: :heart: :trophy: 
+
+Generally we accept any change that adds or changes a Terraform resource that is in line with the [GitLab API](https://docs.gitlab.com/ee/api/api_resources.html). It is always best to [open an issue](https://github.com/gitlabhq/terraform-provider-gitlab/issues/new/choose) before starting on a change.
+
+## Getting Started
+
+Use HashiCorp's [Plugin Development](https://www.terraform.io/plugin) guide as a reference, especially the [Provider Design Principles](https://www.terraform.io/plugin/hashicorp-provider-design-principles).
+
+See the [Developing The Provider](#developing-the-provider) section below for specifics about this GitLab provider.
+
+## PR Checklist
+
+<!--
+These are the most common issues in PRs which we have not automated.
+-->
+
+For a smooth review process, please run through this checklist before submitting a PR. 
+
+1. Resource attributes match 1:1 the names and structure of the API resource in the [GitLab API documentation](https://docs.gitlab.com/ee/api/api_resources.html).
+1. [Docs](/docs) are updated with any new resources or attributes, including how to import the resource.
+1. New resources should have at minimum a basic test with three steps:
+   1. Create the resource
+   1. Update the attributes
+   1. Import the resource
+1. No new `//lintignore` comments that came from copied code. Linter rules are meant to be enforced on new code.
+
+## Guidelines
+
+<!--
+These guidelines are specific callouts for issues that come up occasionally but are somewhat niche.
+-->
+
+#### Resource ID and Import
+
+Terraform resources have a unique ID (`d.SetId("")`). The ID should be comprised from the URL path variables of the `GET` API for the resource in the [GitLab API documentation](https://docs.gitlab.com/ee/api/api_resources.html), separated by `:`.
+
+For example, a resource for the `GET /projects/:id/environments/:environment_id` API would have the ID `123:456` where `123` is the project ID and `456` is the environment ID.
+
+This makes it very easy to add import functionality, by using
+
+```go
+Importer: &schema.ResourceImporter{
+    State: schema.ImportStatePassthrough,
+},
+```
+
+See the [importer state function docs](https://www.terraform.io/plugin/sdkv2/resources/import#importer-state-function) for more details.
+
+#### Documentation
+
+At the moment, documentation is handcrafted. Doc pages are located in [/docs](/docs). Please follow the [Terraform doc formatting guidelines](https://www.terraform.io/registry/providers/docs#format) for these pages. The [Terraform doc preview tool](https://registry.terraform.io/tools/doc-preview) is very helpful for previewing the markdown.
+
+## Developing The Provider
+
+You'll first need [Go](http://www.golang.org) installed on your machine (version 1.14+ is *required*).
+
+1. Clone the git repository.
+
+   ```sh
+   $ git clone git@github.com:gitlabhq/terraform-provider-gitlab
+   $ cd terraform-provider-gitlab
+   ```
+
+2. Build the provider with `make build`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
+
+   ```sh
+   $ make build
+   ```
+
+### Running Tests
+
+The acceptance tests can run against a Gitlab instance where you have a token with administrator permissions (likely not gitlab.com).
+
+#### Option 1: Run tests against a local Gitlab container with docker-compose
+
+This option is the easiest and requires [docker-compose](https://docs.docker.com/compose/install/) (version 1.13+) to be installed on your machine.
+
+1. Start the Gitlab container. It will take about 5 minutes for the container to become healthy.
+
+  ```sh
+  $ make testacc-up
+  ```
+
+2. Run the acceptance tests. The full suite takes 10-20 minutes to run.
+
+  ```sh
+  $ make testacc
+  ```
+
+3. Stop the Gitlab container.
+
+  ```sh
+  $ make testacc-down
+  ```
+
+#### Option 2: Run tests against your own Gitlab instance
+
+If you have your own hosted Gitlab instance, you can run the tests against it directly.
+
+```sh
+$ make testacc GITLAB_TOKEN=example123 GITLAB_BASE_URL=https://example.com/api/v4
+```
+
+`GITLAB_TOKEN` must be a valid token for an account with admin privileges.
+
+#### Testing Tips
+
+* **Gitlab Community Edition and Gitlab Enterprise Edition:**
+
+  This module supports both Gitlab CE and Gitlab EE. We run tests on Gitlab EE,
+  but can't run them on pull requests from forks.
+
+  Features that only work on one flavour can use the following helpers as
+  SkipFunc: `isRunningInEE` and `isRunningInCE`. You can see an example of this
+  for [gitlab_project_level_mr_approvals](gitlab/resource_gitlab_project_level_mr_approvals_test.go)
+  tests.
+
+* **Run EE tests:**
+
+  If you have a `Gitlab-license.txt` you can run Gitlab EE, which will enable the full suite of tests:
+
+  ```sh
+  $ make testacc-up SERVICE=gitlab-ee
+  ```
+
+* **Run a single test:**
+
+  You can pass a pattern to the `RUN` variable to run a reduced number of tests. For example:
+
+  ```sh
+  $ make testacc RUN=TestAccGitlabGroup
+  ```
+
+   ...will run all tests for the `gitlab_group` resource.
+
+* **Debug a test in an IDE:**
+
+  First start the Gitlab container with `make testacc-up`.
+  Then run the desired Go test as you would normally from your IDE, but configure your run configuration to set these environment variables:
+
+  ```
+  GITLAB_TOKEN=ACCTEST1234567890123
+  GITLAB_BASE_URL=http://127.0.0.1:8080/api/v4
+  TF_ACC=1
+  ```
+
+* **Useful HashiCorp documentation:**
+
+  Refer to [HashiCorp's testing guide](https://www.terraform.io/docs/extend/testing/index.html)
+  and [HashiCorp's testing best practices](https://www.terraform.io/docs/extend/best-practices/testing.html).
