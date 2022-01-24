@@ -290,6 +290,14 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:     schema.TypeString,
 		Optional: true,
 	},
+	"issues_template": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
+	"merge_requests_template": {
+		Type:     schema.TypeString,
+		Optional: true,
+	},
 	"ci_config_path": {
 		Type:     schema.TypeString,
 		Optional: true,
@@ -349,6 +357,8 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
 	d.Set("build_coverage_regex", project.BuildCoverageRegex)
+	d.Set("issues_template", project.IssuesTemplate)
+	d.Set("merge_requests_template", project.MergeRequestsTemplate)
 	d.Set("ci_config_path", project.CIConfigPath)
 	return nil
 }
@@ -432,6 +442,14 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if v, ok := d.GetOk("ci_config_path"); ok {
 		options.CIConfigPath = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("issues_template"); ok {
+		options.IssuesTemplate = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("merge_requests_template"); ok {
+		options.MergeRequestsTemplate = gitlab.String(v.(string))
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -722,6 +740,14 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("build_coverage_regex") {
 		options.BuildCoverageRegex = gitlab.String(d.Get("build_coverage_regex").(string))
+	}
+
+	if d.HasChange("issues_template") {
+		options.IssuesTemplate = gitlab.String(d.Get("issues_template").(string))
+	}
+
+	if d.HasChange("merge_requests_template") {
+		options.MergeRequestsTemplate = gitlab.String(d.Get("merge_requests_template").(string))
 	}
 
 	if d.HasChange("ci_config_path") {
