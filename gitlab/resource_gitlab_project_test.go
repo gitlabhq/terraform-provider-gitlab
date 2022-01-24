@@ -790,7 +790,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProjec_templateMutualExclusiveNameAndID(t *testing.T) {
+func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
