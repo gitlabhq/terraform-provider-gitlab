@@ -1,12 +1,14 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
@@ -15,9 +17,9 @@ import (
 func resourceGitlabDeployToken() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Create: resourceGitlabDeployTokenCreate,
-		Read:   resourceGitlabDeployTokenRead,
-		Delete: resourceGitlabDeployTokenDelete,
+		CreateContext: resourceGitlabDeployTokenCreate,
+		ReadContext:   resourceGitlabDeployTokenRead,
+		DeleteContext: resourceGitlabDeployTokenDelete,
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -85,7 +87,7 @@ func expiresAtSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	return oldDate == newDate
 }
 
-func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabDeployTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, isProject := d.GetOk("project")
 	group, isGroup := d.GetOk("group")
@@ -97,7 +99,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 		parsedExpiresAt, err := time.Parse(time.RFC3339, exp.(string))
 		expiresAt = &parsedExpiresAt
 		if err != nil {
-			return fmt.Errorf("Invalid expires_at date: %v", err)
+			return diag.Errorf("Invalid expires_at date: %v", err)
 		}
 	}
 
@@ -115,7 +117,7 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 
 		log.Printf("[DEBUG] Create GitLab deploy token %s in project %s", *options.Name, project.(string))
 
-		deployToken, _, err = client.DeployTokens.CreateProjectDeployToken(project, options)
+		deployToken, _, err = client.DeployTokens.CreateProjectDeployToken(project, options, gitlab.WithContext(ctx))
 
 	} else if isGroup {
 		options := &gitlab.CreateGroupDeployTokenOptions{
@@ -127,11 +129,11 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 
 		log.Printf("[DEBUG] Create GitLab deploy token %s in group %s", *options.Name, group.(string))
 
-		deployToken, _, err = client.DeployTokens.CreateGroupDeployToken(group, options)
+		deployToken, _, err = client.DeployTokens.CreateGroupDeployToken(group, options, gitlab.WithContext(ctx))
 	}
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", deployToken.ID))
@@ -143,27 +145,27 @@ func resourceGitlabDeployTokenCreate(d *schema.ResourceData, meta interface{}) e
 	return nil
 }
 
-func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabDeployTokenRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, isProject := d.GetOk("project")
 	group, isGroup := d.GetOk("group")
 	deployTokenID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	var deployTokens []*gitlab.DeployToken
 
 	if isProject {
 		log.Printf("[DEBUG] Read GitLab deploy token %d in project %s", deployTokenID, project.(string))
-		deployTokens, _, err = client.DeployTokens.ListProjectDeployTokens(project, nil)
+		deployTokens, _, err = client.DeployTokens.ListProjectDeployTokens(project, nil, gitlab.WithContext(ctx))
 
 	} else if isGroup {
 		log.Printf("[DEBUG] Read GitLab deploy token %d in group %s", deployTokenID, group.(string))
-		deployTokens, _, err = client.DeployTokens.ListGroupDeployTokens(group, nil)
+		deployTokens, _, err = client.DeployTokens.ListGroupDeployTokens(group, nil, gitlab.WithContext(ctx))
 	}
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	for _, token := range deployTokens {
@@ -176,7 +178,7 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 			}
 
 			if err := d.Set("scopes", token.Scopes); err != nil {
-				return err
+				return diag.FromErr(err)
 			}
 
 			return nil
@@ -190,33 +192,33 @@ func resourceGitlabDeployTokenRead(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceGitlabDeployTokenDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabDeployTokenDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, isProject := d.GetOk("project")
 	group, isGroup := d.GetOk("group")
 	deployTokenID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	var response *gitlab.Response
 
 	if isProject {
 		log.Printf("[DEBUG] Delete GitLab deploy token %d in project %s", deployTokenID, project.(string))
-		response, err = client.DeployTokens.DeleteProjectDeployToken(project, deployTokenID)
+		response, err = client.DeployTokens.DeleteProjectDeployToken(project, deployTokenID, gitlab.WithContext(ctx))
 
 	} else if isGroup {
 		log.Printf("[DEBUG] Delete GitLab deploy token %d in group %s", deployTokenID, group.(string))
-		response, err = client.DeployTokens.DeleteGroupDeployToken(group, deployTokenID)
+		response, err = client.DeployTokens.DeleteGroupDeployToken(group, deployTokenID, gitlab.WithContext(ctx))
 	}
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	// StatusNoContent = 204
 	// Success with no body
 	if response.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("Invalid status code returned: %s", response.Status)
+		return diag.Errorf("Invalid status code returned: %s", response.Status)
 	}
 
 	return nil

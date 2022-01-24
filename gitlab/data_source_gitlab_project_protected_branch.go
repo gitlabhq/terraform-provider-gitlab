@@ -1,9 +1,11 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
@@ -11,7 +13,7 @@ import (
 
 func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabProjectProtectedBranchRead,
+		ReadContext: dataSourceGitlabProjectProtectedBranchRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
 				Type:         schema.TypeString,
@@ -70,7 +72,7 @@ func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 	}
 }
 
-func dataSourceGitlabProjectProtectedBranchRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabProjectProtectedBranchRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	log.Printf("[INFO] Reading Gitlab protected branch")
@@ -79,24 +81,24 @@ func dataSourceGitlabProjectProtectedBranchRead(d *schema.ResourceData, meta int
 	name := d.Get("name").(string)
 
 	// Get protected branch by project ID/path and branch name
-	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, name)
+	pb, _, err := client.ProtectedBranches.GetProtectedBranch(project, name, gitlab.WithContext(ctx))
 	if err != nil {
-		return fmt.Errorf("error getting protected branch (Project: %v / Name %v): %v", project, name, err)
+		return diag.Errorf("error getting protected branch (Project: %v / Name %v): %v", project, name, err)
 	}
 
 	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("push_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("merge_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", pb.ID))

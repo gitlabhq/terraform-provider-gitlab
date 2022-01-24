@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -19,9 +21,9 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Create: resourceGitlabGroupShareGroupCreate,
-		Read:   resourceGitlabGroupShareGroupRead,
-		Delete: resourceGitlabGroupShareGroupDelete,
+		CreateContext: resourceGitlabGroupShareGroupCreate,
+		ReadContext:   resourceGitlabGroupShareGroupRead,
+		DeleteContext: resourceGitlabGroupShareGroupDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -52,7 +54,7 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupShareGroupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupShareGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	groupId := d.Get("group_id").(string)
 	shareGroupId := d.Get("share_group_id").(int)
 	groupAccess := accessLevelID[d.Get("group_access").(string)]
@@ -65,36 +67,36 @@ func resourceGitlabGroupShareGroupCreate(d *schema.ResourceData, meta interface{
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] create gitlab group share for %d in %s", shareGroupId, groupId)
 
-	_, _, err := client.GroupMembers.ShareWithGroup(groupId, options)
+	_, _, err := client.GroupMembers.ShareWithGroup(groupId, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	shareGroupIdString := strconv.Itoa(shareGroupId)
 	d.SetId(buildTwoPartID(&groupId, &shareGroupIdString))
 
-	return resourceGitlabGroupShareGroupRead(d, meta)
+	return resourceGitlabGroupShareGroupRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupShareGroupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupShareGroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	id := d.Id()
 	log.Printf("[DEBUG] read gitlab shared groups %s", id)
 
 	groupId, sharedGroupId, err := groupIdsFromId(id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Query main group
-	group, resp, err := client.Groups.GetGroup(groupId, nil)
+	group, resp, err := client.Groups.GetGroup(groupId, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", groupId)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	// Find shared group data from queried group
@@ -121,19 +123,23 @@ func resourceGitlabGroupShareGroupRead(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceGitlabGroupShareGroupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupShareGroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	id := d.Id()
 
 	groupId, sharedGroupId, err := groupIdsFromId(id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab share group %d for %s", sharedGroupId, groupId)
 
-	_, err = client.GroupMembers.DeleteShareWithGroup(groupId, sharedGroupId)
-	return err
+	_, err = client.GroupMembers.DeleteShareWithGroup(groupId, sharedGroupId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func groupIdsFromId(id string) (string, int, error) {

@@ -1,10 +1,12 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -12,10 +14,10 @@ import (
 func resourceGitlabProjectHook() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Create: resourceGitlabProjectHookCreate,
-		Read:   resourceGitlabProjectHookRead,
-		Update: resourceGitlabProjectHookUpdate,
-		Delete: resourceGitlabProjectHookDelete,
+		CreateContext: resourceGitlabProjectHookCreate,
+		ReadContext:   resourceGitlabProjectHookRead,
+		UpdateContext: resourceGitlabProjectHookUpdate,
+		DeleteContext: resourceGitlabProjectHookDelete,
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -99,7 +101,7 @@ func resourceGitlabProjectHook() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectHookCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.AddProjectHookOptions{
@@ -125,33 +127,33 @@ func resourceGitlabProjectHookCreate(d *schema.ResourceData, meta interface{}) e
 
 	log.Printf("[DEBUG] create gitlab project hook %q", *options.URL)
 
-	hook, _, err := client.Projects.AddProjectHook(project, options)
+	hook, _, err := client.Projects.AddProjectHook(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", hook.ID))
 
-	return resourceGitlabProjectHookRead(d, meta)
+	return resourceGitlabProjectHookRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectHookRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	hookId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] read gitlab project hook %s/%d", project, hookId)
 
-	hook, _, err := client.Projects.GetProjectHook(project, hookId)
+	hook, _, err := client.Projects.GetProjectHook(project, hookId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab project hook not found %s/%d", project, hookId)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("url", hook.URL)
@@ -171,12 +173,12 @@ func resourceGitlabProjectHookRead(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectHookUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	hookId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	options := &gitlab.EditProjectHookOptions{
 		URL:                      gitlab.String(d.Get("url").(string)),
@@ -201,23 +203,27 @@ func resourceGitlabProjectHookUpdate(d *schema.ResourceData, meta interface{}) e
 
 	log.Printf("[DEBUG] update gitlab project hook %s", d.Id())
 
-	_, _, err = client.Projects.EditProjectHook(project, hookId, options)
+	_, _, err = client.Projects.EditProjectHook(project, hookId, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabProjectHookRead(d, meta)
+	return resourceGitlabProjectHookRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectHookDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectHookDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	hookId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Delete gitlab project hook %s", d.Id())
 
-	_, err = client.Projects.DeleteProjectHook(project, hookId)
-	return err
+	_, err = client.Projects.DeleteProjectHook(project, hookId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }

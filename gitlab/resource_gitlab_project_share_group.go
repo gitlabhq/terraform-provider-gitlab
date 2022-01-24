@@ -1,10 +1,12 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -13,9 +15,9 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 	acceptedAccessLevels := []string{"guest", "reporter", "developer", "maintainer"}
 
 	return &schema.Resource{
-		Create: resourceGitlabProjectShareGroupCreate,
-		Read:   resourceGitlabProjectShareGroupRead,
-		Delete: resourceGitlabProjectShareGroupDelete,
+		CreateContext: resourceGitlabProjectShareGroupCreate,
+		ReadContext:   resourceGitlabProjectShareGroupRead,
+		DeleteContext: resourceGitlabProjectShareGroupDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -41,7 +43,7 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectShareGroupCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectShareGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	groupId := d.Get("group_id").(int)
@@ -54,33 +56,33 @@ func resourceGitlabProjectShareGroupCreate(d *schema.ResourceData, meta interfac
 	}
 	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.GroupID, projectId)
 
-	_, err := client.Projects.ShareProjectWithGroup(projectId, options)
+	_, err := client.Projects.ShareProjectWithGroup(projectId, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	groupIdString := strconv.Itoa(groupId)
 	d.SetId(buildTwoPartID(&projectId, &groupIdString))
-	return resourceGitlabProjectShareGroupRead(d, meta)
+	return resourceGitlabProjectShareGroupRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectShareGroupRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectShareGroupRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	id := d.Id()
 	log.Printf("[DEBUG] read gitlab project projectMember %s", id)
 
 	projectId, groupId, err := projectIdAndGroupIdFromId(id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	projectInformation, _, err := client.Projects.GetProject(projectId, nil)
+	projectInformation, _, err := client.Projects.GetProject(projectId, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] failed to read gitlab project %s: %s", id, err)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	for _, v := range projectInformation.SharedWithGroups {
@@ -106,19 +108,23 @@ func projectIdAndGroupIdFromId(id string) (string, int, error) {
 	return projectId, groupId, nil
 }
 
-func resourceGitlabProjectShareGroupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectShareGroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	id := d.Id()
 	projectId, groupId, err := projectIdAndGroupIdFromId(id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab project membership %v for %s", groupId, projectId)
 
-	_, err = client.Projects.DeleteSharedProjectFromGroup(projectId, groupId)
-	return err
+	_, err = client.Projects.DeleteSharedProjectFromGroup(projectId, groupId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func resourceGitlabProjectShareGroupSetToState(d *schema.ResourceData, group struct {

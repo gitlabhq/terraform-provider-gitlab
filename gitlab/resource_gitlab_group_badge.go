@@ -1,20 +1,22 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupBadge() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabGroupBadgeCreate,
-		Read:   resourceGitlabGroupBadgeRead,
-		Update: resourceGitlabGroupBadgeUpdate,
-		Delete: resourceGitlabGroupBadgeDelete,
+		CreateContext: resourceGitlabGroupBadgeCreate,
+		ReadContext:   resourceGitlabGroupBadgeRead,
+		UpdateContext: resourceGitlabGroupBadgeUpdate,
+		DeleteContext: resourceGitlabGroupBadgeDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -44,7 +46,7 @@ func resourceGitlabGroupBadge() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupBadgeCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupBadgeCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	groupID := d.Get("group").(string)
 	options := &gitlab.AddGroupBadgeOptions{
@@ -54,45 +56,45 @@ func resourceGitlabGroupBadgeCreate(d *schema.ResourceData, meta interface{}) er
 
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", *options.LinkURL, *options.ImageURL)
 
-	badge, _, err := client.GroupBadges.AddGroupBadge(groupID, options)
+	badge, _, err := client.GroupBadges.AddGroupBadge(groupID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	badgeID := strconv.Itoa(badge.ID)
 
 	d.SetId(buildTwoPartID(&groupID, &badgeID))
 
-	return resourceGitlabGroupBadgeRead(d, meta)
+	return resourceGitlabGroupBadgeRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupBadgeRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupBadgeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	ids := strings.Split(d.Id(), ":")
 	groupID := ids[0]
 	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab group badge %s/%d", groupID, badgeID)
 
-	badge, _, err := client.GroupBadges.GetGroupBadge(groupID, badgeID)
+	badge, _, err := client.GroupBadges.GetGroupBadge(groupID, badgeID, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	resourceGitlabGroupBadgeSetToState(d, badge, &groupID)
 	return nil
 }
 
-func resourceGitlabGroupBadgeUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupBadgeUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	ids := strings.Split(d.Id(), ":")
 	groupID := ids[0]
 	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	options := &gitlab.EditGroupBadgeOptions{
@@ -102,27 +104,31 @@ func resourceGitlabGroupBadgeUpdate(d *schema.ResourceData, meta interface{}) er
 
 	log.Printf("[DEBUG] update gitlab group badge %s/%d", groupID, badgeID)
 
-	_, _, err = client.GroupBadges.EditGroupBadge(groupID, badgeID, options)
+	_, _, err = client.GroupBadges.EditGroupBadge(groupID, badgeID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabGroupBadgeRead(d, meta)
+	return resourceGitlabGroupBadgeRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupBadgeDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupBadgeDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	ids := strings.Split(d.Id(), ":")
 	groupID := ids[0]
 	badgeID, err := strconv.Atoi(ids[1])
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab group badge %s/%d", groupID, badgeID)
 
-	_, err = client.GroupBadges.DeleteGroupBadge(groupID, badgeID)
-	return err
+	_, err = client.GroupBadges.DeleteGroupBadge(groupID, badgeID, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func resourceGitlabGroupBadgeSetToState(d *schema.ResourceData, badge *gitlab.GroupBadge, groupID *string) {

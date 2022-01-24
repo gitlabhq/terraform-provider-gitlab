@@ -1,18 +1,20 @@
 package gitlab
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
 func dataSourceGitlabProject() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabProjectRead,
+		ReadContext: dataSourceGitlabProjectRead,
 
 		Schema: map[string]*schema.Schema{
 			"id": {
@@ -156,16 +158,16 @@ func dataSourceGitlabProject() *schema.Resource {
 	}
 }
 
-func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	log.Printf("[INFO] Reading Gitlab project")
 
 	v, _ := d.GetOk("id")
 
-	found, _, err := client.Projects.GetProject(v, nil)
+	found, _, err := client.Projects.GetProject(v, nil, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", found.ID))
@@ -191,12 +193,12 @@ func dataSourceGitlabProjectRead(d *schema.ResourceData, meta interface{}) error
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 
-	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id())
+	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id(), gitlab.WithContext(ctx))
 	var httpError *gitlab.ErrorResponse
 	if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
 		log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
 	} else if err != nil {
-		return fmt.Errorf("Failed to get push rules for project %q: %w", d.Id(), err)
+		return diag.Errorf("Failed to get push rules for project %q: %v", d.Id(), err)
 	}
 
 	d.Set("push_rules", flattenProjectPushRules(pushRules)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue

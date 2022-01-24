@@ -1,24 +1,25 @@
 package gitlab
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectVariable() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabProjectVariableCreate,
-		Read:   resourceGitlabProjectVariableRead,
-		Update: resourceGitlabProjectVariableUpdate,
-		Delete: resourceGitlabProjectVariableDelete,
+		CreateContext: resourceGitlabProjectVariableCreate,
+		ReadContext:   resourceGitlabProjectVariableRead,
+		UpdateContext: resourceGitlabProjectVariableUpdate,
+		DeleteContext: resourceGitlabProjectVariableDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -67,7 +68,7 @@ func resourceGitlabProjectVariable() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectVariableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	project := d.Get("project").(string)
@@ -91,17 +92,17 @@ func resourceGitlabProjectVariableCreate(d *schema.ResourceData, meta interface{
 
 	log.Printf("[DEBUG] create gitlab project variable %q", id)
 
-	_, _, err := client.ProjectVariables.CreateVariable(project, &options)
+	_, _, err := client.ProjectVariables.CreateVariable(project, &options, gitlab.WithContext(ctx))
 	if err != nil {
 		return augmentProjectVariableClientError(d, err)
 	}
 
 	d.SetId(id)
 
-	return resourceGitlabProjectVariableRead(d, meta)
+	return resourceGitlabProjectVariableRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectVariableRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	var (
@@ -123,12 +124,12 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 		key = parts[1]
 		environmentScope = parts[2]
 	default:
-		return fmt.Errorf(`Failed to parse project variable ID %q: expected format project:key or project:key:environment_scope`, d.Id())
+		return diag.Errorf(`Failed to parse project variable ID %q: expected format project:key or project:key:environment_scope`, d.Id())
 	}
 
 	log.Printf("[DEBUG] read gitlab project variable %q", d.Id())
 
-	v, err := getProjectVariable(client, project, key, environmentScope)
+	v, err := getProjectVariable(ctx, client, project, key, environmentScope)
 	if err != nil {
 		if errors.Is(err, errProjectVariableNotExist) {
 			log.Printf("[DEBUG] read gitlab project variable %q was not found", d.Id())
@@ -148,7 +149,7 @@ func resourceGitlabProjectVariableRead(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectVariableUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	project := d.Get("project").(string)
@@ -168,15 +169,15 @@ func resourceGitlabProjectVariableUpdate(d *schema.ResourceData, meta interface{
 	}
 	log.Printf("[DEBUG] update gitlab project variable %q", d.Id())
 
-	_, _, err := client.ProjectVariables.UpdateVariable(project, key, options, withEnvironmentScopeFilter(environmentScope))
+	_, _, err := client.ProjectVariables.UpdateVariable(project, key, options, withEnvironmentScopeFilter(ctx, environmentScope))
 	if err != nil {
 		return augmentProjectVariableClientError(d, err)
 	}
 
-	return resourceGitlabProjectVariableRead(d, meta)
+	return resourceGitlabProjectVariableRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectVariableDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectVariableDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	key := d.Get("key").(string)
@@ -187,19 +188,23 @@ func resourceGitlabProjectVariableDelete(d *schema.ResourceData, meta interface{
 	// but it will be ignored in prior versions, causing nondeterministic destroy behavior when
 	// destroying or updating scoped variables.
 	// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209
-	_, err := client.ProjectVariables.RemoveVariable(project, key, withEnvironmentScopeFilter(environmentScope))
+	_, err := client.ProjectVariables.RemoveVariable(project, key, withEnvironmentScopeFilter(ctx, environmentScope))
 	return augmentProjectVariableClientError(d, err)
 }
 
-func augmentProjectVariableClientError(d *schema.ResourceData, err error) error {
+func augmentProjectVariableClientError(d *schema.ResourceData, err error) diag.Diagnostics {
 	// Masked values will commonly error due to their strict requirements, and the error message from the GitLab API is not very informative,
 	// so we return a custom error message in this case.
 	if d.Get("masked").(bool) && isInvalidValueError(err) {
 		log.Printf("[ERROR] %v", err)
-		return errors.New("Invalid value for a masked variable. Check the masked variable requirements: https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements")
+		return diag.Errorf("Invalid value for a masked variable. Check the masked variable requirements: https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements")
 	}
 
-	return err
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func isInvalidValueError(err error) bool {
@@ -210,8 +215,9 @@ func isInvalidValueError(err error) bool {
 		strings.Contains(httpErr.Message, "invalid")
 }
 
-func withEnvironmentScopeFilter(environmentScope string) gitlab.RequestOptionFunc {
+func withEnvironmentScopeFilter(ctx context.Context, environmentScope string) gitlab.RequestOptionFunc {
 	return func(req *retryablehttp.Request) error {
+		*req = *req.WithContext(ctx)
 		query, err := url.ParseQuery(req.Request.URL.RawQuery)
 		if err != nil {
 			return err
@@ -224,14 +230,14 @@ func withEnvironmentScopeFilter(environmentScope string) gitlab.RequestOptionFun
 
 var errProjectVariableNotExist = errors.New("project variable does not exist")
 
-func getProjectVariable(client *gitlab.Client, project interface{}, key, environmentScope string) (*gitlab.ProjectVariable, error) {
+func getProjectVariable(ctx context.Context, client *gitlab.Client, project interface{}, key, environmentScope string) (*gitlab.ProjectVariable, error) {
 	// List and filter variables manually to support GitLab versions < v13.4 (2020-08-22)
 	// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209
 
 	page := 1
 
 	for {
-		projectVariables, resp, err := client.ProjectVariables.ListVariables(project, &gitlab.ListProjectVariablesOptions{Page: page})
+		projectVariables, resp, err := client.ProjectVariables.ListVariables(project, &gitlab.ListProjectVariablesOptions{Page: page}, gitlab.WithContext(ctx))
 		if err != nil {
 			return nil, err
 		}

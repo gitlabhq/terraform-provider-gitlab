@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
@@ -13,10 +15,10 @@ import (
 
 func resourceGitlabInstanceCluster() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabInstanceClusterCreate,
-		Read:   resourceGitlabInstanceClusterRead,
-		Update: resourceGitlabInstanceClusterUpdate,
-		Delete: resourceGitlabInstanceClusterDelete,
+		CreateContext: resourceGitlabInstanceClusterCreate,
+		ReadContext:   resourceGitlabInstanceClusterRead,
+		UpdateContext: resourceGitlabInstanceClusterUpdate,
+		DeleteContext: resourceGitlabInstanceClusterDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -98,7 +100,7 @@ func resourceGitlabInstanceCluster() *schema.Resource {
 	}
 }
 
-func resourceGitlabInstanceClusterCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	pk := gitlab.AddPlatformKubernetesOptions{
@@ -135,36 +137,36 @@ func resourceGitlabInstanceClusterCreate(d *schema.ResourceData, meta interface{
 
 	log.Printf("[DEBUG] create gitlab instance cluster %q", *options.Name)
 
-	cluster, _, err := client.InstanceCluster.AddCluster(options)
+	cluster, _, err := client.InstanceCluster.AddCluster(options, gitlab.WithContext(ctx))
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	clusterIdString := fmt.Sprintf("%d", cluster.ID)
 	d.SetId(clusterIdString)
 
-	return resourceGitlabInstanceClusterRead(d, meta)
+	return resourceGitlabInstanceClusterRead(ctx, d, meta)
 }
 
-func resourceGitlabInstanceClusterRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceClusterRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	clusterId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab instance cluster %d", clusterId)
 
-	cluster, _, err := client.InstanceCluster.GetCluster(clusterId)
+	cluster, _, err := client.InstanceCluster.GetCluster(clusterId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab instance cluster not found %d", clusterId)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("name", cluster.Name)
@@ -189,12 +191,12 @@ func resourceGitlabInstanceClusterRead(d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceGitlabInstanceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceClusterUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	clusterId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	options := &gitlab.EditClusterOptions{}
@@ -239,25 +241,28 @@ func resourceGitlabInstanceClusterUpdate(d *schema.ResourceData, meta interface{
 
 	if *options != (gitlab.EditClusterOptions{}) {
 		log.Printf("[DEBUG] update gitlab instance cluster %d", clusterId)
-		_, _, err := client.InstanceCluster.EditCluster(clusterId, options)
+		_, _, err := client.InstanceCluster.EditCluster(clusterId, options, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
-	return resourceGitlabInstanceClusterRead(d, meta)
+	return resourceGitlabInstanceClusterRead(ctx, d, meta)
 }
 
-func resourceGitlabInstanceClusterDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabInstanceClusterDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	clusterId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] delete gitlab instance cluster %d", clusterId)
 
-	_, err = client.InstanceCluster.DeleteCluster(clusterId)
+	_, err = client.InstanceCluster.DeleteCluster(clusterId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return err
+	return nil
 }

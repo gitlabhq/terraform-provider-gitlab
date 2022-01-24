@@ -1,20 +1,21 @@
 package gitlab
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabServiceMicrosoftTeamsCreate,
-		Read:   resourceGitlabServiceMicrosoftTeamsRead,
-		Update: resourceGitlabServiceMicrosoftTeamsUpdate,
-		Delete: resourceGitlabServiceMicrosoftTeamsDelete,
+		CreateContext: resourceGitlabServiceMicrosoftTeamsCreate,
+		ReadContext:   resourceGitlabServiceMicrosoftTeamsRead,
+		UpdateContext: resourceGitlabServiceMicrosoftTeamsUpdate,
+		DeleteContext: resourceGitlabServiceMicrosoftTeamsDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -90,7 +91,7 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 	}
 }
 
-func resourceGitlabServiceMicrosoftTeamsCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceMicrosoftTeamsCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	d.SetId(project)
@@ -112,32 +113,32 @@ func resourceGitlabServiceMicrosoftTeamsCreate(d *schema.ResourceData, meta inte
 
 	log.Printf("[DEBUG] Create Gitlab Microsoft Teams service")
 
-	if _, err := client.Services.SetMicrosoftTeamsService(project, options); err != nil {
-		return fmt.Errorf("couldn't create Gitlab Microsoft Teams service: %w", err)
+	if _, err := client.Services.SetMicrosoftTeamsService(project, options, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("couldn't create Gitlab Microsoft Teams service: %v", err)
 	}
 
-	return resourceGitlabServiceMicrosoftTeamsRead(d, meta)
+	return resourceGitlabServiceMicrosoftTeamsRead(ctx, d, meta)
 }
 
-func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceMicrosoftTeamsRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
-	p, resp, err := client.Projects.GetProject(project, nil)
+	p, resp, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] Removing Gitlab Microsoft Teams service %s because project %s not found", d.Id(), p.Name)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Read Gitlab Microsoft Teams service for project %s", d.Id())
 
-	teamsService, _, err := client.Services.GetMicrosoftTeamsService(project)
+	teamsService, _, err := client.Services.GetMicrosoftTeamsService(project, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("project", project)
@@ -160,16 +161,20 @@ func resourceGitlabServiceMicrosoftTeamsRead(d *schema.ResourceData, meta interf
 	return nil
 }
 
-func resourceGitlabServiceMicrosoftTeamsUpdate(d *schema.ResourceData, meta interface{}) error {
-	return resourceGitlabServiceMicrosoftTeamsCreate(d, meta)
+func resourceGitlabServiceMicrosoftTeamsUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	return resourceGitlabServiceMicrosoftTeamsCreate(ctx, d, meta)
 }
 
-func resourceGitlabServiceMicrosoftTeamsDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServiceMicrosoftTeamsDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
 	log.Printf("[DEBUG] Delete Gitlab Microsoft Teams service for project %s", d.Id())
 
-	_, err := client.Services.DeleteMicrosoftTeamsService(project)
-	return err
+	_, err := client.Services.DeleteMicrosoftTeamsService(project, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return diag.FromErr(err)
 }

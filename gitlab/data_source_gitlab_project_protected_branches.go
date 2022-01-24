@@ -1,9 +1,11 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/hashstructure"
 	"github.com/xanzy/go-gitlab"
@@ -11,7 +13,7 @@ import (
 
 func dataSourceGitlabProjectProtectedBranches() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabProjectProtectedBranchesRead,
+		ReadContext: dataSourceGitlabProjectProtectedBranchesRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
 				Type:        schema.TypeString,
@@ -58,16 +60,16 @@ type stateProtectedBranch struct {
 	CodeOwnerApprovalRequired bool                           `json:"code_owner_approval_required,omitempty" mapstructure:"code_owner_approval_required,omitempty"`
 }
 
-func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	log.Printf("[INFO] Reading Gitlab protected branch")
 
 	project := d.Get("project_id")
 
-	projectObject, _, err := client.Projects.GetProject(project, &gitlab.GetProjectOptions{})
+	projectObject, _, err := client.Projects.GetProject(project, &gitlab.GetProjectOptions{}, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	allProtectedBranches := make([]stateProtectedBranch, 0)
@@ -75,9 +77,9 @@ func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta i
 	opts := &gitlab.ListProtectedBranchesOptions{}
 	for opts.Page = 0; opts.Page != totalPages; opts.Page++ {
 		// Get protected branch by project ID/path and branch name
-		pbs, resp, err := client.ProtectedBranches.ListProtectedBranches(project, opts)
+		pbs, resp, err := client.ProtectedBranches.ListProtectedBranches(project, opts, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		totalPages = resp.TotalPages
 		for _, pb := range pbs {
@@ -94,12 +96,12 @@ func dataSourceGitlabProjectProtectedBranchesRead(d *schema.ResourceData, meta i
 
 	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
 	if err := d.Set("protected_branches", allProtectedBranches); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	h, err := hashstructure.Hash(*opts, nil)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d-%d", projectObject.ID, h))

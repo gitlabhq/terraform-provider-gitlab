@@ -1,23 +1,25 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabPipelineSchedule() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabPipelineScheduleCreate,
-		Read:   resourceGitlabPipelineScheduleRead,
-		Update: resourceGitlabPipelineScheduleUpdate,
-		Delete: resourceGitlabPipelineScheduleDelete,
+		CreateContext: resourceGitlabPipelineScheduleCreate,
+		ReadContext:   resourceGitlabPipelineScheduleRead,
+		UpdateContext: resourceGitlabPipelineScheduleUpdate,
+		DeleteContext: resourceGitlabPipelineScheduleDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabPipelineScheduleStateImporter,
+			StateContext: resourceGitlabPipelineScheduleStateImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -52,7 +54,7 @@ func resourceGitlabPipelineSchedule() *schema.Resource {
 	}
 }
 
-func resourceGitlabPipelineScheduleCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabPipelineScheduleCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.CreatePipelineScheduleOptions{
@@ -65,23 +67,23 @@ func resourceGitlabPipelineScheduleCreate(d *schema.ResourceData, meta interface
 
 	log.Printf("[DEBUG] create gitlab PipelineSchedule %s", *options.Description)
 
-	PipelineSchedule, _, err := client.PipelineSchedules.CreatePipelineSchedule(project, options)
+	PipelineSchedule, _, err := client.PipelineSchedules.CreatePipelineSchedule(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(PipelineSchedule.ID))
 
-	return resourceGitlabPipelineScheduleRead(d, meta)
+	return resourceGitlabPipelineScheduleRead(ctx, d, meta)
 }
 
-func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabPipelineScheduleRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	pipelineScheduleID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.Errorf("%s cannot be converted to int", d.Id())
 	}
 
 	log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d", project, pipelineScheduleID)
@@ -93,9 +95,9 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 
 	found := false
 	for {
-		pipelineSchedules, resp, err := client.PipelineSchedules.ListPipelineSchedules(project, opt)
+		pipelineSchedules, resp, err := client.PipelineSchedules.ListPipelineSchedules(project, opt, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 		for _, pipelineSchedule := range pipelineSchedules {
 			if pipelineSchedule.ID == pipelineScheduleID {
@@ -124,7 +126,7 @@ func resourceGitlabPipelineScheduleRead(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceGitlabPipelineScheduleUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabPipelineScheduleUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.EditPipelineScheduleOptions{
@@ -138,7 +140,7 @@ func resourceGitlabPipelineScheduleUpdate(d *schema.ResourceData, meta interface
 	pipelineScheduleID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.Errorf("%s cannot be converted to int", d.Id())
 	}
 
 	if d.HasChange("description") {
@@ -163,15 +165,15 @@ func resourceGitlabPipelineScheduleUpdate(d *schema.ResourceData, meta interface
 
 	log.Printf("[DEBUG] update gitlab PipelineSchedule %s", d.Id())
 
-	_, _, err = client.PipelineSchedules.EditPipelineSchedule(project, pipelineScheduleID, options)
+	_, _, err = client.PipelineSchedules.EditPipelineSchedule(project, pipelineScheduleID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabPipelineScheduleRead(d, meta)
+	return resourceGitlabPipelineScheduleRead(ctx, d, meta)
 }
 
-func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabPipelineScheduleDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	log.Printf("[DEBUG] Delete gitlab PipelineSchedule %s", d.Id())
@@ -179,16 +181,16 @@ func resourceGitlabPipelineScheduleDelete(d *schema.ResourceData, meta interface
 	pipelineScheduleID, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.Errorf("%s cannot be converted to int", d.Id())
 	}
 
-	if _, err := client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID); err != nil {
-		return fmt.Errorf("%s failed to delete pipeline schedule: %s", d.Id(), err.Error())
+	if _, err = client.PipelineSchedules.DeletePipelineSchedule(project, pipelineScheduleID, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("failed to delete pipeline schedule %q: %v", d.Id(), err)
 	}
-	return err
+	return nil
 }
 
-func resourceGitlabPipelineScheduleStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabPipelineScheduleStateImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 2 {
 		d.SetId("")

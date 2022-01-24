@@ -1,11 +1,13 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -18,10 +20,10 @@ func resourceGitlabProjectMembership() *schema.Resource {
 		}
 	}
 	return &schema.Resource{
-		Create: resourceGitlabProjectMembershipCreate,
-		Read:   resourceGitlabProjectMembershipRead,
-		Update: resourceGitlabProjectMembershipUpdate,
-		Delete: resourceGitlabProjectMembershipDelete,
+		CreateContext: resourceGitlabProjectMembershipCreate,
+		ReadContext:   resourceGitlabProjectMembershipRead,
+		UpdateContext: resourceGitlabProjectMembershipUpdate,
+		DeleteContext: resourceGitlabProjectMembershipDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -46,7 +48,7 @@ func resourceGitlabProjectMembership() *schema.Resource {
 	}
 }
 
-func resourceGitlabProjectMembershipCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMembershipCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	userId := d.Get("user_id").(int)
@@ -59,33 +61,33 @@ func resourceGitlabProjectMembershipCreate(d *schema.ResourceData, meta interfac
 	}
 	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.UserID, projectId)
 
-	_, _, err := client.ProjectMembers.AddProjectMember(projectId, options)
+	_, _, err := client.ProjectMembers.AddProjectMember(projectId, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	userIdString := strconv.Itoa(userId)
 	d.SetId(buildTwoPartID(&projectId, &userIdString))
-	return resourceGitlabProjectMembershipRead(d, meta)
+	return resourceGitlabProjectMembershipRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectMembershipRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMembershipRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	id := d.Id()
 	log.Printf("[DEBUG] read gitlab project projectMember %s", id)
 
-	projectId, userId, e := projectIdAndUserIdFromId(id)
-	if e != nil {
-		return e
+	projectId, userId, err := projectIdAndUserIdFromId(id)
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
-	projectMember, resp, err := client.ProjectMembers.GetProjectMember(projectId, userId)
+	projectMember, resp, err := client.ProjectMembers.GetProjectMember(projectId, userId, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab project membership for %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	resourceGitlabProjectMembershipSetToState(d, projectMember, &projectId)
@@ -104,7 +106,7 @@ func projectIdAndUserIdFromId(id string) (string, int, error) {
 	return projectId, userId, e
 }
 
-func resourceGitlabProjectMembershipUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMembershipUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	userId := d.Get("user_id").(int)
@@ -116,26 +118,30 @@ func resourceGitlabProjectMembershipUpdate(d *schema.ResourceData, meta interfac
 	}
 	log.Printf("[DEBUG] update gitlab project membership %v for %s", userId, projectId)
 
-	_, _, err := client.ProjectMembers.EditProjectMember(projectId, userId, &options)
+	_, _, err := client.ProjectMembers.EditProjectMember(projectId, userId, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return resourceGitlabProjectMembershipRead(d, meta)
+	return resourceGitlabProjectMembershipRead(ctx, d, meta)
 }
 
-func resourceGitlabProjectMembershipDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabProjectMembershipDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	id := d.Id()
-	projectId, userId, e := projectIdAndUserIdFromId(id)
-	if e != nil {
-		return e
+	projectId, userId, err := projectIdAndUserIdFromId(id)
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab project membership %v for %s", userId, projectId)
 
-	_, err := client.ProjectMembers.DeleteProjectMember(projectId, userId)
-	return err
+	_, err = client.ProjectMembers.DeleteProjectMember(projectId, userId, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMember *gitlab.ProjectMember, projectId *string) {

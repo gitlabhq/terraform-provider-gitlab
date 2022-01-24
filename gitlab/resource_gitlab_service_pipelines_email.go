@@ -1,9 +1,11 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -11,10 +13,10 @@ import (
 
 func resourceGitlabServicePipelinesEmail() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabServicePipelinesEmailCreate,
-		Read:   resourceGitlabServicePipelinesEmailRead,
-		Update: resourceGitlabServicePipelinesEmailCreate,
-		Delete: resourceGitlabServicePipelinesEmailDelete,
+		CreateContext: resourceGitlabServicePipelinesEmailCreate,
+		ReadContext:   resourceGitlabServicePipelinesEmailRead,
+		UpdateContext: resourceGitlabServicePipelinesEmailCreate,
+		DeleteContext: resourceGitlabServicePipelinesEmailDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -51,7 +53,7 @@ func resourceGitlabServicePipelinesEmailSetToState(d *schema.ResourceData, servi
 	d.Set("branches_to_be_notified", service.Properties.BranchesToBeNotified)
 }
 
-func resourceGitlabServicePipelinesEmailCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServicePipelinesEmailCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	d.SetId(project)
@@ -63,28 +65,28 @@ func resourceGitlabServicePipelinesEmailCreate(d *schema.ResourceData, meta inte
 
 	log.Printf("[DEBUG] create gitlab pipelines emails service for project %s", project)
 
-	_, err := client.Services.SetPipelinesEmailService(project, options)
+	_, err := client.Services.SetPipelinesEmailService(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabServicePipelinesEmailRead(d, meta)
+	return resourceGitlabServicePipelinesEmailRead(ctx, d, meta)
 }
 
-func resourceGitlabServicePipelinesEmailRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServicePipelinesEmailRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
 	log.Printf("[DEBUG] read gitlab pipelines emails service for project %s", project)
 
-	service, _, err := client.Services.GetPipelinesEmailService(project)
+	service, _, err := client.Services.GetPipelinesEmailService(project, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab pipelines emails service not found for project %s", project)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("project", project)
@@ -92,12 +94,16 @@ func resourceGitlabServicePipelinesEmailRead(d *schema.ResourceData, meta interf
 	return nil
 }
 
-func resourceGitlabServicePipelinesEmailDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabServicePipelinesEmailDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
 	log.Printf("[DEBUG] delete gitlab pipelines email service for project %s", project)
 
-	_, err := client.Services.DeletePipelinesEmailService(project)
-	return err
+	_, err := client.Services.DeletePipelinesEmailService(project, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }

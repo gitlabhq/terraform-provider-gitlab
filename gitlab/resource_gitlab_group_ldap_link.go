@@ -1,11 +1,11 @@
 package gitlab
 
 import (
-	"errors"
-	"fmt"
+	"context"
 	"log"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -17,9 +17,9 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 	}
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Create: resourceGitlabGroupLdapLinkCreate,
-		Read:   resourceGitlabGroupLdapLinkRead,
-		Delete: resourceGitlabGroupLdapLinkDelete,
+		CreateContext: resourceGitlabGroupLdapLinkCreate,
+		ReadContext:   resourceGitlabGroupLdapLinkRead,
+		DeleteContext: resourceGitlabGroupLdapLinkDelete,
 
 		Schema: map[string]*schema.Schema{
 			"group_id": {
@@ -55,7 +55,7 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 	}
 }
 
-func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLdapLinkCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	groupId := d.Get("group_id").(string)
@@ -71,29 +71,29 @@ func resourceGitlabGroupLdapLinkCreate(d *schema.ResourceData, meta interface{})
 	}
 
 	if force {
-		if err := resourceGitlabGroupLdapLinkDelete(d, meta); err != nil {
+		if err := resourceGitlabGroupLdapLinkDelete(ctx, d, meta); err != nil {
 			return err
 		}
 	}
 
 	log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
-	LdapLink, _, err := client.Groups.AddGroupLDAPLink(groupId, options)
+	LdapLink, _, err := client.Groups.AddGroupLDAPLink(groupId, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(buildTwoPartID(&LdapLink.Provider, &LdapLink.CN))
 
-	return resourceGitlabGroupLdapLinkRead(d, meta)
+	return resourceGitlabGroupLdapLinkRead(ctx, d, meta)
 }
 
-func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLdapLinkRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	groupId := d.Get("group_id").(string)
 
 	// Try to fetch all group links from GitLab
 	log.Printf("[DEBUG] Read GitLab group LdapLinks %s", groupId)
-	ldapLinks, _, err := client.Groups.ListGroupLDAPLinks(groupId, nil)
+	ldapLinks, _, err := client.Groups.ListGroupLDAPLinks(groupId, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		// The read/GET API wasn't implemented in GitLab until version 12.8 (March 2020, well after the add and delete APIs).
 		// If we 404, assume GitLab is at an older version and take things on faith.
@@ -102,10 +102,10 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 			if err.(*gitlab.ErrorResponse).Response.StatusCode == 404 { // nolint // TODO: Resolve this golangci-lint issue: S1034(related information): could eliminate this type assertion (gosimple)
 				log.Printf("[WARNING] This GitLab instance doesn't have the GET API for group_ldap_sync.  Please upgrade to 12.8 or later for best results.")
 			} else {
-				return err
+				return diag.FromErr(err)
 			}
 		default:
-			return err
+			return diag.FromErr(err)
 		}
 	}
 
@@ -126,21 +126,21 @@ func resourceGitlabGroupLdapLinkRead(d *schema.ResourceData, meta interface{}) e
 
 		if !found {
 			d.SetId("")
-			return errors.New(fmt.Sprintf("LdapLink %s does not exist.", d.Id())) // nolint // TODO: Resolve this golangci-lint issue: S1028: should use fmt.Errorf(...) instead of errors.New(fmt.Sprintf(...)) (gosimple)
+			return diag.Errorf("LdapLink %s does not exist.", d.Id())
 		}
 	}
 
 	return nil
 }
 
-func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupLdapLinkDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
 	ldap_provider := d.Get("ldap_provider").(string)
 
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
-	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn)
+	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn, gitlab.WithContext(ctx))
 	if err != nil {
 		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
@@ -148,10 +148,10 @@ func resourceGitlabGroupLdapLinkDelete(d *schema.ResourceData, meta interface{})
 			if strings.Contains(string(err.(*gitlab.ErrorResponse).Message), "Linked LDAP group not found") { // nolint // TODO: Resolve this golangci-lint issue: S1034(related information): could eliminate this type assertion (gosimple)
 				log.Printf("[WARNING] %s", err)
 			} else {
-				return err
+				return diag.FromErr(err)
 			}
 		default:
-			return err
+			return diag.FromErr(err)
 		}
 	}
 

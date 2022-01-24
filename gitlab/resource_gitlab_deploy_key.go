@@ -1,22 +1,24 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabDeployKey() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabDeployKeyCreate,
-		Read:   resourceGitlabDeployKeyRead,
-		Delete: resourceGitlabDeployKeyDelete,
+		CreateContext: resourceGitlabDeployKeyCreate,
+		ReadContext:   resourceGitlabDeployKeyRead,
+		DeleteContext: resourceGitlabDeployKeyDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabDeployKeyStateImporter,
+			StateContext: resourceGitlabDeployKeyStateImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -48,7 +50,7 @@ func resourceGitlabDeployKey() *schema.Resource {
 	}
 }
 
-func resourceGitlabDeployKeyCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabDeployKeyCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.AddDeployKeyOptions{
@@ -59,33 +61,33 @@ func resourceGitlabDeployKeyCreate(d *schema.ResourceData, meta interface{}) err
 
 	log.Printf("[DEBUG] create gitlab deployment key %s", *options.Title)
 
-	deployKey, _, err := client.DeployKeys.AddDeployKey(project, options)
+	deployKey, _, err := client.DeployKeys.AddDeployKey(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(fmt.Sprintf("%d", deployKey.ID))
 
-	return resourceGitlabDeployKeyRead(d, meta)
+	return resourceGitlabDeployKeyRead(ctx, d, meta)
 }
 
-func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabDeployKeyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	deployKeyID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] read gitlab deploy key %s/%d", project, deployKeyID)
 
-	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID)
+	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab deploy key not found %s/%d", project, deployKeyID)
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set("title", deployKey.Title)
@@ -94,20 +96,25 @@ func resourceGitlabDeployKeyRead(d *schema.ResourceData, meta interface{}) error
 	return nil
 }
 
-func resourceGitlabDeployKeyDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabDeployKeyDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	deployKeyID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] Delete gitlab deploy key %s", d.Id())
 
-	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID)
-	return err
+	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
-func resourceGitlabDeployKeyStateImporter(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+func resourceGitlabDeployKeyStateImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 2 {
 		d.SetId("")
