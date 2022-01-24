@@ -7,67 +7,71 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabProjectMirror_basic(t *testing.T) {
-	var hook gitlab.ProjectMirror
-	rInt := acctest.RandInt()
+	ctx := testAccGitlabProjectStart(t)
+	var miror gitlab.ProjectMirror
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{
-			// Create a project and hook with default options
+			// Create with default options
 			{
-				Config: testAccGitlabProjectMirrorConfig(rInt),
+				Config: testAccGitlabProjectMirrorConfig(ctx.project.PathWithNamespace),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &hook),
-					testAccCheckGitlabProjectMirrorAttributes(&hook, &testAccGitlabProjectMirrorExpectedAttributes{
-						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
+					testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &miror),
+					testAccCheckGitlabProjectMirrorAttributes(&miror, &testAccGitlabProjectMirrorExpectedAttributes{
+						URL:                   "https://example.com/mirror",
 						Enabled:               true,
 						OnlyProtectedBranches: true,
 						KeepDivergentRefs:     true,
 					}),
 				),
 			},
-			// Update the project hook to toggle all the values to their inverse
+			// Update to toggle all the values to their inverse
 			{
-				Config: testAccGitlabProjectMirrorUpdateConfig(rInt),
+				Config: testAccGitlabProjectMirrorUpdateConfig(ctx.project.PathWithNamespace),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &hook),
-					testAccCheckGitlabProjectMirrorAttributes(&hook, &testAccGitlabProjectMirrorExpectedAttributes{
-						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
+					testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &miror),
+					testAccCheckGitlabProjectMirrorAttributes(&miror, &testAccGitlabProjectMirrorExpectedAttributes{
+						URL:                   "https://example.com/mirror",
 						Enabled:               false,
 						OnlyProtectedBranches: false,
 						KeepDivergentRefs:     false,
 					}),
 				),
 			},
-			// Update the project hook to toggle the options back
+			// Update to toggle the options back
 			{
-				Config: testAccGitlabProjectMirrorConfig(rInt),
+				Config: testAccGitlabProjectMirrorConfig(ctx.project.PathWithNamespace),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &hook),
-					testAccCheckGitlabProjectMirrorAttributes(&hook, &testAccGitlabProjectMirrorExpectedAttributes{
-						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
+					testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &miror),
+					testAccCheckGitlabProjectMirrorAttributes(&miror, &testAccGitlabProjectMirrorExpectedAttributes{
+						URL:                   "https://example.com/mirror",
 						Enabled:               true,
 						OnlyProtectedBranches: true,
 						KeepDivergentRefs:     true,
 					}),
 				),
 			},
+			// Import
+			{
+				ResourceName:      "gitlab_project_mirror.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
 
 func TestAccGitlabProjectMirror_withPassword(t *testing.T) {
-	//var mirror gitlab.ProjectMirror
-	rInt := acctest.RandInt()
+	ctx := testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
@@ -76,44 +80,7 @@ func TestAccGitlabProjectMirror_withPassword(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and mirror with a username / password.
 			{
-				Config: testAccGitlabProjectMirrorConfigWithPassword(rInt),
-			},
-		},
-	})
-}
-
-func TestAccGitlabProjectMirror_withCount(t *testing.T) {
-	//var mirror gitlab.ProjectMirror
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectMirrorDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabProjectMirrorConfigWithCount(rInt),
-			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabProjectMirror_import(t *testing.T) {
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectMirrorDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabProjectMirrorConfig(rInt),
-			},
-			{
-				ResourceName:      "gitlab_project_mirror.foo",
-				ImportState:       true,
-				ImportStateVerify: true,
+				Config: testAccGitlabProjectMirrorConfigWithPassword(ctx.project.PathWithNamespace),
 			},
 		},
 	})
@@ -180,101 +147,42 @@ func testAccCheckGitlabProjectMirrorAttributes(mirror *gitlab.ProjectMirror, wan
 }
 
 func testAccCheckGitlabProjectMirrorDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
-			continue
-		}
-
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
-		if err == nil {
-			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
-				}
-			}
-		}
-		if resp != nil && resp.StatusCode != 404 {
-			return err
-		}
-		return nil
+	var mirror gitlab.ProjectMirror
+	if err := testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &mirror)(s); err != nil {
+		return err
+	}
+	if mirror.Enabled {
+		return errors.New("mirror is enabled")
 	}
 	return nil
 }
 
-func testAccGitlabProjectMirrorConfig(rInt int) string {
+func testAccGitlabProjectMirrorConfig(project string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
 resource "gitlab_project_mirror" "foo" {
-  project = "${gitlab_project.foo.id}"
-  url = "https://example.com/hook-%d"
+  project = %q
+  url = "https://example.com/mirror"
 }
-	`, rInt, rInt)
+	`, project)
 }
 
-func testAccGitlabProjectMirrorConfigWithCount(rInt int) string {
+func testAccGitlabProjectMirrorConfigWithPassword(project string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
 resource "gitlab_project_mirror" "foo" {
-  project = "${gitlab_project.foo.id}"
-  url = "https://foo:%d@example.com/mirror-%d"
-  count = 40
+  project = %q
+  url = "https://foo:bar@example.com/mirror"
 }
-	`, rInt, rInt, rInt)
+	`, project)
 }
 
-func testAccGitlabProjectMirrorConfigWithPassword(rInt int) string {
+func testAccGitlabProjectMirrorUpdateConfig(project string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
 resource "gitlab_project_mirror" "foo" {
-  project = "${gitlab_project.foo.id}"
-  url = "https://foo:%d@example.com/mirror-%d"
-}
-	`, rInt, rInt, rInt)
-}
-
-func testAccGitlabProjectMirrorUpdateConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_project_mirror" "foo" {
-  project = "${gitlab_project.foo.id}"
-  url = "https://example.com/hook-%d"
+  project = %q
+  url = "https://example.com/mirror"
   enabled = false
   only_protected_branches = false
   keep_divergent_refs = false
 }
-	`, rInt, rInt)
+	`, project)
 }
