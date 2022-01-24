@@ -43,6 +43,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
+					"skip_confirmation",
 				},
 			},
 			// Update the user to change the name, email, projects_limit and more
@@ -68,6 +69,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
+					"skip_confirmation",
 				},
 			},
 			// Update the user to put the name back
@@ -92,6 +94,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
+					"skip_confirmation",
 				},
 			},
 			// Update the user to disable skip confirmation
@@ -116,6 +119,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
+					"skip_confirmation",
 				},
 			},
 			// Update the user to initial config
@@ -140,6 +144,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
+					"skip_confirmation",
 				},
 			},
 		},
@@ -171,6 +176,8 @@ func TestAccGitlabUser_password_reset(t *testing.T) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"password",
+					"reset_password",
+					"skip_confirmation",
 				},
 			},
 		},
