@@ -3,14 +3,14 @@ package gitlab
 import (
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/onsi/gomega"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/onsi/gomega"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -261,5 +261,55 @@ func testAccAddGroupMembers(t *testing.T, client *gitlab.Client, gid interface{}
 		if err != nil {
 			t.Fatalf("could not add test group member: %v", err)
 		}
+	}
+}
+
+// testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
+// acceptance test.
+type testAccGitlabProjectContext struct {
+	t       *testing.T
+	client  *gitlab.Client
+	project *gitlab.Project
+}
+
+// testAccGitlabProjectStart initializes the GitLab client and creates a test project. Remember to
+// call testAccGitlabProjectContext.finish() when finished with the testAccGitlabProjectContext.
+func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
+	if os.Getenv(resource.TestEnvVar) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+		return testAccGitlabProjectContext{}
+	}
+
+	var options []gitlab.ClientOptionFunc
+	baseURL := os.Getenv("GITLAB_BASE_URL")
+	if baseURL != "" {
+		options = append(options, gitlab.WithBaseURL(baseURL))
+	}
+
+	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"), options...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	project, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+		Name:        gitlab.String(acctest.RandomWithPrefix("acctest")),
+		Description: gitlab.String("Terraform acceptance tests"),
+		// So that acceptance tests can be run in a gitlab organization with no billing
+		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
+	})
+	if err != nil {
+		t.Fatalf("could not create test project: %v", err)
+	}
+
+	t.Cleanup(func() {
+		if _, err := client.Projects.DeleteProject(project.ID); err != nil {
+			t.Fatalf("could not delete test project: %v", err)
+		}
+	})
+
+	return testAccGitlabProjectContext{
+		t:       t,
+		client:  client,
+		project: project,
 	}
 }
