@@ -48,6 +48,10 @@ Importer: &schema.ResourceImporter{
 
 See the [importer state function docs](https://www.terraform.io/plugin/sdkv2/resources/import#importer-state-function) for more details.
 
+#### Documentation
+
+At the moment, documentation is handcrafted. Doc pages are located in [/docs](/docs). Please follow the [Terraform doc formatting guidelines](https://www.terraform.io/registry/providers/docs#format) for these pages. The [Terraform doc preview tool](https://registry.terraform.io/tools/doc-preview) is very helpful for previewing the markdown.
+
 ## Developing The Provider
 
 You'll first need [Go](http://www.golang.org) installed on your machine (version 1.14+ is *required*).
