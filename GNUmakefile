@@ -42,7 +42,7 @@ fmt:
 
 tfproviderlint:
 	go run github.com/bflad/tfproviderlint/cmd/tfproviderlintx \
-	-XAT001=false -XR003=false -XR005=false -XS001=false -XS002=false \
+	-XAT001=false -XR003=false -XS002=false \
 	./...
 
 lint: tfproviderlint
