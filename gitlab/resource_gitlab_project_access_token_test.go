@@ -86,7 +86,7 @@ func testAccCheckGitlabProjectAccessTokenDoesNotExist(pat *testAccGitlabProjectA
 	return func(s *terraform.State) error {
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gomega.InterceptGomegaFailure(func() {
+		return gomega.InterceptGomegaFailure(func() {
 			gomega.Eventually(func() error {
 				tokens, _, err := conn.ProjectAccessTokens.ListProjectAccessTokens(pat.project, nil)
 				if err != nil {
@@ -102,8 +102,6 @@ func testAccCheckGitlabProjectAccessTokenDoesNotExist(pat *testAccGitlabProjectA
 				return nil
 			}).WithTimeout(time.Second * 10).WithPolling(time.Second * 2).Should(gomega.Succeed())
 		})
-
-		return nil
 	}
 }
 
