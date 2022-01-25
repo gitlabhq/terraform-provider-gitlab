@@ -1,0 +1,96 @@
+name: test
+on: [push,pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - lint-golangci
+          - lint-tfprovider
+          - lint-examples-tf
+          - lint-examples-sh
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            bin
+          key: ${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}-include-tools
+      - run: make ${{ matrix.target }}
+
+  unit-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go: [1.16]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}-no-tools
+      - run: make test
+
+  generate-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            bin
+          key: ${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}-include-tools
+      - run: make generate
+      - name: Check generated files
+        run: |
+          [ -z "$(git status --short)" ] || { echo "Error: Files should have been generated:"; git status --short; echo "Diff:"; git diff HEAD; exit 1; }
+
+  acceptance-ce:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}-no-tools
+      - run: make testacc-up
+      - run: make testacc
+
+  acceptance-ee:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.repository_owner == 'gitlabhq'
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}-no-tools
+      - run: |
+          openssl version
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in Gitlab-license.encrypted -out Gitlab-license.txt -pass "pass:${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}"
+      - run: make testacc-up SERVICE=gitlab-ee
+      - run: make testacc

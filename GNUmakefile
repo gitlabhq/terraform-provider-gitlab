@@ -1,51 +1,68 @@
-TEST?=./gitlab
-SERVICE?=gitlab-ce
-GITLAB_TOKEN?=ACCTEST1234567890123
-GITLAB_BASE_URL?=http://127.0.0.1:8080/api/v4
-GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+default: reviewable
+
+reviewable: build fmt generate test ## Run before committing.
+
+GOBIN = $(shell pwd)/bin
+
+build: ## Build the provider binary.
+	go mod tidy
+	GOBIN=$(GOBIN) go install
+
+generate: tools ## Generate files to be checked in.
+	@# Setting empty environment variables to work around issue: https://github.com/hashicorp/terraform-plugin-docs/issues/12
+	GITLAB_TOKEN="" $(GOBIN)/tfplugindocs generate
 
 ifdef RUN
 TESTARGS += -test.run $(RUN)
 endif
 
-default: build
+test: ## Run unit tests.
+	go test $(TESTARGS) ./gitlab
 
-build:
-	go install
+TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
 
-test:
-	go test -i $(TEST) || exit 1
-	echo $(TEST) | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+fmt: tools terraform ## Format files and fix issues.
+	gofmt -w -s .
+	$(GOBIN)/golangci-lint run --fix
+	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) --fix ./...
+	$(TERRAFORM) fmt -recursive -list ./examples
+	$(GOBIN)/shfmt -l -s -w ./examples
 
-testacc-up:
+lint-golangci: tools ## Run golangci-lint linter (same as fmt but without modifying files).
+	$(GOBIN)/golangci-lint run
+
+lint-tfprovider: tools ## Run tfproviderlintx linter (same as fmt but without modifying files).
+	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) ./...
+
+lint-examples-tf: terraform ## Run terraform linter on examples (same as fmt but without modifying files).
+	$(TERRAFORM) fmt -recursive -check ./examples
+
+lint-examples-sh: tools ## Run shell linter on examples (same as fmt but without modifying files).
+	$(GOBIN)/shfmt -l -s -d ./examples
+
+SERVICE ?= gitlab-ce
+GITLAB_TOKEN ?= ACCTEST1234567890123
+GITLAB_BASE_URL ?= http://127.0.0.1:8080/api/v4
+
+testacc-up: ## Launch a GitLab instance.
 	docker-compose up -d $(SERVICE)
 	./scripts/await-healthy.sh
 
-testacc-down:
+testacc-down: ## Teardown a GitLab instance.
 	docker-compose down
 
-testacc:
-	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(TEST) $(TESTARGS) -timeout 40m
+testacc: ## Run acceptance tests against a GitLab instance.
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v ./gitlab $(TESTARGS) -timeout 40m
 
-vet:
-	@echo "go vet ."
-	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
-		echo ""; \
-		echo "Vet found suspicious constructs. Please check the reported constructs"; \
-		echo "and fix them if necessary before submitting the code for review."; \
-		exit 1; \
-	fi
+# TOOLS
+# Tool dependencies are installed into a project-local /bin folder.
 
-fmt:
-	gofmt -w $(GOFMT_FILES)
+.PHONY: tools
+tools:
+	GOBIN=$(GOBIN) go generate ./tools/tools.go
 
-tfproviderlint:
-	go run github.com/bflad/tfproviderlint/cmd/tfproviderlintx \
-	-XAT001=false -XR003=false -XS002=false \
-	./...
-
-lint: tfproviderlint
-	./scripts/lint.sh
-
-.PHONY: default build test testacc-up testacc-down testacc vet fmt tfproviderlint lint
+TERRAFORM = $(GOBIN)/terraform
+TERRAFORM_VERSION = v1.1.4
+terraform:
+	@# See https://github.com/hashicorp/terraform/issues/30356
+	@[ -f $(TERRAFORM) ] || { mkdir -p tmp; cd tmp; rm -rf terraform; git clone --branch $(TERRAFORM_VERSION) --depth 1 https://github.com/hashicorp/terraform.git; cd terraform; GOBIN=$(GOBIN) go install; cd ..; rm -rf terraform; }
