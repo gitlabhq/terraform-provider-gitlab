@@ -157,7 +157,11 @@ func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.Resourc
 				d.Set("created_at", projectAccessToken.CreatedAt.String())
 				d.Set("revoked", projectAccessToken.Revoked)
 				d.Set("user_id", projectAccessToken.UserID)
-				d.Set("scopes", projectAccessToken.Scopes) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+
+				err = d.Set("scopes", projectAccessToken.Scopes)
+				if err != nil {
+					return diag.FromErr(err)
+				}
 
 				return nil
 			}

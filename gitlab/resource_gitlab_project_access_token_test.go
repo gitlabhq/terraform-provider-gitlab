@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/onsi/gomega"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -85,18 +86,23 @@ func testAccCheckGitlabProjectAccessTokenDoesNotExist(pat *testAccGitlabProjectA
 	return func(s *terraform.State) error {
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		//Unfortunately we need to wait a bit, since the API call doesn't wait to destroy the PAT and returns immediately
-		time.Sleep(3 * time.Second) // lintignore: R018 // TODO: Resolve this tfproviderlint issue
-
-		tokens, _, err := conn.ProjectAccessTokens.ListProjectAccessTokens(pat.project, nil)
-		if err != nil {
-			return err
-		}
-
-		for _, token := range tokens {
-			if token.ID == pat.pat.ID {
-				return fmt.Errorf("Found token %d for project %s (tokens found: %d)", token.ID, pat.project, len(tokens))
+		result := gomega.Eventually(func() error {
+			tokens, _, err := conn.ProjectAccessTokens.ListProjectAccessTokens(pat.project, nil)
+			if err != nil {
+				return err
 			}
+
+			for _, token := range tokens {
+				if token.ID == pat.pat.ID {
+					return fmt.Errorf("Found token %d for project %s (tokens found: %d)", token.ID, pat.project, len(tokens))
+				}
+			}
+
+			return nil
+		}).WithTimeout(time.Second * 10).WithPolling(time.Second * 2).Should(gomega.Succeed())
+
+		if !result {
+			return fmt.Errorf("Found token %d for project %s", pat.pat.ID, pat.project)
 		}
 
 		return nil
