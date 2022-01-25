@@ -13,6 +13,8 @@ import (
 
 func resourceGitlabServicePipelinesEmail() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource manages a [Pipelines email integration](https://docs.gitlab.com/ee/user/project/integrations/overview.html#integrations-listing) that emails the pipeline status to a list of recipients.",
+
 		CreateContext: resourceGitlabServicePipelinesEmailCreate,
 		ReadContext:   resourceGitlabServicePipelinesEmailRead,
 		UpdateContext: resourceGitlabServicePipelinesEmailCreate,
@@ -23,21 +25,25 @@ func resourceGitlabServicePipelinesEmail() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the project you want to activate integration on.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"recipients": {
-				Type:     schema.TypeSet,
-				Required: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: ") email addresses where notifications are sent.",
+				Type:        schema.TypeSet,
+				Required:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 			"notify_only_broken_pipelines": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Description: "Notify only broken pipelines. Default is true.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 			"branches_to_be_notified": {
+				Description:  "Branches to send notifications for. Valid options are `all`, `default`, `protected`, and `default_and_protected`. Default is `default`",
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"all", "default", "protected", "default_and_protected"}, true),

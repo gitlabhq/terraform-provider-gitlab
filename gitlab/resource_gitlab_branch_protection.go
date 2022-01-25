@@ -22,12 +22,14 @@ var (
 				Computed: true,
 			},
 			"user_id": {
-				Type:     schema.TypeInt,
-				Optional: true,
+				Description: "The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.",
+				Type:        schema.TypeInt,
+				Optional:    true,
 			},
 			"group_id": {
-				Type:     schema.TypeInt,
-				Optional: true,
+				Description: "The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.",
+				Type:        schema.TypeInt,
+				Optional:    true,
 			},
 		},
 	}
@@ -40,6 +42,9 @@ func resourceGitlabBranchProtection() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
+		Description: "This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.\n\n" +
+			"-> The `allowed_to_push`, `allowed_to_merge` and `code_owner_approval_required` arguments require a GitLab Premium account or above.  Please refer to [Gitlab API documentation](https://docs.gitlab.com/ee/api/protected_branches.html) for further information.",
+
 		CreateContext: resourceGitlabBranchProtectionCreate,
 		ReadContext:   resourceGitlabBranchProtectionRead,
 		UpdateContext: resourceGitlabBranchProtectionUpdate,
@@ -49,22 +54,26 @@ func resourceGitlabBranchProtection() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The id of the project.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"branch": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "Name of the branch.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"merge_access_level": {
+				Description:      "Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,
 				ForceNew:         true,
 			},
 			"push_access_level": {
+				Description:      "Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,
@@ -78,8 +87,9 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Default:  false,
 			},
 			"branch_protection_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "The ID of the branch protection (not the branch name).",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 		},
 	}
@@ -268,8 +278,7 @@ func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
-			AccessLevel:            accessLevel[description.AccessLevel],
-			AccessLevelDescription: description.AccessLevelDescription,
+			AccessLevel: accessLevel[description.AccessLevel],
 		})
 	}
 
@@ -284,10 +293,9 @@ func convertAllowedToToBranchAccessDescriptions(descriptions []*gitlab.BranchAcc
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
-			AccessLevel:            accessLevel[description.AccessLevel],
-			AccessLevelDescription: description.AccessLevelDescription,
-			UserID:                 description.UserID,
-			GroupID:                description.GroupID,
+			AccessLevel: accessLevel[description.AccessLevel],
+			UserID:      description.UserID,
+			GroupID:     description.GroupID,
 		})
 	}
 

@@ -12,6 +12,9 @@ import (
 
 func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to configure project-level MR approvals. for your GitLab projects.\n" +
+			"For further information on merge request approvals, consult the [GitLab API documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).",
+
 		CreateContext: resourceGitlabProjectLevelMRApprovalsCreate,
 		ReadContext:   resourceGitlabProjectLevelMRApprovalsRead,
 		UpdateContext: resourceGitlabProjectLevelMRApprovalsUpdate,
@@ -21,25 +24,30 @@ func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Type:     schema.TypeInt,
-				ForceNew: true,
-				Required: true,
+				Description: "The ID of the project to change MR approval configuration.",
+				Type:        schema.TypeInt,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"reset_approvals_on_push": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Set to `true` if you want to remove all approvals in a merge request when new commits are pushed to its source branch. Default is `true`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"disable_overriding_approvers_per_merge_request": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "By default, users are able to edit the approval rules in merge requests. If set to true,",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"merge_requests_author_approval": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Set to `true` if you want to allow merge request authors to self-approve merge requests. Authors",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"merge_requests_disable_committers_approval": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Set to `true` if you want to prevent approval of merge requests by merge request committers. Default is `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 		},
 	}

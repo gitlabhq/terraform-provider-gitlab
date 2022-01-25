@@ -12,6 +12,10 @@ import (
 func resourceGitlabLabel() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage labels for your GitLab projects.\n" +
+			"For further information on labels, consult the [gitlab\n" +
+			"documentation](https://docs.gitlab.com/ee/user/project/labels.html#project-labels).",
+
 		CreateContext: resourceGitlabLabelCreate,
 		ReadContext:   resourceGitlabLabelRead,
 		UpdateContext: resourceGitlabLabelUpdate,
@@ -19,21 +23,25 @@ func resourceGitlabLabel() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name or id of the project to add the label to.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name of the label.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"color": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords).",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The description of the label.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}

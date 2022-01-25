@@ -14,6 +14,8 @@ import (
 
 func resourceGitlabPipelineTrigger() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage pipeline triggers",
+
 		CreateContext: resourceGitlabPipelineTriggerCreate,
 		ReadContext:   resourceGitlabPipelineTriggerRead,
 		UpdateContext: resourceGitlabPipelineTriggerUpdate,
@@ -24,12 +26,14 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name or id of the project to add the trigger to.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The description of the pipeline trigger.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"token": {
 				Type:     schema.TypeString,
@@ -42,9 +46,7 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 func resourceGitlabPipelineTriggerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	options := &gitlab.AddPipelineTriggerOptions{
-		Description: gitlab.String(d.Get("description").(string)),
-	}
+	options := &gitlab.AddPipelineTriggerOptions{}
 
 	log.Printf("[DEBUG] create gitlab PipelineTrigger %s", *options.Description)
 
@@ -88,9 +90,7 @@ func resourceGitlabPipelineTriggerRead(ctx context.Context, d *schema.ResourceDa
 func resourceGitlabPipelineTriggerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	options := &gitlab.EditPipelineTriggerOptions{
-		Description: gitlab.String(d.Get("description").(string)),
-	}
+	options := &gitlab.EditPipelineTriggerOptions{}
 
 	pipelineTriggerID, err := strconv.Atoi(d.Id())
 

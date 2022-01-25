@@ -12,6 +12,8 @@ import (
 
 func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to manage Microsoft Teams integration.",
+
 		CreateContext: resourceGitlabServiceMicrosoftTeamsCreate,
 		ReadContext:   resourceGitlabServiceMicrosoftTeamsRead,
 		UpdateContext: resourceGitlabServiceMicrosoftTeamsUpdate,
@@ -22,9 +24,10 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the project you want to activate integration on.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"created_at": {
 				Type:     schema.TypeString,
@@ -39,53 +42,65 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 				Computed: true,
 			},
 			"webhook": {
+				Description:  "The Microsoft Teams webhook. For example, https://outlook.office.com/webhook/...",
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateURLFunc,
 			},
 			"notify_only_broken_pipelines": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Send notifications for broken pipelines",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"branches_to_be_notified": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Branches to send notifications for. Valid options are “all”, “default”, “protected”, and “default_and_protected”. The default value is “default”",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"push_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for push events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"issues_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for issue events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"confidential_issues_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for confidential issue events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"merge_requests_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for merge request events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"tag_push_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for tag push events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"note_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for note events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"confidential_note_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for confidential note events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"pipeline_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for pipeline events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"wiki_page_events": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Enable notifications for wiki page events",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 		},
 	}

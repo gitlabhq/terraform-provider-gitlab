@@ -174,20 +174,23 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 func dataSourceGitlabProjects() *schema.Resource {
 	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
+		Description: "Provide details about a list of projects in the Gitlab provider. Listing all projects and group projects with [project filtering](https://docs.gitlab.com/ee/api/projects.html#list-user-projects) or [group project filtering](https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects) is supported.\n\n" +
+			"> **NOTE**: This data source supports all available filters exposed by the `xanzy/go-gitlab` package, which might not expose all available filters exposed by the Gitlab APIs.",
+
 		ReadContext: dataSourceGitlabProjectsRead,
 
 		// lintignore: S006 // TODO: Resolve this tfproviderlint issue
 		Schema: map[string]*schema.Schema{
 			"max_queryable_pages": {
-				Type:        schema.TypeInt,
-				Description: "Prevents overloading your Gitlab instance in case of a misconfiguration.",
-				Optional:    true,
-				Default:     10,
-			},
-			"group_id": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				ForceNew: true,
+				Default:  10,
+			},
+			"group_id": {
+				Description: "The ID of the group owned by the authenticated user to look projects for within. Cannot be used with `min_access_level`, `with_programming_language` or `statistics`.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"page": {
 				Type:     schema.TypeInt,
@@ -201,12 +204,14 @@ func dataSourceGitlabProjects() *schema.Resource {
 				ValidateFunc: validation.IntAtMost(100),
 			},
 			"archived": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Limit by archived status.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"order_by": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at`.",
+				Type:        schema.TypeString,
+				Optional:    true,
 				ValidateFunc: validation.StringInSlice([]string{
 					"id",
 					"name",
@@ -215,25 +220,30 @@ func dataSourceGitlabProjects() *schema.Resource {
 					"updated_at"}, true),
 			},
 			"sort": {
+				Description:  "Return projects sorted in `asc` or `desc` order. Default is `desc`.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice([]string{"desc", "asc"}, true),
 			},
 			"search": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Return list of authorized projects matching the search criteria.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"simple": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Return only the ID, URL, name, and path of each project.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"owned": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Limit by projects owned by the current user.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"starred": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Limit by projects starred by the current user.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"visibility": {
 				Type:     schema.TypeString,
@@ -244,24 +254,29 @@ func dataSourceGitlabProjects() *schema.Resource {
 					"internal"}, true),
 			},
 			"with_issues_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Limit by projects with issues feature enabled. Default is `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"with_merge_requests_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Limit by projects with merge requests feature enabled. Default is `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"with_custom_attributes": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Include custom attributes in response _(admins only)_.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"membership": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Limit by projects that the current user is a member of.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 			"min_access_level": {
-				Type:     schema.TypeInt,
-				Optional: true,
+				Description: "Limit to projects where current user has at least this access level, refer to the [official documentation](https://docs.gitlab.com/ee/api/members.html) for values. Cannot be used with `group_id`.",
+				Type:        schema.TypeInt,
+				Optional:    true,
 				ValidateFunc: validation.IntInSlice([]int{
 					int(gitlab.GuestPermissions),
 					int(gitlab.DeveloperPermissions),
@@ -273,22 +288,25 @@ func dataSourceGitlabProjects() *schema.Resource {
 				},
 			},
 			"with_programming_language": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Limit by projects which use the given programming language. Cannot be used with `group_id`.",
+				Type:        schema.TypeString,
+				Optional:    true,
 				ConflictsWith: []string{
 					"group_id",
 				},
 			},
 			"statistics": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Include project statistics. Cannot be used with `group_id`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 				ConflictsWith: []string{
 					"group_id",
 				},
 			},
 			"with_shared": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Include projects shared to this group. Default is `true`. Needs `group_id`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 				ConflictsWith: []string{
 					"statistics",
 					"with_programming_language",
@@ -296,8 +314,9 @@ func dataSourceGitlabProjects() *schema.Resource {
 				},
 			},
 			"include_subgroups": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Include projects in subgroups of this group. Default is `false`. Needs `group_id`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 				ConflictsWith: []string{
 					"statistics",
 					"with_programming_language",
@@ -305,13 +324,15 @@ func dataSourceGitlabProjects() *schema.Resource {
 				},
 			},
 			"projects": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Description: "A list containing the projects matching the supplied arguments",
+				Type:        schema.TypeList,
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Description: "The ID of the project.",
+							Type:        schema.TypeInt,
+							Computed:    true,
 						},
 						"description": {
 							Type:     schema.TypeString,
@@ -322,20 +343,23 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed: true,
 						},
 						"public": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Description: "Whether the project is public.",
+							Type:        schema.TypeBool,
+							Computed:    true,
 						},
 						"visibility": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 						"ssh_url_to_repo": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The SSH clone URL of the project.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"http_url_to_repo": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The HTTP clone URL of the project.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"web_url": {
 							Type:     schema.TypeString,
@@ -346,26 +370,30 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed: true,
 						},
 						"tag_list": {
-							Type:     schema.TypeSet,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: "A set of the project topics (formerly called \"project tags\").",
+							Type:        schema.TypeSet,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 						"owner": {
-							Type:     schema.TypeList,
-							Computed: true,
+							Description: "The owner of the project, due to Terraform aggregate types limitations, this field's attributes are accessed with the `owner.0` prefix. Structure is documented below.",
+							Type:        schema.TypeList,
+							Computed:    true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"id": {
-										Type:     schema.TypeInt,
-										Computed: true,
+										Description: "The ID of the project.",
+										Type:        schema.TypeInt,
+										Computed:    true,
 									},
 									"username": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
 									"name": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Description: "The name of the project.",
+										Type:        schema.TypeString,
+										Computed:    true,
 									},
 									"state": {
 										Type:     schema.TypeString,
@@ -383,20 +411,23 @@ func dataSourceGitlabProjects() *schema.Resource {
 							},
 						},
 						"name": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The name of the project.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"name_with_namespace": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "In `group / subgroup / project` or `user / project` format.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"path": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 						"path_with_namespace": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "In `group/subgroup/project` or `user/project` format.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"issues_enabled": {
 							Type:     schema.TypeBool,
@@ -411,12 +442,14 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Computed: true,
 						},
 						"approvals_before_merge": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Description: "The numbers of approvals needed in a merge requests.",
+							Type:        schema.TypeInt,
+							Computed:    true,
 						},
 						"jobs_enabled": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Description: "Whether pipelines are enabled for the project.",
+							Type:        schema.TypeBool,
+							Computed:    true,
 						},
 						"wiki_enabled": {
 							Type:     schema.TypeBool,
@@ -452,12 +485,14 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"id": {
-										Type:     schema.TypeInt,
-										Computed: true,
+										Description: "The ID of the project.",
+										Type:        schema.TypeInt,
+										Computed:    true,
 									},
 									"name": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Description: "The name of the project.",
+										Type:        schema.TypeString,
+										Computed:    true,
 									},
 									"path": {
 										Type:     schema.TypeString,
@@ -505,8 +540,9 @@ func dataSourceGitlabProjects() *schema.Resource {
 							},
 						},
 						"archived": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Description: "Limit by archived status.",
+							Type:        schema.TypeBool,
+							Computed:    true,
 						},
 						"avatar_url": {
 							Type:     schema.TypeString,
@@ -563,28 +599,33 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"http_url_to_repo": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Description: "The HTTP clone URL of the project.",
+										Type:        schema.TypeString,
+										Computed:    true,
 									},
 									"id": {
-										Type:     schema.TypeInt,
-										Computed: true,
+										Description: "The ID of the project.",
+										Type:        schema.TypeInt,
+										Computed:    true,
 									},
 									"name": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Description: "The name of the project.",
+										Type:        schema.TypeString,
+										Computed:    true,
 									},
 									"name_with_namespace": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Description: "In `group / subgroup / project` or `user / project` format.",
+										Type:        schema.TypeString,
+										Computed:    true,
 									},
 									"path": {
 										Type:     schema.TypeString,
 										Computed: true,
 									},
 									"path_with_namespace": {
-										Type:     schema.TypeString,
-										Computed: true,
+										Description: "In `group/subgroup/project` or `user/project` format.",
+										Type:        schema.TypeString,
+										Computed:    true,
 									},
 									"web_url": {
 										Type:     schema.TypeString,
@@ -619,8 +660,9 @@ func dataSourceGitlabProjects() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"group_id": {
-										Type:     schema.TypeInt,
-										Computed: true,
+										Description: "The ID of the group owned by the authenticated user to look projects for within. Cannot be used with `min_access_level`, `with_programming_language` or `statistics`.",
+										Type:        schema.TypeInt,
+										Computed:    true,
 									},
 									"group_access_level": {
 										Type:     schema.TypeString,
@@ -634,8 +676,9 @@ func dataSourceGitlabProjects() *schema.Resource {
 							},
 						},
 						"statistics": {
-							Type:     schema.TypeMap,
-							Computed: true,
+							Description: "Include project statistics. Cannot be used with `group_id`.",
+							Type:        schema.TypeMap,
+							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeInt,
 							},

@@ -16,6 +16,14 @@ import (
 
 func resourceGitlabProjectVariable() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage CI/CD variables for your GitLab projects.\n" +
+			"For further information on variables, consult the [gitlab\n" +
+			"documentation](https://docs.gitlab.com/ce/ci/variables/README.html#variables).\n\n" +
+			"~> **Important:** If your GitLab version is older than 13.4, you may see nondeterministic behavior\n" +
+			"when updating or deleting `gitlab_project_variable` resources with non-unique keys, for example if\n" +
+			"there is another variable with the same key and different environment scope. See\n" +
+			"[this GitLab issue](https://gitlab.com/gitlab-org/gitlab/-/issues/9912).",
+
 		CreateContext: resourceGitlabProjectVariableCreate,
 		ReadContext:   resourceGitlabProjectVariableRead,
 		UpdateContext: resourceGitlabProjectVariableUpdate,
@@ -26,41 +34,48 @@ func resourceGitlabProjectVariable() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "The name or id of the project to add the hook to.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"key": {
+				Description:  "The name of the variable.",
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: StringIsGitlabVariableName,
 			},
 			"value": {
-				Type:      schema.TypeString,
-				Required:  true,
-				Sensitive: true,
+				Description: "The value of the variable.",
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
 			},
 			"variable_type": {
+				Description:  "The type of a variable. Available types are: env_var (default) and file.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "env_var",
 				ValidateFunc: StringIsGitlabVariableType,
 			},
 			"protected": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"masked": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "If set to `true`, the variable will be masked if it would have been written to the logs. Defaults to `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"environment_scope": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "*",
+				Description: "The environment_scope of the variable. Defaults to `*`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "*",
 				// Versions of GitLab prior to 13.4 cannot update environment_scope.
 				ForceNew: true,
 			},

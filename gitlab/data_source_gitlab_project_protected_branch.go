@@ -13,17 +13,19 @@ import (
 
 func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 	return &schema.Resource{
+		Description: "Provides details about a specific protected branch in a given project.",
+
 		ReadContext: dataSourceGitlabProjectProtectedBranchRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
+				Description:  "The integer or path with namespace that uniquely identifies the project.",
 				Type:         schema.TypeString,
-				Description:  "ID or URL encoded name of project",
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"name": {
+				Description:  "The name of the protected branch.",
 				Type:         schema.TypeString,
-				Description:  "Name of the protected branch",
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
@@ -34,12 +36,14 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 			"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 			"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 			"allow_force_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Whether force push is allowed.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"code_owner_approval_required": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Reject code pushes that change files listed in the CODEOWNERS file.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 		},
 	}
@@ -52,20 +56,24 @@ func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_level": {
-					Type:     schema.TypeString,
-					Computed: true,
+					Description: "The access level allowed to perform the respective action (shows as 40 - \"maintainer\" if `user_id` or `group_id` are present).",
+					Type:        schema.TypeString,
+					Computed:    true,
 				},
 				"access_level_description": {
-					Type:     schema.TypeString,
-					Computed: true,
+					Description: "A description of the allowed access level(s), or the name of the user or group if `user_id` or `group_id` are present.",
+					Type:        schema.TypeString,
+					Computed:    true,
 				},
 				"user_id": {
-					Type:     schema.TypeInt,
-					Computed: true,
+					Description: "If present, indicates that the user is allowed to perform the respective action.",
+					Type:        schema.TypeInt,
+					Computed:    true,
 				},
 				"group_id": {
-					Type:     schema.TypeInt,
-					Computed: true,
+					Description: "If present, indicates that the group is allowed to perform the respective action.",
+					Type:        schema.TypeInt,
+					Computed:    true,
 				},
 			},
 		},
@@ -125,8 +133,7 @@ func convertBranchAccessDescriptionsToStateBranchAccessDescriptions(descriptions
 
 func convertBranchAccessDescriptionToStateBranchAccessDescription(description *gitlab.BranchAccessDescription) stateBranchAccessDescription {
 	stateDescription := stateBranchAccessDescription{
-		AccessLevel:            accessLevel[description.AccessLevel],
-		AccessLevelDescription: description.AccessLevelDescription,
+		AccessLevel: accessLevel[description.AccessLevel],
 	}
 	if description.UserID != 0 {
 		stateDescription.UserID = description.UserID

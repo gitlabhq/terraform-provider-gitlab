@@ -15,6 +15,10 @@ import (
 
 func resourceGitlabInstanceCluster() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage instance clusters for your GitLab instances.\n" +
+			"For further information on clusters, consult the [gitlab\n" +
+			"documentation](https://docs.gitlab.com/ee/user/instance/clusters/).",
+
 		CreateContext: resourceGitlabInstanceClusterCreate,
 		ReadContext:   resourceGitlabInstanceClusterRead,
 		UpdateContext: resourceGitlabInstanceClusterUpdate,
@@ -25,24 +29,28 @@ func resourceGitlabInstanceCluster() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name of cluster.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"domain": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The base domain of the cluster.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-				ForceNew: true,
+				Description: "Determines if cluster is active or not. Defaults to `true`. This attribute cannot be read.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				ForceNew:    true,
 			},
 			"managed": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-				ForceNew: true,
+				Description: "Determines if cluster is managed by gitlab or not. Defaults to `true`. This attribute cannot be read.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				ForceNew:    true,
 			},
 			"created_at": {
 				Type:     schema.TypeString,
@@ -57,35 +65,41 @@ func resourceGitlabInstanceCluster() *schema.Resource {
 				Computed: true,
 			},
 			"environment_scope": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "*",
+				Description: "The associated environment to the cluster. Defaults to `*`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "*",
 			},
 			"cluster_type": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 			"kubernetes_api_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The URL to access the Kubernetes API.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"kubernetes_token": {
-				Type:      schema.TypeString,
-				Required:  true,
-				Sensitive: true,
+				Description: "The token to authenticate against Kubernetes. This attribute cannot be read.",
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
 			},
 			"kubernetes_ca_cert": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "TLS certificate (needed if API is using a self-signed TLS certificate).",
+				Type:        schema.TypeString,
+				Optional:    true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					return strings.TrimSpace(old) == strings.TrimSpace(new)
 				},
 			},
 			"kubernetes_namespace": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The unique namespace related to the instance.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"kubernetes_authorization_type": {
+				Description:  "The cluster authorization type. Valid values are `rbac`, `abac`, `unknown_authorization`. Defaults to `rbac`.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				ForceNew:     true,
@@ -93,8 +107,9 @@ func resourceGitlabInstanceCluster() *schema.Resource {
 				ValidateFunc: validation.StringInSlice([]string{"rbac", "abac", "unknown_authorization"}, false),
 			},
 			"management_project_id": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The ID of the management project for the cluster.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}

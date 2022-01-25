@@ -17,23 +17,28 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 	}
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
+		Description: "This resource allows you to add an LDAP link to an existing GitLab group.",
+
 		CreateContext: resourceGitlabGroupLdapLinkCreate,
 		ReadContext:   resourceGitlabGroupLdapLinkRead,
 		DeleteContext: resourceGitlabGroupLdapLinkDelete,
 
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The id of the GitLab group.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"cn": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The CN of the LDAP group to link with.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			// Using the friendlier "access_level" here instead of the GitLab API "group_access".
 			"access_level": {
+				Description:      "Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,
@@ -41,9 +46,10 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 			},
 			// Changing GitLab API parameter "provider" to "ldap_provider" to avoid clashing with the Terraform "provider" key word
 			"ldap_provider": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name of the LDAP provider as stored in the GitLab database.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"force": {
 				Type:     schema.TypeBool,

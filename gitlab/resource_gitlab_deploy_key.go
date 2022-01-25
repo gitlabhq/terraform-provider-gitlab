@@ -14,6 +14,8 @@ import (
 
 func resourceGitlabDeployKey() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage [deploy keys](https://docs.gitlab.com/ee/user/project/deploy_keys/) for your GitLab projects.",
+
 		CreateContext: resourceGitlabDeployKeyCreate,
 		ReadContext:   resourceGitlabDeployKeyRead,
 		DeleteContext: resourceGitlabDeployKeyDelete,
@@ -23,28 +25,32 @@ func resourceGitlabDeployKey() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name or id of the project to add the deploy key to.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"title": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "A title to describe the deploy key with.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The public ssh key body.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					return old == strings.TrimSpace(new)
 				},
 			},
 			"can_push": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-				ForceNew: true,
+				Description: "Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				ForceNew:    true,
 			},
 		},
 	}

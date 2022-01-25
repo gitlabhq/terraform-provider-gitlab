@@ -18,20 +18,24 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
+		Description: "Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.",
+
 		ReadContext: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
-				Optional: true,
+				Description: "The ID of the group.",
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Optional:    true,
 				ConflictsWith: []string{
 					"full_path",
 				},
 			},
 			"full_path": {
-				Type:     schema.TypeString,
-				Computed: true,
-				Optional: true,
+				Description: "The full path of the group.",
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
 				ConflictsWith: []string{
 					"group_id",
 				},
@@ -43,41 +47,49 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 			},
 			"members": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Description: "The list of group members.",
+				Type:        schema.TypeList,
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Description: "The unique id assigned to the user by the gitlab server.",
+							Type:        schema.TypeInt,
+							Computed:    true,
 						},
 						"username": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The username of the user.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"name": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The name of the user.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"state": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "Whether the user is active or blocked.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"avatar_url": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The avatar URL of the user.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"web_url": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "User's website URL.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"access_level": {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
 						"expires_at": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "Expiration date for the group membership.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 					},
 				},

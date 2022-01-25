@@ -16,6 +16,18 @@ const encoding = "base64"
 
 func resourceGitLabRepositoryFile() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage GitLab repository files.\n\n" +
+			"**Limitations**:\n\n" +
+			"The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html)\n" +
+			"can only create, update or delete a single file at the time.\n" +
+			"The API will also\n" +
+			"[fail with a `400`](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository)\n" +
+			"response status code if the underlying repository is changed while the API tries to make changes.\n" +
+			"Therefore, it's recommended to make sure that you execute it with\n" +
+			"[`-parallelism=1`](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n)\n" +
+			"and that no other entity than the terraform at hand makes changes to the\n" +
+			"underlying repository while it's executing.",
+
 		CreateContext: resourceGitlabRepositoryFileCreate,
 		ReadContext:   resourceGitlabRepositoryFileRead,
 		UpdateContext: resourceGitlabRepositoryFileUpdate,
@@ -30,40 +42,48 @@ func resourceGitLabRepositoryFile() *schema.Resource {
 		// a `400 {error: encoding does not have a valid value}` error.
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The ID of the project.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"file_path": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The full path of the file.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"branch": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "Name of the branch to which to commit to.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"start_branch": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Name of the branch to start the new commit from.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"author_email": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Email of the commit author.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"author_name": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Name of the commit author.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"content": {
+				Description:  "base64 encoded file content.",
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateBase64Content,
 			},
 			"commit_message": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Commit message.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"encoding": {
 				Type:     schema.TypeString,

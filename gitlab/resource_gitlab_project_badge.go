@@ -13,6 +13,10 @@ import (
 
 func resourceGitlabProjectBadge() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage badges for your GitLab projects.\n" +
+			"For further information on hooks, consult the [gitlab\n" +
+			"documentation](https://docs.gitlab.com/ce/user/project/badges.html).",
+
 		CreateContext: resourceGitlabProjectBadgeCreate,
 		ReadContext:   resourceGitlabProjectBadgeRead,
 		UpdateContext: resourceGitlabProjectBadgeUpdate,
@@ -23,24 +27,29 @@ func resourceGitlabProjectBadge() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The id of the project to add the badge to.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"link_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The url linked with the badge.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"image_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The image url which will be presented on project overview.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"rendered_link_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The link_url argument rendered (in case of use of placeholders).",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"rendered_image_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The image_url argument rendered (in case of use of placeholders).",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}

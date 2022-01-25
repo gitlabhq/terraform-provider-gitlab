@@ -13,6 +13,10 @@ import (
 
 func resourceGitlabGroupBadge() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage badges for your GitLab groups.\n" +
+			"For further information, consult the [gitlab\n" +
+			"documentation](https://docs.gitlab.com/ee/user/project/badges.html#group-badges).",
+
 		CreateContext: resourceGitlabGroupBadgeCreate,
 		ReadContext:   resourceGitlabGroupBadgeRead,
 		UpdateContext: resourceGitlabGroupBadgeUpdate,
@@ -23,24 +27,29 @@ func resourceGitlabGroupBadge() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"group": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The id of the group to add the badge to.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"link_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The url linked with the badge.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"image_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The image url which will be presented on group overview.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"rendered_link_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The link_url argument rendered (in case of use of placeholders).",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"rendered_image_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The image_url argument rendered (in case of use of placeholders).",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}

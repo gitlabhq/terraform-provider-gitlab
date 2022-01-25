@@ -16,33 +16,39 @@ import (
 func resourceGitlabProjectAccessToken() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage Project Access Token for your GitLab projects.",
+
 		CreateContext: resourceGitlabProjectAccessTokenCreate,
 		ReadContext:   resourceGitlabProjectAccessTokenRead,
 		DeleteContext: resourceGitlabProjectAccessTokenDelete,
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The id of the project to add the project access token to.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "A name to describe the project access token.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"scopes": {
-				Type:     schema.TypeSet,
-				Required: true,
-				ForceNew: true,
+				Description: "Valid values: `api`, `read_api`, `read_repository`, `write_repository`.",
+				Type:        schema.TypeSet,
+				Required:    true,
+				ForceNew:    true,
 				Elem: &schema.Schema{
 					Type:         schema.TypeString,
 					ValidateFunc: validation.StringInSlice([]string{"api", "read_api", "read_repository", "write_repository"}, false),
 				},
 			},
 			"expires_at": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Time the token will expire it, YYYY-MM-DD format. Will not expire per default.",
+				Type:        schema.TypeString,
+				Optional:    true,
 				ValidateFunc: func(i interface{}, k string) (warnings []string, errors []error) {
 					v := i.(string)
 
@@ -55,25 +61,30 @@ func resourceGitlabProjectAccessToken() *schema.Resource {
 				ForceNew: true,
 			},
 			"token": {
-				Type:      schema.TypeString,
-				Computed:  true,
-				Sensitive: true,
+				Description: "The secret token. This is only populated when creating a new project access token.",
+				Type:        schema.TypeString,
+				Computed:    true,
+				Sensitive:   true,
 			},
 			"active": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "True if the token is active.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"created_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Time the token has been created, RFC3339 format.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"revoked": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "True if the token is revoked.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"user_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "The user_id associated to the token.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 		},
 	}
