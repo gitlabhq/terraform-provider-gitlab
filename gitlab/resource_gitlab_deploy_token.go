@@ -112,7 +112,7 @@ func resourceGitlabDeployTokenCreate(ctx context.Context, d *schema.ResourceData
 			Name:      gitlab.String(d.Get("name").(string)),
 			Username:  gitlab.String(d.Get("username").(string)),
 			ExpiresAt: expiresAt,
-			Scopes:    *scopes,
+			Scopes:    scopes,
 		}
 
 		log.Printf("[DEBUG] Create GitLab deploy token %s in project %s", *options.Name, project.(string))
@@ -124,7 +124,7 @@ func resourceGitlabDeployTokenCreate(ctx context.Context, d *schema.ResourceData
 			Name:      gitlab.String(d.Get("name").(string)),
 			Username:  gitlab.String(d.Get("username").(string)),
 			ExpiresAt: expiresAt,
-			Scopes:    *scopes,
+			Scopes:    scopes,
 		}
 
 		log.Printf("[DEBUG] Create GitLab deploy token %s in group %s", *options.Name, group.(string))
