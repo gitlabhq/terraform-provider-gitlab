@@ -68,8 +68,9 @@ func (c *Config) Client() (*gitlab.Client, error) {
 		opts = append(opts, gitlab.WithBaseURL(c.BaseURL))
 	}
 
-	// The OAuth method is also compatible with project/personal access tokens because they are all usable as Bearer tokens.
-	// https://docs.gitlab.com/ee/api
+	// The OAuth method is also compatible with project/group/personal access and job tokens because they are all usable as Bearer tokens.
+	// Although the job token API access is very limited.
+	// see https://docs.gitlab.com/ee/api#authentication
 	client, err := gitlab.NewOAuthClient(c.Token, opts...)
 	if err != nil {
 		return nil, err

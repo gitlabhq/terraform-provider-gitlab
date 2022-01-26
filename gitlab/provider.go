@@ -123,7 +123,7 @@ var descriptions map[string]string
 
 func init() {
 	descriptions = map[string]string{
-		"token": "The OAuth2 token or project/personal access token used to connect to GitLab.",
+		"token": "The OAuth2 Token, Project, Group, Personal Access Token or CI Job Token used to connect to GitLab. The OAuth method is used in this provider for authentication (using Bearer authorization token). See https://docs.gitlab.com/ee/api/#authentication for details",
 
 		"base_url": "The GitLab Base API URL",
 
@@ -135,7 +135,7 @@ func init() {
 
 		"client_key": "File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data.",
 
-		"early_auth_check": "Try to authenticate with the `CurrentUser` endpoint during the provider initialization. (experimental, see docs)",
+		"early_auth_check": "Try to authenticate with the `CurrentUser` endpoint during the provider initialization. Needs to be disabled for CI Job Tokens. (experimental, see docs)",
 	}
 }
 
