@@ -161,8 +161,9 @@ func resourceGitlabServiceSlack() *schema.Resource {
 				Optional:    true,
 			},
 			"job_events": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Enable notifications for job events.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 		},
 	}

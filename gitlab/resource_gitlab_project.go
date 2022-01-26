@@ -211,10 +211,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Default:     true,
 	},
 	"push_rules": {
-		Type:     schema.TypeList,
-		MaxItems: 1,
-		Optional: true,
-		Computed: true,
+		Description: "Push rules for the project.",
+		Type:        schema.TypeList,
+		MaxItems:    1,
+		Optional:    true,
+		Computed:    true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"author_email_regex": {
@@ -310,24 +311,28 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	// The GitLab API requires that import_url is also set when mirror options are used
 	// Ref: https://github.com/gitlabhq/terraform-provider-gitlab/pull/449#discussion_r549729230
 	"mirror": {
+		Description:  "Enable project pull mirror.",
 		Type:         schema.TypeBool,
 		Optional:     true,
 		Default:      false,
 		RequiredWith: []string{"import_url"},
 	},
 	"mirror_trigger_builds": {
+		Description:  "Enable trigger builds on pushes for a mirrored project.",
 		Type:         schema.TypeBool,
 		Optional:     true,
 		Default:      false,
 		RequiredWith: []string{"import_url"},
 	},
 	"mirror_overwrites_diverged_branches": {
+		Description:  "Enable overwrite diverged branches for a mirrored project.",
 		Type:         schema.TypeBool,
 		Optional:     true,
 		Default:      false,
 		RequiredWith: []string{"import_url"},
 	},
 	"only_mirror_protected_branches": {
+		Description:  "Enable only mirror protected branches for a mirrored project.",
 		Type:         schema.TypeBool,
 		Optional:     true,
 		Default:      false,

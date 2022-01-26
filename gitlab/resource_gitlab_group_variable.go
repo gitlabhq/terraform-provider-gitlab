@@ -43,7 +43,7 @@ func resourceGitlabGroupVariable() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"group": {
-				Description: "The name or id of the group to add the hook to.",
+				Description: "The name or id of the group.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,

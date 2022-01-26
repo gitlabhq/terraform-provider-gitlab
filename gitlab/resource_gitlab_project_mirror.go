@@ -36,8 +36,9 @@ func resourceGitlabProjectMirror() *schema.Resource {
 				Required:    true,
 			},
 			"mirror_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "Mirror ID.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 			"url": {
 				Description: "The URL of the remote repository to be mirrored.",

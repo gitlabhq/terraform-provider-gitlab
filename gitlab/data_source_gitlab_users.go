@@ -52,8 +52,9 @@ func dataSourceGitlabUsers() *schema.Resource {
 				Optional:    true,
 			},
 			"extern_uid": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "Lookup users by external UID. (Requires administrator privileges)",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"extern_provider": {
 				Description: "Lookup users by external provider. (Requires administrator privileges)",
@@ -132,8 +133,9 @@ func dataSourceGitlabUsers() *schema.Resource {
 							Computed:    true,
 						},
 						"extern_uid": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The external UID of the user.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"organization": {
 							Description: "The organization of the user.",

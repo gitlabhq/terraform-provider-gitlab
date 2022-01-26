@@ -12,7 +12,8 @@ import (
 
 func dataSourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provide details about a specific group in the gitlab provider.",
+		Description: "Provide details about a specific group in the gitlab provider.\n\n" +
+			"> **Note**: exactly one of group_id or full_path must be provided.",
 
 		ReadContext: dataSourceGitlabGroupRead,
 		Schema: map[string]*schema.Schema{

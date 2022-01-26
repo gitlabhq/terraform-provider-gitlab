@@ -34,7 +34,7 @@ func resourceGitlabProjectVariable() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Description: "The name or id of the project to add the hook to.",
+				Description: "The name or id of the project.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,

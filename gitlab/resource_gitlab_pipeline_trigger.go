@@ -36,8 +36,9 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 				Required:    true,
 			},
 			"token": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The pipeline trigger token.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}

@@ -18,7 +18,8 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
-		Description: "Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.",
+		Description: "Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.\n\n" +
+			"> **Note**: exactly one of group_id or full_path must be provided.",
 
 		ReadContext: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{
@@ -41,6 +42,7 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 				},
 			},
 			"access_level": {
+				Description:      "Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.",
 				Type:             schema.TypeString,
 				Computed:         true,
 				Optional:         true,
@@ -83,8 +85,9 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 							Computed:    true,
 						},
 						"access_level": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Description: "The level of access to the group.",
+							Type:        schema.TypeString,
+							Computed:    true,
 						},
 						"expires_at": {
 							Description: "Expiration date for the group membership.",

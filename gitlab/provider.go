@@ -16,44 +16,44 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITLAB_TOKEN", nil),
-				Description: descriptions["token"],
+				Description: "The OAuth2 Token, Project, Group, Personal Access Token or CI Job Token used to connect to GitLab. The OAuth method is used in this provider for authentication (using Bearer authorization token). See https://docs.gitlab.com/ee/api/#authentication for details. It may be sourced from the `GITLAB_TOKEN` environment variable.",
 			},
 			"base_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				DefaultFunc:  schema.EnvDefaultFunc("GITLAB_BASE_URL", ""),
-				Description:  descriptions["base_url"],
+				Description:  "This is the target GitLab base API endpoint. Providing a value is a requirement when working with GitLab CE or GitLab Enterprise e.g. `https://my.gitlab.server/api/v4/`. It is optional to provide this value and it can also be sourced from the `GITLAB_BASE_URL` environment variable. The value must end with a slash.",
 				ValidateFunc: validateApiURLVersion,
 			},
 			"cacert_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
-				Description: descriptions["cacert_file"],
+				Description: "This is a file containing the ca cert to verify the gitlab instance. This is available for use when working with GitLab CE or Gitlab Enterprise with a locally-issued or self-signed certificate chain.",
 			},
 			"insecure": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
-				Description: descriptions["insecure"],
+				Description: "When set to true this disables SSL verification of the connection to the GitLab instance.",
 			},
 			"client_cert": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
-				Description: descriptions["client_cert"],
+				Description: "File path to client certificate when GitLab instance is behind company proxy. File must contain PEM encoded data.",
 			},
 			"client_key": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "",
-				Description: descriptions["client_key"],
+				Description: "File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data. Required when `client_cert` is set.",
 			},
 			"early_auth_check": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     true,
-				Description: descriptions["early_auth_check"],
+				Description: "(Experimental) By default the provider does a dummy request to get the current user in order to verify that the provider configuration is correct and the GitLab API is reachable. Turn it off, to skip this check. This may be useful if the GitLab instance does not yet exist and is created within the same terraform module. This is an experimental feature and may change in the future. Please make sure to always keep backups of your state.",
 			},
 		},
 
@@ -118,26 +118,6 @@ func Provider() *schema.Provider {
 	}
 
 	return provider
-}
-
-var descriptions map[string]string
-
-func init() {
-	descriptions = map[string]string{
-		"token": "The OAuth2 Token, Project, Group, Personal Access Token or CI Job Token used to connect to GitLab. The OAuth method is used in this provider for authentication (using Bearer authorization token). See https://docs.gitlab.com/ee/api/#authentication for details",
-
-		"base_url": "The GitLab Base API URL",
-
-		"cacert_file": "A file containing the ca certificate to use in case ssl certificate is not from a standard chain",
-
-		"insecure": "Disable SSL verification of API calls",
-
-		"client_cert": "File path to client certificate when GitLab instance is behind company proxy. File  must contain PEM encoded data.",
-
-		"client_key": "File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data.",
-
-		"early_auth_check": "Try to authenticate with the `CurrentUser` endpoint during the provider initialization. Needs to be disabled for CI Job Tokens. (experimental, see docs)",
-	}
 }
 
 func providerConfigure(ctx context.Context, p *schema.Provider, d *schema.ResourceData) (interface{}, diag.Diagnostics) {

@@ -14,12 +14,14 @@ var (
 	allowedToElem = &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"access_level": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Level of access.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"access_level_description": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Readable description of level of access.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"user_id": {
 				Description: "The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.",
@@ -82,9 +84,10 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			"allowed_to_push":  schemaAllowedTo(),
 			"allowed_to_merge": schemaAllowedTo(),
 			"code_owner_approval_required": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "Can be set to true to require code owner approval before merging.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"branch_protection_id": {
 				Description: "The ID of the branch protection (not the branch name).",
@@ -263,10 +266,11 @@ func expandBranchPermissionOptions(allowedTo []interface{}) []*gitlab.BranchPerm
 
 func schemaAllowedTo() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeSet,
-		Optional: true,
-		ForceNew: true,
-		Elem:     allowedToElem,
+		Description: "Defines permissions for action.",
+		Type:        schema.TypeSet,
+		Optional:    true,
+		ForceNew:    true,
+		Elem:        allowedToElem,
 	}
 }
 

@@ -30,8 +30,9 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "The ID of this resource.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 			"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 			"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
@@ -51,8 +52,9 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 
 func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeList,
-		Computed: true,
+		Description: "Describes which access levels, users, or groups are allowed to perform the action.",
+		Type:        schema.TypeList,
+		Computed:    true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_level": {

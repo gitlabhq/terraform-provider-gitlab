@@ -48,7 +48,7 @@ func resourceGitLabRepositoryFile() *schema.Resource {
 				ForceNew:    true,
 			},
 			"file_path": {
-				Description: "The full path of the file.",
+				Description: "The full path of the file. It must be relative to the root of the project without a leading slash `/`.",
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
@@ -75,7 +75,7 @@ func resourceGitLabRepositoryFile() *schema.Resource {
 				Optional:    true,
 			},
 			"content": {
-				Description:  "base64 encoded file content.",
+				Description:  "base64 encoded file content. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).",
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validateBase64Content,
@@ -86,8 +86,9 @@ func resourceGitLabRepositoryFile() *schema.Resource {
 				Required:    true,
 			},
 			"encoding": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Content encoding.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}

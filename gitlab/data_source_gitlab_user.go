@@ -13,7 +13,8 @@ import (
 
 func dataSourceGitlabUser() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.",
+		Description: "Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.\n\n" +
+			"-> Some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.",
 
 		ReadContext: dataSourceGitlabUserRead,
 		Schema: map[string]*schema.Schema{
@@ -38,9 +39,10 @@ func dataSourceGitlabUser() *schema.Resource {
 				},
 			},
 			"email": {
-				Type:     schema.TypeString,
-				Computed: true,
-				Optional: true,
+				Description: "The email address of the user.",
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
 				ConflictsWith: []string{
 					"user_id",
 					"username",
@@ -102,8 +104,9 @@ func dataSourceGitlabUser() *schema.Resource {
 				Computed:    true,
 			},
 			"note": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Admin notes for this user.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"user_provider": {
 				Description: "The UID provider of the user.",

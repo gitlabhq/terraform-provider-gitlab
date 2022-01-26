@@ -52,10 +52,11 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 				ForceNew:    true,
 			},
 			"force": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
-				ForceNew: true,
+				Description: "If true, then delete and replace an existing LDAP link if one exists.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				ForceNew:    true,
 			},
 		},
 	}

@@ -50,20 +50,24 @@ func resourceGitlabServiceGithub() *schema.Resource {
 
 			// Computed from the GitLab API. Omitted event fields because they're always true in Github.
 			"title": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Title.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"created_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Create time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"updated_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Update time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"active": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Whether the integration is active.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 		},
 	}

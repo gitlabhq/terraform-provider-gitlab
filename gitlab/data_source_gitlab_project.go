@@ -20,17 +20,19 @@ func dataSourceGitlabProject() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The integer or path with namespace that uniquely identifies the project within the gitlab install.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				ExactlyOneOf: []string{
 					"id",
 					"path_with_namespace",
 				},
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The name of the project.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"path": {
 				Description: "The path of the repository.",
@@ -134,8 +136,9 @@ func dataSourceGitlabProject() *schema.Resource {
 			},
 			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Description: "Push rules for the project.",
+				Type:        schema.TypeList,
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"author_email_regex": {

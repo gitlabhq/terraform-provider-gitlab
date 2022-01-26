@@ -14,7 +14,7 @@ import (
 func resourceGitlabProjectBadge() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage badges for your GitLab projects.\n" +
-			"For further information on hooks, consult the [gitlab\n" +
+			"For further information consult the [gitlab\n" +
 			"documentation](https://docs.gitlab.com/ce/user/project/badges.html).",
 
 		CreateContext: resourceGitlabProjectBadgeCreate,

@@ -59,16 +59,19 @@ func resourceGitlabProjectCluster() *schema.Resource {
 				ForceNew:    true,
 			},
 			"created_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Create time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"provider_type": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Provider type.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"platform_type": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Platform type.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"environment_scope": {
 				Description: "The associated environment to the cluster. Defaults to `*`.",
@@ -77,8 +80,9 @@ func resourceGitlabProjectCluster() *schema.Resource {
 				Default:     "*",
 			},
 			"cluster_type": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Cluster type.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"kubernetes_api_url": {
 				Description: "The URL to access the Kubernetes API.",

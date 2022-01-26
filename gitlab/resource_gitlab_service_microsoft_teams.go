@@ -30,16 +30,19 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 				ForceNew:    true,
 			},
 			"created_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Create time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"updated_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Update time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"active": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Whether the integration is active.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"webhook": {
 				Description:  "The Microsoft Teams webhook. For example, https://outlook.office.com/webhook/...",
