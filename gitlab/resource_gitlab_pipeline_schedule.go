@@ -68,6 +68,7 @@ func resourceGitlabPipelineScheduleCreate(ctx context.Context, d *schema.Resourc
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.CreatePipelineScheduleOptions{
+		Description:  gitlab.String(d.Get("description").(string)),
 		Ref:          gitlab.String(d.Get("ref").(string)),
 		Cron:         gitlab.String(d.Get("cron").(string)),
 		CronTimezone: gitlab.String(d.Get("cron_timezone").(string)),
@@ -139,6 +140,7 @@ func resourceGitlabPipelineScheduleUpdate(ctx context.Context, d *schema.Resourc
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	options := &gitlab.EditPipelineScheduleOptions{
+		Description:  gitlab.String(d.Get("description").(string)),
 		Ref:          gitlab.String(d.Get("ref").(string)),
 		Cron:         gitlab.String(d.Get("cron").(string)),
 		CronTimezone: gitlab.String(d.Get("cron_timezone").(string)),

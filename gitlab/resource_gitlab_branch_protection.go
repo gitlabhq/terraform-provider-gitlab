@@ -282,7 +282,8 @@ func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
-			AccessLevel: accessLevel[description.AccessLevel],
+			AccessLevel:            accessLevel[description.AccessLevel],
+			AccessLevelDescription: description.AccessLevelDescription,
 		})
 	}
 
@@ -297,9 +298,10 @@ func convertAllowedToToBranchAccessDescriptions(descriptions []*gitlab.BranchAcc
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
-			AccessLevel: accessLevel[description.AccessLevel],
-			UserID:      description.UserID,
-			GroupID:     description.GroupID,
+			AccessLevel:            accessLevel[description.AccessLevel],
+			AccessLevelDescription: description.AccessLevelDescription,
+			UserID:                 description.UserID,
+			GroupID:                description.GroupID,
 		})
 	}
 

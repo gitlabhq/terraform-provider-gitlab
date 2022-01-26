@@ -47,7 +47,9 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 func resourceGitlabPipelineTriggerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	options := &gitlab.AddPipelineTriggerOptions{}
+	options := &gitlab.AddPipelineTriggerOptions{
+		Description: gitlab.String(d.Get("description").(string)),
+	}
 
 	log.Printf("[DEBUG] create gitlab PipelineTrigger %s", *options.Description)
 
@@ -91,7 +93,9 @@ func resourceGitlabPipelineTriggerRead(ctx context.Context, d *schema.ResourceDa
 func resourceGitlabPipelineTriggerUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	options := &gitlab.EditPipelineTriggerOptions{}
+	options := &gitlab.EditPipelineTriggerOptions{
+		Description: gitlab.String(d.Get("description").(string)),
+	}
 
 	pipelineTriggerID, err := strconv.Atoi(d.Id())
 

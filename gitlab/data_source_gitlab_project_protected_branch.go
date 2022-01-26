@@ -135,7 +135,8 @@ func convertBranchAccessDescriptionsToStateBranchAccessDescriptions(descriptions
 
 func convertBranchAccessDescriptionToStateBranchAccessDescription(description *gitlab.BranchAccessDescription) stateBranchAccessDescription {
 	stateDescription := stateBranchAccessDescription{
-		AccessLevel: accessLevel[description.AccessLevel],
+		AccessLevel:            accessLevel[description.AccessLevel],
+		AccessLevelDescription: description.AccessLevelDescription,
 	}
 	if description.UserID != 0 {
 		stateDescription.UserID = description.UserID
