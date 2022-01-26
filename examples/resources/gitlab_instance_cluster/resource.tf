@@ -1,4 +1,4 @@
-resource gitlab_instance_cluster "bar" {
+resource "gitlab_instance_cluster" "bar" {
   name                          = "bar-cluster"
   domain                        = "example.com"
   enabled                       = true

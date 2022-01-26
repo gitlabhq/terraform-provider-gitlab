@@ -20,10 +20,10 @@ resource "gitlab_branch_protection" "BranchProtect" {
 
 # Example using dynamic block
 resource "gitlab_branch_protection" "main" {
-  project                      = "12345"
-  branch                       = "main"
-  push_access_level            = "maintainer"
-  merge_access_level           = "maintainer"
+  project            = "12345"
+  branch             = "main"
+  push_access_level  = "maintainer"
+  merge_access_level = "maintainer"
 
   dynamic "allowed_to_push" {
     for_each = [50, 55, 60]

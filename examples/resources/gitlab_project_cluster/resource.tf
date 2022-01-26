@@ -2,8 +2,8 @@ resource "gitlab_project" "foo" {
   name = "foo-project"
 }
 
-resource gitlab_project_cluster "bar" {
-  project                       = "${gitlab_project.foo.id}"
+resource "gitlab_project_cluster" "bar" {
+  project                       = gitlab_project.foo.id
   name                          = "bar-cluster"
   domain                        = "example.com"
   enabled                       = true

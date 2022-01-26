@@ -1,6 +1,6 @@
 resource "gitlab_project" "foo" {
-  name              = "Example"
-  description       = "My example project"
+  name        = "Example"
+  description = "My example project"
 }
 
 resource "gitlab_project_level_mr_approvals" "foo" {

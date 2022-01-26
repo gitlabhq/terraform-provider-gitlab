@@ -4,7 +4,7 @@ resource "gitlab_group" "foo" {
 }
 
 resource "gitlab_group_cluster" "bar" {
-  group                       = "${gitlab_group.foo.id}"
+  group                         = gitlab_group.foo.id
   name                          = "bar-cluster"
   domain                        = "example.com"
   enabled                       = true

@@ -4,8 +4,8 @@ resource "gitlab_deploy_token" "example" {
   name       = "Example deploy token"
   username   = "example-username"
   expires_at = "2020-03-14T00:00:00.000Z"
-  
-  scopes = [ "read_repository", "read_registry" ]
+
+  scopes = ["read_repository", "read_registry"]
 }
 
 resource "gitlab_deploy_token" "example-two" {
@@ -16,8 +16,8 @@ resource "gitlab_deploy_token" "example-two" {
 
 # Example Usage - Group
 resource "gitlab_deploy_token" "example" {
-  group      = "example/deploying"
-  name       = "Example group deploy token"
+  group = "example/deploying"
+  name  = "Example group deploy token"
 
-  scopes = [ "read_repository" ]
+  scopes = ["read_repository"]
 }

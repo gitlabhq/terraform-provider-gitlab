@@ -12,6 +12,6 @@ data "gitlab_projects" "group_projects" {
 
 # List projects using the search syntax
 data "gitlab_projects" "projects" {
-  search              = "postgresql"
-  visibility          = "private"
+  search     = "postgresql"
+  visibility = "private"
 }
