@@ -113,8 +113,8 @@ func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.Resourc
 		Name:                      &branch,
 		PushAccessLevel:           &pushAccessLevel,
 		MergeAccessLevel:          &mergeAccessLevel,
-		AllowedToPush:             allowedToPush,
-		AllowedToMerge:            allowedToMerge,
+		AllowedToPush:             &allowedToPush,
+		AllowedToMerge:            &allowedToMerge,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	}, gitlab.WithContext(ctx))
 	if err != nil {
