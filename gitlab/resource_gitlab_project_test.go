@@ -50,6 +50,8 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		PackagesEnabled:             true,
 		PagesAccessLevel:            gitlab.PublicAccessControl,
 		BuildCoverageRegex:          "foo",
+		IssuesTemplate:              "",
+		MergeRequestsTemplate:       "",
 		CIConfigPath:                ".gitlab-ci.yml@mynamespace/myproject",
 	}
 
@@ -373,6 +375,37 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 						if len(branches) != 0 {
 							return fmt.Errorf("expected no branch for new project when initialized without README; found %d", len(branches))
 						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectConfigIssueMergeRequestTemplates(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						if project.IssuesTemplate != "foo" {
+							return fmt.Errorf("expected issues template to be 'foo'; got '%s'", project.IssuesTemplate)
+						}
+
+						if project.MergeRequestsTemplate != "bar" {
+							return fmt.Errorf("expected merge requests template to be 'bar'; got '%s'", project.MergeRequestsTemplate)
+						}
+
 						return nil
 					},
 				),
@@ -1295,6 +1328,18 @@ resource "gitlab_project" "template-mutual-exclusive" {
   template_project_id = 999
   use_custom_template = true
   default_branch = "master"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigIssueMergeRequestTemplates(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  issues_template = "foo"
+  merge_requests_template = "bar"
 }
 	`, rInt, rInt)
 }
