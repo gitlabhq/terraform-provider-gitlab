@@ -2,12 +2,30 @@ package gitlab
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strings"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
+
+// modifyRequestAddEnvironmentFilter returns a RequestOptionFunc function that
+// can be passed to the go-gitlab library calls to add the environment scope to
+// requests to lookup, modification, and deletion requests. Since gitlab 13.11,
+// an environment variable key is no longer unique and is composit-keyed with
+// the scope.
+// See https://docs.gitlab.com/ee/ci/variables/#add-a-cicd-variable-to-a-group
+func modifyRequestAddEnvironmentFilter(scope string) gitlab.RequestOptionFunc {
+	return func(r *retryablehttp.Request) error {
+		queryParams := r.URL.Query()
+		queryParams.Add("filter[environment_scope]", scope)
+		r.URL.RawQuery = queryParams.Encode()
+		return nil
+	}
+}
 
 func resourceGitlabGroupVariable() *schema.Resource {
 	return &schema.Resource{
@@ -52,6 +70,12 @@ func resourceGitlabGroupVariable() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"environment_scope": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Default:  "*",
+			},
 		},
 	}
 }
@@ -65,13 +89,15 @@ func resourceGitlabGroupVariableCreate(ctx context.Context, d *schema.ResourceDa
 	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
 	masked := d.Get("masked").(bool)
+	environmentScope := d.Get("environment_scope").(string)
 
 	options := gitlab.CreateGroupVariableOptions{
-		Key:          &key,
-		Value:        &value,
-		VariableType: variableType,
-		Protected:    &protected,
-		Masked:       &masked,
+		Key:              &key,
+		Value:            &value,
+		VariableType:     variableType,
+		Protected:        &protected,
+		Masked:           &masked,
+		EnvironmentScope: &environmentScope,
 	}
 	log.Printf("[DEBUG] create gitlab group variable %s/%s", group, key)
 
@@ -80,7 +106,9 @@ func resourceGitlabGroupVariableCreate(ctx context.Context, d *schema.ResourceDa
 		return diag.FromErr(err)
 	}
 
-	d.SetId(buildTwoPartID(&group, &key))
+	keyScope := fmt.Sprintf("%s:%s", key, environmentScope)
+
+	d.SetId(buildTwoPartID(&group, &keyScope))
 
 	return resourceGitlabGroupVariableRead(ctx, d, meta)
 }
@@ -93,9 +121,21 @@ func resourceGitlabGroupVariableRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] read gitlab group variable %s/%s", group, key)
+	keyScope := strings.SplitN(key, ":", 2)
+	scope := "*"
+	if len(keyScope) == 2 {
+		key = keyScope[0]
+		scope = keyScope[1]
+	}
 
-	v, _, err := client.GroupVariables.GetVariable(group, key, gitlab.WithContext(ctx))
+	log.Printf("[DEBUG] read gitlab group variable %s/%s/%s", group, key, scope)
+
+	v, _, err := client.GroupVariables.GetVariable(
+		group,
+		key,
+		gitlab.WithContext(ctx),
+		modifyRequestAddEnvironmentFilter(scope),
+	)
 	if err != nil {
 		if is404(err) {
 			log.Printf("[DEBUG] gitlab group variable not found %s/%s", group, key)
@@ -111,6 +151,7 @@ func resourceGitlabGroupVariableRead(ctx context.Context, d *schema.ResourceData
 	d.Set("group", group)
 	d.Set("protected", v.Protected)
 	d.Set("masked", v.Masked)
+	d.Set("environment_scope", v.EnvironmentScope)
 	return nil
 }
 
@@ -123,16 +164,24 @@ func resourceGitlabGroupVariableUpdate(ctx context.Context, d *schema.ResourceDa
 	variableType := stringToVariableType(d.Get("variable_type").(string))
 	protected := d.Get("protected").(bool)
 	masked := d.Get("masked").(bool)
+	environmentScope := d.Get("environment_scope").(string)
 
 	options := &gitlab.UpdateGroupVariableOptions{
-		Value:        &value,
-		Protected:    &protected,
-		VariableType: variableType,
-		Masked:       &masked,
+		Value:            &value,
+		Protected:        &protected,
+		VariableType:     variableType,
+		Masked:           &masked,
+		EnvironmentScope: &environmentScope,
 	}
-	log.Printf("[DEBUG] update gitlab group variable %s/%s", group, key)
+	log.Printf("[DEBUG] update gitlab group variable %s/%s/%s", group, key, environmentScope)
 
-	_, _, err := client.GroupVariables.UpdateVariable(group, key, options, gitlab.WithContext(ctx))
+	_, _, err := client.GroupVariables.UpdateVariable(
+		group,
+		key,
+		options,
+		gitlab.WithContext(ctx),
+		modifyRequestAddEnvironmentFilter(environmentScope),
+	)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -143,9 +192,15 @@ func resourceGitlabGroupVariableDelete(ctx context.Context, d *schema.ResourceDa
 	client := meta.(*gitlab.Client)
 	group := d.Get("group").(string)
 	key := d.Get("key").(string)
-	log.Printf("[DEBUG] Delete gitlab group variable %s/%s", group, key)
+	environmentScope := d.Get("environment_scope").(string)
+	log.Printf("[DEBUG] Delete gitlab group variable %s/%s/%s", group, key, environmentScope)
 
-	_, err := client.GroupVariables.RemoveVariable(group, key, gitlab.WithContext(ctx))
+	_, err := client.GroupVariables.RemoveVariable(
+		group,
+		key,
+		gitlab.WithContext(ctx),
+		modifyRequestAddEnvironmentFilter(environmentScope),
+	)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -25,8 +25,9 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:   fmt.Sprintf("key_%s", rString),
-						Value: fmt.Sprintf("value-%s", rString),
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -36,9 +37,10 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-inverse-%s", rString),
-						Protected: true,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-inverse-%s", rString),
+						Protected:        true,
+						EnvironmentScope: "*",
 					}),
 				),
 			},
@@ -48,9 +50,80 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
 					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
-						Key:       fmt.Sprintf("key_%s", rString),
-						Value:     fmt.Sprintf("value-%s", rString),
-						Protected: false,
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						Protected:        false,
+						EnvironmentScope: "*",
+					}),
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabGroupVariable_scope(t *testing.T) {
+	var groupVariableA, groupVariableB gitlab.GroupVariable
+	rString := acctest.RandString(5)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabGroupVariableDestroy,
+		Steps: []resource.TestStep{
+			// Create a group and variables with same keys, different scopes
+			{
+				Config:   testAccGitlabGroupVariableScopeConfig(rString, "*", "review/*"),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.a", &groupVariableA),
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.b", &groupVariableB),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariableA, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s-a", rString),
+						EnvironmentScope: "*",
+					}),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariableB, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s-b", rString),
+						EnvironmentScope: "review/*",
+					}),
+				),
+			},
+			// Change a variable's scope
+			{
+				Config:   testAccGitlabGroupVariableScopeConfig(rString, "my-new-scope", "review/*"),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.a", &groupVariableA),
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.b", &groupVariableB),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariableA, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s-a", rString),
+						EnvironmentScope: "my-new-scope",
+					}),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariableB, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s-b", rString),
+						EnvironmentScope: "review/*",
+					}),
+				),
+			},
+			// Change both variables scopes at the same time
+			{
+				Config:   testAccGitlabGroupVariableScopeConfig(rString, "my-new-new-scope", "review/hello-world"),
+				SkipFunc: isRunningInCE,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.a", &groupVariableA),
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.b", &groupVariableB),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariableA, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s-a", rString),
+						EnvironmentScope: "my-new-new-scope",
+					}),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariableB, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s-b", rString),
+						EnvironmentScope: "review/hello-world",
 					}),
 				),
 			},
@@ -85,10 +158,11 @@ func testAccCheckGitlabGroupVariableExists(n string, groupVariable *gitlab.Group
 }
 
 type testAccGitlabGroupVariableExpectedAttributes struct {
-	Key       string
-	Value     string
-	Protected bool
-	Masked    bool
+	Key              string
+	Value            string
+	Protected        bool
+	Masked           bool
+	EnvironmentScope string
 }
 
 func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, want *testAccGitlabGroupVariableExpectedAttributes) resource.TestCheckFunc {
@@ -107,6 +181,10 @@ func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, w
 
 		if variable.Masked != want.Masked {
 			return fmt.Errorf("got masked %t; want %t", variable.Masked, want.Masked)
+		}
+
+		if variable.EnvironmentScope != want.EnvironmentScope {
+			return fmt.Errorf("got environment_scope %s; want %s", variable.EnvironmentScope, want.EnvironmentScope)
 		}
 
 		return nil
@@ -169,4 +247,27 @@ resource "gitlab_group_variable" "foo" {
   masked = false
 }
 	`, rString, rString, rString, rString)
+}
+
+func testAccGitlabGroupVariableScopeConfig(rString, scopeA, scopeB string) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo%v"
+  path = "foo%v"
+}
+
+resource "gitlab_group_variable" "a" {
+  group             = "${gitlab_group.foo.id}"
+  key               = "key_%s"
+  value             = "value-%s-a"
+  environment_scope = "%s"
+}
+
+resource "gitlab_group_variable" "b" {
+  group             = "${gitlab_group.foo.id}"
+  key               = "key_%s"
+  value             = "value-%s-b"
+  environment_scope = "%s"
+}
+	`, rString, rString, rString, rString, scopeA, rString, rString, scopeB)
 }
