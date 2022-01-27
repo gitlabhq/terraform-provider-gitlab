@@ -83,7 +83,7 @@ resource "gitlab_project" "test"{
 }
 
 data "gitlab_project" "foo" {
-	id = gitlab_project.test.path_with_namespace
+	path_with_namespace = gitlab_project.test.path_with_namespace
 }
 	`, projectname, projectname)
 }
