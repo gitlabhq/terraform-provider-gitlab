@@ -19,7 +19,13 @@ func dataSourceGitlabProject() *schema.Resource {
 		Schema: map[string]*schema.Schema{
 			"id": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+				Computed: true,
+				ExactlyOneOf: []string{
+					"id",
+					"path_with_namespace",
+				},
+				Description: "The ID of the project",
 			},
 			"name": {
 				Type:     schema.TypeString,
@@ -31,7 +37,13 @@ func dataSourceGitlabProject() *schema.Resource {
 			},
 			"path_with_namespace": {
 				Type:     schema.TypeString,
+				Optional: true,
 				Computed: true,
+				ExactlyOneOf: []string{
+					"id",
+					"path_with_namespace",
+				},
+				Description: "The full path of the project including the namespace",
 			},
 			"description": {
 				Type:     schema.TypeString,
@@ -163,9 +175,16 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 
 	log.Printf("[INFO] Reading Gitlab project")
 
-	v, _ := d.GetOk("id")
+	var pid interface{}
+	if v, ok := d.GetOk("id"); ok {
+		pid = v
+	} else if v, ok := d.GetOk("path_with_namespace"); ok {
+		pid = v
+	} else {
+		return diag.Errorf("Must specify either id or path_with_namespace")
+	}
 
-	found, _, err := client.Projects.GetProject(v, nil, gitlab.WithContext(ctx))
+	found, _, err := client.Projects.GetProject(pid, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
