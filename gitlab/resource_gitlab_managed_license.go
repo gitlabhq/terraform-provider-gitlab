@@ -1,9 +1,11 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 	"log"
 	"strconv"
@@ -11,10 +13,10 @@ import (
 
 func resourceGitlabManagedLicense() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabManagedLicenseCreate,
-		Read:   resourceGitlabManagedLicenseRead,
-		Update: resourceGitlabManagedLicenseUpdate,
-		Delete: resourceGitlabManagedLicenseDelete,
+		CreateContext: resourceGitlabManagedLicenseCreate,
+		ReadContext:   resourceGitlabManagedLicenseRead,
+		UpdateContext: resourceGitlabManagedLicenseUpdate,
+		DeleteContext: resourceGitlabManagedLicenseDelete,
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -39,7 +41,7 @@ func resourceGitlabManagedLicense() *schema.Resource {
 	}
 }
 
-func resourceGitlabManagedLicenseCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabManagedLicenseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 
@@ -50,45 +52,45 @@ func resourceGitlabManagedLicenseCreate(d *schema.ResourceData, meta interface{}
 
 	log.Printf("[DEBUG] create gitlab Managed License on Project %s, with Name %s", project, *options.Name)
 
-	addManagedLicense, _, err := client.ManagedLicenses.AddManagedLicense(project, options)
+	addManagedLicense, _, err := client.ManagedLicenses.AddManagedLicense(project, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(addManagedLicense.ID))
-	return resourceGitlabManagedLicenseRead(d, meta)
+	return resourceGitlabManagedLicenseRead(ctx, d, meta)
 }
 
-func resourceGitlabManagedLicenseDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabManagedLicenseDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	licenseId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
 	}
 
 	log.Printf("[DEBUG] Delete gitlab Managed License %s", d.Id())
-	_, err = client.ManagedLicenses.DeleteManagedLicense(project, licenseId)
+	_, err = client.ManagedLicenses.DeleteManagedLicense(project, licenseId, gitlab.WithContext(ctx))
 	if err != nil {
-		return fmt.Errorf("failed to delete managed license %d for projec %s: %w", licenseId, project, err)
+		return diag.FromErr(fmt.Errorf("failed to delete managed license %d for projec %s: %w", licenseId, project, err))
 	}
 
 	return nil
 }
 
-func resourceGitlabManagedLicenseRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabManagedLicenseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	id, err := strconv.Atoi(d.Id())
 
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
 	}
 	log.Printf("[DEBUG] read gitlab Managed License for project/id %s/%d", project, id)
 
-	license, _, err := client.ManagedLicenses.GetManagedLicense(project, id)
+	license, _, err := client.ManagedLicenses.GetManagedLicense(project, id, gitlab.WithContext(ctx))
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
 	}
 
 	d.Set("project", license.ID)
@@ -98,12 +100,12 @@ func resourceGitlabManagedLicenseRead(d *schema.ResourceData, meta interface{}) 
 	return nil
 }
 
-func resourceGitlabManagedLicenseUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabManagedLicenseUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	licenseId, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return fmt.Errorf("%s cannot be converted to int", d.Id())
+		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
 	}
 
 	opts := &gitlab.EditManagedLicenceOptions{
@@ -115,12 +117,12 @@ func resourceGitlabManagedLicenseUpdate(d *schema.ResourceData, meta interface{}
 	}
 
 	log.Printf("[DEBUG] update gitlab Managed License %s", d.Id())
-	_, _, err = client.ManagedLicenses.EditManagedLicense(project, licenseId, opts)
+	_, _, err = client.ManagedLicenses.EditManagedLicense(project, licenseId, opts, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return resourceGitlabManagedLicenseRead(d, meta)
+	return resourceGitlabManagedLicenseRead(ctx, d, meta)
 }
 
 // Convert the incoming string into the proper constant value for passing into the API.
