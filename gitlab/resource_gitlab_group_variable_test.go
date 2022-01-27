@@ -148,7 +148,7 @@ func testAccCheckGitlabGroupVariableExists(n string, groupVariable *gitlab.Group
 		}
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotVariable, _, err := conn.GroupVariables.GetVariable(repoName, key)
+		gotVariable, _, err := conn.GroupVariables.GetVariable(repoName, key, modifyRequestAddEnvironmentFilter(rs.Primary.Attributes["environment_scope"]))
 		if err != nil {
 			return err
 		}
