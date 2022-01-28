@@ -17,7 +17,7 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 	var pat testAccGitlabProjectAccessTokenWrapper
 	rInt := acctest.RandInt()
 
-	ctx := testAccGitlabProjectStart(t)
+	testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -53,7 +53,7 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 				Config: testAccGitlabProjectAccessTokenUpdateConfigWithCICDvar(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectAccessTokenExists("gitlab_project_access_token.bar", &pat),
-					testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.var"),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.var"),
 					testAccCheckGitlabProjectAccessTokenAttributes(&pat, &testAccGitlabProjectAccessTokenExpectedAttributes{
 						name:      "my new project token",
 						scopes:    map[string]bool{"read_repository": false, "api": true, "write_repository": false, "read_api": false},

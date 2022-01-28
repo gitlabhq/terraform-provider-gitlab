@@ -9,10 +9,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/xanzy/go-gitlab"
 )
 
-func testAccCheckGitlabProjectVariableExists(client *gitlab.Client, name string) resource.TestCheckFunc {
+func testAccCheckGitlabProjectVariableExists(name string) resource.TestCheckFunc {
 	var (
 		key              string
 		value            string
@@ -27,7 +26,7 @@ func testAccCheckGitlabProjectVariableExists(client *gitlab.Client, name string)
 		func(state *terraform.State) error {
 			attributes := state.RootModule().Resources[name].Primary.Attributes
 
-			got, err := getProjectVariable(context.Background(), client, attributes["project"], attributes["key"], attributes["environment_scope"])
+			got, err := getProjectVariable(context.Background(), testGitlabClient, attributes["project"], attributes["key"], attributes["environment_scope"])
 			if err != nil {
 				return err
 			}
@@ -56,7 +55,7 @@ func testAccCheckGitlabProjectVariableExists(client *gitlab.Client, name string)
 
 func testAccGitlabProjectVariableCheckAllVariablesDestroyed(ctx testAccGitlabProjectContext) func(state *terraform.State) error {
 	return func(state *terraform.State) error {
-		vars, _, err := ctx.client.ProjectVariables.ListVariables(ctx.project.ID, nil)
+		vars, _, err := testGitlabClient.ProjectVariables.ListVariables(ctx.project.ID, nil)
 		if err != nil {
 			return err
 		}
@@ -86,7 +85,7 @@ resource "gitlab_project_variable" "foo" {
   value = "my_value"
 }
 `, ctx.project.PathWithNamespace),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			{
 				ResourceName:      "gitlab_project_variable.foo",
@@ -102,12 +101,12 @@ resource "gitlab_project_variable" "foo" {
   value = "my_value"
 }
 `, ctx.project.ID),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			// Check that the variable is recreated if deleted out-of-band.
 			{
 				PreConfig: func() {
-					if _, err := ctx.client.ProjectVariables.RemoveVariable(ctx.project.ID, "my_key"); err != nil {
+					if _, err := testGitlabClient.ProjectVariables.RemoveVariable(ctx.project.ID, "my_key"); err != nil {
 						t.Fatalf("failed to remove variable: %v", err)
 					}
 				},
@@ -118,7 +117,7 @@ resource "gitlab_project_variable" "foo" {
   value = "my_value"
 }
 `, ctx.project.ID),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			// Update the variable_type.
 			{
@@ -130,7 +129,7 @@ resource "gitlab_project_variable" "foo" {
   variable_type = "file"
 }
 `, ctx.project.ID),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			// Update all other attributes.
 			{
@@ -143,7 +142,7 @@ resource "gitlab_project_variable" "foo" {
   masked = true
 }
 `, ctx.project.ID),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			{
 				ResourceName:      "gitlab_project_variable.foo",
@@ -180,7 +179,7 @@ func TestAccGitlabProjectVariable_scoped(t *testing.T) {
 		CheckDestroy: func(state *terraform.State) error {
 			// Destroy behavior is nondeterministic for variables with scopes in GitLab versions prior to 13.4
 			// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209
-			if isAtLeast134, err := isGitLabVersionAtLeast(ctx.client, "13.4")(); err != nil {
+			if isAtLeast134, err := isGitLabVersionAtLeast(testGitlabClient, "13.4")(); err != nil {
 				return err
 			} else if isAtLeast134 {
 				return testAccGitlabProjectVariableCheckAllVariablesDestroyed(ctx)(state)
@@ -197,7 +196,7 @@ resource "gitlab_project_variable" "foo" {
   value = "my_value"
 }
 `, ctx.project.ID),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			// Update the scope.
 			{
@@ -209,7 +208,7 @@ resource "gitlab_project_variable" "foo" {
   environment_scope = "foo"
 }
 `, ctx.project.ID),
-				Check: testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
+				Check: testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
 			},
 			// Add a second variable with the same key and different scope.
 			{
@@ -229,8 +228,8 @@ resource "gitlab_project_variable" "bar" {
 }
 `, ctx.project.ID),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
-					testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.bar"),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.bar"),
 				),
 			},
 			{
@@ -246,7 +245,7 @@ resource "gitlab_project_variable" "bar" {
 			// Update an attribute on one of the variables.
 			// Updating a variable with a non-unique key only works reliably on GitLab v13.4+.
 			{
-				SkipFunc: isGitLabVersionLessThan(ctx.client, "13.4"),
+				SkipFunc: isGitLabVersionLessThan(testGitlabClient, "13.4"),
 				Config: fmt.Sprintf(`
 resource "gitlab_project_variable" "foo" {
   project = %[1]d
@@ -263,14 +262,14 @@ resource "gitlab_project_variable" "bar" {
 }
 `, ctx.project.ID),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.foo"),
-					testAccCheckGitlabProjectVariableExists(ctx.client, "gitlab_project_variable.bar"),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.foo"),
+					testAccCheckGitlabProjectVariableExists("gitlab_project_variable.bar"),
 				),
 			},
 			// Try to have two variables with the same keys and scopes.
 			// On versions of GitLab < 13.4 this can sometimes result in an inconsistent state instead of an error.
 			{
-				SkipFunc: isGitLabVersionLessThan(ctx.client, "13.4"),
+				SkipFunc: isGitLabVersionLessThan(testGitlabClient, "13.4"),
 				Config: fmt.Sprintf(`
 resource "gitlab_project_variable" "foo" {
   project = %[1]d

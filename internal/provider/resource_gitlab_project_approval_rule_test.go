@@ -16,25 +16,22 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	// Set up project, groups, users, and branches to use in the test.
 
 	testAccCheck(t)
-
-	client := testAccNewClient(t)
-
-	testAccCheckEE(t, client)
+	testAccCheckEE(t)
 
 	// Need to get the current user (usually the admin) because they are automatically added as group members, and we
 	// will need the user ID for our assertions later.
-	currentUser := testAccCurrentUser(t, client)
+	currentUser := testAccCurrentUser(t)
 
-	project := testAccCreateProject(t, client)
-	projectUsers := testAccCreateUsers(t, client, 2)
-	branches := testAccCreateProtectedBranches(t, client, project, 2)
-	groups := testAccCreateGroups(t, client, 2)
-	group0Users := testAccCreateUsers(t, client, 1)
-	group1Users := testAccCreateUsers(t, client, 1)
+	project := testAccCreateProject(t)
+	projectUsers := testAccCreateUsers(t, 2)
+	branches := testAccCreateProtectedBranches(t, project, 2)
+	groups := testAccCreateGroups(t, 2)
+	group0Users := testAccCreateUsers(t, 1)
+	group1Users := testAccCreateUsers(t, 1)
 
-	testAccAddProjectMembers(t, client, project.ID, projectUsers) // Users must belong to the project for rules to work.
-	testAccAddGroupMembers(t, client, groups[0].ID, group0Users)
-	testAccAddGroupMembers(t, client, groups[1].ID, group1Users)
+	testAccAddProjectMembers(t, project.ID, projectUsers) // Users must belong to the project for rules to work.
+	testAccAddGroupMembers(t, groups[0].ID, group0Users)
+	testAccAddGroupMembers(t, groups[1].ID, group1Users)
 
 	// Terraform test starts here.
 
@@ -42,7 +39,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabProjectApprovalRuleDestroy(client, project.ID),
+		CheckDestroy:      testAccCheckGitlabProjectApprovalRuleDestroy(project.ID),
 		Steps: []resource.TestStep{
 			// Create rule
 			{
@@ -162,10 +159,10 @@ func testAccCheckGitlabProjectApprovalRuleExists(n string, projectApprovalRule *
 	}
 }
 
-func testAccCheckGitlabProjectApprovalRuleDestroy(client *gitlab.Client, pid interface{}) resource.TestCheckFunc {
+func testAccCheckGitlabProjectApprovalRuleDestroy(pid interface{}) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		return InterceptGomegaFailure(func() {
-			rules, _, err := client.Projects.GetProjectApprovalRules(pid)
+			rules, _, err := testGitlabClient.Projects.GetProjectApprovalRules(pid)
 			Expect(err).To(BeNil())
 			Expect(rules).To(BeEmpty())
 		})
