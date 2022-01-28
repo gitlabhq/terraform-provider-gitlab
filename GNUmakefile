@@ -3,6 +3,7 @@ default: reviewable
 reviewable: build fmt generate test ## Run before committing.
 
 GOBIN = $(shell pwd)/bin
+PROVIDER_SRC_DIR := ./internal/provider
 
 build: ## Build the provider binary.
 	go mod tidy
@@ -17,7 +18,7 @@ TESTARGS += -test.run $(RUN)
 endif
 
 test: ## Run unit tests.
-	go test $(TESTARGS) ./gitlab
+	go test $(TESTARGS) $(PROVIDER_SRC_DIR)
 
 TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
 
@@ -68,7 +69,7 @@ testacc-down: ## Teardown a GitLab instance.
 	docker-compose down
 
 testacc: ## Run acceptance tests against a GitLab instance.
-	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v ./gitlab $(TESTARGS) -timeout 40m
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
 
 # TOOLS
 # Tool dependencies are installed into a project-local /bin folder.
