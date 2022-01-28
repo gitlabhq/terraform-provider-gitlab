@@ -3,9 +3,9 @@ package gitlab
 import (
 	"context"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 	"log"
 	"strconv"
@@ -17,6 +17,9 @@ func resourceGitlabManagedLicense() *schema.Resource {
 		ReadContext:   resourceGitlabManagedLicenseRead,
 		UpdateContext: resourceGitlabManagedLicenseUpdate,
 		DeleteContext: resourceGitlabManagedLicenseDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
