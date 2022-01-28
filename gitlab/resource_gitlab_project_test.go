@@ -383,6 +383,21 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectArchivedOnDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigArchiveOnDestroy(rInt),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
@@ -881,6 +896,27 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 	return nil
 }
 
+func testAccCheckGitlabProjectArchivedOnDestroy(s *terraform.State) error {
+	conn := testAccProvider.Meta().(*gitlab.Client)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gitlab_project" {
+			continue
+		}
+
+		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		if err != nil {
+			return fmt.Errorf("unable to get project %s, to check if it has been archived on the destroy", rs.Primary.ID)
+		}
+
+		if !gotRepo.Archived {
+			return fmt.Errorf("expected project to be archived, but it isn't")
+		}
+		return nil
+	}
+
+	return fmt.Errorf("no project resources found in state, but expected a `gitlab_project` resource marked as archvied")
+}
+
 func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) resource.TestCheckFunc {
 	var checks []resource.TestCheckFunc
 
@@ -1340,6 +1376,18 @@ resource "gitlab_project" "foo" {
   description = "Terraform acceptance tests"
   issues_template = "foo"
   merge_requests_template = "bar"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigArchiveOnDestroy(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  archive_on_destroy = true
+  archived = false
 }
 	`, rInt, rInt)
 }

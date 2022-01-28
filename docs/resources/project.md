@@ -44,6 +44,7 @@ resource "gitlab_project" "example-two" {
 
 - **allow_merge_on_skipped_pipeline** (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
 - **approvals_before_merge** (Number) Number of merge request approvals required for merging. Default is 0.
+- **archive_on_destroy** (Boolean) Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
 - **archived** (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 - **build_coverage_regex** (String) Test coverage parsing for the project.
 - **ci_config_path** (String) Custom Path to CI config file.
