@@ -13,6 +13,10 @@ import (
 
 func resourceGitlabManagedLicense() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to add rules for managing licenses on a project.\n" +
+			"For additional information, please see the " +
+			"[gitlab documentation](https://docs.gitlab.com/ee/user/compliance/license_compliance/).",
+
 		CreateContext: resourceGitlabManagedLicenseCreate,
 		ReadContext:   resourceGitlabManagedLicenseRead,
 		UpdateContext: resourceGitlabManagedLicenseUpdate,
@@ -23,22 +27,25 @@ func resourceGitlabManagedLicense() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The ID of the project under which the managed license will be created.",
 			},
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				// GitLab's edit API doesn't allow us to edit the name, only
 				// the approval status.
-				ForceNew: true,
+				ForceNew:    true,
+				Description: "The name of the managed license (I.e., 'Apache License 2.0' or 'MIT license')",
 			},
 			"approval_status": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     false,
 				ValidateFunc: validation.StringInSlice([]string{"approved", "blacklisted"}, true),
+				Description:  "Whether the license is approved or not. Only 'approved' or 'blacklisted' allowed.",
 			},
 		},
 	}

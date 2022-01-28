@@ -13,8 +13,6 @@ import (
 func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	var managedLicense gitlab.ManagedLicense
 	rInt := acctest.RandInt()
-	client := testAccNewClient(t)
-	testAccCheckEE(t, client)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() {},
@@ -23,19 +21,22 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				// Create a managed license with an "approved" state
-				Config: testManagedLicenseConfig(rInt, "approved"),
+				SkipFunc: isRunningInCE,
+				Config:   testManagedLicenseConfig(rInt, "approved"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fix_me", &managedLicense),
 				),
 			},
 			{
 				// Update the managed license to have a blacklisted state
-				Config: testManagedLicenseConfig(rInt, "blacklisted"),
+				SkipFunc: isRunningInCE,
+				Config:   testManagedLicenseConfig(rInt, "blacklisted"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fix_me", &managedLicense),
 				),
 			},
 			{
+				SkipFunc:          isRunningInCE,
 				ResourceName:      "gitlab_managed_license.foo",
 				ImportState:       true,
 				ImportStateVerify: true,
