@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"context"
@@ -73,9 +73,9 @@ func TestAccGitlabProjectVariable_basic(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccGitlabProjectVariableCheckAllVariablesDestroyed(ctx),
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccGitlabProjectVariableCheckAllVariablesDestroyed(ctx),
 		Steps: []resource.TestStep{
 			// Create a project variable from a project name.
 			{
@@ -175,8 +175,8 @@ func TestAccGitlabProjectVariable_scoped(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		CheckDestroy: func(state *terraform.State) error {
 			// Destroy behavior is nondeterministic for variables with scopes in GitLab versions prior to 13.4
 			// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209

@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -17,9 +17,9 @@ func TestAccGitlabGroupBadge_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupBadgeDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupBadgeDestroy,
 		Steps: []resource.TestStep{
 			// Create a group and badge
 			{
@@ -71,9 +71,7 @@ func testAccCheckGitlabGroupBadgeExists(n string, badge *gitlab.GroupBadge) reso
 			return fmt.Errorf("No group ID is set")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotBadge, _, err := conn.GroupBadges.GetGroupBadge(groupID, badgeID)
+		gotBadge, _, err := testGitlabClient.GroupBadges.GetGroupBadge(groupID, badgeID)
 		if err != nil {
 			return err
 		}
@@ -102,14 +100,12 @@ func testAccCheckGitlabGroupBadgeAttributes(badge *gitlab.GroupBadge, want *test
 }
 
 func testAccCheckGitlabGroupBadgeDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_group" {
 			continue
 		}
 
-		group, resp, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
+		group, resp, err := testGitlabClient.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {

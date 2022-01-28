@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -14,8 +14,8 @@ func TestAccDataSourceGitlabUsers_basic(t *testing.T) {
 	user2 := fmt.Sprintf("user%d@test.test", rInt2)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDataSourceGitlabUsersConfig(rInt, rInt2),

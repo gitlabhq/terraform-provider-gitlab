@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ func TestAccDataGitlabProjectsSearch(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDataGitlabProjectsConfigGetProjectSearch(projectName),
@@ -62,8 +62,8 @@ func TestAccDataGitlabProjectsGroups(t *testing.T) {
 	subGroupProjectName2 := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDataGitlabProjectsConfigGetGroupProjectsByGroupId(groupName, projectName),

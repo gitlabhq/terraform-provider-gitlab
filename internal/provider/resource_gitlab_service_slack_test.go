@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 	slackResourceName := "gitlab_service_slack.slack"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceSlackDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceSlackDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and a slack service with minimal settings
 			{
@@ -85,9 +85,9 @@ func TestAccGitlabServiceSlack_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceSlackDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceSlackDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabServiceSlackConfig(rInt),
@@ -117,9 +117,7 @@ func testAccCheckGitlabServiceExists(n string, service *gitlab.SlackService) res
 		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		slackService, _, err := conn.Services.GetSlackService(project)
+		slackService, _, err := testGitlabClient.Services.GetSlackService(project)
 		if err != nil {
 			return fmt.Errorf("Slack service does not exist in project %s: %v", project, err)
 		}
@@ -130,14 +128,12 @@ func testAccCheckGitlabServiceExists(n string, service *gitlab.SlackService) res
 }
 
 func testAccCheckGitlabServiceSlackDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

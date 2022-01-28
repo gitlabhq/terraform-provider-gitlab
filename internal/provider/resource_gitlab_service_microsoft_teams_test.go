@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabServiceMicrosoftTeams_basic(t *testing.T) {
 	teamsResourceName := "gitlab_service_microsoft_teams.teams"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceMicrosoftTeamsDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceMicrosoftTeamsDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and a teams service
 			{
@@ -97,9 +97,7 @@ func testAccCheckGitlabServiceMicrosoftTeamsExists(n string, service *gitlab.Mic
 		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		teamsService, _, err := conn.Services.GetMicrosoftTeamsService(project)
+		teamsService, _, err := testGitlabClient.Services.GetMicrosoftTeamsService(project)
 		if err != nil {
 			return fmt.Errorf("Microsoft Teams service does not exist in project %s: %v", project, err)
 		}
@@ -110,14 +108,12 @@ func testAccCheckGitlabServiceMicrosoftTeamsExists(n string, service *gitlab.Mic
 }
 
 func testAccCheckGitlabServiceMicrosoftTeamsDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

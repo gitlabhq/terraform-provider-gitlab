@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"encoding/json"
@@ -26,8 +26,8 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupLdapLinkDestroy,
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupLdapLinkDestroy,
 		Steps: []resource.TestStep{
 
 			// Create a group LDAP link as a developer (uses testAccGitlabGroupLdapLinkCreateConfig for Config)
@@ -114,15 +114,13 @@ func testAccCheckGitlabGroupLdapLinkAttributes(ldapLink *gitlab.LDAPGroupLink, w
 }
 
 func testAccCheckGitlabGroupLdapLinkDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	// Can't check for links if the group is destroyed so make sure all groups are destroyed instead
 	for _, resourceState := range s.RootModule().Resources {
 		if resourceState.Type != "gitlab_group" {
 			continue
 		}
 
-		group, _, err := conn.Groups.GetGroup(resourceState.Primary.ID, nil)
+		group, _, err := testGitlabClient.Groups.GetGroup(resourceState.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == resourceState.Primary.ID {
 				if group.MarkedForDeletionOn == nil {
@@ -139,8 +137,6 @@ func testAccCheckGitlabGroupLdapLinkDestroy(s *terraform.State) error {
 }
 
 func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState *terraform.ResourceState) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	groupId := resourceState.Primary.Attributes["group_id"]
 	if groupId == "" {
 		return fmt.Errorf("No group ID is set")
@@ -156,7 +152,7 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 	desiredLdapLinkId := buildTwoPartID(&desiredLdapLink.Provider, &desiredLdapLink.CN)
 
 	// Try to fetch all group links from GitLab
-	currentLdapLinks, _, err := conn.Groups.ListGroupLDAPLinks(groupId, nil)
+	currentLdapLinks, _, err := testGitlabClient.Groups.ListGroupLDAPLinks(groupId, nil)
 	if err != nil {
 		// The read/GET API wasn't implemented in GitLab until version 12.8 (March 2020, well after the add and delete APIs).
 		// If we 404, assume GitLab is at an older version and take things on faith.

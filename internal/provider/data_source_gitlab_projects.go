@@ -1,6 +1,6 @@
 // lintignore: S031 // TODO: Resolve this tfproviderlint issue
 
-package gitlab
+package provider
 
 import (
 	"context"

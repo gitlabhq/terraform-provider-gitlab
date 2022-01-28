@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabTagProtectionDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabTagProtectionDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and Tag Protection with default options
 			{
@@ -65,9 +65,9 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 	wildcard := "-*"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabTagProtectionDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabTagProtectionDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and Tag Protection with default options
 			{
@@ -111,9 +111,9 @@ func TestAccGitlabTagProtection_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabTagProtectionDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabTagProtectionDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabTagProtectionConfig(rInt, ""),
@@ -138,9 +138,7 @@ func testAccCheckGitlabTagProtectionExists(n string, pt *gitlab.ProtectedTag) re
 			return fmt.Errorf("Error in Splitting Project and Tag Ids")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		pts, _, err := conn.ProtectedTags.ListProtectedTags(project, nil)
+		pts, _, err := testGitlabClient.ProtectedTags.ListProtectedTags(project, nil)
 		if err != nil {
 			return err
 		}
@@ -174,7 +172,6 @@ func testAccCheckGitlabTagProtectionAttributes(pt *gitlab.ProtectedTag, want *te
 }
 
 func testAccCheckGitlabTagProtectionDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
 	var project string
 	var tag string
 	for _, rs := range s.RootModule().Resources {
@@ -185,7 +182,7 @@ func testAccCheckGitlabTagProtectionDestroy(s *terraform.State) error {
 		}
 	}
 
-	pt, _, err := conn.ProtectedTags.GetProtectedTag(project, tag)
+	pt, _, err := testGitlabClient.ProtectedTags.GetProtectedTag(project, tag)
 	if err == nil {
 		if pt != nil {
 			return fmt.Errorf("project tag protection %s still exists", tag)

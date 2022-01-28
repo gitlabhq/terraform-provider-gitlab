@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectHookDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectHookDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and hook with default options
 			{
@@ -86,9 +86,8 @@ func testAccCheckGitlabProjectHookExists(n string, hook *gitlab.ProjectHook) res
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotHook, _, err := conn.Projects.GetProjectHook(repoName, hookID)
+		gotHook, _, err := testGitlabClient.Projects.GetProjectHook(repoName, hookID)
 		if err != nil {
 			return err
 		}
@@ -177,14 +176,12 @@ func testAccCheckGitlabProjectHookAttributes(hook *gitlab.ProjectHook, want *tes
 }
 
 func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

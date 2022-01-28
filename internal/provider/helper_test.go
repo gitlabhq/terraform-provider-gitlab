@@ -1,7 +1,6 @@
-package gitlab
+package provider
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -43,17 +42,14 @@ func testAccCompareGitLabAttribute(attr string, expected, received *schema.Resou
 // Returns true if the acceptance test is running Gitlab EE.
 // Meant to be used as SkipFunc to skip tests that work only on Gitlab CE.
 func isRunningInEE() (bool, error) {
-	if conn, ok := testAccProvider.Meta().(*gitlab.Client); ok {
-		version, _, err := conn.Version.GetVersion()
-		if err != nil {
-			return false, err
-		}
-		if strings.Contains(version.String(), "-ee") {
-			return true, nil
-		}
-	} else {
-		return false, errors.New("Provider not initialized, unable to get GitLab connection")
+	version, _, err := testGitlabClient.Version.GetVersion()
+	if err != nil {
+		return false, err
 	}
+	if strings.Contains(version.String(), "-ee") {
+		return true, nil
+	}
+
 	return false, nil
 }
 

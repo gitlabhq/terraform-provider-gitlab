@@ -1,10 +1,11 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
-	. "github.com/onsi/gomega"
 	"strconv"
 	"testing"
+
+	. "github.com/onsi/gomega"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -40,8 +41,8 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	var projectApprovalRule gitlab.ProjectApprovalRule
 
 	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectApprovalRuleDestroy(client, project.ID),
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectApprovalRuleDestroy(client, project.ID),
 		Steps: []resource.TestStep{
 			// Create rule
 			{
@@ -145,9 +146,7 @@ func testAccCheckGitlabProjectApprovalRuleExists(n string, projectApprovalRule *
 			return err
 		}
 
-		client := testAccProvider.Meta().(*gitlab.Client)
-
-		rules, _, err := client.Projects.GetProjectApprovalRules(projectID)
+		rules, _, err := testGitlabClient.Projects.GetProjectApprovalRules(projectID)
 		if err != nil {
 			return err
 		}

@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabGroupCluster_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupClusterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupClusterDestroy,
 		Steps: []resource.TestStep{
 			// Create a group and cluster with default options
 			{
@@ -103,9 +103,9 @@ func TestAccGitlabGroupCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupClusterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupClusterDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabGroupClusterConfig(rInt, true),
@@ -142,9 +142,7 @@ func testAccCheckGitlabGroupClusterExists(n string, cluster *gitlab.GroupCluster
 			return err
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotCluster, _, err := conn.GroupCluster.GetCluster(group, clusterID)
+		gotCluster, _, err := testGitlabClient.GroupCluster.GetCluster(group, clusterID)
 		if err != nil {
 			return err
 		}
@@ -156,7 +154,6 @@ func testAccCheckGitlabGroupClusterExists(n string, cluster *gitlab.GroupCluster
 }
 
 func testAccCheckGitlabGroupClusterDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_group_cluster" {
@@ -168,7 +165,7 @@ func testAccCheckGitlabGroupClusterDestroy(s *terraform.State) error {
 			return err
 		}
 
-		gotCluster, _, err := conn.GroupCluster.GetCluster(group, clusterID)
+		gotCluster, _, err := testGitlabClient.GroupCluster.GetCluster(group, clusterID)
 		if err == nil {
 			if gotCluster != nil && fmt.Sprintf("%d", gotCluster.ID) == group {
 				return fmt.Errorf("group cluster still exists")

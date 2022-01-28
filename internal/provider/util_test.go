@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"testing"

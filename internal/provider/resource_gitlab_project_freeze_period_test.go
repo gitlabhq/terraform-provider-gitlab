@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabProjectFreezePeriod_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and freeze period with default options
 			{
@@ -64,9 +64,9 @@ func TestAccGitlabProjectFreezePeriod_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectFreezePeriodConfig(rInt),
@@ -92,8 +92,7 @@ func testAccCheckGitlabProjectFreezePeriodExists(n string, freezePeriod *gitlab.
 			return err
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		gotFreezePeriod, _, err := conn.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID)
+		gotFreezePeriod, _, err := testGitlabClient.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID)
 		if err != nil {
 			return err
 		}

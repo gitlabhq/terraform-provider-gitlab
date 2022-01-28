@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectLevelMRApprovalsDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
@@ -69,9 +69,9 @@ func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectLevelMRApprovalsDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
@@ -113,14 +113,12 @@ func testAccCheckGitlabProjectLevelMRApprovalsAttributes(projectApprovals *gitla
 }
 
 func testAccCheckGitlabProjectLevelMRApprovalsDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
@@ -147,9 +145,8 @@ func testAccCheckGitlabProjectLevelMRApprovalsExists(n string, projectApprovals 
 		if projectId == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotApprovalConfig, _, err := conn.Projects.GetApprovalConfiguration(projectId)
+		gotApprovalConfig, _, err := testGitlabClient.Projects.GetApprovalConfiguration(projectId)
 		if err != nil {
 			return err
 		}

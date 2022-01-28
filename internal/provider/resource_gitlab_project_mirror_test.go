@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"errors"
@@ -17,9 +17,9 @@ func TestAccGitlabProjectMirror_basic(t *testing.T) {
 	var miror gitlab.ProjectMirror
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectMirrorDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{
 			// Create with default options
 			{
@@ -74,9 +74,9 @@ func TestAccGitlabProjectMirror_withPassword(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectMirrorDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and mirror with a username / password.
 			{
@@ -103,9 +103,8 @@ func testAccCheckGitlabProjectMirrorExists(n string, mirror *gitlab.ProjectMirro
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		mirrors, _, err := conn.ProjectMirrors.ListProjectMirror(repoName, nil)
+		mirrors, _, err := testGitlabClient.ProjectMirrors.ListProjectMirror(repoName, nil)
 		if err != nil {
 			return err
 		}

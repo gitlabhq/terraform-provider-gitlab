@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabDeployKeyDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with default options
 			{
@@ -61,9 +61,9 @@ func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabDeployKeyDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with newline as suffix
 			{
@@ -79,9 +79,9 @@ func TestAccGitlabDeployKey_import(t *testing.T) {
 	resourceName := "gitlab_deploy_key.foo"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabDeployKeyDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabDeployKeyConfig(rInt, ""),
@@ -111,9 +111,7 @@ func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.DeployKey) re
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(repoName, deployKeyID)
+		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(repoName, deployKeyID)
 		if err != nil {
 			return err
 		}
@@ -147,8 +145,6 @@ func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.DeployKey, want *te
 }
 
 func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
@@ -156,7 +152,7 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		deployKeyID, err := strconv.Atoi(rs.Primary.ID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
 		project := rs.Primary.Attributes["project"]
 
-		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
+		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
 		if err == nil {
 			if gotDeployKey != nil && fmt.Sprintf("%d", gotDeployKey.ID) == rs.Primary.ID {
 				return fmt.Errorf("Deploy key still exists")

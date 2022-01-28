@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabLabelDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabLabelDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and label with default options
 			{
@@ -101,9 +101,8 @@ func testAccCheckGitlabLabelExists(n string, label *gitlab.Label) resource.TestC
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		labels, _, err := conn.Labels.ListLabels(repoName, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{PerPage: 1000}})
+		labels, _, err := testGitlabClient.Labels.ListLabels(repoName, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{PerPage: 1000}})
 		if err != nil {
 			return err
 		}
@@ -142,14 +141,12 @@ func testAccCheckGitlabLabelAttributes(label *gitlab.Label, want *testAccGitlabL
 }
 
 func testAccCheckGitlabLabelDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

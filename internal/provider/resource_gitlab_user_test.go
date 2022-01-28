@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -17,9 +17,9 @@ func TestAccGitlabUser_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabUserDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabUserDestroy,
 		Steps: []resource.TestStep{
 			// Create a user
 			{
@@ -156,9 +156,9 @@ func TestAccGitlabUser_password_reset(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			// Test that either password or reset_password is needed
 			{
@@ -195,11 +195,9 @@ func testAccCheckGitlabUserExists(n string, user *gitlab.User) resource.TestChec
 		if userID == "" {
 			return fmt.Errorf("No user ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		id, _ := strconv.Atoi(userID)
 
-		gotUser, _, err := conn.Users.GetUser(id, gitlab.GetUsersOptions{})
+		gotUser, _, err := testGitlabClient.Users.GetUser(id, gitlab.GetUsersOptions{})
 		if err != nil {
 			return err
 		}
@@ -258,8 +256,6 @@ func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUser
 }
 
 func testAccCheckGitlabUserDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_user" {
 			continue
@@ -267,7 +263,7 @@ func testAccCheckGitlabUserDestroy(s *terraform.State) error {
 
 		id, _ := strconv.Atoi(rs.Primary.ID)
 
-		user, _, err := conn.Users.GetUser(id, gitlab.GetUsersOptions{})
+		user, _, err := testGitlabClient.Users.GetUser(id, gitlab.GetUsersOptions{})
 		if err == nil {
 			if user != nil && fmt.Sprintf("%d", user.ID) == rs.Primary.ID {
 				return fmt.Errorf("User still exists")

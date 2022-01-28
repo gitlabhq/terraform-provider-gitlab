@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabDeployToken_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabDeployTokenDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployTokenDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabDeployTokenConfig(rInt),
@@ -46,17 +46,15 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 			return err
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		projectName := rs.Primary.Attributes["project"]
 		groupName := rs.Primary.Attributes["group"]
 
 		var gotDeployTokens []*gitlab.DeployToken
 
 		if projectName != "" {
-			gotDeployTokens, _, err = conn.DeployTokens.ListProjectDeployTokens(projectName, nil)
+			gotDeployTokens, _, err = testGitlabClient.DeployTokens.ListProjectDeployTokens(projectName, nil)
 		} else if groupName != "" {
-			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(groupName, nil)
+			gotDeployTokens, _, err = testGitlabClient.DeployTokens.ListGroupDeployTokens(groupName, nil)
 		} else {
 			return fmt.Errorf("No project or group ID is set")
 		}
@@ -97,8 +95,6 @@ func testAccCheckGitlabDeployTokenAttributes(deployToken *gitlab.DeployToken, wa
 }
 
 func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_deploy_token" {
 			continue
@@ -115,9 +111,9 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 		var gotDeployTokens []*gitlab.DeployToken
 
 		if project != "" {
-			gotDeployTokens, _, err = conn.DeployTokens.ListProjectDeployTokens(project, nil)
+			gotDeployTokens, _, err = testGitlabClient.DeployTokens.ListProjectDeployTokens(project, nil)
 		} else if group != "" {
-			gotDeployTokens, _, err = conn.DeployTokens.ListGroupDeployTokens(group, nil)
+			gotDeployTokens, _, err = testGitlabClient.DeployTokens.ListGroupDeployTokens(group, nil)
 		} else {
 			return fmt.Errorf("somehow neither project nor group were set")
 		}

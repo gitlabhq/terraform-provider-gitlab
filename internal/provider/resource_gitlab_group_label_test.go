@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupLabelDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupLabelDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabGroupLabelConfig(rInt),
@@ -90,9 +90,9 @@ func TestAccGitlabGroupLabel_import(t *testing.T) {
 	resourceName := "gitlab_group_label.fixme"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupLabelDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupLabelDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabGroupLabelConfig(rInt),
@@ -139,9 +139,8 @@ func testAccCheckGitlabGroupLabelExists(n string, label *gitlab.GroupLabel) reso
 		if groupName == "" {
 			return fmt.Errorf("No group ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		labels, _, err := conn.GroupLabels.ListGroupLabels(groupName, &gitlab.ListGroupLabelsOptions{PerPage: 1000})
+		labels, _, err := testGitlabClient.GroupLabels.ListGroupLabels(groupName, &gitlab.ListGroupLabelsOptions{PerPage: 1000})
 		if err != nil {
 			return err
 		}
@@ -180,14 +179,12 @@ func testAccCheckGitlabGroupLabelAttributes(label *gitlab.GroupLabel, want *test
 }
 
 func testAccCheckGitlabGroupLabelDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_group" {
 			continue
 		}
 
-		group, _, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
+		group, _, err := testGitlabClient.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {

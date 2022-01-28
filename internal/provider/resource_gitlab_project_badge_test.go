@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -17,9 +17,9 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectBadgeDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectBadgeDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and badge
 			{
@@ -71,9 +71,7 @@ func testAccCheckGitlabProjectBadgeExists(n string, badge *gitlab.ProjectBadge) 
 			return fmt.Errorf("No project ID is set")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotBadge, _, err := conn.ProjectBadges.GetProjectBadge(repoName, badgeID)
+		gotBadge, _, err := testGitlabClient.ProjectBadges.GetProjectBadge(repoName, badgeID)
 		if err != nil {
 			return err
 		}
@@ -102,14 +100,12 @@ func testAccCheckGitlabProjectBadgeAttributes(badge *gitlab.ProjectBadge, want *
 }
 
 func testAccCheckGitlabProjectBadgeDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -20,9 +20,9 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 	key := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDblguSWgpqiXIjHPSas4+N3Dten7MTLJMlGQXxGpaqN9nGPdNmuRB2YXyjT/nrryoY/qrtuVkPnis5WVo8N/s3hAnJbeJPUS2WKEGjpBlL34AQ+ANnlmGY8L6zr82Hp2Ommb7XGGtlq5D3yLCgTfcXLjC51tgcdwHsdH1U+RisgLwaTSrP/HF4G7IAr5ATsyYjtCwQRQ8ijdf5A34+XN6h8J6TLXKab5eZDuH38s9LxJuS7MRxx/P2UTOsqfjtrZWoQgE5adEGvnDxKyruex9PzNbCNVahzsma7tdikDbzxlHLIZ1aht6rKuai3iyLgcZfGIYtkq4xvg/bnNXxSsGf worker@kg.getwifi.com"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabDeployKeyEnableDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployKeyEnableDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with default options
 			{
@@ -54,9 +54,8 @@ func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.DeployK
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(repoName, deployKeyID)
+		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(repoName, deployKeyID)
 		if err != nil {
 			return err
 		}
@@ -90,8 +89,6 @@ func testAccCheckGitlabDeployKeyEnableAttributes(deployKey *gitlab.DeployKey, wa
 }
 
 func testAccCheckGitlabDeployKeyEnableDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	var project string
 	var deployKeyID int
 
@@ -103,7 +100,7 @@ func testAccCheckGitlabDeployKeyEnableDestroy(s *terraform.State) error {
 		}
 	}
 
-	gotDeployKey, _, err := conn.DeployKeys.GetDeployKey(project, deployKeyID)
+	gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
 	if err == nil {
 		if gotDeployKey != nil {
 			return fmt.Errorf("Deploy key still exists: %d", deployKeyID)

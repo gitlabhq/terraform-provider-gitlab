@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 	githubResourceName := "gitlab_service_github.github"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceGithubDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceGithubDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and a github service
 			{
@@ -60,9 +60,9 @@ func TestAccGitlabServiceGithub_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceGithubDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceGithubDestroy,
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
@@ -93,9 +93,7 @@ func testAccCheckGitlabServiceGithubExists(n string, service *gitlab.GithubServi
 		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		githubService, _, err := conn.Services.GetGithubService(project)
+		githubService, _, err := testGitlabClient.Services.GetGithubService(project)
 		if err != nil {
 			return fmt.Errorf("Github service does not exist in project %s: %v", project, err)
 		}
@@ -106,14 +104,12 @@ func testAccCheckGitlabServiceGithubExists(n string, service *gitlab.GithubServi
 }
 
 func testAccCheckGitlabServiceGithubDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

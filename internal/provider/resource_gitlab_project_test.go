@@ -1,6 +1,6 @@
 // lintignore: AT012 // TODO: Resolve this tfproviderlint issue
 
-package gitlab
+package provider
 
 import (
 	"errors"
@@ -59,9 +59,9 @@ func TestAccGitlabProject_basic(t *testing.T) {
 	defaultsMainBranch.DefaultBranch = "main"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			// Create a project with all the features on (note: "archived" is "false")
 			{
@@ -256,11 +256,9 @@ max_file_size = 123
 						DefaultBranch: "master",
 					}),
 					func(state *terraform.State) error {
-						client := testAccProvider.Meta().(*gitlab.Client)
-
 						projectID := state.RootModule().Resources["gitlab_project.template-name"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, ".ruby-version", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, ".ruby-version", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get '.ruby-version' file from template project: %w", err)
 						}
@@ -279,11 +277,9 @@ max_file_size = 123
 						DefaultBranch: "master",
 					}),
 					func(state *terraform.State) error {
-						client := testAccProvider.Meta().(*gitlab.Client)
-
 						projectID := state.RootModule().Resources["gitlab_project.template-name-custom"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "Gemfile", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "Gemfile", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get 'Gemfile' file from template project: %w", err)
 						}
@@ -302,11 +298,9 @@ max_file_size = 123
 						DefaultBranch: "master",
 					}),
 					func(state *terraform.State) error {
-						client := testAccProvider.Meta().(*gitlab.Client)
-
 						projectID := state.RootModule().Resources["gitlab_project.template-id"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "Rakefile", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "Rakefile", &gitlab.GetFileOptions{Ref: gitlab.String("master")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get 'Rakefile' file from template project: %w", err)
 						}
@@ -328,9 +322,9 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectConfigInitializeWithReadme(rInt),
@@ -338,8 +332,7 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					testAccCheckGitlabProjectDefaultBranch(&project, nil),
 					func(state *terraform.State) error {
-						client := testAccProvider.Meta().(*gitlab.Client)
-						_, _, err := client.RepositoryFiles.GetFile(project.ID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(project.ID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get 'README.md' file from project: %w", err)
 						}
@@ -357,17 +350,16 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectConfigInitializeWithoutReadme(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					func(s *terraform.State) error {
-						client := testAccProvider.Meta().(*gitlab.Client)
-						branches, _, err := client.Branches.ListBranches(project.ID, nil)
+						branches, _, err := testGitlabClient.Branches.ListBranches(project.ID, nil)
 						if err != nil {
 							return fmt.Errorf("failed to list branches: %w", err)
 						}
@@ -424,9 +416,9 @@ func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
@@ -482,9 +474,9 @@ func TestAccGitlabProject_willError(t *testing.T) {
 	willError := defaults
 	willError.TagList = []string{"notatag"}
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			// Step0 Create a project
 			{
@@ -518,9 +510,9 @@ func TestAccGitlabProject_willError(t *testing.T) {
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectConfig(rInt),
@@ -537,9 +529,9 @@ func TestAccGitlabProject_import(t *testing.T) {
 func TestAccGitlabProject_nestedImport(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectInGroupConfig(rInt),
@@ -584,9 +576,9 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			// Create a project in a group
 			{
@@ -614,11 +606,10 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
 	}
 
-	client := testAccProvider.Meta().(*gitlab.Client)
 	rInt := acctest.RandInt()
 
 	// Create a base project for importing.
-	baseProject, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+	baseProject, _, err := testGitlabClient.Projects.CreateProject(&gitlab.CreateProjectOptions{
 		Name:       gitlab.String(fmt.Sprintf("base-%d", rInt)),
 		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
 	})
@@ -626,10 +617,10 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 		t.Fatalf("failed to create base project: %v", err)
 	}
 
-	defer client.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `client.Projects.DeleteProject` is not checked (errcheck)
+	defer testGitlabClient.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `testGitlabClient.Projects.DeleteProject` is not checked (errcheck)
 
 	// Add a file to the base project, for later verifying the import.
-	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
+	_, _, err = testGitlabClient.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
 		Branch:        gitlab.String("main"),
 		CommitMessage: gitlab.String("add file"),
 		Content:       gitlab.String(""),
@@ -639,9 +630,9 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectConfigImportURL(rInt, baseProject.HTTPURLToRepo),
@@ -650,7 +641,7 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -668,9 +659,9 @@ func TestAccGitlabProject_initializeWithReadmeAndCustomDefaultBranch(t *testing.
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
@@ -693,11 +684,9 @@ resource "gitlab_project" "foo" {
 						DefaultBranch: "foo",
 					}),
 					func(state *terraform.State) error {
-						client := testAccProvider.Meta().(*gitlab.Client)
-
 						projectID := state.RootModule().Resources["gitlab_project.foo"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("foo")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "README.md", &gitlab.GetFileOptions{Ref: gitlab.String("foo")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get 'README.md' file from project: %w", err)
 						}
@@ -745,12 +734,11 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
 	}
 
-	client := testAccProvider.Meta().(*gitlab.Client)
 	var mirror gitlab.Project
 	rInt := acctest.RandInt()
 
 	// Create a base project for importing.
-	baseProject, _, err := client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+	baseProject, _, err := testGitlabClient.Projects.CreateProject(&gitlab.CreateProjectOptions{
 		Name:       gitlab.String(fmt.Sprintf("base-%d", rInt)),
 		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
 	})
@@ -758,10 +746,10 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 		t.Fatalf("failed to create base project: %v", err)
 	}
 
-	defer client.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `client.Projects.DeleteProject` is not checked (errcheck)
+	defer testGitlabClient.Projects.DeleteProject(baseProject.ID) // nolint // TODO: Resolve this golangci-lint issue: Error return value of `testGitlabClient.Projects.DeleteProject` is not checked (errcheck)
 
 	// Add a file to the base project, for later verifying the import.
-	_, _, err = client.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
+	_, _, err = testGitlabClient.RepositoryFiles.CreateFile(baseProject.ID, "foo.txt", &gitlab.CreateFileOptions{
 		Branch:        gitlab.String("main"),
 		CommitMessage: gitlab.String("add file"),
 		Content:       gitlab.String(""),
@@ -771,9 +759,9 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				// First, import, as mirrored
@@ -792,7 +780,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -819,7 +807,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -846,7 +834,7 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 					func(state *terraform.State) error {
 						projectID := state.RootModule().Resources["gitlab_project.imported"].Primary.ID
 
-						_, _, err := client.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
+						_, _, err := testGitlabClient.RepositoryFiles.GetFile(projectID, "foo.txt", &gitlab.GetFileOptions{Ref: gitlab.String("main")}, nil)
 						if err != nil {
 							return fmt.Errorf("failed to get file from imported project: %w", err)
 						}
@@ -864,8 +852,8 @@ func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 
 	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccCheckMutualExclusiveNameAndID(rInt),
@@ -887,8 +875,7 @@ func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		if g, _, err := conn.Projects.GetProject(repoName, nil); err == nil {
+		if g, _, err := testGitlabClient.Projects.GetProject(repoName, nil); err == nil {
 			*project = *g
 		}
 		return err
@@ -896,12 +883,11 @@ func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource
 }
 
 func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {
@@ -978,9 +964,7 @@ func testAccCheckGitlabProjectDefaultBranch(project *gitlab.Project, want *testA
 			return fmt.Errorf("got default branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
 		}
 
-		client := testAccProvider.Meta().(*gitlab.Client)
-
-		branches, _, err := client.Branches.ListBranches(project.ID, nil)
+		branches, _, err := testGitlabClient.Branches.ListBranches(project.ID, nil)
 		if err != nil {
 			return fmt.Errorf("failed to list branches: %w", err)
 		}
@@ -999,10 +983,9 @@ func testAccCheckGitlabProjectDefaultBranch(project *gitlab.Project, want *testA
 
 func testAccCheckGitlabProjectPushRules(name string, wantPushRules *gitlab.ProjectPushRules) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
-		client := testAccProvider.Meta().(*gitlab.Client)
 		projectResource := state.RootModule().Resources[name].Primary
 
-		gotPushRules, _, err := client.Projects.GetProjectPushRules(projectResource.ID, nil)
+		gotPushRules, _, err := testGitlabClient.Projects.GetProjectPushRules(projectResource.ID, nil)
 		if err != nil {
 			return err
 		}
@@ -1156,8 +1139,6 @@ resource "gitlab_project" "foo" {
 
 func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, defaultBranch string) func() (bool, error) {
 	return func() (bool, error) {
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		// Commit data
 		commitMessage := "Initial Commit"
 		commitFile := "file.txt"
@@ -1175,7 +1156,7 @@ func testAccGitlabProjectConfigDefaultBranchSkipFunc(project *gitlab.Project, de
 			Actions:       commitActions,
 		}
 
-		_, _, err := conn.Commits.CreateCommit(project.ID, options)
+		_, _, err := testGitlabClient.Commits.CreateCommit(project.ID, options)
 
 		return false, err
 	}

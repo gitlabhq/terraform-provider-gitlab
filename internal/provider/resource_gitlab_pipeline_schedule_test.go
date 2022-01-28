@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabPipelineSchedule_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabPipelineScheduleDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabPipelineScheduleDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and pipeline schedule with default options
 			{
@@ -72,9 +72,9 @@ func TestAccGitlabPipelineSchedule_import(t *testing.T) {
 	resourceName := "gitlab_pipeline_schedule.schedule"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabPipelineScheduleDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabPipelineScheduleDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabPipelineScheduleConfig(rInt),
@@ -121,9 +121,8 @@ func testAccCheckGitlabPipelineScheduleExists(n string, schedule *gitlab.Pipelin
 		if repoName == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		schedules, _, err := conn.PipelineSchedules.ListPipelineSchedules(repoName, nil)
+		schedules, _, err := testGitlabClient.PipelineSchedules.ListPipelineSchedules(repoName, nil)
 		if err != nil {
 			return err
 		}
@@ -171,8 +170,6 @@ func testAccCheckGitlabPipelineScheduleAttributes(schedule *gitlab.PipelineSched
 }
 
 func testAccCheckGitlabPipelineScheduleDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_pipeline_schedule" {
 			continue
@@ -183,7 +180,7 @@ func testAccCheckGitlabPipelineScheduleDestroy(s *terraform.State) error {
 			return fmt.Errorf("could not convert pipeline schedule id to integer: %s", err)
 		}
 
-		gotPS, _, err := conn.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], id)
+		gotPS, _, err := testGitlabClient.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], id)
 		if err == nil {
 			if gotPS != nil && fmt.Sprintf("%d", gotPS.ID) == rs.Primary.ID {
 				return fmt.Errorf("pipeline schedule still exists")

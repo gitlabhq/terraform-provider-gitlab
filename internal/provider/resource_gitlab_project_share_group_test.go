@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"context"
@@ -47,8 +47,8 @@ func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 
 	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			// Share a new project with a new group.
 			{
@@ -71,14 +71,12 @@ func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 
 func testAccCheckGitlabProjectSharedWithGroup(projectName, groupName string, accessLevel gitlab.AccessLevelValue) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
-		client := testAccProvider.Meta().(*gitlab.Client)
-
-		project, _, err := client.Projects.GetProject(projectName, nil)
+		project, _, err := testGitlabClient.Projects.GetProject(projectName, nil)
 		if err != nil {
 			return err
 		}
 
-		group, _, err := client.Groups.GetGroup(groupName, nil)
+		group, _, err := testGitlabClient.Groups.GetGroup(groupName, nil)
 		if err != nil {
 			return err
 		}
@@ -98,9 +96,7 @@ func testAccCheckGitlabProjectSharedWithGroup(projectName, groupName string, acc
 
 func testAccCheckGitlabProjectIsNotShared(projectName string) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
-		client := testAccProvider.Meta().(*gitlab.Client)
-
-		project, _, err := client.Projects.GetProject(projectName, nil)
+		project, _, err := testGitlabClient.Projects.GetProject(projectName, nil)
 		if err != nil {
 			return err
 		}

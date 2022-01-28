@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabRepositoryFile_create(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabRepositoryFileDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabRepositoryFileConfig(rInt),
@@ -39,9 +39,9 @@ func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T)
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabRepositoryFileDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabRepositoryFileSameFileDifferentRepositoryConfig(rInt),
@@ -90,9 +90,9 @@ func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabRepositoryFileDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabRepositoryFileStartBranchConfig(rInt),
@@ -113,9 +113,9 @@ func TestAccGitlabRepositoryFile_update(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabRepositoryFileDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabRepositoryFileConfig(rInt),
@@ -147,9 +147,9 @@ func TestAccGitlabRepositoryFile_import(t *testing.T) {
 	resourceName := "gitlab_repository_file.this"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabPipelineTriggerDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabPipelineTriggerDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabRepositoryFileConfig(rInt),
@@ -187,9 +187,7 @@ func testAccCheckGitlabRepositoryFileExists(n string, file *gitlab.File) resourc
 			return fmt.Errorf("No project ID set")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotFile, _, err := conn.RepositoryFiles.GetFile(repoName, fileID, options)
+		gotFile, _, err := testGitlabClient.RepositoryFiles.GetFile(repoName, fileID, options)
 		if err != nil {
 			return fmt.Errorf("Cannot get file: %v", err)
 		}
@@ -221,14 +219,12 @@ func testAccCheckGitlabRepositoryFileAttributes(got *gitlab.File, want *testAccG
 }
 
 func testAccCheckGitlabRepositoryFileDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

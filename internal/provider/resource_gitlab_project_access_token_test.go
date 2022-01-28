@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -20,9 +20,9 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectAccessTokenDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectAccessTokenDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and a Project Access Token
 			{
@@ -84,11 +84,9 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 
 func testAccCheckGitlabProjectAccessTokenDoesNotExist(pat *testAccGitlabProjectAccessTokenWrapper) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		return gomega.InterceptGomegaFailure(func() {
 			gomega.Eventually(func() error {
-				tokens, _, err := conn.ProjectAccessTokens.ListProjectAccessTokens(pat.project, nil)
+				tokens, _, err := testGitlabClient.ProjectAccessTokens.ListProjectAccessTokens(pat.project, nil)
 				if err != nil {
 					return err
 				}
@@ -129,9 +127,7 @@ func testAccCheckGitlabProjectAccessTokenExists(n string, pat *testAccGitlabProj
 			return fmt.Errorf("Project [%s] in project identifier [%s] it's different from project stored into the state [%s]", project, rs.Primary.ID, repoName)
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		tokens, _, err := conn.ProjectAccessTokens.ListProjectAccessTokens(repoName, nil)
+		tokens, _, err := testGitlabClient.ProjectAccessTokens.ListProjectAccessTokens(repoName, nil)
 		if err != nil {
 			return err
 		}
@@ -183,7 +179,7 @@ func testAccCheckGitlabProjectAccessTokenAttributes(patWrap *testAccGitlabProjec
 			}
 		}
 
-		git, err := gitlab.NewClient(patWrap.token, gitlab.WithBaseURL((testAccProvider.Meta().(*gitlab.Client)).BaseURL().String()))
+		git, err := gitlab.NewClient(patWrap.token, gitlab.WithBaseURL(testGitlabClient.BaseURL().String()))
 		if err != nil {
 			return fmt.Errorf("Cannot use the token to instantiate a new client %s", err)
 		}
@@ -197,14 +193,12 @@ func testAccCheckGitlabProjectAccessTokenAttributes(patWrap *testAccGitlabProjec
 }
 
 func testAccCheckGitlabProjectAccessTokenDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

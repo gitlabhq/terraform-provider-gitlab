@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabInstanceCluster_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabInstanceClusterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabInstanceClusterDestroy,
 		Steps: []resource.TestStep{
 			// Create an instance cluster with default options
 			{
@@ -105,9 +105,9 @@ func TestAccGitlabInstanceCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabInstanceClusterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabInstanceClusterDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabInstanceClusterConfig(rInt, true),
@@ -145,9 +145,7 @@ func testAccCheckGitlabInstanceClusterExists(n string, cluster *gitlab.InstanceC
 			return err
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotCluster, _, err := conn.InstanceCluster.GetCluster(instanceClusterID)
+		gotCluster, _, err := testGitlabClient.InstanceCluster.GetCluster(instanceClusterID)
 		if err != nil {
 			return err
 		}
@@ -159,8 +157,6 @@ func testAccCheckGitlabInstanceClusterExists(n string, cluster *gitlab.InstanceC
 }
 
 func testAccCheckGitlabInstanceClusterDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_instance_cluster" {
 			continue
@@ -171,7 +167,7 @@ func testAccCheckGitlabInstanceClusterDestroy(s *terraform.State) error {
 			return err
 		}
 
-		gotCluster, resp, err := conn.InstanceCluster.GetCluster(instanceClusterID)
+		gotCluster, resp, err := testGitlabClient.InstanceCluster.GetCluster(instanceClusterID)
 
 		if err == nil {
 			if gotCluster != nil && gotCluster.ID == instanceClusterID {

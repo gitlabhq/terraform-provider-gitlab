@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -18,9 +18,9 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 	pipelinesEmailResourceName := "gitlab_service_pipelines_email.email"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServicePipelinesEmailDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServicePipelinesEmailDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and a pipelines email service
 			{
@@ -62,9 +62,9 @@ func TestAccGitlabServicePipelinesEmail_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServicePipelinesEmailDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServicePipelinesEmailDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabServicePipelinesEmailConfig(rInt),
@@ -89,9 +89,7 @@ func testAccCheckGitlabServicePipelinesEmailExists(n string, service *gitlab.Pip
 		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		pipelinesEmailService, _, err := conn.Services.GetPipelinesEmailService(project)
+		pipelinesEmailService, _, err := testGitlabClient.Services.GetPipelinesEmailService(project)
 		if err != nil {
 			return fmt.Errorf("PipelinesEmail service does not exist in project %s: %v", project, err)
 		}
@@ -122,14 +120,12 @@ func testRecipients(service *gitlab.PipelinesEmailService, expected []string) re
 }
 
 func testAccCheckGitlabServicePipelinesEmailDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, resp, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, resp, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -17,9 +17,9 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			// Create a group
 			{
@@ -90,9 +90,9 @@ func TestAccGitlabGroup_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabGroupConfig(rInt),
@@ -113,9 +113,9 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabNestedGroupConfig(rInt),
@@ -206,9 +206,9 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabGroupConfig(rInt),
@@ -224,16 +224,14 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 
 func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		_, err := conn.Groups.DeleteGroup(group.ID)
+		_, err := testGitlabClient.Groups.DeleteGroup(group.ID)
 		if err != nil {
 			return err
 		}
 		// Fixes groups API async deletion issue
 		// https://github.com/gitlabhq/terraform-provider-gitlab/issues/319
 		for start := time.Now(); time.Since(start) < 15*time.Second; {
-			g, resp, err := conn.Groups.GetGroup(group.ID, nil)
+			g, resp, err := testGitlabClient.Groups.GetGroup(group.ID, nil)
 			if resp != nil && resp.StatusCode == http.StatusNotFound {
 				return nil
 			}
@@ -259,9 +257,8 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 		if groupID == "" {
 			return fmt.Errorf("No group ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotGroup, _, err := conn.Groups.GetGroup(groupID, nil)
+		gotGroup, _, err := testGitlabClient.Groups.GetGroup(groupID, nil)
 		if err != nil {
 			return err
 		}
@@ -366,14 +363,12 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 }
 
 func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_group" {
 			continue
 		}
 
-		group, _, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
+		group, _, err := testGitlabClient.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil {
 			if group != nil && fmt.Sprintf("%d", group.ID) == rs.Primary.ID {
 				if group.MarkedForDeletionOn == nil {

@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabProjectCluster_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectClusterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectClusterDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and cluster with default options
 			{
@@ -105,9 +105,9 @@ func TestAccGitlabProjectCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectClusterDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectClusterDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectClusterConfig(rInt, true),
@@ -145,9 +145,7 @@ func testAccCheckGitlabProjectClusterExists(n string, cluster *gitlab.ProjectClu
 			return err
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotCluster, _, err := conn.ProjectCluster.GetCluster(project, clusterID)
+		gotCluster, _, err := testGitlabClient.ProjectCluster.GetCluster(project, clusterID)
 		if err != nil {
 			return err
 		}
@@ -159,8 +157,6 @@ func testAccCheckGitlabProjectClusterExists(n string, cluster *gitlab.ProjectClu
 }
 
 func testAccCheckGitlabProjectClusterDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project_cluster" {
 			continue
@@ -171,7 +167,7 @@ func testAccCheckGitlabProjectClusterDestroy(s *terraform.State) error {
 			return err
 		}
 
-		gotCluster, _, err := conn.ProjectCluster.GetCluster(project, clusterID)
+		gotCluster, _, err := testGitlabClient.ProjectCluster.GetCluster(project, clusterID)
 		if err == nil {
 			if gotCluster != nil && fmt.Sprintf("%d", gotCluster.ID) == project {
 				return fmt.Errorf("project cluster still exists")

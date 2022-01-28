@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ func TestAccGitlabInstanceVariable_basic(t *testing.T) {
 
 	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			// Create a variable with default options
 			{
@@ -69,9 +69,8 @@ func testAccCheckGitlabInstanceVariableExists(n string, instanceVariable *gitlab
 		if key == "" {
 			return fmt.Errorf("No variable key is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		gotVariable, _, err := conn.InstanceVariables.GetVariable(key)
+		gotVariable, _, err := testGitlabClient.InstanceVariables.GetVariable(key)
 		if err != nil {
 			return err
 		}

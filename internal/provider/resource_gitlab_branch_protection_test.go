@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -18,9 +18,9 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabBranchProtectionDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and Branch Protection with default options
 			{
@@ -114,9 +114,9 @@ func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabBranchProtectionDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
 			// Start with code owner approval required disabled
 			{
@@ -185,9 +185,9 @@ func TestAccGitlabBranchProtection_createWithMultipleAccessLevels(t *testing.T) 
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabBranchProtectionDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
 			// Create a project, groups, users and Branch Protection with advanced allowed_to blocks
 			{
@@ -277,9 +277,7 @@ func testAccCheckGitlabBranchProtectionExists(n string, pb *gitlab.ProtectedBran
 			return fmt.Errorf("Error in Splitting Project and Branch Ids")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		pbs, _, err := conn.ProtectedBranches.ListProtectedBranches(project, nil)
+		pbs, _, err := testGitlabClient.ProtectedBranches.ListProtectedBranches(project, nil)
 		if err != nil {
 			return err
 		}
@@ -338,11 +336,9 @@ func testAccCheckGitlabBranchProtectionAttributes(pb *gitlab.ProtectedBranch, wa
 			return fmt.Errorf("got Merge access level %v; want %v", mergeAccessLevel, accessLevelNameToValue[want.MergeAccessLevel])
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		remainingWantedUserIDsAllowedToPush := map[int]struct{}{}
 		for _, v := range want.UsersAllowedToPush {
-			users, _, err := conn.Users.ListUsers(&gitlab.ListUsersOptions{
+			users, _, err := testGitlabClient.Users.ListUsers(&gitlab.ListUsersOptions{
 				Username: gitlab.String(v),
 			})
 			if err != nil {
@@ -355,7 +351,7 @@ func testAccCheckGitlabBranchProtectionAttributes(pb *gitlab.ProtectedBranch, wa
 		}
 		remainingWantedGroupIDsAllowedToPush := map[int]struct{}{}
 		for _, v := range want.GroupsAllowedToPush {
-			group, _, err := conn.Groups.GetGroup(v, nil)
+			group, _, err := testGitlabClient.Groups.GetGroup(v, nil)
 			if err != nil {
 				return fmt.Errorf("error looking up group by path %v: %v", v, err)
 			}
@@ -390,7 +386,6 @@ func testAccCheckGitlabBranchProtectionAttributes(pb *gitlab.ProtectedBranch, wa
 }
 
 func testAccCheckGitlabBranchProtectionDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
 	var project string
 	var branch string
 	for _, rs := range s.RootModule().Resources {
@@ -401,7 +396,7 @@ func testAccCheckGitlabBranchProtectionDestroy(s *terraform.State) error {
 		}
 	}
 
-	pb, _, err := conn.ProtectedBranches.GetProtectedBranch(project, branch)
+	pb, _, err := testGitlabClient.ProtectedBranches.GetProtectedBranch(project, branch)
 	if err == nil {
 		if pb != nil {
 			return fmt.Errorf("project branch protection %s still exists", branch)

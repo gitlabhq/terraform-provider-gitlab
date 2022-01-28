@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{PreCheck: func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupMembershipDestroy,
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupMembershipDestroy,
 		Steps: []resource.TestStep{
 
 			// Assign member to the group as a developer
@@ -51,7 +51,6 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupMember) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-		conn := testAccProvider.Meta().(*gitlab.Client)
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
@@ -67,7 +66,7 @@ func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupM
 			return fmt.Errorf("No user userId is set")
 		}
 
-		gotGroupMembership, _, err := conn.GroupMembers.GetGroupMember(groupId, userId)
+		gotGroupMembership, _, err := testGitlabClient.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
 			return err
 		}
@@ -97,8 +96,6 @@ func testAccCheckGitlabGroupMembershipAttributes(membership *gitlab.GroupMember,
 }
 
 func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_group_membership" {
 			continue
@@ -109,7 +106,7 @@ func testAccCheckGitlabGroupMembershipDestroy(s *terraform.State) error {
 
 		// GetGroupMember needs int type for userIdString
 		userId, err := strconv.Atoi(userIdString) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
-		groupMember, _, err := conn.GroupMembers.GetGroupMember(groupId, userId)
+		groupMember, _, err := testGitlabClient.GroupMembers.GetGroupMember(groupId, userId)
 		if err != nil {
 			if groupMember != nil && fmt.Sprintf("%d", groupMember.AccessLevel) == rs.Primary.Attributes["access_level"] {
 				return fmt.Errorf("Group still has member.")

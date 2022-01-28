@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,9 +15,9 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 	rString := acctest.RandString(5)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupVariableDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupVariableDestroy,
 		Steps: []resource.TestStep{
 			// Create a group and variable with default options
 			{
@@ -66,9 +66,9 @@ func TestAccGitlabGroupVariable_scope(t *testing.T) {
 	rString := acctest.RandString(5)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabGroupVariableDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupVariableDestroy,
 		Steps: []resource.TestStep{
 			// Create a group and variables with same keys, different scopes
 			{
@@ -146,9 +146,7 @@ func testAccCheckGitlabGroupVariableExists(n string, groupVariable *gitlab.Group
 		if key == "" {
 			return fmt.Errorf("No variable key is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		gotVariable, _, err := conn.GroupVariables.GetVariable(repoName, key, modifyRequestAddEnvironmentFilter(rs.Primary.Attributes["environment_scope"]))
+		gotVariable, _, err := testGitlabClient.GroupVariables.GetVariable(repoName, key, modifyRequestAddEnvironmentFilter(rs.Primary.Attributes["environment_scope"]))
 		if err != nil {
 			return err
 		}
@@ -192,14 +190,12 @@ func testAccCheckGitlabGroupVariableAttributes(variable *gitlab.GroupVariable, w
 }
 
 func testAccCheckGitlabGroupVariableDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_group" {
 			continue
 		}
 
-		_, _, err := conn.Groups.GetGroup(rs.Primary.ID, nil)
+		_, _, err := testGitlabClient.Groups.GetGroup(rs.Primary.ID, nil)
 		if err == nil { // nolint // TODO: Resolve this golangci-lint issue: SA9003: empty branch (staticcheck)
 			//if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 			//	if gotRepo.MarkedForDeletionAt == nil {

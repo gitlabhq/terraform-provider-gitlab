@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 	jiraResourceName := "gitlab_service_jira.jira"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceJiraDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceJiraDestroy,
 		Steps: []resource.TestStep{
 			// Create a project and a jira service
 			{
@@ -70,9 +70,9 @@ func TestAccGitlabServiceJira_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabServiceJiraDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabServiceJiraDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabServiceJiraConfig(rInt),
@@ -101,9 +101,7 @@ func testAccCheckGitlabServiceJiraExists(n string, service *gitlab.JiraService) 
 		if project == "" {
 			return fmt.Errorf("No project ID is set")
 		}
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		jiraService, _, err := conn.Services.GetJiraService(project)
+		jiraService, _, err := testGitlabClient.Services.GetJiraService(project)
 		if err != nil {
 			return fmt.Errorf("Jira service does not exist in project %s: %v", project, err)
 		}
@@ -114,14 +112,12 @@ func testAccCheckGitlabServiceJiraExists(n string, service *gitlab.JiraService) 
 }
 
 func testAccCheckGitlabServiceJiraDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err == nil {
 			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
 				if gotRepo.MarkedForDeletionAt == nil {

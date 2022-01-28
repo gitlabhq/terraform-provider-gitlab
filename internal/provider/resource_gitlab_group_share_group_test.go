@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -15,8 +15,8 @@ func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
 
 	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			// Share a new group with another group
 			{
@@ -48,9 +48,9 @@ func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
 	resource.Test(t, resource.TestCase{
-		Providers:    testAccProviders,
-		PreCheck:     func() { testAccPreCheck(t) },
-		CheckDestroy: testAccCheckGitlabGroupDestroy,
+		ProviderFactories: providerFactories,
+		PreCheck:          func() { testAccPreCheck(t) },
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			{
 				// create shared groups
@@ -79,9 +79,7 @@ func testAccCheckGitlabGroupSharedWithGroup(
 	accessLevel gitlab.AccessLevelValue,
 ) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
-		client := testAccProvider.Meta().(*gitlab.Client)
-
-		mainGroup, _, err := client.Groups.GetGroup(fmt.Sprintf("%s_main", groupName), nil)
+		mainGroup, _, err := testGitlabClient.Groups.GetGroup(fmt.Sprintf("%s_main", groupName), nil)
 		if err != nil {
 			return err
 		}
@@ -113,9 +111,7 @@ func testAccCheckGitlabGroupSharedWithGroup(
 
 func testAccCheckGitlabGroupIsNotShared(groupName string) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
-		client := testAccProvider.Meta().(*gitlab.Client)
-
-		mainGroup, _, err := client.Groups.GetGroup(fmt.Sprintf("%s_main", groupName), nil)
+		mainGroup, _, err := testGitlabClient.Groups.GetGroup(fmt.Sprintf("%s_main", groupName), nil)
 		if err != nil {
 			return err
 		}

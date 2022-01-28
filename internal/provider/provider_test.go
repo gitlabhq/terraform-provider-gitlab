@@ -1,39 +1,56 @@
-package gitlab
+package provider
 
 import (
-	"context"
-	"fmt"
 	"os"
 	"testing"
 
+	// "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+
+	// "github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/xanzy/go-gitlab"
 )
 
-var testAccProviders map[string]*schema.Provider
-var testAccProvider *schema.Provider
+// providerFactories are used to instantiate a provider during acceptance testing.
+// The factory function will be invoked for every Terraform CLI command executed
+// to create a provider server to which the CLI can reattach.
+var providerFactories = map[string]func() (*schema.Provider, error){
+	"gitlab": func() (*schema.Provider, error) {
+		return New("dev")(), nil
+	},
+}
+
+var testGitlabConfig = Config{
+	Token:         os.Getenv("GITLAB_TOKEN"),
+	BaseURL:       os.Getenv("GITLAB_BASE_URL"),
+	CACertFile:    "",
+	Insecure:      false,
+	ClientCert:    "",
+	ClientKey:     "",
+	EarlyAuthFail: true,
+}
+
+var testGitlabClient *gitlab.Client
 
 func init() {
 	if os.Getenv(resource.TestEnvVar) != "" {
-		testAccProvider = Provider()
-		if err := testAccProvider.Configure(context.TODO(), &terraform.ResourceConfig{}); err != nil {
-			panic(fmt.Sprintf("%#v", err)) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
+		client, err := testGitlabConfig.Client()
+		if err != nil {
+			panic("failed to create test client: " + err.Error()) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
 		}
-		testAccProviders = map[string]*schema.Provider{
-			"gitlab": testAccProvider,
-		}
+		testGitlabClient = client
 	}
 }
 
 func TestProvider(t *testing.T) {
-	if err := Provider().InternalValidate(); err != nil {
+	if err := New("dev")().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
 }
 
 func TestProvider_impl(t *testing.T) {
-	var _ *schema.Provider = Provider()
+	var _ *schema.Provider = New("dev")()
 }
 
 func testAccPreCheck(t *testing.T) {

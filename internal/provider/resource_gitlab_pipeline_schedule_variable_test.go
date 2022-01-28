@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabPipelineScheduleVariable_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabPipelineScheduleVariableConfig(rInt),
@@ -60,9 +60,9 @@ func TestAccGitlabPipelineScheduleVariable_import(t *testing.T) {
 	resourceName := "gitlab_pipeline_schedule_variable.schedule_var"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabPipelineScheduleVariableDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabPipelineScheduleVariableDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabPipelineScheduleVariableConfig(rInt),
@@ -110,8 +110,7 @@ func testAccCheckGitlabPipelineScheduleVariableExists(n string, variable *gitlab
 			return fmt.Errorf("failed to convert PipelineSchedule.ID to int")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		pipelineSchedule, _, err := conn.PipelineSchedules.GetPipelineSchedule(project, scheduleID)
+		pipelineSchedule, _, err := testGitlabClient.PipelineSchedules.GetPipelineSchedule(project, scheduleID)
 		if err != nil {
 			return err
 		}
@@ -196,8 +195,6 @@ resource "gitlab_pipeline_schedule_variable" "schedule_var" {
 }
 
 func testAccCheckGitlabPipelineScheduleVariableDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_pipeline_schedule_variable" {
 			continue
@@ -209,7 +206,7 @@ func testAccCheckGitlabPipelineScheduleVariableDestroy(s *terraform.State) error
 			return fmt.Errorf("could not convert pipeline schedule id to integer: %s", err)
 		}
 
-		gotPS, _, err := conn.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], psid)
+		gotPS, _, err := testGitlabClient.PipelineSchedules.GetPipelineSchedule(rs.Primary.Attributes["project"], psid)
 		if err == nil {
 			for _, v := range gotPS.Variables {
 				if buildTwoPartID(&psidString, &v.Key) == rs.Primary.ID {

@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{PreCheck: func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectMembershipDestroy,
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectMembershipDestroy,
 		Steps: []resource.TestStep{
 
 			// Assign member to the project as a developer
@@ -50,7 +50,6 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 func testAccCheckGitlabProjectMembershipExists(n string, membership *gitlab.ProjectMember) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
-		conn := testAccProvider.Meta().(*gitlab.Client)
 		if !ok {
 			return fmt.Errorf("Not found: %s", n)
 		}
@@ -66,7 +65,7 @@ func testAccCheckGitlabProjectMembershipExists(n string, membership *gitlab.Proj
 			return fmt.Errorf("No user id is set")
 		}
 
-		gotProjectMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, id)
+		gotProjectMembership, _, err := testGitlabClient.ProjectMembers.GetProjectMember(projectID, id)
 		if err != nil {
 			return err
 		}
@@ -95,8 +94,6 @@ func testAccCheckGitlabProjectMembershipAttributes(membership *gitlab.ProjectMem
 }
 
 func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project_membership" {
 			continue
@@ -107,7 +104,7 @@ func testAccCheckGitlabProjectMembershipDestroy(s *terraform.State) error {
 
 		// GetProjectMember needs int type for userID
 		userIDI, err := strconv.Atoi(userID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
-		gotMembership, _, err := conn.ProjectMembers.GetProjectMember(projectID, userIDI)
+		gotMembership, _, err := testGitlabClient.ProjectMembers.GetProjectMember(projectID, userIDI)
 		if err != nil {
 			if gotMembership != nil && fmt.Sprintf("%d", gotMembership.AccessLevel) == rs.Primary.Attributes["access_level"] {
 				return fmt.Errorf("Project still has member.")

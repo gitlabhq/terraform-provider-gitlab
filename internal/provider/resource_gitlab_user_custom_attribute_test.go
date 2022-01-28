@@ -1,4 +1,4 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
@@ -16,9 +16,9 @@ func TestAccGitlabUserCustomAttribute_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabUserDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabUserDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
@@ -88,8 +88,7 @@ func testAccCheckGitlabUserCustomAttributeExists(n string, customAttribute *gitl
 			return err
 		}
 
-		client := testAccProvider.Meta().(*gitlab.Client)
-		gotCustomAttribute, _, err := client.CustomAttribute.GetCustomUserAttribute(id, key)
+		gotCustomAttribute, _, err := testGitlabClient.CustomAttribute.GetCustomUserAttribute(id, key)
 		if err != nil {
 			return err
 		}
