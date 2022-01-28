@@ -16,6 +16,9 @@ var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 func resourceGitlabProjectApprovalRule() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).\n\n" +
+			"-> This feature requires GitLab Premium.",
+
 		CreateContext: resourceGitlabProjectApprovalRuleCreate,
 		ReadContext:   resourceGitlabProjectApprovalRuleRead,
 		UpdateContext: resourceGitlabProjectApprovalRuleUpdate,
@@ -25,35 +28,41 @@ func resourceGitlabProjectApprovalRule() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "The name or id of the project to add the approval rules.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name of the approval rule.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"approvals_required": {
-				Type:     schema.TypeInt,
-				Required: true,
+				Description: "The number of approvals required for this rule.",
+				Type:        schema.TypeInt,
+				Required:    true,
 			},
 			"user_ids": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeInt},
-				Set:      schema.HashInt,
+				Description: "A list of specific User IDs to add to the list of approvers.",
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeInt},
+				Set:         schema.HashInt,
 			},
 			"group_ids": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeInt},
-				Set:      schema.HashInt,
+				Description: "A list of group IDs whose members can approve of the merge request.",
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeInt},
+				Set:         schema.HashInt,
 			},
 			"protected_branch_ids": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeInt},
-				Set:      schema.HashInt,
+				Description: "A list of protected branch IDs (not branch names) for which the rule applies.",
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeInt},
+				Set:         schema.HashInt,
 			},
 		},
 	}

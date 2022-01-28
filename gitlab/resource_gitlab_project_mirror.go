@@ -14,6 +14,12 @@ import (
 
 func resourceGitlabProjectMirror() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to add a mirror target for the repository, all changes will be synced to the remote target.\n\n" +
+			"-> This is for *pushing* changes to a remote repository. *Pull Mirroring* can be configured using a combination of the\n" +
+			"`import_url`, `mirror`, and `mirror_trigger_builds` properties on the `gitlab_project` resource.\n\n" +
+			"For further information on mirroring, consult the\n" +
+			"[gitlab documentation](https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring).",
+
 		CreateContext: resourceGitlabProjectMirrorCreate,
 		ReadContext:   resourceGitlabProjectMirrorRead,
 		UpdateContext: resourceGitlabProjectMirrorUpdate,
@@ -24,19 +30,22 @@ func resourceGitlabProjectMirror() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "The id of the project.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"mirror_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "Mirror ID.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 			"url": {
-				Type:      schema.TypeString,
-				ForceNew:  true,
-				Required:  true,
-				Sensitive: true, // Username and password must be provided in the URL for https.
+				Description: "The URL of the remote repository to be mirrored.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
+				Sensitive:   true, // Username and password must be provided in the URL for https.
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					oldURL, err := url.Parse(old)
 					if err != nil {
@@ -56,19 +65,22 @@ func resourceGitlabProjectMirror() *schema.Resource {
 				},
 			},
 			"enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Description: "Determines if the mirror is enabled.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 			"only_protected_branches": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Description: "Determines if only protected branches are mirrored.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 			"keep_divergent_refs": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Description: "Determines if divergent refs are skipped.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 		},
 	}

@@ -13,36 +13,42 @@ import (
 
 func dataSourceGitlabProjectProtectedBranches() *schema.Resource {
 	return &schema.Resource{
+		Description: "Provides details about all protected branches in a given project.",
+
 		ReadContext: dataSourceGitlabProjectProtectedBranchesRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
+				Description: "The integer or path with namespace that uniquely identifies the project.",
 				Type:        schema.TypeString,
-				Description: "ID or URL encoded name of project",
 				Required:    true,
 			},
 			"protected_branches": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Description: "A list of protected branches, as defined below.",
+				Type:        schema.TypeList,
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
+							Description: "The name of the protected branch.",
 							Type:        schema.TypeString,
-							Description: "Name of the protected branch",
 							Computed:    true,
 						},
 						"id": {
-							Type:     schema.TypeInt,
-							Computed: true,
+							Description: "The ID of the protected branch.",
+							Type:        schema.TypeInt,
+							Computed:    true,
 						},
 						"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 						"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 						"allow_force_push": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Description: "Whether force push is allowed.",
+							Type:        schema.TypeBool,
+							Computed:    true,
 						},
 						"code_owner_approval_required": {
-							Type:     schema.TypeBool,
-							Computed: true,
+							Description: "Reject code pushes that change files listed in the CODEOWNERS file.",
+							Type:        schema.TypeBool,
+							Computed:    true,
 						},
 					},
 				},

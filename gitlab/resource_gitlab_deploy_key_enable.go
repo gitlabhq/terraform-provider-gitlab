@@ -14,6 +14,9 @@ import (
 
 func resourceGitlabDeployEnableKey() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to enable pre-existing deploy keys for your GitLab projects.\n\n" +
+			"> **NOTE**: the GITLAB KEY_ID for the deploy key must be known",
+
 		CreateContext: resourceGitlabDeployKeyEnableCreate,
 		ReadContext:   resourceGitlabDeployKeyEnableRead,
 		DeleteContext: resourceGitlabDeployKeyEnableDelete,
@@ -23,29 +26,34 @@ func resourceGitlabDeployEnableKey() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name or id of the project to add the deploy key to.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"key_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The Gitlab key id for the pre-existing deploy key",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"title": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Deploy key's title.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 			"key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Deploy key.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 			"can_push": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "Can deploy key push to the project’s repository.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}

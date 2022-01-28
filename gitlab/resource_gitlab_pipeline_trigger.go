@@ -14,6 +14,8 @@ import (
 
 func resourceGitlabPipelineTrigger() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage pipeline triggers",
+
 		CreateContext: resourceGitlabPipelineTriggerCreate,
 		ReadContext:   resourceGitlabPipelineTriggerRead,
 		UpdateContext: resourceGitlabPipelineTriggerUpdate,
@@ -24,16 +26,19 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name or id of the project to add the trigger to.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The description of the pipeline trigger.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"token": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The pipeline trigger token.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 		},
 	}

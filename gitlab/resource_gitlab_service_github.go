@@ -12,6 +12,9 @@ import (
 
 func resourceGitlabServiceGithub() *schema.Resource {
 	return &schema.Resource{
+		Description: "**NOTE**: requires either EE (self-hosted) or Silver and above (GitLab.com).\n\n" +
+			"This resource manages a [GitHub integration](https://docs.gitlab.com/ee/user/project/integrations/github.html) that updates pipeline statuses on a GitHub repo's pull requests.",
+
 		CreateContext: resourceGitlabServiceGithubCreate,
 		ReadContext:   resourceGitlabServiceGithubRead,
 		UpdateContext: resourceGitlabServiceGithubUpdate,
@@ -22,41 +25,49 @@ func resourceGitlabServiceGithub() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "ID of the project you want to activate integration on.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"token": {
-				Type:      schema.TypeString,
-				Required:  true,
-				Sensitive: true,
+				Description: "A GitHub personal access token with at least `repo:status` scope.",
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
 			},
 			"repository_url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"static_context": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Description: "Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
 			},
 
 			// Computed from the GitLab API. Omitted event fields because they're always true in Github.
 			"title": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Title.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"created_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Create time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"updated_at": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "Update time.",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"active": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Whether the integration is active.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 		},
 	}

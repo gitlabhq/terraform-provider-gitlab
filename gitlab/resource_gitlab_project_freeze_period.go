@@ -14,6 +14,8 @@ import (
 
 func resourceGitlabProjectFreezePeriod() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period).",
+
 		CreateContext: resourceGitlabProjectFreezePeriodCreate,
 		ReadContext:   resourceGitlabProjectFreezePeriodRead,
 		UpdateContext: resourceGitlabProjectFreezePeriodUpdate,
@@ -23,22 +25,26 @@ func resourceGitlabProjectFreezePeriod() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"project_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The id of the project to add the schedule to.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"freeze_start": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Start of the Freeze Period in cron format (e.g. `0 1 * * *`).",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"freeze_end": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "End of the Freeze Period in cron format (e.g. `0 2 * * *`).",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"cron_timezone": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "UTC",
+				Description: "The timezone.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "UTC",
 			},
 		},
 	}

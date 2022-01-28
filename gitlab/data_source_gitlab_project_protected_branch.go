@@ -13,33 +13,38 @@ import (
 
 func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 	return &schema.Resource{
+		Description: "Provides details about a specific protected branch in a given project.",
+
 		ReadContext: dataSourceGitlabProjectProtectedBranchRead,
 		Schema: map[string]*schema.Schema{
 			"project_id": {
+				Description:  "The integer or path with namespace that uniquely identifies the project.",
 				Type:         schema.TypeString,
-				Description:  "ID or URL encoded name of project",
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"name": {
+				Description:  "The name of the protected branch.",
 				Type:         schema.TypeString,
-				Description:  "Name of the protected branch",
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Description: "The ID of this resource.",
+				Type:        schema.TypeInt,
+				Computed:    true,
 			},
 			"push_access_levels":  dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 			"merge_access_levels": dataSourceGitlabProjectProtectedBranchSchemaAccessLevels(),
 			"allow_force_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Whether force push is allowed.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"code_owner_approval_required": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Reject code pushes that change files listed in the CODEOWNERS file.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 		},
 	}
@@ -47,25 +52,30 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 
 func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeList,
-		Computed: true,
+		Description: "Describes which access levels, users, or groups are allowed to perform the action.",
+		Type:        schema.TypeList,
+		Computed:    true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_level": {
-					Type:     schema.TypeString,
-					Computed: true,
+					Description: "The access level allowed to perform the respective action (shows as 40 - \"maintainer\" if `user_id` or `group_id` are present).",
+					Type:        schema.TypeString,
+					Computed:    true,
 				},
 				"access_level_description": {
-					Type:     schema.TypeString,
-					Computed: true,
+					Description: "A description of the allowed access level(s), or the name of the user or group if `user_id` or `group_id` are present.",
+					Type:        schema.TypeString,
+					Computed:    true,
 				},
 				"user_id": {
-					Type:     schema.TypeInt,
-					Computed: true,
+					Description: "If present, indicates that the user is allowed to perform the respective action.",
+					Type:        schema.TypeInt,
+					Computed:    true,
 				},
 				"group_id": {
-					Type:     schema.TypeInt,
-					Computed: true,
+					Description: "If present, indicates that the group is allowed to perform the respective action.",
+					Type:        schema.TypeInt,
+					Computed:    true,
 				},
 			},
 		},

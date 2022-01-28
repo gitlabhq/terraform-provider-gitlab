@@ -17,5 +17,6 @@ func resourceGitlabGroupCustomAttribute() *schema.Resource {
 		func(client *gitlab.Client) CustomAttributeDeleter {
 			return client.CustomAttribute.DeleteCustomGroupAttribute
 		},
+		"This resource allows you to set custom attributes for a group.",
 	)
 }

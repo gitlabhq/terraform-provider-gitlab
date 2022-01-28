@@ -15,6 +15,10 @@ import (
 
 func resourceGitlabUser() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage GitLab users.\n" +
+			"Note your provider will need to be configured with admin-level access for this resource to work.\n\n" +
+			"-> You must specify either `password` or `reset_password`.",
+
 		CreateContext: resourceGitlabUserCreate,
 		ReadContext:   resourceGitlabUserRead,
 		UpdateContext: resourceGitlabUserUpdate,
@@ -25,57 +29,68 @@ func resourceGitlabUser() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"username": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The username of the user.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"password": {
-				Type:      schema.TypeString,
-				Optional:  true,
-				Sensitive: true,
-				ForceNew:  true,
+				Description: "The password of the user.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
+				ForceNew:    true,
 			},
 			"email": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The e-mail address of the user.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name of the user.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"is_admin": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "Boolean, defaults to false.  Whether to enable administrative privileges",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"can_create_group": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "Boolean, defaults to false. Whether to allow the user to create groups.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"skip_confirmation": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
-				ForceNew: true,
+				Description: "Boolean, defaults to true. Whether to skip confirmation.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				ForceNew:    true,
 			},
 			"projects_limit": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  0,
+				Description: "Integer, defaults to 0.  Number of projects user can create.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     0,
 			},
 			"is_external": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"reset_password": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				ForceNew: true,
+				Description: "Boolean, defaults to false. Send user password reset link.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				ForceNew:    true,
 			},
 			"note": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "The note associated to the user.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}

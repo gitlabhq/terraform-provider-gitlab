@@ -12,6 +12,10 @@ import (
 
 func resourceGitlabInstanceVariable() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage CI/CD variables for your GitLab instance.\n" +
+			"For further information on variables, consult the [gitlab\n" +
+			"documentation](https://docs.gitlab.com/ee/api/instance_level_ci_variables.html).",
+
 		CreateContext: resourceGitlabInstanceVariableCreate,
 		ReadContext:   resourceGitlabInstanceVariableRead,
 		UpdateContext: resourceGitlabInstanceVariableUpdate,
@@ -22,31 +26,36 @@ func resourceGitlabInstanceVariable() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"key": {
+				Description:  "The name of the variable.",
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: StringIsGitlabVariableName,
 			},
 			"value": {
-				Type:      schema.TypeString,
-				Required:  true,
-				Sensitive: true,
+				Description: "The value of the variable.",
+				Type:        schema.TypeString,
+				Required:    true,
+				Sensitive:   true,
 			},
 			"variable_type": {
+				Description:  "The type of a variable. Available types are: env_var (default) and file.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "env_var",
 				ValidateFunc: StringIsGitlabVariableType,
 			},
 			"protected": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 			"masked": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Description: "If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements). Defaults to `false`.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 		},
 	}

@@ -16,6 +16,8 @@ func resourceGitlabTagProtection() *schema.Resource {
 		acceptedAccessLevels = append(acceptedAccessLevels, k)
 	}
 	return &schema.Resource{
+		Description: "This resource allows you to protect a specific tag or wildcard by an access level so that the user with less access level cannot Create the tags.",
+
 		CreateContext: resourceGitlabTagProtectionCreate,
 		ReadContext:   resourceGitlabTagProtectionRead,
 		DeleteContext: resourceGitlabTagProtectionDelete,
@@ -25,16 +27,19 @@ func resourceGitlabTagProtection() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The id of the project.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 			"tag": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "Name of the tag or wildcard.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"create_access_level": {
+				Description:      "One of five levels of access to the project.",
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
 				Required:         true,
