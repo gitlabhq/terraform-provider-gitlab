@@ -1,3 +1,43 @@
+## 3.9.0 
+
+NEW RESOURCES:
+
+* 0519c96 - Add gitlab_repository_file resource (#724)
+* a915ccb - Add the project access token (#588)
+* 8564a07 - Implement support for the Custom Attribute APIs (#731)
+* 39b0b6d - Add support for gitlab group badges (#673)
+* dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
+
+NEW DATA SOURCES:
+
+* febe745 - Add data sources gitlab_project_protected_branch(es) (#551)
+
+FEATURES:
+
+* b4d4f8d - Support `early_auth_check` flag in provider config (#787)
+* 500361c - Add scripts to locally lint, like ci does (#793)
+
+ENHANCEMENTS:
+
+* 9863a61 - Auto Generate Docs (#802) 
+* 84d729e - Improve documentation around authentication with GitLab (#803)
+* a9edc4a - Add environment scope to gitlab_group_variable (#717)
+* c5a2f34 - Support issues_template and merge_requests_template in project resource (#796)
+* 18f9815 - Add CONTRIBUTING.md (#786)
+* 65b8e9c - Add minimal access level permissions (#747)
+* 79a17cb - Upgrade to SDK v2 (#725)
+* 12ae791 - Added missing scopes to deploy token (#769)
+
+BUGFIXES:
+
+* f3b0f31 - Handle manually removed resources (#318)
+* fc84cc3 - Properly allow arguments id or path_with_namespace for project data source (#806)
+* d7059cf - Do not recreate project mirror on every run (#632)
+* e57bf1d - Fix branch_protection documentation (#780)
+* 912b647 - Fix docs for gitlab_project_level_mr_approvals import (#766)
+* e89922e - instance_cluster/group_cluster: Suppress whitespace diff for kubernetes_ca_cert (#728)
+* edda219 - gitlab_user: Do not set skip_confirmation on read (#491)
+
 ## 3.8.0 (Nov 19, 2021)
 
 ENHANCEMENTS:
