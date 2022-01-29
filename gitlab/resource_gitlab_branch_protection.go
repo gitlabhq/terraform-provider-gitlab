@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -38,11 +39,6 @@ var (
 )
 
 func resourceGitlabBranchProtection() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-
-	for k := range accessLevelID {
-		acceptedAccessLevels = append(acceptedAccessLevels, k)
-	}
 	return &schema.Resource{
 		Description: "This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.\n\n" +
 			"-> The `allowed_to_push`, `allowed_to_merge` and `code_owner_approval_required` arguments require a GitLab Premium account or above.  Please refer to [Gitlab API documentation](https://docs.gitlab.com/ee/api/protected_branches.html) for further information.",
@@ -68,16 +64,16 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required:    true,
 			},
 			"merge_access_level": {
-				Description:      "Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.",
+				Description:      fmt.Sprintf("Access levels allowed to merge. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validateValueFunc(validProtectedBranchTagAccessLevelNames),
 				Required:         true,
 				ForceNew:         true,
 			},
 			"push_access_level": {
-				Description:      "Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.",
+				Description:      fmt.Sprintf("Access levels allowed to push. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validateValueFunc(validProtectedBranchTagAccessLevelNames),
 				Required:         true,
 				ForceNew:         true,
 			},
@@ -115,8 +111,8 @@ func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.Resourc
 		}
 	}
 
-	mergeAccessLevel := accessLevelID[d.Get("merge_access_level").(string)]
-	pushAccessLevel := accessLevelID[d.Get("push_access_level").(string)]
+	mergeAccessLevel := accessLevelNameToValue[d.Get("merge_access_level").(string)]
+	pushAccessLevel := accessLevelNameToValue[d.Get("push_access_level").(string)]
 	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	allowedToPush := expandBranchPermissionOptions(d.Get("allowed_to_push").(*schema.Set).List())
@@ -282,7 +278,7 @@ func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
-			AccessLevel:            accessLevel[description.AccessLevel],
+			AccessLevel:            accessLevelValueToName[description.AccessLevel],
 			AccessLevelDescription: description.AccessLevelDescription,
 		})
 	}
@@ -298,7 +294,7 @@ func convertAllowedToToBranchAccessDescriptions(descriptions []*gitlab.BranchAcc
 			continue
 		}
 		result = append(result, stateBranchAccessDescription{
-			AccessLevel:            accessLevel[description.AccessLevel],
+			AccessLevel:            accessLevelValueToName[description.AccessLevel],
 			AccessLevelDescription: description.AccessLevelDescription,
 			UserID:                 description.UserID,
 			GroupID:                description.GroupID,

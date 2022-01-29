@@ -102,7 +102,7 @@ type testAccGitlabGroupLdapLinkExpectedAttributes struct {
 func testAccCheckGitlabGroupLdapLinkAttributes(ldapLink *gitlab.LDAPGroupLink, want *testAccGitlabGroupLdapLinkExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		accessLevelId, ok := accessLevel[ldapLink.GroupAccess]
+		accessLevelId, ok := accessLevelValueToName[ldapLink.GroupAccess]
 		if !ok {
 			return fmt.Errorf("Invalid access level '%s'", accessLevelId)
 		}
@@ -149,7 +149,7 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 	// Construct our desired LDAP Link from the config values
 	desiredLdapLink := gitlab.LDAPGroupLink{
 		CN:          resourceState.Primary.Attributes["cn"],
-		GroupAccess: accessLevelNameToValue[resourceState.Primary.Attributes["access_level"]],
+		GroupAccess: accessLevelNameToValue[resourceState.Primary.Attributes["group_access"]],
 		Provider:    resourceState.Primary.Attributes["ldap_provider"],
 	}
 
@@ -220,7 +220,7 @@ resource "gitlab_group" "foo" {
 resource "gitlab_group_ldap_link" "foo" {
     group_id 		= "${gitlab_group.foo.id}"
     cn				= "%s"
-	access_level 	= "developer"
+	group_access 	= "developer"
 	ldap_provider   = "%s"
 
 }`, rInt, rInt, testLdapLink.CN, testLdapLink.Provider)
@@ -237,7 +237,7 @@ resource "gitlab_group" "foo" {
 resource "gitlab_group_ldap_link" "foo" {
     group_id 		= "${gitlab_group.foo.id}"
     cn				= "%s"
-	access_level 	= "maintainer"
+	group_access 	= "maintainer"
 	ldap_provider   = "%s"
 }`, rInt, rInt, testLdapLink.CN, testLdapLink.Provider)
 }
@@ -253,14 +253,14 @@ resource "gitlab_group" "foo" {
 resource "gitlab_group_ldap_link" "foo" {
     group_id 		= "${gitlab_group.foo.id}"
     cn				= "%s"
-	access_level 	= "maintainer"
+	group_access 	= "maintainer"
 	ldap_provider   = "%s"
 }
 
 resource "gitlab_group_ldap_link" "bar" {
     group_id 		= "${gitlab_group.foo.id}"
     cn				= "%s"
-	access_level 	= "developer"
+	group_access 	= "developer"
 	ldap_provider   = "%s"
 	force			= true
 }`, rInt, rInt, testLdapLink.CN, testLdapLink.Provider, testLdapLink.CN, testLdapLink.Provider)

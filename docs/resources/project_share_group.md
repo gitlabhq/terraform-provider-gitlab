@@ -16,7 +16,7 @@ This resource allows you to share a project with a group
 resource "gitlab_project_share_group" "test" {
   project_id   = "12345"
   group_id     = 1337
-  access_level = "guest"
+  group_access = "guest"
 }
 ```
 
@@ -25,12 +25,13 @@ resource "gitlab_project_share_group" "test" {
 
 ### Required
 
-- **access_level** (String) One of five levels of access to the project.
 - **group_id** (Number) The id of the group.
 - **project_id** (String) The id of the project.
 
 ### Optional
 
+- **access_level** (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- **group_access** (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
 - **id** (String) The ID of this resource.
 
 ## Import

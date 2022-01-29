@@ -85,7 +85,7 @@ type testAccGitlabGroupMembershipExpectedAttributes struct {
 func testAccCheckGitlabGroupMembershipAttributes(membership *gitlab.GroupMember, want *testAccGitlabGroupMembershipExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
-		accessLevelId, ok := accessLevel[membership.AccessLevel]
+		accessLevelId, ok := accessLevelValueToName[membership.AccessLevel]
 		if !ok {
 			return fmt.Errorf("Invalid access level '%s'", accessLevelId)
 		}

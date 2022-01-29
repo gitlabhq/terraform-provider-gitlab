@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -12,10 +13,6 @@ import (
 )
 
 func resourceGitlabGroupMembership() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-	for k := range accessLevelID {
-		acceptedAccessLevels = append(acceptedAccessLevels, k)
-	}
 	return &schema.Resource{
 		Description: "This resource allows you to add a user to an existing group.",
 
@@ -41,9 +38,9 @@ func resourceGitlabGroupMembership() *schema.Resource {
 				Required:    true,
 			},
 			"access_level": {
-				Description:      "Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.",
+				Description:      fmt.Sprintf("Access level for the member. Valid values are: %s.", renderValueListForDocs(validGroupAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validateValueFunc(validGroupAccessLevelNames),
 				Required:         true,
 			},
 			"expires_at": {
@@ -62,7 +59,7 @@ func resourceGitlabGroupMembershipCreate(ctx context.Context, d *schema.Resource
 	userId := d.Get("user_id").(int)
 	groupId := d.Get("group_id").(string)
 	expiresAt := d.Get("expires_at").(string)
-	accessLevelId := accessLevelID[d.Get("access_level").(string)]
+	accessLevelId := accessLevelNameToValue[d.Get("access_level").(string)]
 
 	options := &gitlab.AddGroupMemberOptions{
 		UserID:      &userId,
@@ -122,7 +119,7 @@ func resourceGitlabGroupMembershipUpdate(ctx context.Context, d *schema.Resource
 	userId := d.Get("user_id").(int)
 	groupId := d.Get("group_id").(string)
 	expiresAt := d.Get("expires_at").(string)
-	accessLevelId := accessLevelID[strings.ToLower(d.Get("access_level").(string))]
+	accessLevelId := accessLevelNameToValue[strings.ToLower(d.Get("access_level").(string))]
 
 	options := gitlab.EditGroupMemberOptions{
 		AccessLevel: &accessLevelId,
@@ -161,7 +158,7 @@ func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember
 
 	d.Set("group_id", groupId)
 	d.Set("user_id", groupMember.ID)
-	d.Set("access_level", accessLevel[groupMember.AccessLevel])
+	d.Set("access_level", accessLevelValueToName[groupMember.AccessLevel])
 	if groupMember.ExpiresAt != nil {
 		d.Set("expires_at", groupMember.ExpiresAt.String())
 	}

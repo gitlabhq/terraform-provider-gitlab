@@ -16,7 +16,7 @@ This resource allows you to add an LDAP link to an existing GitLab group.
 resource "gitlab_group_ldap_link" "test" {
   group_id      = "12345"
   cn            = "testuser"
-  access_level  = "developer"
+  group_access  = "developer"
   ldap_provider = "ldapmain"
 }
 ```
@@ -26,14 +26,15 @@ resource "gitlab_group_ldap_link" "test" {
 
 ### Required
 
-- **access_level** (String) Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.
 - **cn** (String) The CN of the LDAP group to link with.
 - **group_id** (String) The id of the GitLab group.
 - **ldap_provider** (String) The name of the LDAP provider as stored in the GitLab database.
 
 ### Optional
 
+- **access_level** (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 - **force** (Boolean) If true, then delete and replace an existing LDAP link if one exists.
+- **group_access** (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 - **id** (String) The ID of this resource.
 
 ## Import

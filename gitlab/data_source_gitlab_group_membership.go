@@ -13,10 +13,6 @@ import (
 )
 
 func dataSourceGitlabGroupMembership() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-	for k := range accessLevelID {
-		acceptedAccessLevels = append(acceptedAccessLevels, k)
-	}
 	return &schema.Resource{
 		Description: "Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.\n\n" +
 			"> **Note**: exactly one of group_id or full_path must be provided.",
@@ -46,7 +42,7 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 				Type:             schema.TypeString,
 				Computed:         true,
 				Optional:         true,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validateValueFunc(validGroupAccessLevelNames),
 			},
 			"members": {
 				Description: "The list of group members.",
@@ -160,7 +156,7 @@ func flattenGitlabMembers(d *schema.ResourceData, members []*gitlab.GroupMember)
 
 	var filterAccessLevel gitlab.AccessLevelValue = gitlab.NoPermissions
 	if data, ok := d.GetOk("access_level"); ok {
-		filterAccessLevel = accessLevelID[data.(string)]
+		filterAccessLevel = accessLevelNameToValue[data.(string)]
 	}
 
 	for _, member := range members {
@@ -175,7 +171,7 @@ func flattenGitlabMembers(d *schema.ResourceData, members []*gitlab.GroupMember)
 			"state":        member.State,
 			"avatar_url":   member.AvatarURL,
 			"web_url":      member.WebURL,
-			"access_level": accessLevel[gitlab.AccessLevelValue(member.AccessLevel)],
+			"access_level": accessLevelValueToName[gitlab.AccessLevelValue(member.AccessLevel)],
 		}
 
 		if member.ExpiresAt != nil {
