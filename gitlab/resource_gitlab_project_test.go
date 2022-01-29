@@ -1210,6 +1210,10 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1221,6 +1225,10 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = false
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1318,6 +1326,10 @@ resource "gitlab_project" "template-name" {
   description = "Terraform acceptance tests"
   template_name = "rails"
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1337,6 +1349,10 @@ resource "gitlab_project" "template-name-custom" {
   template_name = "myrails"
   use_custom_template = true
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1350,6 +1366,10 @@ resource "gitlab_project" "template-id" {
   template_project_id = 999
   use_custom_template = true
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1364,6 +1384,10 @@ resource "gitlab_project" "template-mutual-exclusive" {
   template_project_id = 999
   use_custom_template = true
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1376,6 +1400,10 @@ resource "gitlab_project" "foo" {
   description = "Terraform acceptance tests"
   issues_template = "foo"
   merge_requests_template = "bar"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1388,6 +1416,10 @@ resource "gitlab_project" "foo" {
   description = "Terraform acceptance tests"
   archive_on_destroy = true
   archived = false
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
