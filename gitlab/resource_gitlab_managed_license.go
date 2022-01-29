@@ -109,12 +109,12 @@ func resourceGitlabManagedLicenseDelete(ctx context.Context, d *schema.ResourceD
 func resourceGitlabManagedLicenseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	id, err := strconv.Atoi(d.Id())
 
+	id, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
 	}
-	log.Printf("[DEBUG] read gitlab Managed License for project/id %s/%d", project, id)
+	log.Printf("[DEBUG] read gitlab Managed License for project/licenseId %s/%d", project, id)
 
 	license, _, err := client.ManagedLicenses.GetManagedLicense(project, id, gitlab.WithContext(ctx))
 	if err != nil {
