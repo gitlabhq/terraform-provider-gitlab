@@ -24,7 +24,7 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testManagedLicenseConfig(rInt, "approved"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fix_me", &managedLicense),
+					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
 				),
 			},
 			{
@@ -32,12 +32,13 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testManagedLicenseConfig(rInt, "blacklisted"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fix_me", &managedLicense),
+					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", &managedLicense),
 				),
 			},
 			{
 				SkipFunc:          isRunningInCE,
-				ResourceName:      "gitlab_managed_license.foo",
+				ResourceName:      "gitlab_managed_license.fixme",
+				ImportStateIdFunc: getLicenseImportId("gitlab_managed_license.fixme"),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -45,14 +46,30 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	})
 }
 
+func getLicenseImportId(resource string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[resource]
+		if !ok {
+			return "", fmt.Errorf("not Found: %s", resource)
+		}
+
+		if rs.Primary.Attributes["project"] == "" {
+			return "", fmt.Errorf("project ID Not Found: %s", resource)
+		}
+
+		importId := fmt.Sprintf("%s:%s", rs.Primary.Attributes["project"], rs.Primary.ID)
+		return importId, nil
+	}
+}
+
 func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLicense) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+			return fmt.Errorf("not Found: %s", n)
 		}
 
-		licenseName := rs.Primary.ID
+		licenseStatus := rs.Primary.Attributes["approval_status"]
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
 			return fmt.Errorf("no project ID is set")
@@ -66,7 +83,7 @@ func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLic
 		}
 
 		for _, gotLicense := range licenses {
-			if gotLicense.Name == licenseName {
+			if gotLicense.ApprovalStatus == *stringToApprovalStatus(licenseStatus) {
 				*license = *gotLicense
 				return nil
 			}
@@ -108,7 +125,7 @@ func testAccCheckGitlabManagedLicenseExists(n string, license *gitlab.ManagedLic
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		licenseName := rs.Primary.ID
+		licenseName := rs.Primary.Attributes["name"]
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
 			return fmt.Errorf("no project ID is set")

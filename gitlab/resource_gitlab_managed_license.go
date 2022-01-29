@@ -9,6 +9,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 	"log"
 	"strconv"
+	"strings"
 )
 
 func resourceGitlabManagedLicense() *schema.Resource {
@@ -22,7 +23,7 @@ func resourceGitlabManagedLicense() *schema.Resource {
 		UpdateContext: resourceGitlabManagedLicenseUpdate,
 		DeleteContext: resourceGitlabManagedLicenseDelete,
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			StateContext: resourceGitlabManagedLicenseImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -49,6 +50,23 @@ func resourceGitlabManagedLicense() *schema.Resource {
 			},
 		},
 	}
+}
+
+func resourceGitlabManagedLicenseImporter(ctx context.Context, data *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(data.Id(), ":", 2)
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid label id (should be <project id>:<license id>). Input: %s", data.Id())
+	}
+
+	data.SetId(parts[1])
+	data.Set("project", parts[0])
+
+	diagnostic := resourceGitlabManagedLicenseRead(ctx, data, meta)
+	if diagnostic.HasError() {
+		return nil, fmt.Errorf("failed to managed license instance %s: %s", data.Id(), diagnostic[0].Summary)
+	}
+
+	return []*schema.ResourceData{data}, nil
 }
 
 func resourceGitlabManagedLicenseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -103,7 +121,7 @@ func resourceGitlabManagedLicenseRead(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
 	}
 
-	d.Set("project", license.ID)
+	d.Set("project", project)
 	d.Set("name", license.Name)
 	d.Set("approval_status", license.ApprovalStatus)
 
