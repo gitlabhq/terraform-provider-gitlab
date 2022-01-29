@@ -38,7 +38,6 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 			{
 				SkipFunc:          isRunningInCE,
 				ResourceName:      "gitlab_managed_license.fixme",
-				ImportStateIdFunc: getLicenseImportId("gitlab_managed_license.fixme"),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},

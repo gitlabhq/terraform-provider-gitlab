@@ -9,7 +9,6 @@ import (
 	"github.com/xanzy/go-gitlab"
 	"log"
 	"strconv"
-	"strings"
 )
 
 func resourceGitlabManagedLicense() *schema.Resource {
@@ -23,7 +22,7 @@ func resourceGitlabManagedLicense() *schema.Resource {
 		UpdateContext: resourceGitlabManagedLicenseUpdate,
 		DeleteContext: resourceGitlabManagedLicenseDelete,
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceGitlabManagedLicenseImporter,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -52,23 +51,6 @@ func resourceGitlabManagedLicense() *schema.Resource {
 	}
 }
 
-func resourceGitlabManagedLicenseImporter(ctx context.Context, data *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	parts := strings.SplitN(data.Id(), ":", 2)
-	if len(parts) != 2 {
-		return nil, fmt.Errorf("invalid label id (should be <project id>:<license id>). Input: %s", data.Id())
-	}
-
-	data.SetId(parts[1])
-	data.Set("project", parts[0])
-
-	diagnostic := resourceGitlabManagedLicenseRead(ctx, data, meta)
-	if diagnostic.HasError() {
-		return nil, fmt.Errorf("failed to managed license instance %s: %s", data.Id(), diagnostic[0].Summary)
-	}
-
-	return []*schema.ResourceData{data}, nil
-}
-
 func resourceGitlabManagedLicenseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
@@ -85,16 +67,17 @@ func resourceGitlabManagedLicenseCreate(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	d.SetId(strconv.Itoa(addManagedLicense.ID))
+	licenseId := strconv.Itoa(addManagedLicense.ID)
+	d.SetId(buildTwoPartID(&project, &licenseId))
+
 	return resourceGitlabManagedLicenseRead(ctx, d, meta)
 }
 
 func resourceGitlabManagedLicenseDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	licenseId, err := strconv.Atoi(d.Id())
+	project, licenseId, err := projectIdAndLicenseIdFromId(d.Id())
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] Delete gitlab Managed License %s", d.Id())
@@ -108,17 +91,15 @@ func resourceGitlabManagedLicenseDelete(ctx context.Context, d *schema.ResourceD
 
 func resourceGitlabManagedLicenseRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-
-	id, err := strconv.Atoi(d.Id())
+	project, licenseId, err := projectIdAndLicenseIdFromId(d.Id())
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
+		diag.FromErr(err)
 	}
-	log.Printf("[DEBUG] read gitlab Managed License for project/licenseId %s/%d", project, id)
 
-	license, _, err := client.ManagedLicenses.GetManagedLicense(project, id, gitlab.WithContext(ctx))
+	log.Printf("[DEBUG] read gitlab Managed License for project/licenseId %s/%d", project, licenseId)
+	license, _, err := client.ManagedLicenses.GetManagedLicense(project, licenseId, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
+		return diag.FromErr(err)
 	}
 
 	d.Set("project", project)
@@ -130,10 +111,9 @@ func resourceGitlabManagedLicenseRead(ctx context.Context, d *schema.ResourceDat
 
 func resourceGitlabManagedLicenseUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	licenseId, err := strconv.Atoi(d.Id())
+	project, licenseId, err := projectIdAndLicenseIdFromId(d.Id())
 	if err != nil {
-		return diag.FromErr(fmt.Errorf("%s cannot be converted to int", d.Id()))
+		return diag.FromErr(err)
 	}
 
 	opts := &gitlab.EditManagedLicenceOptions{
@@ -150,6 +130,9 @@ func resourceGitlabManagedLicenseUpdate(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
+	licenseIdStr := strconv.Itoa(licenseId)
+	d.SetId(buildTwoPartID(&project, &licenseIdStr))
+
 	return resourceGitlabManagedLicenseRead(ctx, d, meta)
 }
 
@@ -165,4 +148,18 @@ func stringToApprovalStatus(s string) *gitlab.LicenseApprovalStatusValue {
 		return nil
 	}
 	return &value
+}
+
+func projectIdAndLicenseIdFromId(id string) (string, int, error) {
+	projectId, id, err := parseTwoPartID(id)
+	if err != nil {
+		return "", 0, err
+	}
+
+	licenseId, err := strconv.Atoi(id)
+	if err != nil {
+		return "", 0, err
+	}
+
+	return projectId, licenseId, nil
 }
