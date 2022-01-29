@@ -21,6 +21,7 @@ jobs:
       go-version: ${{ steps.go-version.outputs.go-version }}
     steps:
       - uses: actions/checkout@v2
+      # Read the .go-version file and output it for other jobs to use.
       - id: go-version
         run: echo "::set-output name=go-version::$(cat .go-version)"
 

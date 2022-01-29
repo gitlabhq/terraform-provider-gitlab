@@ -14,8 +14,6 @@ See the [Developing The Provider](#developing-the-provider) section below for sp
 
 Run `make reviewable` and include any generated files in your commit. This will help ensure your PR passes automated checks.
 
-**Tip:** If you have issues passing the automated checks, try deleting your project-local `bin` directory and re-run `make reviewable`.
-
 ### PR Checklist
 
 <!--

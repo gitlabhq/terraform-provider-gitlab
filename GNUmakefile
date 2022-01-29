@@ -8,7 +8,7 @@ build: ## Build the provider binary.
 	go mod tidy
 	GOBIN=$(GOBIN) go install
 
-generate: tools ## Generate files to be checked in.
+generate: tool-tfplugindocs ## Generate files to be checked in.
 	@# Setting empty environment variables to work around issue: https://github.com/hashicorp/terraform-plugin-docs/issues/12
 	GITLAB_TOKEN="" $(GOBIN)/tfplugindocs generate
 
@@ -21,24 +21,34 @@ test: ## Run unit tests.
 
 TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
 
-fmt: tools terraform ## Format files and fix issues.
+fmt: tool-golangci-lint tool-tfproviderlintx tool-terraform tool-shfmt ## Format files and fix issues.
 	gofmt -w -s .
 	$(GOBIN)/golangci-lint run --fix
 	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) --fix ./...
-	$(TERRAFORM) fmt -recursive -list ./examples
+	$(GOBIN)/terraform fmt -recursive -list ./examples
 	$(GOBIN)/shfmt -l -s -w ./examples
 
-lint-golangci: tools ## Run golangci-lint linter (same as fmt but without modifying files).
+lint-golangci: tool-golangci-lint ## Run golangci-lint linter (same as fmt but without modifying files).
 	$(GOBIN)/golangci-lint run
 
-lint-tfprovider: tools ## Run tfproviderlintx linter (same as fmt but without modifying files).
+lint-tfprovider: tool-tfproviderlintx ## Run tfproviderlintx linter (same as fmt but without modifying files).
 	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) ./...
 
-lint-examples-tf: terraform ## Run terraform linter on examples (same as fmt but without modifying files).
-	$(TERRAFORM) fmt -recursive -check ./examples
+lint-examples-tf: tool-terraform ## Run terraform linter on examples (same as fmt but without modifying files).
+	$(GOBIN)/terraform fmt -recursive -check ./examples
 
-lint-examples-sh: tools ## Run shell linter on examples (same as fmt but without modifying files).
+lint-examples-sh: tool-shfmt ## Run shell linter on examples (same as fmt but without modifying files).
 	$(GOBIN)/shfmt -l -s -d ./examples
+
+lint-generated: generate ## Check that "make generate" was called. Note this only works if the git workspace is clean.
+	@echo "Checking git status"
+	@[ -z "$(shell git status --short)" ] || { \
+		echo "Error: Files should have been generated:"; \
+		git status --short; echo "Diff:"; \
+		git --no-pager diff HEAD; \
+		echo "Run \"make generate\" and try again"; \
+		exit 1; \
+	}
 
 SERVICE ?= gitlab-ce
 GITLAB_TOKEN ?= ACCTEST1234567890123
@@ -57,12 +67,23 @@ testacc: ## Run acceptance tests against a GitLab instance.
 # TOOLS
 # Tool dependencies are installed into a project-local /bin folder.
 
-.PHONY: tools
-tools:
-	GOBIN=$(GOBIN) go generate ./tools/tools.go
+tool-golangci-lint:
+	@$(call install-tool, github.com/golangci/golangci-lint/cmd/golangci-lint)
 
-TERRAFORM = $(GOBIN)/terraform
+tool-tfproviderlintx:
+	@$(call install-tool, github.com/bflad/tfproviderlint/cmd/tfproviderlintx)
+
+tool-tfplugindocs:
+	@$(call install-tool, github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs)
+
+tool-shfmt:
+	@$(call install-tool, mvdan.cc/sh/v3/cmd/shfmt)
+
+define install-tool
+	cd tools && GOBIN=$(GOBIN) go install $(1)
+endef
+
 TERRAFORM_VERSION = v1.1.4
-terraform:
+tool-terraform:
 	@# See https://github.com/hashicorp/terraform/issues/30356
-	@[ -f $(TERRAFORM) ] || { mkdir -p tmp; cd tmp; rm -rf terraform; git clone --branch $(TERRAFORM_VERSION) --depth 1 https://github.com/hashicorp/terraform.git; cd terraform; GOBIN=$(GOBIN) go install; cd ..; rm -rf terraform; }
+	@[ -f $(GOBIN)/terraform ] || { mkdir -p tmp; cd tmp; rm -rf terraform; git clone --branch $(TERRAFORM_VERSION) --depth 1 https://github.com/hashicorp/terraform.git; cd terraform; GOBIN=$(GOBIN) go install; cd ..; rm -rf terraform; }
