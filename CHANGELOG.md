@@ -4,7 +4,7 @@ NEW RESOURCES:
 
 * 0519c96 - Add `gitlab_repository_file` resource (#724)
 * a915ccb - Add the `gitlab_project_access_token` resource (#588)
-* 8564a07 - Add gitlab_group_custom_attribute, gitlab_project_custom_attribute, and gitlab_user_custom_attribute (#731)
+* 8564a07 - Add `gitlab_group_custom_attribute`, `gitlab_project_custom_attribute`, and `gitlab_user_custom_attribute` (#731)
 * 39b0b6d - Add support for `gitlab_group_badge` resource (#673)
 * dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
 
@@ -20,18 +20,18 @@ ENHANCEMENTS:
 
 * 9863a61 - Add missing attributes to documentation (#802) 
 * 84d729e - Improve documentation around authentication with GitLab (#803)
-* a9edc4a - Add environment scope to gitlab_group_variable (#717)
-* c5a2f34 - Support issues_template and merge_requests_template in project resource (#796)
+* a9edc4a - Add environment scope to `gitlab_group_variable` (#717)
+* c5a2f34 - Support `issues_template` and `merge_requests_template` attributes in project resource (#796)
 * 65b8e9c - Add minimal access level permissions (#747)
 * 12ae791 - Added missing scopes to deploy token (#769)
 
 BUGFIXES:
 
 * f3b0f31 - Handle manually removed resources (#318)
-* fc84cc3 - Properly allow arguments id or path_with_namespace for project data source (#806)
+* fc84cc3 - Properly allow arguments `id`or `path_with_namespace` for project data source (#806)
 * d7059cf - Do not recreate project mirror on every run (#632)
 * e57bf1d - Fix branch_protection documentation (#780)
-* 912b647 - Fix docs for gitlab_project_level_mr_approvals import (#766)
+* 912b647 - Fix docs for `gitlab_project_level_mr_approvals` import (#766)
 * e89922e - instance_cluster/group_cluster: Suppress whitespace diff for kubernetes_ca_cert (#728)
 * edda219 - gitlab_user: Do not set skip_confirmation on read (#491)
 
