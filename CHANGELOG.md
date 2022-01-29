@@ -1,19 +1,13 @@
 ## 3.9.0 (Unreleased)
 
-NEW RESOURCES:
+FEATURES:
 
 * 0519c96 - Add `gitlab_repository_file` resource (#724)
 * a915ccb - Add the `gitlab_project_access_token` resource (#588)
 * 8564a07 - Add `gitlab_group_custom_attribute`, `gitlab_project_custom_attribute`, and `gitlab_user_custom_attribute` (#731)
 * 39b0b6d - Add support for `gitlab_group_badge` resource (#673)
 * dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
-
-NEW DATA SOURCES:
-
 * febe745 - Add `gitlab_project_protected_branch` and `gitlab_project_protected_branches` data sources (#551)
-
-FEATURES:
-
 * b4d4f8d - Support `early_auth_check` flag in provider config (#787)
 
 ENHANCEMENTS:
