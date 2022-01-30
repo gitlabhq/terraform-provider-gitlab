@@ -144,8 +144,8 @@ resource "gitlab_project" "foo" {
 
 resource "gitlab_managed_license" "fixme" {
   project = "${gitlab_project.foo.id}"
-  name = "FIXME-%d"
+  name = "MIT"
   approval_status = "%s"
 }
-	`, rInt, rInt, status)
+	`, rInt, status)
 }
