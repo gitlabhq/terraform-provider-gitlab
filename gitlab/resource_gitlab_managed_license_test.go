@@ -45,22 +45,6 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	})
 }
 
-func getLicenseImportId(resource string) resource.ImportStateIdFunc {
-	return func(s *terraform.State) (string, error) {
-		rs, ok := s.RootModule().Resources[resource]
-		if !ok {
-			return "", fmt.Errorf("not Found: %s", resource)
-		}
-
-		if rs.Primary.Attributes["project"] == "" {
-			return "", fmt.Errorf("project ID Not Found: %s", resource)
-		}
-
-		importId := fmt.Sprintf("%s:%s", rs.Primary.Attributes["project"], rs.Primary.ID)
-		return importId, nil
-	}
-}
-
 func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLicense) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
