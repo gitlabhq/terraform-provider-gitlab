@@ -36,6 +36,11 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "webhook", "https://test.com"),
 					resource.TestCheckResourceAttr(slackResourceName, "push_events", "true"),
 					resource.TestCheckResourceAttr(slackResourceName, "push_channel", "test"),
+					// TODO: Currently, GitLab doesn't correctly implement the API, so this is
+					//       impossible to implement here at the moment.
+					//       see https://gitlab.com/gitlab-org/gitlab/-/issues/28903
+					// resource.TestCheckResourceAttr(slackResourceName, "deployment_events", "true"),
+					// resource.TestCheckResourceAttr(slackResourceName, "deployment_channel", "test"),
 					resource.TestCheckResourceAttr(slackResourceName, "notify_only_broken_pipelines", "true"),
 				),
 			},
@@ -204,6 +209,11 @@ resource "gitlab_service_slack" "slack" {
   confidential_issues_events   = true
   confidential_issue_channel   = "test"
   confidential_note_events     = true
+// TODO: Currently, GitLab doesn't correctly implement the API, so this is
+//       impossible to implement here at the moment.
+//       see https://gitlab.com/gitlab-org/gitlab/-/issues/28903
+//   deployment_channel           = "test"
+//   deployment_events            = true
   merge_requests_events        = true
   merge_request_channel        = "test"
   tag_push_events              = true
@@ -242,6 +252,11 @@ resource "gitlab_service_slack" "slack" {
   confidential_issues_events   = false
   confidential_issue_channel   = "test confidential_issue_channel"
   confidential_note_events     = false
+// TODO: Currently, GitLab doesn't correctly implement the API, so this is
+//       impossible to implement here at the moment.
+//       see https://gitlab.com/gitlab-org/gitlab/-/issues/28903
+//   deployment_channel           = "test deployment_channel"
+//   deployment_events            = false
   merge_requests_events        = false
   merge_request_channel        = "test merge_request_channel"
   tag_push_events              = false
