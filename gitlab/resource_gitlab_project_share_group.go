@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -38,7 +39,7 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 			"group_access": {
 				Description:      fmt.Sprintf("The access level to grant the group for the project. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validProjectAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				ForceNew:         true,
 				Optional:         true,
 				ExactlyOneOf:     []string{"access_level", "group_access"},
@@ -46,7 +47,7 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 			"access_level": {
 				Description:      fmt.Sprintf("The access level to grant the group for the project. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validProjectAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				ForceNew:         true,
 				Optional:         true,
 				Deprecated:       "Use `group_access` instead of the `access_level` attribute.",
@@ -192,7 +193,7 @@ func resourceGitlabProjectShareGroupResourceV0() *schema.Resource {
 			"access_level": {
 				Description:      fmt.Sprintf("The access level to grant the group for the project. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validProjectAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				ForceNew:         true,
 				Required:         true,
 			},

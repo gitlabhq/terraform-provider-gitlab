@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -36,7 +37,7 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 			"access_level": {
 				Description:      fmt.Sprintf("Minimum access level for members of the LDAP group. Valid values are: %s", renderValueListForDocs(validGroupAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validGroupAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validGroupAccessLevelNames, false)),
 				Optional:         true,
 				ForceNew:         true,
 				Deprecated:       "Use `group_access` instead of the `access_level` attribute.",
@@ -45,7 +46,7 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 			"group_access": {
 				Description:      fmt.Sprintf("Minimum access level for members of the LDAP group. Valid values are: %s", renderValueListForDocs(validGroupAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validGroupAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validGroupAccessLevelNames, false)),
 				Optional:         true,
 				ForceNew:         true,
 				ExactlyOneOf:     []string{"access_level", "group_access"},

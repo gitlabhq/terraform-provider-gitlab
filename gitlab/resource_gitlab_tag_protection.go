@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -37,7 +38,7 @@ func resourceGitlabTagProtection() *schema.Resource {
 			"create_access_level": {
 				Description:      fmt.Sprintf("Access levels which are allowed to create. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validProtectedBranchTagAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchTagAccessLevelNames, false)),
 				Required:         true,
 				ForceNew:         true,
 			},

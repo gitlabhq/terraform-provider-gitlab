@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-cty/cty"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -20,26 +18,6 @@ func renderValueListForDocs(values []string) string {
 		inlineCodeValues = append(inlineCodeValues, fmt.Sprintf("`%s`", v))
 	}
 	return strings.Join(inlineCodeValues, ", ")
-}
-
-// copied from ../github/util.go
-func validateValueFunc(values []string) schema.SchemaValidateDiagFunc {
-	return func(v interface{}, k cty.Path) diag.Diagnostics {
-		value := v.(string)
-		valid := false
-		for _, role := range values {
-			if value == role {
-				valid = true
-				break
-			}
-		}
-
-		if !valid {
-			return diag.Errorf("%s is an invalid value for argument %s acceptable values are: %v", value, k, values)
-		}
-
-		return nil
-	}
 }
 
 var validateDateFunc = func(v interface{}, k string) (we []string, errors []error) {

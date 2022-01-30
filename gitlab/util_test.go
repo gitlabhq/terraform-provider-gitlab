@@ -3,39 +3,8 @@ package gitlab
 import (
 	"testing"
 
-	"github.com/hashicorp/go-cty/cty"
 	gitlab "github.com/xanzy/go-gitlab"
 )
-
-func TestGitlab_validation(t *testing.T) {
-	cases := []struct {
-		Value    string
-		ErrCount int
-	}{
-		{
-			Value:    "invalid",
-			ErrCount: 1,
-		},
-		{
-			Value:    "valid_one",
-			ErrCount: 0,
-		},
-		{
-			Value:    "valid_two",
-			ErrCount: 0,
-		},
-	}
-
-	validationFunc := validateValueFunc([]string{"valid_one", "valid_two"})
-
-	for _, tc := range cases {
-		diags := validationFunc(tc.Value, cty.Path{cty.IndexStep{Key: cty.StringVal("test_arg")}})
-
-		if len(diags) != tc.ErrCount {
-			t.Fatalf("Expected 1 validation error")
-		}
-	}
-}
 
 func TestGitlab_visbilityHelpers(t *testing.T) {
 	cases := []struct {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -41,7 +42,7 @@ func resourceGitlabProjectMembership() *schema.Resource {
 			"access_level": {
 				Description:      fmt.Sprintf("The access level for the member. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(validProjectAccessLevelNames),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				Required:         true,
 			},
 		},
