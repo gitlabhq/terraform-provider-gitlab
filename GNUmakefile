@@ -50,6 +50,12 @@ lint-generated: generate ## Check that "make generate" was called. Note this onl
 		exit 1; \
 	}
 
+apicovered: tool-apicovered ## Run an analysis tool to estimate the GitLab API coverage.
+	@$(GOBIN)/apicovered ./gitlab
+
+apiunused: tool-apiunused ## Run an analysis tool to output unused parts of the go-gitlab package.
+	@$(GOBIN)/apiunused ./gitlab
+
 SERVICE ?= gitlab-ce
 GITLAB_TOKEN ?= ACCTEST1234567890123
 GITLAB_BASE_URL ?= http://127.0.0.1:8080/api/v4
@@ -78,6 +84,12 @@ tool-tfplugindocs:
 
 tool-shfmt:
 	@$(call install-tool, mvdan.cc/sh/v3/cmd/shfmt)
+
+tool-apicovered:
+	@$(call install-tool, ./cmd/apicovered)
+
+tool-apiunused:
+	@$(call install-tool, ./cmd/apiunused)
 
 define install-tool
 	cd tools && GOBIN=$(GOBIN) go install $(1)
