@@ -42,6 +42,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	}
 
 	process(result, goGitLab.TypeToFilenames, usage.Types)
+	process(result, goGitLab.FuncToFilenames, usage.Funcs)
 	process(result, goGitLab.MethodToFilenames, usage.Methods)
 	process(result, goGitLab.FieldToFilenames, usage.Fields)
 
