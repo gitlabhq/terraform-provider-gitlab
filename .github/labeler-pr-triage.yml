@@ -4,22 +4,34 @@ dependencies:
   - '.github/dependabot.yml'
   - '**/go.mod'
   - '**/go.sum'
+
 documentation:
   - '**/*.md'
   - 'docs/**/*'
   - 'examples/**/*'
+
 linter:
   - '.github/workflows/*-lint.yml'
   - '.golangci.yml'
+
 provider:
   - '.go-version'
   - 'gitlab/**/*'
   - 'main.go'
+
+resource:
+  - 'gitlab/resource_*.go'
+
+data-source:
+  - 'gitlab/data_source_*.go'
+
 tests:
   - '**/*_test.go'
+
 tools:
   - 'tools/**/*'
   - 'scripts/**/*'
   - 'GNUMakefile'
+
 workflows:
   - '.github/**/*'
