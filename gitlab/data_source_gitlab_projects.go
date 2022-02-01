@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/mitchellh/hashstructure"
 	"github.com/xanzy/go-gitlab"
 )
@@ -350,7 +350,6 @@ func dataSourceGitlabProjects() *schema.Resource {
 						},
 						"owner": {
 							Type:     schema.TypeList,
-							MaxItems: 1,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -447,7 +446,6 @@ func dataSourceGitlabProjects() *schema.Resource {
 						},
 						"namespace": {
 							Type:     schema.TypeList,
-							MaxItems: 1,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -484,7 +482,6 @@ func dataSourceGitlabProjects() *schema.Resource {
 						},
 						"permissions": {
 							Type:     schema.TypeList,
-							MaxItems: 1,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
@@ -560,7 +557,6 @@ func dataSourceGitlabProjects() *schema.Resource {
 						},
 						"forked_from_project": {
 							Type:     schema.TypeList,
-							MaxItems: 1,
 							Computed: true,
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{

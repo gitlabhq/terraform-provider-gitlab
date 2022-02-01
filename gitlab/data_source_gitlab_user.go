@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -199,11 +199,11 @@ func dataSourceGitlabUserRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("state", user.State)
 	d.Set("external", user.External)
 	d.Set("extern_uid", user.ExternUID)
-	d.Set("created_at", user.CreatedAt) // lintignore: R004,XR004 // TODO: Resolve this tfproviderlint issue
+	d.Set("created_at", user.CreatedAt.String())
 	d.Set("organization", user.Organization)
 	d.Set("two_factor_enabled", user.TwoFactorEnabled)
 	d.Set("note", user.Note)
-	d.Set("provider", user.Provider)
+	d.Set("user_provider", user.Provider)
 	d.Set("avatar_url", user.AvatarURL)
 	d.Set("bio", user.Bio)
 	d.Set("location", user.Location)

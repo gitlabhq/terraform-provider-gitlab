@@ -8,12 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
 	"no one":     gitlab.NoPermissions,
+	"minimal":    gitlab.MinimalAccessPermissions,
 	"guest":      gitlab.GuestPermissions,
 	"reporter":   gitlab.ReporterPermissions,
 	"developer":  gitlab.DeveloperPermissions,
@@ -25,18 +28,18 @@ var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
 }
 
 var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
-	gitlab.NoPermissions:         "no one",
-	gitlab.GuestPermissions:      "guest",
-	gitlab.ReporterPermissions:   "reporter",
-	gitlab.DeveloperPermissions:  "developer",
-	gitlab.MaintainerPermissions: "maintainer",
-	gitlab.OwnerPermissions:      "owner",
+	gitlab.NoPermissions:            "no one",
+	gitlab.MinimalAccessPermissions: "minimal",
+	gitlab.GuestPermissions:         "guest",
+	gitlab.ReporterPermissions:      "reporter",
+	gitlab.DeveloperPermissions:     "developer",
+	gitlab.MaintainerPermissions:    "maintainer",
+	gitlab.OwnerPermissions:         "owner",
 }
 
 // copied from ../github/util.go
-func validateValueFunc(values []string) schema.SchemaValidateFunc {
-	// lintignore: V013 // TODO: Resolve this tfproviderlint issue
-	return func(v interface{}, k string) (we []string, errors []error) {
+func validateValueFunc(values []string) schema.SchemaValidateDiagFunc {
+	return func(v interface{}, k cty.Path) diag.Diagnostics {
 		value := v.(string)
 		valid := false
 		for _, role := range values {
@@ -47,9 +50,10 @@ func validateValueFunc(values []string) schema.SchemaValidateFunc {
 		}
 
 		if !valid {
-			errors = append(errors, fmt.Errorf("%s is an invalid value for argument %s acceptable values are: %v", value, k, values))
+			return diag.Errorf("%s is an invalid value for argument %s acceptable values are: %v", value, k, values)
 		}
-		return
+
+		return nil
 	}
 }
 
@@ -217,6 +221,18 @@ func parseTwoPartID(id string) (string, string, error) {
 // format the strings into an id `a:b`
 func buildTwoPartID(a, b *string) string {
 	return fmt.Sprintf("%s:%s", *a, *b)
+}
+
+var tagProtectionAccessLevelID = map[string]gitlab.AccessLevelValue{
+	"no one":     gitlab.NoPermissions,
+	"developer":  gitlab.DeveloperPermissions,
+	"maintainer": gitlab.MaintainerPermissions,
+}
+
+var tagProtectionAccessLevelNames = map[gitlab.AccessLevelValue]string{
+	gitlab.NoPermissions:         "no one",
+	gitlab.DeveloperPermissions:  "developer",
+	gitlab.MaintainerPermissions: "maintainer",
 }
 
 var accessLevelID = map[string]gitlab.AccessLevelValue{

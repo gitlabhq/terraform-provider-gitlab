@@ -1,26 +1,28 @@
 package gitlab
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabGroupCreate,
-		Read:   resourceGitlabGroupRead,
-		Update: resourceGitlabGroupUpdate,
-		Delete: resourceGitlabGroupDelete,
+		Create:        resourceGitlabGroupCreate,
+		Read:          resourceGitlabGroupRead,
+		Update:        resourceGitlabGroupUpdate,
+		DeleteContext: resourceGitlabGroupDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -320,13 +322,13 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	return resourceGitlabGroupRead(d, meta)
 }
 
-func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabGroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] Delete gitlab group %s", d.Id())
 
 	_, err := client.Groups.DeleteGroup(d.Id())
 	if err != nil && !strings.Contains(err.Error(), "Group has been already marked for deletion") {
-		return fmt.Errorf("error deleting group %s: %s", d.Id(), err)
+		return diag.Errorf("error deleting group %s: %s", d.Id(), err)
 	}
 
 	// Wait for the group to be deleted.
@@ -355,9 +357,9 @@ func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 		Delay:      5 * time.Second,
 	}
 
-	_, err = stateConf.WaitForState()
+	_, err = stateConf.WaitForStateContext(ctx)
 	if err != nil {
-		return fmt.Errorf("error waiting for group (%s) to become deleted: %s", d.Id(), err)
+		return diag.Errorf("error waiting for group (%s) to become deleted: %s", d.Id(), err)
 	}
-	return err
+	return nil
 }

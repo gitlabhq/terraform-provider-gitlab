@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -44,7 +44,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 		Update: resourceGitlabBranchProtectionUpdate,
 		Delete: resourceGitlabBranchProtectionDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -58,16 +58,16 @@ func resourceGitlabBranchProtection() *schema.Resource {
 				Required: true,
 			},
 			"merge_access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				Required:         true,
+				ForceNew:         true,
 			},
 			"push_access_level": {
-				Type:         schema.TypeString,
-				ValidateFunc: validateValueFunc(acceptedAccessLevels),
-				Required:     true,
-				ForceNew:     true,
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				Required:         true,
+				ForceNew:         true,
 			},
 			"allowed_to_push":  schemaAllowedTo(),
 			"allowed_to_merge": schemaAllowedTo(),
@@ -253,13 +253,6 @@ func schemaAllowedTo() *schema.Schema {
 		ForceNew: true,
 		Elem:     allowedToElem,
 	}
-}
-
-type stateBranchAccessDescription struct {
-	AccessLevel            string `mapstructure:"access_level"`
-	AccessLevelDescription string `mapstructure:"access_level_description"`
-	GroupID                int    `mapstructure:"group_id,omitempty"`
-	UserID                 int    `mapstructure:"user_id,omitempty"`
 }
 
 func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
