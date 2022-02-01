@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -66,9 +65,9 @@ func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta i
 	}
 	log.Printf("[DEBUG] read gitlab topic %d", topicID)
 
-	topic, resp, err := client.Topics.GetTopic(topicID, gitlab.WithContext(ctx))
+	topic, _, err := client.Topics.GetTopic(topicID, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
