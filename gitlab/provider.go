@@ -101,7 +101,6 @@ func Provider() *schema.Provider {
 			"gitlab_project_freeze_period":      resourceGitlabProjectFreezePeriod(),
 			"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
 			"gitlab_project_badge":              resourceGitlabProjectBadge(),
-			"gitlab_topic":                      resourceGitlabTopic(),
 			"gitlab_group_badge":                resourceGitlabGroupBadge(),
 			"gitlab_topic":                      resourceGitlabTopic(),
 		},
