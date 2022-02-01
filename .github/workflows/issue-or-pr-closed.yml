@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        labels: ['needs-triage', 'waiting-response']
+        labels: ['needs-triage', 'waiting-response', 'needs-rebase']
     steps:
       - name: Remove ${{ matrix.labels }} label
         uses: actions-ecosystem/action-remove-labels@v1
