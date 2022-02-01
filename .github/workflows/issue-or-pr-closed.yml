@@ -17,10 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        labels: ['needs-triage', 'waiting-response', 'needs-rebase']
+        label:
+          - 'needs-triage'
+          - 'waiting-response'
+          - 'needs-rebase'
+          - 'merge-conflict'
     steps:
-      - name: Remove ${{ matrix.labels }} label
+      - name: Remove ${{ matrix.label }} label
         uses: actions-ecosystem/action-remove-labels@v1
-        if: contains(github.event.*.labels.*.name, matrix.labels)
+        if: contains(github.event.*.labels.*.name, matrix.label)
         with:
-          labels: ${{ matrix.labels }}
+          labels: ${{ matrix.label }}
