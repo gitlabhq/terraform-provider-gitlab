@@ -109,6 +109,7 @@ func Provider() *schema.Provider {
 			"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
 			"gitlab_project_badge":              resourceGitlabProjectBadge(),
 			"gitlab_topic":                      resourceGitlabTopic(),
+			"gitlab_repository_file":            resourceGitLabRepositoryFile(),
 		},
 	}
 
