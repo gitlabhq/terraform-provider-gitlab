@@ -23,12 +23,14 @@ func resourceGitlabTopic() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The topic's name",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "A text describing the topic",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 		},
 	}
