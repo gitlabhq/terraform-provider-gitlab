@@ -1,9 +1,12 @@
 package gitlab
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
@@ -11,10 +14,10 @@ import (
 
 func resourceGitlabTopic() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabTopicCreate,
-		Read:   resourceGitlabTopicRead,
-		Update: resourceGitlabTopicUpdate,
-		Delete: resourceGitlabTopicDelete,
+		CreateContext: resourceGitlabTopicCreate,
+		ReadContext:   resourceGitlabTopicRead,
+		UpdateContext: resourceGitlabTopicUpdate,
+		DeleteContext: resourceGitlabTopicDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -32,7 +35,7 @@ func resourceGitlabTopic() *schema.Resource {
 	}
 }
 
-func resourceGitlabTopicCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.CreateTopicOptions{
 		Name: gitlab.String(d.Get("name").(string)),
@@ -44,33 +47,33 @@ func resourceGitlabTopicCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] create gitlab topic %s", *options.Name)
 
-	topic, _, err := client.Topics.CreateTopic(options)
+	topic, _, err := client.Topics.CreateTopic(options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.Errorf("Failed to create topic %q: %s", *options.Name, err)
 	}
 
 	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
 
-	return resourceGitlabTopicRead(d, meta)
+	return resourceGitlabTopicRead(ctx, d, meta)
 }
 
-func resourceGitlabTopicRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
 	topicID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.Errorf("Failed to convert topic id %s to int: %s", d.Id(), err)
 	}
 	log.Printf("[DEBUG] read gitlab topic %d", topicID)
 
-	topic, resp, err := client.Topics.GetTopic(topicID, nil)
+	topic, resp, err := client.Topics.GetTopic(topicID, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp != nil && resp.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
-		return err
+		return diag.Errorf("Failed to read topic %d: %s", topicID, err)
 	}
 
 	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
@@ -80,7 +83,7 @@ func resourceGitlabTopicRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.UpdateTopicOptions{}
 
@@ -96,17 +99,17 @@ func resourceGitlabTopicUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	topicID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.Errorf("Failed to convert topic id %s to int: %s", d.Id(), err)
 	}
-	_, _, err = client.Topics.UpdateTopic(topicID, options)
+	_, _, err = client.Topics.UpdateTopic(topicID, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return err
+		return diag.Errorf("Failed to update topic %d: %s", topicID, err)
 	}
 
-	return resourceGitlabTopicRead(d, meta)
+	return resourceGitlabTopicRead(ctx, d, meta)
 }
 
-func resourceGitlabTopicDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabTopicDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	log.Printf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics. Instead emptying its description", d.Id())
 
@@ -117,8 +120,11 @@ func resourceGitlabTopicDelete(d *schema.ResourceData, meta interface{}) error {
 
 	topicID, err := strconv.Atoi(d.Id())
 	if err != nil {
-		return err
+		return diag.Errorf("Failed to convert topic id %s to int: %s", d.Id(), err)
 	}
-	_, _, err = client.Topics.UpdateTopic(topicID, options)
-	return err
+	_, _, err = client.Topics.UpdateTopic(topicID, options, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.Errorf("Failed to update topic %d: %s", topicID, err)
+	}
+	return nil
 }
