@@ -13,6 +13,8 @@ import (
 
 func resourceGitlabTopic() *schema.Resource {
 	return &schema.Resource{
+		Description: "This resource allows you to create and manage topics that are then assignable to projects. Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.\n\nFor assigning topics, use the [project](./project.md) resource.",
+
 		CreateContext: resourceGitlabTopicCreate,
 		ReadContext:   resourceGitlabTopicRead,
 		UpdateContext: resourceGitlabTopicUpdate,
