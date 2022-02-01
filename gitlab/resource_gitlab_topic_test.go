@@ -2,12 +2,12 @@ package gitlab
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -73,16 +73,27 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 }
 
 func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
+	return func(s *terraform.State) (err error) {
+
+		defer func() {
+			if err != nil {
+				err = fmt.Errorf("checking for gitlab topic existence failed: %w", err)
+			}
+		}()
+
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
 			return fmt.Errorf("not Found: %s", n)
 		}
 
-		topicID := rs.Primary.ID
 		conn := testAccProvider.Meta().(*gitlab.Client)
 
-		topic, _, err := conn.Topics.GetTopic(topicID)
+		id, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		topic, _, err := conn.Topics.GetTopic(id)
 		*assign = *topic
 
 		return err
@@ -108,7 +119,14 @@ func testAccCheckGitlabTopicAttributes(topic *gitlab.Topic, want *testAccGitlabT
 	}
 }
 
-func testAccCheckGitlabTopicDestroy(s *terraform.State) error {
+func testAccCheckGitlabTopicDestroy(s *terraform.State) (err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("destroying gitlab topic failed: %w", err)
+		}
+	}()
+
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
@@ -116,7 +134,12 @@ func testAccCheckGitlabTopicDestroy(s *terraform.State) error {
 			continue
 		}
 
-		topic, resp, err := conn.Topics.GetTopic(rs.Primary.ID)
+		id, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		topic, resp, err := conn.Topics.GetTopic(id)
 		if err == nil {
 			if topic != nil && fmt.Sprintf("%d", topic.ID) == rs.Primary.ID {
 
