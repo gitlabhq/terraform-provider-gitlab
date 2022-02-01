@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -51,7 +52,7 @@ func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta
 		return diag.Errorf("Failed to create topic %q: %s", *options.Name, err)
 	}
 
-	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
+	d.SetId(fmt.Sprintf("%d", topic.ID))
 
 	return resourceGitlabTopicRead(ctx, d, meta)
 }
@@ -75,7 +76,7 @@ func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta i
 		return diag.Errorf("Failed to read topic %d: %s", topicID, err)
 	}
 
-	d.SetId(strconv.FormatInt(int64(topic.ID), 10))
+	d.SetId(fmt.Sprintf("%d", topic.ID))
 	d.Set("name", topic.Name)
 	d.Set("description", topic.Description)
 
