@@ -50,7 +50,7 @@ resource "gitlab_service_slack" "slack" {
 - **note_channel** (String) The name of the channel to receive note events notifications.
 - **note_events** (Boolean) Enable notifications for note events.
 - **notify_only_broken_pipelines** (Boolean) Send notifications for broken pipelines.
-- **notify_only_default_branch** (Boolean, Deprecated) DEPRECATED: This parameter has been replaced with `branches_to_be_notified`.
+- **notify_only_default_branch** (Boolean, Deprecated) This parameter has been replaced with `branches_to_be_notified`.
 - **pipeline_channel** (String) The name of the channel to receive pipeline events notifications.
 - **pipeline_events** (Boolean) Enable notifications for pipeline events.
 - **push_channel** (String) The name of the channel to receive push events notifications.
@@ -63,7 +63,7 @@ resource "gitlab_service_slack" "slack" {
 
 ### Read-Only
 
-- **job_events** (Boolean) Enable notifications for job events.
+- **job_events** (Boolean) Enable notifications for job events. **ATTENTION**: This attribute is currently not being submitted to the GitLab API, due to https://github.com/xanzy/go-gitlab/issues/1354.
 
 ## Import
 
