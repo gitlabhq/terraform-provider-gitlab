@@ -1,13 +1,14 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
+	"strconv"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
-	"strconv"
-	"testing"
 )
 
 func TestAccGitlabManagedLicense_basic(t *testing.T) {
@@ -15,9 +16,9 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() {},
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckManagedLicenseDestroy,
+		PreCheck:          func() {},
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
 			{
 				// Create a managed license with an "approved" state
@@ -58,9 +59,7 @@ func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLic
 			return fmt.Errorf("no project ID is set")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		licenses, _, err := conn.ManagedLicenses.ListManagedLicenses(project)
+		licenses, _, err := testGitlabClient.ManagedLicenses.ListManagedLicenses(project)
 		if err != nil {
 			return err
 		}
@@ -76,8 +75,6 @@ func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLic
 }
 
 func testAccCheckManagedLicenseDestroy(state *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range state.RootModule().Resources {
 		if rs.Type != "gitlab_managed_licence" {
 			continue
@@ -86,7 +83,7 @@ func testAccCheckManagedLicenseDestroy(state *terraform.State) error {
 		id, _ := strconv.Atoi(rs.Primary.ID)
 		pid := rs.Primary.Attributes["project"]
 
-		license, _, err := conn.ManagedLicenses.GetManagedLicense(pid, id)
+		license, _, err := testGitlabClient.ManagedLicenses.GetManagedLicense(pid, id)
 		if err == nil {
 			if license != nil && license.ID == id {
 				return fmt.Errorf("license still exists")
@@ -114,9 +111,7 @@ func testAccCheckGitlabManagedLicenseExists(n string, license *gitlab.ManagedLic
 			return fmt.Errorf("no project ID is set")
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
-		licenses, _, err := conn.ManagedLicenses.ListManagedLicenses(project)
+		licenses, _, err := testGitlabClient.ManagedLicenses.ListManagedLicenses(project)
 		if err != nil {
 			return err
 		}

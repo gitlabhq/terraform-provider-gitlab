@@ -1,14 +1,15 @@
-package gitlab
+package provider
 
 import (
 	"context"
 	"fmt"
+	"log"
+	"strconv"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
-	"log"
-	"strconv"
 )
 
 func resourceGitlabManagedLicense() *schema.Resource {

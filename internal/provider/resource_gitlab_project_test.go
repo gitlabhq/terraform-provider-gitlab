@@ -379,9 +379,9 @@ func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectArchivedOnDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectArchivedOnDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabProjectConfigArchiveOnDestroy(rInt),
@@ -904,13 +904,12 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 }
 
 func testAccCheckGitlabProjectArchivedOnDestroy(s *terraform.State) error {
-	conn := testAccProvider.Meta().(*gitlab.Client)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_project" {
 			continue
 		}
 
-		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
 		if err != nil {
 			return fmt.Errorf("unable to get project %s, to check if it has been archived on the destroy", rs.Primary.ID)
 		}
