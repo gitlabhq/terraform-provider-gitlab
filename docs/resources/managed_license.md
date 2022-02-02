@@ -5,12 +5,14 @@ subcategory: ""
 description: |-
   This resource allows you to add rules for managing licenses on a project.
   For additional information, please see the gitlab documentation https://docs.gitlab.com/ee/user/compliance/license_compliance/.
+  ~> Using this resource requires an active gitlab ultimate https://about.gitlab.com/pricing/subscription.
 ---
 
 # gitlab_managed_license (Resource)
 
 This resource allows you to add rules for managing licenses on a project.
 For additional information, please see the [gitlab documentation](https://docs.gitlab.com/ee/user/compliance/license_compliance/).
+~> Using this resource requires an active [gitlab ultimate](https://about.gitlab.com/pricing/)subscription.
 
 ## Example Usage
 
@@ -46,5 +48,6 @@ resource "gitlab_managed_license" "mit" {
 Import is supported using the following syntax:
 
 ```shell
+# You can import this resource with an id made up of `{project-id}:{license-id}`, e.g.
 terraform import gitlab_managed_license.foo 1:2
 ```
