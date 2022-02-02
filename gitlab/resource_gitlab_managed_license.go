@@ -99,6 +99,11 @@ func resourceGitlabManagedLicenseRead(ctx context.Context, d *schema.ResourceDat
 	log.Printf("[DEBUG] read gitlab Managed License for project/licenseId %s/%d", project, licenseId)
 	license, _, err := client.ManagedLicenses.GetManagedLicense(project, licenseId, gitlab.WithContext(ctx))
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] Managed License %s:%d no longer exists and is being removed from state", project, licenseId)
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
