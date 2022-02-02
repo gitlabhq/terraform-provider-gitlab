@@ -15,7 +15,7 @@ func resourceGitlabManagedLicense() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to add rules for managing licenses on a project.\n" +
 			"For additional information, please see the " +
-			"[gitlab documentation](https://docs.gitlab.com/ee/user/compliance/license_compliance/).\n" +
+			"[gitlab documentation](https://docs.gitlab.com/ee/user/compliance/license_compliance/).\n\n" +
 			"~> Using this resource requires an active [gitlab ultimate](https://about.gitlab.com/pricing/)" +
 			"subscription.",
 
