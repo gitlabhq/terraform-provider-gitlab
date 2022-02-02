@@ -358,6 +358,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
 	},
+	"archive_on_destroy": {
+		Description: "Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+	},
 }
 
 func resourceGitlabProject() *schema.Resource {
@@ -857,43 +862,53 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
 
-	_, err := client.Projects.DeleteProject(d.Id(), gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
-	}
+	if !d.Get("archive_on_destroy").(bool) {
+		log.Printf("[DEBUG] Delete gitlab project %s", d.Id())
+		_, err := client.Projects.DeleteProject(d.Id(), gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
 
-	// Wait for the project to be deleted.
-	// Deleting a project in gitlab is async.
-	stateConf := &resource.StateChangeConf{
-		Pending: []string{"Deleting"},
-		Target:  []string{"Deleted"},
-		Refresh: func() (interface{}, string, error) {
-			out, response, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
-			if err != nil {
-				if response.StatusCode == 404 {
+		// Wait for the project to be deleted.
+		// Deleting a project in gitlab is async.
+		stateConf := &resource.StateChangeConf{
+			Pending: []string{"Deleting"},
+			Target:  []string{"Deleted"},
+			Refresh: func() (interface{}, string, error) {
+				out, response, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
+				if err != nil {
+					if response.StatusCode == 404 {
+						return out, "Deleted", nil
+					}
+					log.Printf("[ERROR] Received error: %#v", err)
+					return out, "Error", err
+				}
+				if out.MarkedForDeletionAt != nil {
+					// Represents a Gitlab EE soft-delete
 					return out, "Deleted", nil
 				}
-				log.Printf("[ERROR] Received error: %#v", err)
-				return out, "Error", err
-			}
-			if out.MarkedForDeletionAt != nil {
-				// Represents a Gitlab EE soft-delete
-				return out, "Deleted", nil
-			}
-			return out, "Deleting", nil
-		},
+				return out, "Deleting", nil
+			},
 
-		Timeout:    10 * time.Minute,
-		MinTimeout: 3 * time.Second,
-		Delay:      5 * time.Second,
+			Timeout:    10 * time.Minute,
+			MinTimeout: 3 * time.Second,
+			Delay:      5 * time.Second,
+		}
+
+		_, err = stateConf.WaitForStateContext(ctx)
+		if err != nil {
+			return diag.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
+		}
+
+	} else {
+		log.Printf("[DEBUG] Archive gitlab project %s", d.Id())
+		_, _, err := client.Projects.ArchiveProject(d.Id(), gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
-	_, err = stateConf.WaitForStateContext(ctx)
-	if err != nil {
-		return diag.Errorf("error waiting for project (%s) to become deleted: %s", d.Id(), err)
-	}
 	return nil
 }
 

@@ -383,6 +383,21 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectArchivedOnDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigArchiveOnDestroy(rInt),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
@@ -881,6 +896,27 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 	return nil
 }
 
+func testAccCheckGitlabProjectArchivedOnDestroy(s *terraform.State) error {
+	conn := testAccProvider.Meta().(*gitlab.Client)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gitlab_project" {
+			continue
+		}
+
+		gotRepo, _, err := conn.Projects.GetProject(rs.Primary.ID, nil)
+		if err != nil {
+			return fmt.Errorf("unable to get project %s, to check if it has been archived on the destroy", rs.Primary.ID)
+		}
+
+		if !gotRepo.Archived {
+			return fmt.Errorf("expected project to be archived, but it isn't")
+		}
+		return nil
+	}
+
+	return fmt.Errorf("no project resources found in state, but expected a `gitlab_project` resource marked as archvied")
+}
+
 func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) resource.TestCheckFunc {
 	var checks []resource.TestCheckFunc
 
@@ -1174,6 +1210,10 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1185,6 +1225,10 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests"
   initialize_with_readme = false
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1282,6 +1326,10 @@ resource "gitlab_project" "template-name" {
   description = "Terraform acceptance tests"
   template_name = "rails"
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1301,6 +1349,10 @@ resource "gitlab_project" "template-name-custom" {
   template_name = "myrails"
   use_custom_template = true
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1314,6 +1366,10 @@ resource "gitlab_project" "template-id" {
   template_project_id = 999
   use_custom_template = true
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1328,6 +1384,10 @@ resource "gitlab_project" "template-mutual-exclusive" {
   template_project_id = 999
   use_custom_template = true
   default_branch = "master"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
@@ -1340,6 +1400,26 @@ resource "gitlab_project" "foo" {
   description = "Terraform acceptance tests"
   issues_template = "foo"
   merge_requests_template = "bar"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigArchiveOnDestroy(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  archive_on_destroy = true
+  archived = false
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
 }
 	`, rInt, rInt)
 }
