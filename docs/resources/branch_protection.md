@@ -58,9 +58,9 @@ resource "gitlab_branch_protection" "main" {
 ### Required
 
 - **branch** (String) Name of the branch.
-- **merge_access_level** (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
+- **merge_access_level** (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`.
 - **project** (String) The id of the project.
-- **push_access_level** (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
+- **push_access_level** (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`.
 
 ### Optional
 

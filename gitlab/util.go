@@ -8,53 +8,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-cty/cty"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
-	"no one":     gitlab.NoPermissions,
-	"minimal":    gitlab.MinimalAccessPermissions,
-	"guest":      gitlab.GuestPermissions,
-	"reporter":   gitlab.ReporterPermissions,
-	"developer":  gitlab.DeveloperPermissions,
-	"maintainer": gitlab.MaintainerPermissions,
-	"owner":      gitlab.OwnerPermission,
-
-	// Deprecated
-	"master": gitlab.MaintainerPermissions,
-}
-
-var accessLevelValueToName = map[gitlab.AccessLevelValue]string{
-	gitlab.NoPermissions:            "no one",
-	gitlab.MinimalAccessPermissions: "minimal",
-	gitlab.GuestPermissions:         "guest",
-	gitlab.ReporterPermissions:      "reporter",
-	gitlab.DeveloperPermissions:     "developer",
-	gitlab.MaintainerPermissions:    "maintainer",
-	gitlab.OwnerPermissions:         "owner",
-}
-
-// copied from ../github/util.go
-func validateValueFunc(values []string) schema.SchemaValidateDiagFunc {
-	return func(v interface{}, k cty.Path) diag.Diagnostics {
-		value := v.(string)
-		valid := false
-		for _, role := range values {
-			if value == role {
-				valid = true
-				break
-			}
-		}
-
-		if !valid {
-			return diag.Errorf("%s is an invalid value for argument %s acceptable values are: %v", value, k, values)
-		}
-
-		return nil
+func renderValueListForDocs(values []string) string {
+	inlineCodeValues := make([]string, 0, len(values))
+	for _, v := range values {
+		inlineCodeValues = append(inlineCodeValues, fmt.Sprintf("`%s`", v))
 	}
+	return strings.Join(inlineCodeValues, ", ")
 }
 
 var validateDateFunc = func(v interface{}, k string) (we []string, errors []error) {
@@ -233,27 +196,6 @@ var tagProtectionAccessLevelNames = map[gitlab.AccessLevelValue]string{
 	gitlab.NoPermissions:         "no one",
 	gitlab.DeveloperPermissions:  "developer",
 	gitlab.MaintainerPermissions: "maintainer",
-}
-
-var accessLevelID = map[string]gitlab.AccessLevelValue{
-	"no one":     gitlab.NoPermissions,
-	"guest":      gitlab.GuestPermissions,
-	"reporter":   gitlab.ReporterPermissions,
-	"developer":  gitlab.DeveloperPermissions,
-	"maintainer": gitlab.MaintainerPermissions,
-	"owner":      gitlab.OwnerPermission,
-
-	// Deprecated
-	"master": gitlab.MaintainerPermissions,
-}
-
-var accessLevel = map[gitlab.AccessLevelValue]string{
-	gitlab.NoPermissions:         "no one",
-	gitlab.GuestPermissions:      "guest",
-	gitlab.ReporterPermissions:   "reporter",
-	gitlab.DeveloperPermissions:  "developer",
-	gitlab.MaintainerPermissions: "maintainer",
-	gitlab.OwnerPermission:       "owner",
 }
 
 func stringSetToStringSlice(stringSet *schema.Set) *[]string {

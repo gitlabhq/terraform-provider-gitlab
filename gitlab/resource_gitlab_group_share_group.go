@@ -9,17 +9,13 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 // https://docs.gitlab.com/ee/api/groups.html#share-groups-with-groups
 
 func resourceGitlabGroupShareGroup() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-	for k := range accessLevelID {
-		acceptedAccessLevels = append(acceptedAccessLevels, k)
-	}
-
 	return &schema.Resource{
 		Description: "This resource allows you to share a group with another group",
 
@@ -43,9 +39,9 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 				Required:    true,
 			},
 			"group_access": {
-				Description:      "One of five levels of access to the group.",
+				Description:      fmt.Sprintf("The access level to grant the group. Valid values are: %s", renderValueListForDocs(validGroupAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validGroupAccessLevelNames, false)),
 				ForceNew:         true,
 				Required:         true,
 			},
@@ -63,7 +59,7 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 func resourceGitlabGroupShareGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	groupId := d.Get("group_id").(string)
 	shareGroupId := d.Get("share_group_id").(int)
-	groupAccess := accessLevelID[d.Get("group_access").(string)]
+	groupAccess := accessLevelNameToValue[d.Get("group_access").(string)]
 	options := &gitlab.ShareWithGroupOptions{
 		GroupID:     &shareGroupId,
 		GroupAccess: &groupAccess,
@@ -112,7 +108,7 @@ func resourceGitlabGroupShareGroupRead(ctx context.Context, d *schema.ResourceDa
 
 			d.Set("group_id", groupId)
 			d.Set("share_group_id", sharedGroup.GroupID)
-			d.Set("group_access", accessLevel[convertedAccessLevel])
+			d.Set("group_access", accessLevelValueToName[convertedAccessLevel])
 
 			if sharedGroup.ExpiresAt == nil {
 				d.Set("expires_at", "")

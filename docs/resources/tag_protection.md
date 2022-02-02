@@ -25,7 +25,7 @@ resource "gitlab_tag_protection" "TagProtect" {
 
 ### Required
 
-- **create_access_level** (String) One of five levels of access to the project.
+- **create_access_level** (String) Access levels which are allowed to create. Valid values are: `no one`, `developer`, `maintainer`.
 - **project** (String) The id of the project.
 - **tag** (String) Name of the tag or wildcard.
 

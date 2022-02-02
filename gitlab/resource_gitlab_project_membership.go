@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -9,16 +10,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectMembership() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-	for k := range accessLevelID {
-		if k != "owner" {
-			acceptedAccessLevels = append(acceptedAccessLevels, k)
-		}
-	}
 	return &schema.Resource{
 		Description: "This resource allows you to add a current user to an existing project with a set access level.",
 
@@ -44,9 +40,9 @@ func resourceGitlabProjectMembership() *schema.Resource {
 				Required:    true,
 			},
 			"access_level": {
-				Description:      "One of five levels of access to the project.",
+				Description:      fmt.Sprintf("The access level for the member. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				Required:         true,
 			},
 		},
@@ -58,7 +54,7 @@ func resourceGitlabProjectMembershipCreate(ctx context.Context, d *schema.Resour
 
 	userId := d.Get("user_id").(int)
 	projectId := d.Get("project_id").(string)
-	accessLevelId := accessLevelID[d.Get("access_level").(string)]
+	accessLevelId := accessLevelNameToValue[d.Get("access_level").(string)]
 
 	options := &gitlab.AddProjectMemberOptions{
 		UserID:      &userId,
@@ -116,7 +112,7 @@ func resourceGitlabProjectMembershipUpdate(ctx context.Context, d *schema.Resour
 
 	userId := d.Get("user_id").(int)
 	projectId := d.Get("project_id").(string)
-	accessLevelId := accessLevelID[strings.ToLower(d.Get("access_level").(string))]
+	accessLevelId := accessLevelNameToValue[strings.ToLower(d.Get("access_level").(string))]
 
 	options := gitlab.EditProjectMemberOptions{
 		AccessLevel: &accessLevelId,
@@ -153,7 +149,7 @@ func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMe
 
 	d.Set("project_id", projectId)
 	d.Set("user_id", projectMember.ID)
-	d.Set("access_level", accessLevel[projectMember.AccessLevel])
+	d.Set("access_level", accessLevelValueToName[projectMember.AccessLevel])
 
 	userId := strconv.Itoa(projectMember.ID)
 	d.SetId(buildTwoPartID(projectId, &userId))

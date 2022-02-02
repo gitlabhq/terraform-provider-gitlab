@@ -2,19 +2,17 @@ package gitlab
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabGroupLdapLink() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(accessLevelID))
-	for k := range accessLevelID {
-		acceptedAccessLevels = append(acceptedAccessLevels, k)
-	}
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "This resource allows you to add an LDAP link to an existing GitLab group.",
@@ -36,13 +34,22 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
-			// Using the friendlier "access_level" here instead of the GitLab API "group_access".
 			"access_level": {
-				Description:      "Acceptable values are: guest, minimal, reporter, developer, maintainer, owner.",
+				Description:      fmt.Sprintf("Minimum access level for members of the LDAP group. Valid values are: %s", renderValueListForDocs(validGroupAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
-				Required:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validGroupAccessLevelNames, false)),
+				Optional:         true,
 				ForceNew:         true,
+				Deprecated:       "Use `group_access` instead of the `access_level` attribute.",
+				ExactlyOneOf:     []string{"access_level", "group_access"},
+			},
+			"group_access": {
+				Description:      fmt.Sprintf("Minimum access level for members of the LDAP group. Valid values are: %s", renderValueListForDocs(validGroupAccessLevelNames)),
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validGroupAccessLevelNames, false)),
+				Optional:         true,
+				ForceNew:         true,
+				ExactlyOneOf:     []string{"access_level", "group_access"},
 			},
 			// Changing GitLab API parameter "provider" to "ldap_provider" to avoid clashing with the Terraform "provider" key word
 			"ldap_provider": {
@@ -67,13 +74,22 @@ func resourceGitlabGroupLdapLinkCreate(ctx context.Context, d *schema.ResourceDa
 
 	groupId := d.Get("group_id").(string)
 	cn := d.Get("cn").(string)
-	group_access := gitlab.AccessLevelValue(accessLevelNameToValue[d.Get("access_level").(string)])
+
+	var groupAccess gitlab.AccessLevelValue
+	if v, ok := d.GetOk("group_access"); ok {
+		groupAccess = gitlab.AccessLevelValue(accessLevelNameToValue[v.(string)])
+	} else if v, ok := d.GetOk("access_level"); ok {
+		groupAccess = gitlab.AccessLevelValue(accessLevelNameToValue[v.(string)])
+	} else {
+		return diag.Errorf("Neither `group_access` nor `access_level` (deprecated) is set")
+	}
+
 	ldap_provider := d.Get("ldap_provider").(string)
 	force := d.Get("force").(bool)
 
 	options := &gitlab.AddGroupLDAPLinkOptions{
 		CN:          &cn,
-		GroupAccess: &group_access,
+		GroupAccess: &groupAccess,
 		Provider:    &ldap_provider,
 	}
 

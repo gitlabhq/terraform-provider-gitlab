@@ -58,7 +58,7 @@ func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
 				"access_level": {
-					Description: "The access level allowed to perform the respective action (shows as 40 - \"maintainer\" if `user_id` or `group_id` are present).",
+					Description: fmt.Sprintf("The access level allowed to perform the respective action (shows as 40 - \"maintainer\" if `user_id` or `group_id` are present). Valid values are: %s", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 					Type:        schema.TypeString,
 					Computed:    true,
 				},
@@ -68,14 +68,16 @@ func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 					Computed:    true,
 				},
 				"user_id": {
-					Description: "If present, indicates that the user is allowed to perform the respective action.",
+					Description: "If present, indicates that the user is allowed to perform the respective action. (only GitLab Premium or higher)",
 					Type:        schema.TypeInt,
 					Computed:    true,
+					Optional:    true,
 				},
 				"group_id": {
-					Description: "If present, indicates that the group is allowed to perform the respective action.",
+					Description: "If present, indicates that the group is allowed to perform the respective action. (only GitLab Premium or higher)",
 					Type:        schema.TypeInt,
 					Computed:    true,
+					Optional:    true,
 				},
 			},
 		},
@@ -135,7 +137,7 @@ func convertBranchAccessDescriptionsToStateBranchAccessDescriptions(descriptions
 
 func convertBranchAccessDescriptionToStateBranchAccessDescription(description *gitlab.BranchAccessDescription) stateBranchAccessDescription {
 	stateDescription := stateBranchAccessDescription{
-		AccessLevel:            accessLevel[description.AccessLevel],
+		AccessLevel:            accessLevelValueToName[description.AccessLevel],
 		AccessLevelDescription: description.AccessLevelDescription,
 	}
 	if description.UserID != 0 {

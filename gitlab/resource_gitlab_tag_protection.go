@@ -2,19 +2,16 @@ package gitlab
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabTagProtection() *schema.Resource {
-	acceptedAccessLevels := make([]string, 0, len(tagProtectionAccessLevelID))
-
-	for k := range tagProtectionAccessLevelID {
-		acceptedAccessLevels = append(acceptedAccessLevels, k)
-	}
 	return &schema.Resource{
 		Description: "This resource allows you to protect a specific tag or wildcard by an access level so that the user with less access level cannot Create the tags.",
 
@@ -39,9 +36,9 @@ func resourceGitlabTagProtection() *schema.Resource {
 				Required:    true,
 			},
 			"create_access_level": {
-				Description:      "One of five levels of access to the project.",
+				Description:      fmt.Sprintf("Access levels which are allowed to create. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchTagAccessLevelNames, false)),
 				Required:         true,
 				ForceNew:         true,
 			},

@@ -8,12 +8,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/xanzy/go-gitlab"
 )
 
 func resourceGitlabProjectShareGroup() *schema.Resource {
-	acceptedAccessLevels := []string{"guest", "reporter", "developer", "maintainer"}
-
 	return &schema.Resource{
 		Description: "This resource allows you to share a project with a group",
 
@@ -37,12 +36,30 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 				ForceNew:    true,
 				Required:    true,
 			},
-			"access_level": {
-				Description:      "One of five levels of access to the project.",
+			"group_access": {
+				Description:      fmt.Sprintf("The access level to grant the group for the project. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
 				Type:             schema.TypeString,
-				ValidateDiagFunc: validateValueFunc(acceptedAccessLevels),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				ForceNew:         true,
-				Required:         true,
+				Optional:         true,
+				ExactlyOneOf:     []string{"access_level", "group_access"},
+			},
+			"access_level": {
+				Description:      fmt.Sprintf("The access level to grant the group for the project. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
+				ForceNew:         true,
+				Optional:         true,
+				Deprecated:       "Use `group_access` instead of the `access_level` attribute.",
+				ExactlyOneOf:     []string{"access_level", "group_access"},
+			},
+		},
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    resourceGitlabProjectShareGroupResourceV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceGitlabProjectShareGroupStateUpgradeV0,
+				Version: 0,
 			},
 		},
 	}
@@ -53,11 +70,19 @@ func resourceGitlabProjectShareGroupCreate(ctx context.Context, d *schema.Resour
 
 	groupId := d.Get("group_id").(int)
 	projectId := d.Get("project_id").(string)
-	accessLevelId := accessLevelID[d.Get("access_level").(string)]
+
+	var groupAccess gitlab.AccessLevelValue
+	if v, ok := d.GetOk("group_access"); ok {
+		groupAccess = gitlab.AccessLevelValue(accessLevelNameToValue[v.(string)])
+	} else if v, ok := d.GetOk("access_level"); ok {
+		groupAccess = gitlab.AccessLevelValue(accessLevelNameToValue[v.(string)])
+	} else {
+		return diag.Errorf("Neither `group_access` nor `access_level` (deprecated) is set")
+	}
 
 	options := &gitlab.ShareWithGroupOptions{
 		GroupID:     &groupId,
-		GroupAccess: &accessLevelId,
+		GroupAccess: &groupAccess,
 	}
 	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.GroupID, projectId)
 
@@ -144,8 +169,40 @@ func resourceGitlabProjectShareGroupSetToState(d *schema.ResourceData, group str
 
 	d.Set("project_id", projectId)
 	d.Set("group_id", group.GroupID)
-	d.Set("access_level", accessLevel[convertedAccessLevel])
+	d.Set("group_access", accessLevelValueToName[convertedAccessLevel])
 
 	groupId := strconv.Itoa(group.GroupID)
 	d.SetId(buildTwoPartID(projectId, &groupId))
+}
+
+func resourceGitlabProjectShareGroupResourceV0() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"project_id": {
+				Description: "The id of the project.",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
+			},
+			"group_id": {
+				Description: "The id of the group.",
+				Type:        schema.TypeInt,
+				ForceNew:    true,
+				Required:    true,
+			},
+			"access_level": {
+				Description:      fmt.Sprintf("The access level to grant the group for the project. Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
+				ForceNew:         true,
+				Required:         true,
+			},
+		},
+	}
+}
+
+func resourceGitlabProjectShareGroupStateUpgradeV0(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	rawState["group_access"] = rawState["access_level"]
+	delete(rawState, "access_level")
+	return rawState, nil
 }

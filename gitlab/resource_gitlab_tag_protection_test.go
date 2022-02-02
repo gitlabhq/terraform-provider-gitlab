@@ -27,7 +27,7 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d", rInt),
-						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
 					}),
 				),
 			},
@@ -38,7 +38,7 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d", rInt),
-						CreateAccessLevel: accessLevel[gitlab.MasterPermissions],
+						CreateAccessLevel: accessLevelValueToName[gitlab.MasterPermissions],
 					}),
 				),
 			},
@@ -49,7 +49,7 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d", rInt),
-						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
 					}),
 				),
 			},
@@ -76,7 +76,7 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d%s", rInt, wildcard),
-						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
 					}),
 				),
 			},
@@ -87,7 +87,7 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d%s", rInt, wildcard),
-						CreateAccessLevel: accessLevel[gitlab.MasterPermissions],
+						CreateAccessLevel: accessLevelValueToName[gitlab.MasterPermissions],
 					}),
 				),
 			},
@@ -98,7 +98,7 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 					testAccCheckGitlabTagProtectionExists("gitlab_tag_protection.TagProtect", &pt),
 					testAccCheckGitlabTagProtectionAttributes(&pt, &testAccGitlabTagProtectionExpectedAttributes{
 						Name:              fmt.Sprintf("TagProtect-%d%s", rInt, wildcard),
-						CreateAccessLevel: accessLevel[gitlab.DeveloperPermissions],
+						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
 					}),
 				),
 			},
@@ -165,8 +165,8 @@ func testAccCheckGitlabTagProtectionAttributes(pt *gitlab.ProtectedTag, want *te
 			return fmt.Errorf("got name %q; want %q", pt.Name, want.Name)
 		}
 
-		if pt.CreateAccessLevels[0].AccessLevel != accessLevelID[want.CreateAccessLevel] {
-			return fmt.Errorf("got Create access levels %q; want %q", pt.CreateAccessLevels[0].AccessLevel, accessLevelID[want.CreateAccessLevel])
+		if pt.CreateAccessLevels[0].AccessLevel != accessLevelNameToValue[want.CreateAccessLevel] {
+			return fmt.Errorf("got Create access levels %q; want %q", pt.CreateAccessLevels[0].AccessLevel, accessLevelNameToValue[want.CreateAccessLevel])
 		}
 
 		return nil

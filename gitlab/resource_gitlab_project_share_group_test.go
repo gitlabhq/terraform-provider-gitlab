@@ -1,8 +1,10 @@
 package gitlab
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -10,6 +12,35 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
+
+func testResourceGitlabProjectShareGroupStateDataV0() map[string]interface{} {
+	return map[string]interface{}{
+		"project_id":   "1",
+		"group_id":     "2",
+		"access_level": "maintainer",
+	}
+}
+
+func testResourceGitlabProjectShareGroupStateDataV1() map[string]interface{} {
+	v0 := testResourceGitlabProjectShareGroupStateDataV0()
+	return map[string]interface{}{
+		"project_id":   v0["project_id"],
+		"group_id":     v0["group_id"],
+		"group_access": v0["access_level"],
+	}
+}
+
+func TestResourceGitlabProjectShareGroupStateUpgradeV0(t *testing.T) {
+	expected := testResourceGitlabProjectShareGroupStateDataV1()
+	actual, err := resourceGitlabProjectShareGroupStateUpgradeV0(context.Background(), testResourceGitlabProjectShareGroupStateDataV0(), nil)
+	if err != nil {
+		t.Fatalf("error migrating state: %s", err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
+	}
+}
 
 func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
@@ -99,7 +130,7 @@ resource "gitlab_group" "test" {
 resource "gitlab_project_share_group" "test" {
   project_id = gitlab_project.test.id
   group_id = gitlab_group.test.id
-  access_level = "%[2]s"
+  group_access = "%[2]s"
 }
 `, randName, accessLevel)
 }
