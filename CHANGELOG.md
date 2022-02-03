@@ -9,6 +9,7 @@ FEATURES:
 * dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
 * febe745 - Add `gitlab_project_protected_branch` and `gitlab_project_protected_branches` data sources (#551)
 * b4d4f8d - Support `early_auth_check` flag in provider config (#787)
+* 1455db0 - Add managed license resources and tests (#700)
 
 ENHANCEMENTS:
 
