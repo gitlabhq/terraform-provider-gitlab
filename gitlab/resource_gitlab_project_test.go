@@ -398,6 +398,27 @@ func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_setSinglePushRuleToDefault(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config: testAccGitlabProjectConfigPushRules(rInt, `
+member_check = false
+`),
+				Check: testAccCheckGitlabProjectPushRules("gitlab_project.foo", &gitlab.ProjectPushRules{
+					MemberCheck: false,
+				}),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
