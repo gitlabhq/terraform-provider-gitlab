@@ -9,7 +9,8 @@ FEATURES:
 * dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
 * febe745 - Add `gitlab_project_protected_branch` and `gitlab_project_protected_branches` data sources (#551)
 * b4d4f8d - Support `early_auth_check` flag in provider config (#787)
-* 1455db0 - Add managed license resources and tests (#700)
+* 1455db0 - Add `gitlab_managed_license` resource (#700)
+* be59cd1 - New `archive_on_destroy` attribute for `gitlab_project` (#816)
 
 ENHANCEMENTS:
 
@@ -19,6 +20,8 @@ ENHANCEMENTS:
 * c5a2f34 - Support `issues_template` and `merge_requests_template` attributes in project resource (#796)
 * 65b8e9c - Add minimal access level permissions (#747)
 * 12ae791 - Added missing scopes to deploy token (#769)
+* 1455db0 - Update allowed access levels in `gitlab_branch_protection`, `gitlab_group_ldap_link`, `gitlab_group_membership`, `gitlab_group_share_group`, `gitlab_project_membership`, `gitlab_project_share_group`, and `gitlab_tag_protection` (#819)
+* 1455db0 - New attribute `group_access` in `gitlab_project_share_group` and `gitlab_group_ldap_link` (attribute `access_level` is now considered deprecated on those resources) (#819)
 
 BUGFIXES:
 
