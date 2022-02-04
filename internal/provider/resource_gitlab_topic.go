@@ -15,10 +15,9 @@ func resourceGitlabTopic() *schema.Resource {
 	return &schema.Resource{
 		Description: `This resource allows you to create and manage topics that are then assignable to projects. Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.  
 
-For assigning topics, use the [project](./project.md) resource.  
+For assigning topics, use the [project](./project.md) resource.
 
-
-~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet`,
+~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.`,
 
 		CreateContext: resourceGitlabTopicCreate,
 		ReadContext:   resourceGitlabTopicRead,
@@ -32,6 +31,11 @@ For assigning topics, use the [project](./project.md) resource.
 			"name": {
 				Description: "The topic's name",
 				Type:        schema.TypeString,
+				Required:    true,
+			},
+			"soft_destroy": {
+				Description: "Empty the topics fields instead of deleting it",
+				Type:        schema.TypeBool,
 				Required:    true,
 			},
 			"description": {
@@ -119,7 +123,18 @@ func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta
 
 func resourceGitlabTopicDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
-	log.Printf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics. Instead emptying its description", d.Id())
+	softDestroy := d.Get("soft_destroy").(bool)
+	warning := fmt.Sprintf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics", d.Id())
+
+	if softDestroy {
+		warning += ". Instead emptying its description"
+	}
+
+	log.Println(warning)
+
+	if !softDestroy {
+		return nil
+	}
 
 	client := meta.(*gitlab.Client)
 	options := &gitlab.UpdateTopicOptions{

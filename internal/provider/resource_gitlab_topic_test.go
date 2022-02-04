@@ -67,6 +67,9 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ResourceName:      "gitlab_topic.foo",
 				ImportState:       true,
 				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"soft_destroy",
+				},
 			},
 		},
 	})
@@ -103,6 +106,7 @@ func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.Test
 type testAccGitlabTopicExpectedAttributes struct {
 	Name        string
 	Description string
+	SoftDestroy bool
 }
 
 func testAccCheckGitlabTopicAttributes(topic *gitlab.Topic, want *testAccGitlabTopicExpectedAttributes) resource.TestCheckFunc {
@@ -146,6 +150,7 @@ func testAccCheckGitlabTopicDestroy(s *terraform.State) (err error) {
 				if topic.Description != "" {
 					return fmt.Errorf("topic still has a description")
 				}
+
 				// TODO: Return error as soon as deleting a topic is supported
 				return nil
 			}
@@ -162,6 +167,7 @@ func testAccGitlabTopicRequiredConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
   name             = "foo-req-%d"
+  soft_destroy     = true
 }`, rInt)
 }
 
@@ -170,5 +176,6 @@ func testAccGitlabTopicFullConfig(rInt int) string {
 resource "gitlab_topic" "foo" {
   name             = "foo-full-%d"
   description      = "Terraform acceptance tests"
+  soft_destroy     = true
 }`, rInt)
 }
