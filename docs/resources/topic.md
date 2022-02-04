@@ -5,17 +5,16 @@ subcategory: ""
 description: |-
   This resource allows you to create and manage topics that are then assignable to projects. Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
   For assigning topics, use the project ./project.md resource.
-  ~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet
+  ~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.
 ---
 
 # gitlab_topic (Resource)
 
 This resource allows you to create and manage topics that are then assignable to projects. Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.  
 
-For assigning topics, use the [project](./project.md) resource.  
+For assigning topics, use the [project](./project.md) resource.
 
-
-~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet
+~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.
 
 ## Example Usage
 
@@ -32,6 +31,7 @@ resource "gitlab_topic" "functional-programming" {
 ### Required
 
 - **name** (String) The topic's name
+- **soft_destroy** (Boolean) Empty the topics fields instead of deleting it
 
 ### Optional
 
