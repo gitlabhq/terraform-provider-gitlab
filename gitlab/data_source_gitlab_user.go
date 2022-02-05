@@ -231,7 +231,13 @@ func dataSourceGitlabUserRead(ctx context.Context, d *schema.ResourceData, meta 
 	d.Set("state", user.State)
 	d.Set("external", user.External)
 	d.Set("extern_uid", user.ExternUID)
-	d.Set("created_at", user.CreatedAt.String())
+
+	if user.CreatedAt != nil {
+		d.Set("created_at", user.CreatedAt.String())
+	} else {
+		d.Set("created_at", "")
+	}
+
 	d.Set("organization", user.Organization)
 	d.Set("two_factor_enabled", user.TwoFactorEnabled)
 	d.Set("note", user.Note)

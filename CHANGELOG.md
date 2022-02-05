@@ -1,4 +1,10 @@
-## 3.9.0 (2022-01-04)
+## 3.9.1 (Unreleased)
+
+BUGFIXES:
+
+* Fix crash in `gitlab_user` data source
+
+## 3.9.0 (2022-02-04)
 
 FEATURES:
 
