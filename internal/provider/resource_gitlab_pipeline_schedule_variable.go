@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabPipelineScheduleVariable() *schema.Resource {
+var _ = registerResource("gitlab_pipeline_schedule_variable", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage variables for pipeline schedules.",
 
@@ -50,7 +50,7 @@ func resourceGitlabPipelineScheduleVariable() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabPipelineScheduleVariableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

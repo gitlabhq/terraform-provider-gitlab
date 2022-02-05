@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabDeployKey() *schema.Resource {
+var _ = registerResource("gitlab_deploy_key", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage [deploy keys](https://docs.gitlab.com/ee/user/project/deploy_keys/) for your GitLab projects.",
 
@@ -54,7 +54,7 @@ func resourceGitlabDeployKey() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabDeployKeyCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

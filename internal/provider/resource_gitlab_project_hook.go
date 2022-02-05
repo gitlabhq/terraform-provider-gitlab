@@ -11,7 +11,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectHook() *schema.Resource {
+var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage hooks for your GitLab projects.\n" +
@@ -119,7 +119,7 @@ func resourceGitlabProjectHook() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectHookCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

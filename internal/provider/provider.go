@@ -9,6 +9,19 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+var (
+	allDataSources = make(map[string]func() *schema.Resource)
+	allResources   = make(map[string]func() *schema.Resource)
+)
+
+// registerDataSource may be called during package initialization to register a new data source with
+// the provider.
+var registerDataSource = makeRegisterResourceFunc(allDataSources, "data source")
+
+// registerResource may be called during package initialization to register a new resource with the
+// provider.
+var registerResource = makeRegisterResourceFunc(allResources, "resource")
+
 func init() {
 	// Set descriptions to support markdown syntax, this will be used in document generation
 	// and the language server.
@@ -70,61 +83,8 @@ func New(version string) func() *schema.Provider {
 				},
 			},
 
-			DataSourcesMap: map[string]*schema.Resource{
-				"gitlab_group":                      dataSourceGitlabGroup(),
-				"gitlab_group_membership":           dataSourceGitlabGroupMembership(),
-				"gitlab_project":                    dataSourceGitlabProject(),
-				"gitlab_project_protected_branch":   dataSourceGitlabProjectProtectedBranch(),
-				"gitlab_project_protected_branches": dataSourceGitlabProjectProtectedBranches(),
-				"gitlab_projects":                   dataSourceGitlabProjects(),
-				"gitlab_user":                       dataSourceGitlabUser(),
-				"gitlab_users":                      dataSourceGitlabUsers(),
-			},
-
-			ResourcesMap: map[string]*schema.Resource{
-				"gitlab_branch_protection":          resourceGitlabBranchProtection(),
-				"gitlab_tag_protection":             resourceGitlabTagProtection(),
-				"gitlab_group":                      resourceGitlabGroup(),
-				"gitlab_group_custom_attribute":     resourceGitlabGroupCustomAttribute(),
-				"gitlab_project":                    resourceGitlabProject(),
-				"gitlab_project_custom_attribute":   resourceGitlabProjectCustomAttribute(),
-				"gitlab_label":                      resourceGitlabLabel(),
-				"gitlab_managed_license":            resourceGitlabManagedLicense(),
-				"gitlab_group_label":                resourceGitlabGroupLabel(),
-				"gitlab_pipeline_schedule":          resourceGitlabPipelineSchedule(),
-				"gitlab_pipeline_schedule_variable": resourceGitlabPipelineScheduleVariable(),
-				"gitlab_pipeline_trigger":           resourceGitlabPipelineTrigger(),
-				"gitlab_project_hook":               resourceGitlabProjectHook(),
-				"gitlab_deploy_key":                 resourceGitlabDeployKey(),
-				"gitlab_deploy_key_enable":          resourceGitlabDeployEnableKey(),
-				"gitlab_deploy_token":               resourceGitlabDeployToken(),
-				"gitlab_user":                       resourceGitlabUser(),
-				"gitlab_user_custom_attribute":      resourceGitlabUserCustomAttribute(),
-				"gitlab_project_membership":         resourceGitlabProjectMembership(),
-				"gitlab_group_membership":           resourceGitlabGroupMembership(),
-				"gitlab_project_variable":           resourceGitlabProjectVariable(),
-				"gitlab_group_variable":             resourceGitlabGroupVariable(),
-				"gitlab_project_access_token":       resourceGitlabProjectAccessToken(),
-				"gitlab_project_cluster":            resourceGitlabProjectCluster(),
-				"gitlab_service_slack":              resourceGitlabServiceSlack(),
-				"gitlab_service_jira":               resourceGitlabServiceJira(),
-				"gitlab_service_microsoft_teams":    resourceGitlabServiceMicrosoftTeams(),
-				"gitlab_service_github":             resourceGitlabServiceGithub(),
-				"gitlab_service_pipelines_email":    resourceGitlabServicePipelinesEmail(),
-				"gitlab_project_share_group":        resourceGitlabProjectShareGroup(),
-				"gitlab_group_cluster":              resourceGitlabGroupCluster(),
-				"gitlab_group_ldap_link":            resourceGitlabGroupLdapLink(),
-				"gitlab_instance_cluster":           resourceGitlabInstanceCluster(),
-				"gitlab_project_mirror":             resourceGitlabProjectMirror(),
-				"gitlab_project_level_mr_approvals": resourceGitlabProjectLevelMRApprovals(),
-				"gitlab_project_approval_rule":      resourceGitlabProjectApprovalRule(),
-				"gitlab_instance_variable":          resourceGitlabInstanceVariable(),
-				"gitlab_project_freeze_period":      resourceGitlabProjectFreezePeriod(),
-				"gitlab_group_share_group":          resourceGitlabGroupShareGroup(),
-				"gitlab_project_badge":              resourceGitlabProjectBadge(),
-				"gitlab_group_badge":                resourceGitlabGroupBadge(),
-				"gitlab_repository_file":            resourceGitLabRepositoryFile(),
-			},
+			DataSourcesMap: resourceFactoriesToMap(allDataSources),
+			ResourcesMap:   resourceFactoriesToMap(allResources),
 		}
 
 		provider.ConfigureContextFunc = configure(version, provider)
@@ -155,4 +115,36 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 
 		return client, nil
 	}
+}
+
+func makeRegisterResourceFunc(factories map[string]func() *schema.Resource, resourceType string) func(name string, fn func() *schema.Resource) interface{} {
+	// lintignore: R009 // panic() during package initialization is ok
+	return func(name string, fn func() *schema.Resource) interface{} {
+		if strings.ToLower(name) != name {
+			panic(fmt.Sprintf("cannot register %s %q: name must be lowercase", resourceType, name))
+		}
+
+		const wantPrefix = "gitlab_"
+		if !strings.HasPrefix(name, wantPrefix) {
+			panic(fmt.Sprintf("cannot register %s %q: name must begin with %q", resourceType, name, wantPrefix))
+		}
+
+		if _, exists := factories[name]; exists {
+			panic(fmt.Sprintf("cannot register %s %q: a %s with the same name already exists", resourceType, name, resourceType))
+		}
+
+		factories[name] = fn
+
+		return nil
+	}
+}
+
+func resourceFactoriesToMap(factories map[string]func() *schema.Resource) map[string]*schema.Resource {
+	resourcesMap := make(map[string]*schema.Resource)
+
+	for name, fn := range factories {
+		resourcesMap[name] = fn()
+	}
+
+	return resourcesMap
 }

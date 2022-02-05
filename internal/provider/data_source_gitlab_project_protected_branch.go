@@ -11,7 +11,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
+var _ = registerDataSource("gitlab_project_protected_branch", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "Provides details about a specific protected branch in a given project.",
 
@@ -48,7 +48,7 @@ func dataSourceGitlabProjectProtectedBranch() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func dataSourceGitlabProjectProtectedBranchSchemaAccessLevels() *schema.Schema {
 	return &schema.Schema{

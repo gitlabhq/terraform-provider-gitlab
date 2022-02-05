@@ -11,7 +11,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabGroupBadge() *schema.Resource {
+var _ = registerResource("gitlab_group_badge", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage badges for your GitLab groups.\n" +
 			"For further information, consult the [gitlab\n" +
@@ -53,7 +53,7 @@ func resourceGitlabGroupBadge() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupBadgeCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

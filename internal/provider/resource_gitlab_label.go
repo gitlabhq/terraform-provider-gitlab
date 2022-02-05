@@ -9,7 +9,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabLabel() *schema.Resource {
+var _ = registerResource("gitlab_label", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage labels for your GitLab projects.\n" +
@@ -45,7 +45,7 @@ func resourceGitlabLabel() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabLabelCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

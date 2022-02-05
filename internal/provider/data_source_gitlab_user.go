@@ -11,7 +11,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabUser() *schema.Resource {
+var _ = registerDataSource("gitlab_user", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.\n\n" +
 			"-> Some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.",
@@ -170,7 +170,7 @@ func dataSourceGitlabUser() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func dataSourceGitlabUserRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

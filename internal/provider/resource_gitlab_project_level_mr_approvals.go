@@ -10,7 +10,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
+var _ = registerResource("gitlab_project_level_mr_approvals", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to configure project-level MR approvals. for your GitLab projects.\n" +
 			"For further information on merge request approvals, consult the [GitLab API documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).",
@@ -51,7 +51,7 @@ func resourceGitlabProjectLevelMRApprovals() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectLevelMRApprovalsCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

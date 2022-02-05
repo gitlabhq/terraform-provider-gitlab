@@ -14,7 +14,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectVariable() *schema.Resource {
+var _ = registerResource("gitlab_project_variable", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage CI/CD variables for your GitLab projects.\n" +
 			"For further information on variables, consult the [gitlab\n" +
@@ -81,7 +81,7 @@ func resourceGitlabProjectVariable() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectVariableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

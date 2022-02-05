@@ -10,7 +10,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabServiceJira() *schema.Resource {
+var _ = registerResource("gitlab_service_jira", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to manage Jira integration.",
 
@@ -133,7 +133,7 @@ func resourceGitlabServiceJira() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabServiceJiraCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

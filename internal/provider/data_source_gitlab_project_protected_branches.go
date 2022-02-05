@@ -11,7 +11,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabProjectProtectedBranches() *schema.Resource {
+var _ = registerDataSource("gitlab_project_protected_branches", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "Provides details about all protected branches in a given project.",
 
@@ -55,7 +55,7 @@ func dataSourceGitlabProjectProtectedBranches() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 type stateProtectedBranch struct {
 	ID                        int                            `json:"id,omitempty" mapstructure:"id,omitempty"`

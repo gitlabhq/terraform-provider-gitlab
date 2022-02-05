@@ -15,7 +15,7 @@ import (
 
 // https://docs.gitlab.com/ee/api/groups.html#share-groups-with-groups
 
-func resourceGitlabGroupShareGroup() *schema.Resource {
+var _ = registerResource("gitlab_group_share_group", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to share a group with another group",
 
@@ -54,7 +54,7 @@ func resourceGitlabGroupShareGroup() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupShareGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	groupId := d.Get("group_id").(string)

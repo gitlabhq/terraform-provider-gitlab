@@ -394,9 +394,9 @@ func TestAccGitlabProject_setSinglePushRuleToDefault(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabProjectDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				SkipFunc: isRunningInCE,
@@ -926,7 +926,7 @@ func testAccCheckGitlabProjectArchivedOnDestroy(s *terraform.State) error {
 func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) resource.TestCheckFunc {
 	var checks []resource.TestCheckFunc
 
-	testResource := resourceGitlabProject()
+	testResource := allResources["gitlab_project"]()
 	expectedData := testResource.TestResourceData()
 	receivedData := testResource.TestResourceData()
 	for a, v := range testResource.Schema {

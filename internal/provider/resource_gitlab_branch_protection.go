@@ -39,7 +39,7 @@ var (
 	}
 )
 
-func resourceGitlabBranchProtection() *schema.Resource {
+var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.\n\n" +
 			"-> The `allowed_to_push`, `allowed_to_merge` and `code_owner_approval_required` arguments require a GitLab Premium account or above.  Please refer to [Gitlab API documentation](https://docs.gitlab.com/ee/api/protected_branches.html) for further information.",
@@ -93,7 +93,7 @@ func resourceGitlabBranchProtection() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

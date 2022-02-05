@@ -27,7 +27,7 @@ func modifyRequestAddEnvironmentFilter(scope string) gitlab.RequestOptionFunc {
 	}
 }
 
-func resourceGitlabGroupVariable() *schema.Resource {
+var _ = registerResource("gitlab_group_variable", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage CI/CD variables for your GitLab groups.\n" +
 			"For further information on variables, consult the [gitlab\n" +
@@ -89,7 +89,7 @@ func resourceGitlabGroupVariable() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupVariableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

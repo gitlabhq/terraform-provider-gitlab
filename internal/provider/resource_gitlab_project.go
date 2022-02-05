@@ -365,7 +365,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	},
 }
 
-func resourceGitlabProject() *schema.Resource {
+var _ = registerResource("gitlab_project", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage projects within your GitLab group or within your user.",
 
@@ -378,7 +378,7 @@ func resourceGitlabProject() *schema.Resource {
 		},
 		Schema: resourceGitLabProjectSchema,
 	}
-}
+})
 
 func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) error {
 	d.SetId(fmt.Sprintf("%d", project.ID))

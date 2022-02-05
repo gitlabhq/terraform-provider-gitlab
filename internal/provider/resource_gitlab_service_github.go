@@ -10,7 +10,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabServiceGithub() *schema.Resource {
+var _ = registerResource("gitlab_service_github", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "**NOTE**: requires either EE (self-hosted) or Silver and above (GitLab.com).\n\n" +
 			"This resource manages a [GitHub integration](https://docs.gitlab.com/ee/user/project/integrations/github.html) that updates pipeline statuses on a GitHub repo's pull requests.",
@@ -71,7 +71,7 @@ func resourceGitlabServiceGithub() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabServiceGithubSetToState(d *schema.ResourceData, service *gitlab.GithubService) {
 	d.SetId(fmt.Sprintf("%d", service.ID))

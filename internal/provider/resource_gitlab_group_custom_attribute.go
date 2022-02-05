@@ -5,7 +5,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabGroupCustomAttribute() *schema.Resource {
+var _ = registerResource("gitlab_group_custom_attribute", func() *schema.Resource {
 	return CreateCustomAttributeResource(
 		"group",
 		func(client *gitlab.Client) CustomAttributeGetter {
@@ -19,4 +19,4 @@ func resourceGitlabGroupCustomAttribute() *schema.Resource {
 		},
 		"This resource allows you to set custom attributes for a group.",
 	)
-}
+})

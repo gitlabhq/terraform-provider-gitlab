@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabGroupLabel() *schema.Resource {
+var _ = registerResource("gitlab_group_label", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage labels for your GitLab groups.\n" +
 			"For further information on labels, consult the [gitlab\n" +
@@ -50,7 +50,7 @@ func resourceGitlabGroupLabel() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupLabelCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

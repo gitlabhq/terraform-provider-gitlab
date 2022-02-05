@@ -11,7 +11,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabTagProtection() *schema.Resource {
+var _ = registerResource("gitlab_tag_protection", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to protect a specific tag or wildcard by an access level so that the user with less access level cannot Create the tags.",
 
@@ -44,7 +44,7 @@ func resourceGitlabTagProtection() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabTagProtectionCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

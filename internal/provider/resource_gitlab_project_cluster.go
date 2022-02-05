@@ -13,7 +13,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectCluster() *schema.Resource {
+var _ = registerResource("gitlab_project_cluster", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage project clusters for your GitLab projects.\n" +
 			"For further information on clusters, consult the [gitlab\n" +
@@ -123,7 +123,7 @@ func resourceGitlabProjectCluster() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectClusterCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

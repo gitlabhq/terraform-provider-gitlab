@@ -12,7 +12,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabProject() *schema.Resource {
+var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "Provide details about a specific project in the gitlab provider. The results include the name of the project, path, description, default branch, etc.",
 
@@ -201,7 +201,7 @@ func dataSourceGitlabProject() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

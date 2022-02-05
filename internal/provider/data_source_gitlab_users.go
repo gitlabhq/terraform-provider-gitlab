@@ -13,7 +13,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabUsers() *schema.Resource {
+var _ = registerDataSource("gitlab_users", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "Provide details about a list of users in the gitlab provider. The results include id, username, email, name and more about the requested users. Users can also be sorted and filtered using several options.\n\n" +
 			"**NOTE**: Some available options require administrator privileges. Please visit [Gitlab API documentation][users_for_admins] for more information.",
@@ -212,7 +212,7 @@ func dataSourceGitlabUsers() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func dataSourceGitlabUsersRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

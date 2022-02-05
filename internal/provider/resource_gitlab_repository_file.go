@@ -14,7 +14,7 @@ import (
 
 const encoding = "base64"
 
-func resourceGitLabRepositoryFile() *schema.Resource {
+var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage GitLab repository files.\n\n" +
 			"**Limitations**:\n\n" +
@@ -92,7 +92,7 @@ func resourceGitLabRepositoryFile() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabRepositoryFileCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

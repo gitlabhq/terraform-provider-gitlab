@@ -13,7 +13,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabGroupMembership() *schema.Resource {
+var _ = registerResource("gitlab_group_membership", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to add a user to an existing group.",
 
@@ -52,7 +52,7 @@ func resourceGitlabGroupMembership() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupMembershipCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

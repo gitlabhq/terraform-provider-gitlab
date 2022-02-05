@@ -11,7 +11,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabServicePipelinesEmail() *schema.Resource {
+var _ = registerResource("gitlab_service_pipelines_email", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource manages a [Pipelines email integration](https://docs.gitlab.com/ee/user/project/integrations/overview.html#integrations-listing) that emails the pipeline status to a list of recipients.",
 
@@ -51,7 +51,7 @@ func resourceGitlabServicePipelinesEmail() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabServicePipelinesEmailSetToState(d *schema.ResourceData, service *gitlab.PipelinesEmailService) {
 	d.Set("recipients", strings.Split(service.Properties.Recipients, ",")) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue

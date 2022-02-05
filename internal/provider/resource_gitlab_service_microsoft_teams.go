@@ -10,7 +10,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
+var _ = registerResource("gitlab_service_microsoft_teams", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to manage Microsoft Teams integration.",
 
@@ -107,7 +107,7 @@ func resourceGitlabServiceMicrosoftTeams() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabServiceMicrosoftTeamsCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

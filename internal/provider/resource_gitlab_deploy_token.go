@@ -14,7 +14,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabDeployToken() *schema.Resource {
+var _ = registerResource("gitlab_deploy_token", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage deploy token for your GitLab projects and groups. Please refer to [Gitlab documentation](https://docs.gitlab.com/ee/user/project/deploy_tokens/) for further information.",
@@ -85,7 +85,7 @@ func resourceGitlabDeployToken() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func expiresAtSuppressFunc(k, old, new string, d *schema.ResourceData) bool {
 	oldDate, oldDateErr := time.Parse(time.RFC3339, old)

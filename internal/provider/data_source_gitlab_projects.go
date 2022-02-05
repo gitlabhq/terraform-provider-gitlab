@@ -171,7 +171,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 	return values
 }
 
-func dataSourceGitlabProjects() *schema.Resource {
+var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "Provide details about a list of projects in the Gitlab provider. Listing all projects and group projects with [project filtering](https://docs.gitlab.com/ee/api/projects.html#list-user-projects) or [group project filtering](https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects) is supported.\n\n" +
@@ -776,7 +776,7 @@ func dataSourceGitlabProjects() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 // CRUD methods
 

@@ -13,7 +13,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectAccessToken() *schema.Resource {
+var _ = registerResource("gitlab_project_access_token", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage Project Access Token for your GitLab projects.",
@@ -88,7 +88,7 @@ func resourceGitlabProjectAccessToken() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

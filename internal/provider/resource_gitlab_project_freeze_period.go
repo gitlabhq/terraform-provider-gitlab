@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectFreezePeriod() *schema.Resource {
+var _ = registerResource("gitlab_project_freeze_period", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period).",
 
@@ -48,7 +48,7 @@ func resourceGitlabProjectFreezePeriod() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectFreezePeriodCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	projectID := d.Get("project_id").(string)

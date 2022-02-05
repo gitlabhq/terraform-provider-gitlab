@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabPipelineTrigger() *schema.Resource {
+var _ = registerResource("gitlab_pipeline_trigger", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage pipeline triggers",
 
@@ -42,7 +42,7 @@ func resourceGitlabPipelineTrigger() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabPipelineTriggerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

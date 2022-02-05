@@ -12,7 +12,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectMirror() *schema.Resource {
+var _ = registerResource("gitlab_project_mirror", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to add a mirror target for the repository, all changes will be synced to the remote target.\n\n" +
 			"-> This is for *pushing* changes to a remote repository. *Pull Mirroring* can be configured using a combination of the\n" +
@@ -84,7 +84,7 @@ func resourceGitlabProjectMirror() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectMirrorCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

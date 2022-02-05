@@ -12,7 +12,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectShareGroup() *schema.Resource {
+var _ = registerResource("gitlab_project_share_group", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to share a project with a group",
 
@@ -63,7 +63,7 @@ func resourceGitlabProjectShareGroup() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectShareGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

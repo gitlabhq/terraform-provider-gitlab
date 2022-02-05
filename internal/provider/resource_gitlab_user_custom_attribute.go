@@ -5,7 +5,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabUserCustomAttribute() *schema.Resource {
+var _ = registerResource("gitlab_user_custom_attribute", func() *schema.Resource {
 	return CreateCustomAttributeResource(
 		"user",
 		func(client *gitlab.Client) CustomAttributeGetter {
@@ -19,4 +19,4 @@ func resourceGitlabUserCustomAttribute() *schema.Resource {
 		},
 		"This resource allows you to set custom attributes for a user.",
 	)
-}
+})

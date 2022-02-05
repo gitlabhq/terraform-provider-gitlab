@@ -15,7 +15,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabGroup() *schema.Resource {
+var _ = registerResource("gitlab_group", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage GitLab groups.\n" +
 			"Note your provider will need to be configured with admin-level access for this resource to work.",
@@ -150,7 +150,7 @@ func resourceGitlabGroup() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

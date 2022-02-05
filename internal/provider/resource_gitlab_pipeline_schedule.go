@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabPipelineSchedule() *schema.Resource {
+var _ = registerResource("gitlab_pipeline_schedule", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage pipeline schedules.\n" +
 			"For further information on clusters, consult the [gitlab\n" +
@@ -62,7 +62,7 @@ func resourceGitlabPipelineSchedule() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabPipelineScheduleCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

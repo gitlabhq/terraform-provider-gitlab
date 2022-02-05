@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabGroupLdapLink() *schema.Resource {
+var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: "This resource allows you to add an LDAP link to an existing GitLab group.",
@@ -67,7 +67,7 @@ func resourceGitlabGroupLdapLink() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabGroupLdapLinkCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

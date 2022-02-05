@@ -13,7 +13,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabGroupMembership() *schema.Resource {
+var _ = registerDataSource("gitlab_group_membership", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.\n\n" +
 			"> **Note**: exactly one of group_id or full_path must be provided.",
@@ -96,7 +96,7 @@ func dataSourceGitlabGroupMembership() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

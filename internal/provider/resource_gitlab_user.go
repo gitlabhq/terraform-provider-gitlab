@@ -13,7 +13,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabUser() *schema.Resource {
+var _ = registerResource("gitlab_user", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage GitLab users.\n" +
 			"Note your provider will need to be configured with admin-level access for this resource to work.\n\n" +
@@ -94,7 +94,7 @@ func resourceGitlabUser() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("username", user.Username)

@@ -12,7 +12,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabManagedLicense() *schema.Resource {
+var _ = registerResource("gitlab_managed_license", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to add rules for managing licenses on a project.\n" +
 			"For additional information, please see the " +
@@ -52,7 +52,7 @@ func resourceGitlabManagedLicense() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabManagedLicenseCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

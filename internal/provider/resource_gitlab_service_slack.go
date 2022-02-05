@@ -9,7 +9,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabServiceSlack() *schema.Resource {
+var _ = registerResource("gitlab_service_slack", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to manage Slack notifications integration.",
 
@@ -190,7 +190,7 @@ func resourceGitlabServiceSlack() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabServiceSlackCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)

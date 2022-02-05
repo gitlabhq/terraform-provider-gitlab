@@ -14,7 +14,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabProjectMembership() *schema.Resource {
+var _ = registerResource("gitlab_project_membership", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to add a current user to an existing project with a set access level.",
 
@@ -47,7 +47,7 @@ func resourceGitlabProjectMembership() *schema.Resource {
 			},
 		},
 	}
-}
+})
 
 func resourceGitlabProjectMembershipCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
