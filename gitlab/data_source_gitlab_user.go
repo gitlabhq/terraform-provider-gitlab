@@ -39,7 +39,7 @@ func dataSourceGitlabUser() *schema.Resource {
 				},
 			},
 			"email": {
-				Description: "The email address of the user.",
+				Description: "The public email address of the user. **Note**: before GitLab 14.8 the lookup was based on the users primary email address.",
 				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,

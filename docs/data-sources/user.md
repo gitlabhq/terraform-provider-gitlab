@@ -33,7 +33,7 @@ data "gitlab_user" "example-two" {
 
 ### Optional
 
-- **email** (String) The email address of the user.
+- **email** (String) The public email address of the user. **Note**: before GitLab 14.8 the lookup was based on the users primary email address.
 - **id** (String) The ID of this resource.
 - **user_id** (Number) The ID of the user.
 - **username** (String) The username of the user.
