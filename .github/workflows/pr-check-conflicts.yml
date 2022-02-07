@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - main
-      - master
+
   # For removing the merge-conflict label.
   pull_request_target:
     types: [synchronize]

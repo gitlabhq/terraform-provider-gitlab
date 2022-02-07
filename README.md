@@ -1,15 +1,16 @@
-<img src="https://www.datocms-assets.com/2885/1629941242-logo-terraform-main.svg" width="600px">
+<a href="https://terraform.io">
+    <img src=".github/terraform_logo.svg" alt="Terraform logo" title="Terraform" align="right" height="50" />
+</a>
 
 # Terraform Provider for Gitlab
 
+[![Tests](https://github.com/gitlabhq/terraform-provider-gitlab/actions/workflows/push.yml/badge.svg)](https://github.com/gitlabhq/terraform-provider-gitlab/actions/workflows/push.yml)
+
 - [Documentation](https://www.terraform.io/docs/providers/gitlab/index.html)
-- [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
-- Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
-- Build status: [![Tests](https://github.com/gitlabhq/terraform-provider-gitlab/actions/workflows/push.yml/badge.svg)](https://github.com/gitlabhq/terraform-provider-gitlab/actions/workflows/push.yml)
+- [Issues](https://github.com/gitlabhq/terraform-provider-gitlab/issues)
 
-## Requirements
-
--	[Terraform](https://www.terraform.io/downloads.html) >= 0.12.x
+The Terraform Gitlab Provider is a plugin for Terraform that allows for the full lifecycle management of
+GitLab resources, like users, groups and projects.
 
 ## Contributing
 
