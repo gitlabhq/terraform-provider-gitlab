@@ -44,16 +44,17 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeMethod:                      gitlab.FastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		SquashOption:                gitlab.SquashOptionDefaultOff,
-		AllowMergeOnSkippedPipeline: false,
-		Archived:                    false, // needless, but let's make this explicit
-		PackagesEnabled:             true,
-		PagesAccessLevel:            gitlab.PublicAccessControl,
-		BuildCoverageRegex:          "foo",
-		IssuesTemplate:              "",
-		MergeRequestsTemplate:       "",
-		CIConfigPath:                ".gitlab-ci.yml@mynamespace/myproject",
-		CIForwardDeploymentEnabled:  true,
+		SquashOption:                    gitlab.SquashOptionDefaultOff,
+		AllowMergeOnSkippedPipeline:     false,
+		Archived:                        false, // needless, but let's make this explicit
+		PackagesEnabled:                 true,
+		PrintingMergeRequestLinkEnabled: true,
+		PagesAccessLevel:                gitlab.PublicAccessControl,
+		BuildCoverageRegex:              "foo",
+		IssuesTemplate:                  "",
+		MergeRequestsTemplate:           "",
+		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
+		CIForwardDeploymentEnabled:      true,
 	}
 
 	defaultsMainBranch = defaults
@@ -91,6 +92,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						SharedRunnersEnabled:             false,
 						Visibility:                       gitlab.PublicVisibility,
 						MergeMethod:                      gitlab.FastForwardMerge,
+						PrintingMergeRequestLinkEnabled:  true,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 						SquashOption:                gitlab.SquashOptionDefaultOn,
@@ -482,6 +484,7 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		SharedRunnersEnabled:             true,
 		Visibility:                       gitlab.PublicVisibility,
 		MergeMethod:                      gitlab.FastForwardMerge,
+		PrintingMergeRequestLinkEnabled:  true,
 		OnlyAllowMergeIfPipelineSucceeds: true,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
 		SquashOption:               gitlab.SquashOptionDefaultOff,
@@ -589,11 +592,12 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		MergeMethod:                      gitlab.NoFastForwardMerge,
 		OnlyAllowMergeIfPipelineSucceeds: false,
 		OnlyAllowMergeIfAllDiscussionsAreResolved: false,
-		SquashOption:               gitlab.SquashOptionDefaultOff,
-		PackagesEnabled:            true,
-		PagesAccessLevel:           gitlab.PrivateAccessControl,
-		BuildCoverageRegex:         "foo",
-		CIForwardDeploymentEnabled: true,
+		SquashOption:                    gitlab.SquashOptionDefaultOff,
+		PackagesEnabled:                 true,
+		PrintingMergeRequestLinkEnabled: true,
+		PagesAccessLevel:                gitlab.PrivateAccessControl,
+		BuildCoverageRegex:              "foo",
+		CIForwardDeploymentEnabled:      true,
 	}
 
 	resource.Test(t, resource.TestCase{

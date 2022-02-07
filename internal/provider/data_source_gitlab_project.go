@@ -134,6 +134,11 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
+			"printing_merge_request_link_enabled": {
+				Description: "Show link to create/view merge request when pushing from the command line",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
 			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
 				Description: "Push rules for the project.",
