@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -93,10 +94,11 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 				Optional:    true,
 			},
 			"state": {
-				Description: "String, defaults to 'active'. The state of the user account.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "active",
+				Description:      "String, defaults to 'active'. The state of the user account. Valid values are either 'active' or 'blocked'",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          "active",
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"active", "blocked"}, false)),
 			},
 		},
 	}
@@ -142,6 +144,14 @@ func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta 
 	}
 
 	d.SetId(fmt.Sprintf("%d", user.ID))
+
+	if d.Get("state") == "blocked" {
+		err := client.Users.BlockUser(user.ID)
+
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
 
 	return resourceGitlabUserRead(ctx, d, meta)
 }
