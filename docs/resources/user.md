@@ -51,7 +51,7 @@ resource "gitlab_user" "example" {
 - **projects_limit** (Number) Integer, defaults to 0.  Number of projects user can create.
 - **reset_password** (Boolean) Boolean, defaults to false. Send user password reset link.
 - **skip_confirmation** (Boolean) Boolean, defaults to true. Whether to skip confirmation.
-- **state** - (Optional) String, defaults to "active". Sets the state of the user.
+- **state** (String) String, defaults to 'active'. The state of the user account.
 
 ## Import
 

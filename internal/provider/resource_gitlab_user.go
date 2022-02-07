@@ -93,9 +93,10 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 				Optional:    true,
 			},
 			"state": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "active",
+				Description: "String, defaults to 'active'. The state of the user account.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "active",
 			},
 		},
 	}
@@ -217,18 +218,18 @@ func resourceGitlabUserUpdate(ctx context.Context, d *schema.ResourceData, meta 
 			err := client.Users.UnblockUser(id)
 
 			if err != nil {
-				return err
+				return diag.FromErr(err)
 			}
-		} else if d.Get("state") == "deactivated" {
+		} else if d.Get("state") == "blocked" {
 			err := client.Users.BlockUser(id)
 
 			if err != nil {
-				return err
+				return diag.FromErr(err)
 			}
 		}
 	}
 
-	return resourceGitlabUserRead(d, meta)
+	return resourceGitlabUserRead(ctx, d, meta)
 }
 
 func resourceGitlabUserDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
