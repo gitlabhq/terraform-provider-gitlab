@@ -811,15 +811,24 @@ func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, m
 	var withProgrammingLanguagePtr *string
 	var withSharedPtr *bool
 
-	if data, ok := d.GetOk("archived"); ok {
+	// NOTE: `GetOkExists()` is deprecated, but until there is a replacement we need to use it.
+	//       see https://github.com/hashicorp/terraform-plugin-sdk/pull/350#issuecomment-597888969
+
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("archived"); ok {
 		d := data.(bool)
 		archivedPtr = &d
 	}
-	if data, ok := d.GetOk("include_subgroups"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("include_subgroups"); ok {
 		d := data.(bool)
 		includeSubGroupsPtr = &d
 	}
-	if data, ok := d.GetOk("membership"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("membership"); ok {
 		d := data.(bool)
 		membershipPtr = &d
 	}
@@ -830,7 +839,9 @@ func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, m
 		d := data.(string)
 		orderByPtr = &d
 	}
-	if data, ok := d.GetOk("owned"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("owned"); ok {
 		d := data.(bool)
 		ownedPtr = &d
 	}
@@ -838,7 +849,9 @@ func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, m
 		d := data.(string)
 		searchPtr = &d
 	}
-	if data, ok := d.GetOk("simple"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("simple"); ok {
 		d := data.(bool)
 		simplePtr = &d
 	}
@@ -846,26 +859,36 @@ func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, m
 		d := data.(string)
 		sortPtr = &d
 	}
-	if data, ok := d.GetOk("starred"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("starred"); ok {
 		d := data.(bool)
 		starredPtr = &d
 	}
-	if data, ok := d.GetOk("statistics"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("statistics"); ok {
 		d := data.(bool)
 		statisticsPtr = &d
 	}
 	if data, ok := d.GetOk("visibility"); ok {
 		visibilityPtr = gitlab.Visibility(gitlab.VisibilityValue(data.(string)))
 	}
-	if data, ok := d.GetOk("with_custom_attributes"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("with_custom_attributes"); ok {
 		d := data.(bool)
 		withCustomAttributesPtr = &d
 	}
-	if data, ok := d.GetOk("with_issues_enabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("with_issues_enabled"); ok {
 		d := data.(bool)
 		withIssuesEnabledPtr = &d
 	}
-	if data, ok := d.GetOk("with_merge_requests_enabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("with_merge_requests_enabled"); ok {
 		d := data.(bool)
 		withMergeRequestsEnabledPtr = &d
 	}
@@ -873,7 +896,9 @@ func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, m
 		d := data.(string)
 		withProgrammingLanguagePtr = &d
 	}
-	if data, ok := d.GetOk("with_shared"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if data, ok := d.GetOkExists("with_shared"); ok {
 		d := data.(bool)
 		withSharedPtr = &d
 	}

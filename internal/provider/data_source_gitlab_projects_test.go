@@ -2,10 +2,11 @@ package provider
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -96,6 +97,52 @@ func TestAccDataGitlabProjectsGroups(t *testing.T) {
 	})
 }
 
+func TestAccDataGitlabProjects_searchArchivedRepository(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDataGitlabProjectsConfigGetProjectArchivedRepositoryAll(rInt),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"data.gitlab_projects.search",
+						"projects.0.name",
+						fmt.Sprintf("archived-%d", rInt),
+					),
+					resource.TestCheckResourceAttr(
+						"data.gitlab_projects.search",
+						"projects.1.name",
+						fmt.Sprintf("not-archived-%d", rInt),
+					),
+				),
+			},
+			{
+				Config: testAccDataGitlabProjectsConfigGetProjectArchivedRepository(rInt, "true"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"data.gitlab_projects.search",
+						"projects.0.name",
+						fmt.Sprintf("archived-%d", rInt),
+					),
+				),
+			},
+			{
+				Config: testAccDataGitlabProjectsConfigGetProjectArchivedRepository(rInt, "false"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"data.gitlab_projects.search",
+						"projects.0.name",
+						fmt.Sprintf("not-archived-%d", rInt),
+					),
+				),
+			},
+		},
+	})
+}
+
 func testAccDataSourceGitlabProjects(src string, n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
@@ -165,6 +212,68 @@ data "gitlab_projects" "search" {
   search = gitlab_project.search.name
 }
 	`, projectName, projectName)
+}
+
+func testAccDataGitlabProjectsConfigGetProjectArchivedRepositoryAll(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "test" {
+	name = "test-%d"
+	path = "test-%d"
+}
+
+resource "gitlab_project" "archived_repo" {
+  name         = "archived-%d"
+  namespace_id = gitlab_group.test.id
+  archived     = true
+}
+
+resource "gitlab_project" "not_archived_repo" {
+  name         = "not-archived-%d"
+  namespace_id = gitlab_group.test.id
+  archived     = false
+}
+
+data "gitlab_projects" "search" {
+  group_id = gitlab_group.test.id
+  // NOTE: is required to have deterministic results
+  order_by = "name"
+  sort     = "asc"
+
+  depends_on = [gitlab_project.archived_repo, gitlab_project.not_archived_repo]
+}
+	`, rInt, rInt, rInt, rInt)
+}
+
+func testAccDataGitlabProjectsConfigGetProjectArchivedRepository(rInt int, archived string) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "test" {
+	name = "test-%d"
+	path = "test-%d"
+}
+
+resource "gitlab_project" "archived_repo" {
+  name         = "archived-%d"
+  namespace_id = gitlab_group.test.id
+  archived     = true
+}
+
+resource "gitlab_project" "not_archived_repo" {
+  name         = "not-archived-%d"
+  namespace_id = gitlab_group.test.id
+  archived     = false
+}
+
+data "gitlab_projects" "search" {
+  group_id = gitlab_group.test.id
+  // NOTE: is required to have deterministic results
+  order_by = "name"
+  sort     = "asc"
+
+  archived = %s
+
+  depends_on = [gitlab_project.archived_repo, gitlab_project.not_archived_repo]
+}
+	`, rInt, rInt, rInt, rInt, archived)
 }
 
 func testAccDataGitlabProjectsConfigGetGroupProjectsByGroupId(groupName string, projectName string) string {
