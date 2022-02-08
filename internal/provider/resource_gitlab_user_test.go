@@ -34,6 +34,33 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:          false,
 						CanCreateGroup: false,
 						External:       false,
+						State:          "active",
+					}),
+				),
+			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+					"skip_confirmation",
+				},
+			},
+			// Create a user with blocked state
+			{
+				Config: testAccGitlabUserConfigBlocked(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "blocked",
 					}),
 				),
 			},
@@ -60,6 +87,34 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						CanCreateGroup: true,
 						External:       false,
 						Note:           fmt.Sprintf("note%d", rInt),
+						State:          "active",
+					}),
+				),
+			},
+			{
+				ResourceName:      "gitlab_user.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"password",
+					"skip_confirmation",
+				},
+			},
+			// Update the user to change the state to blocked
+			{
+				Config: testAccGitlabUserUpdateConfigBlocked(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@tttt.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("bar %d", rInt),
+						ProjectsLimit:  10,
+						Admin:          true,
+						CanCreateGroup: true,
+						External:       false,
+						Note:           fmt.Sprintf("note%d", rInt),
+						State:          "blocked",
 					}),
 				),
 			},
@@ -85,6 +140,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:          false,
 						CanCreateGroup: false,
 						External:       false,
+						State:          "active",
 					}),
 				),
 			},
@@ -110,6 +166,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:          false,
 						CanCreateGroup: false,
 						External:       false,
+						State:          "active",
 					}),
 				),
 			},
@@ -135,6 +192,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 						Admin:          false,
 						CanCreateGroup: false,
 						External:       false,
+						State:          "active",
 					}),
 				),
 			},
@@ -215,6 +273,7 @@ type testAccGitlabUserExpectedAttributes struct {
 	CanCreateGroup bool
 	External       bool
 	Note           string
+	State          string
 }
 
 func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUserExpectedAttributes) resource.TestCheckFunc {
@@ -249,6 +308,10 @@ func testAccCheckGitlabUserAttributes(user *gitlab.User, want *testAccGitlabUser
 
 		if user.ProjectsLimit != want.ProjectsLimit {
 			return fmt.Errorf("got projects_limit %d; want %d", user.ProjectsLimit, want.ProjectsLimit)
+		}
+
+		if user.State != want.State {
+			return fmt.Errorf("got state %q; want %q", user.State, want.State)
 		}
 
 		return nil
@@ -292,6 +355,22 @@ resource "gitlab_user" "foo" {
   `, rInt, rInt, rInt, rInt)
 }
 
+func testAccGitlabUserConfigBlocked(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name             = "foo %d"
+  username         = "listest%d"
+  password         = "test%dtt"
+  email            = "listest%d@ssss.com"
+  is_admin         = false
+  projects_limit   = 0
+  can_create_group = false
+  is_external      = false
+  state            = "blocked"
+}
+  `, rInt, rInt, rInt, rInt)
+}
+
 func testAccGitlabUserUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_user" "foo" {
@@ -304,6 +383,23 @@ resource "gitlab_user" "foo" {
   can_create_group = true
   is_external      = false
   note             = "note%d"
+}
+  `, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabUserUpdateConfigBlocked(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name             = "bar %d"
+  username         = "listest%d"
+  password         = "test%dtt"
+  email            = "listest%d@tttt.com"
+  is_admin         = true
+  projects_limit   = 10
+  can_create_group = true
+  is_external      = false
+  note             = "note%d"
+  state            = "blocked"
 }
   `, rInt, rInt, rInt, rInt, rInt)
 }
