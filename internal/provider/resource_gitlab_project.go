@@ -600,8 +600,8 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 
 		log.Printf("[DEBUG] check for protection on old default branch %q for project %q", oldDefaultBranch, d.Id())
-		branch, resp, err := client.ProtectedBranches.GetProtectedBranch(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
-		if err != nil && resp.StatusCode != http.StatusNotFound {
+		branch, _, err := client.ProtectedBranches.GetProtectedBranch(project.ID, oldDefaultBranch, gitlab.WithContext(ctx))
+		if err != nil && !is404(err) {
 			return diag.Errorf("Failed to check for protected default branch %q for project %q: %v", oldDefaultBranch, d.Id(), err)
 		}
 		if branch == nil {

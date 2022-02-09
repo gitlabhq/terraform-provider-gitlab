@@ -411,6 +411,23 @@ member_check = false
 	})
 }
 
+func TestAccGitlabProject_groupWithoutDefaultBranchProtection(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabProjectConfigWithoutDefaultBranchProtection(rInt),
+				Check:  testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
@@ -1071,6 +1088,23 @@ resource "gitlab_project" "foo" {
   # with no billing
   visibility_level = "public"
   build_coverage_regex = "foo"
+}
+	`, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigWithoutDefaultBranchProtection(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foogroup-%d"
+  path = "foogroup-%d"
+  default_branch_protection = 0
+  visibility_level = "public"
+}
+
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+  namespace_id = "${gitlab_group.foo.id}"
 }
 	`, rInt, rInt, rInt)
 }
