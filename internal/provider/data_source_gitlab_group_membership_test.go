@@ -44,6 +44,27 @@ func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 	})
 }
 
+func TestAccDataSourceGitlabMembership_pagination(t *testing.T) {
+	testAccPreCheck(t)
+
+	userCount := 21
+
+	group := testAccCreateGroups(t, 1)[0]
+	users := testAccCreateUsers(t, userCount)
+	testAccAddGroupMembers(t, group.ID, users)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDataSourceGitlabGroupMembershipPagination(group.ID),
+				Check:  resource.TestCheckResourceAttr("data.gitlab_group_membership.this", "members.#", fmt.Sprintf("%d", userCount)),
+			},
+		},
+	})
+}
+
 func testAccDataSourceGitlabGroupMembershipConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
@@ -88,4 +109,12 @@ data "gitlab_group_membership" "foomaintainers" {
   group_id     = "${gitlab_group.foo.id}"
   access_level = "maintainer"
 }`, rInt, rInt)
+}
+
+func testAccDataSourceGitlabGroupMembershipPagination(groupId int) string {
+	return fmt.Sprintf(`
+data "gitlab_group_membership" "this" {
+  group_id     = "%d"
+  access_level = "developer"
+}`, groupId)
 }
