@@ -363,6 +363,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:        schema.TypeBool,
 		Optional:    true,
 	},
+	"ci_forward_deployment_enabled": {
+		Description: "When a new deployment job starts, skip older deployment jobs that are still pending.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Default:     true,
+	},
 }
 
 var _ = registerResource("gitlab_project", func() *schema.Resource {
@@ -423,6 +429,7 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("issues_template", project.IssuesTemplate)
 	d.Set("merge_requests_template", project.MergeRequestsTemplate)
 	d.Set("ci_config_path", project.CIConfigPath)
+	d.Set("ci_forward_deployment_enabled", project.CIForwardDeploymentEnabled)
 	return nil
 }
 
@@ -453,6 +460,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 		BuildCoverageRegex:                        gitlab.String(d.Get("build_coverage_regex").(string)),
 		CIConfigPath:                              gitlab.String(d.Get("ci_config_path").(string)),
+		CIForwardDeploymentEnabled:                gitlab.Bool(d.Get("ci_forward_deployment_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -815,6 +823,10 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("ci_config_path") {
 		options.CIConfigPath = gitlab.String(d.Get("ci_config_path").(string))
+	}
+
+	if d.HasChange("ci_forward_deployment_enabled") {
+		options.CIForwardDeploymentEnabled = gitlab.Bool(d.Get("ci_forward_deployment_enabled").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
