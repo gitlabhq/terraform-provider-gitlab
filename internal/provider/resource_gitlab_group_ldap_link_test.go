@@ -1,10 +1,8 @@
 package provider
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -14,15 +12,13 @@ import (
 )
 
 func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
-	var testLdapLink gitlab.LDAPGroupLink
-	var ldapLink gitlab.LDAPGroupLink
 	rInt := acctest.RandInt()
-	testDataFile := "testdata/resource_gitlab_group_ldap_link.json"
 
 	// PreCheck runs after Config so load test data here
-	err := testAccLoadTestData(testDataFile, &testLdapLink)
-	if err != nil {
-		t.Fatalf("[ERROR] Failed to load test data: %s", err.Error())
+	var ldapLink gitlab.LDAPGroupLink
+	testLdapLink := gitlab.LDAPGroupLink{
+		CN:       "default",
+		Provider: "default",
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -186,20 +182,6 @@ func testAccGetGitlabGroupLdapLink(ldapLink *gitlab.LDAPGroupLink, resourceState
 		}
 	} else {
 		*ldapLink = desiredLdapLink
-	}
-
-	return nil
-}
-
-func testAccLoadTestData(testdatafile string, ldapLink *gitlab.LDAPGroupLink) error {
-	testLdapLinkBytes, err := ioutil.ReadFile(testdatafile)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(testLdapLinkBytes, ldapLink)
-	if err != nil {
-		return err
 	}
 
 	return nil
