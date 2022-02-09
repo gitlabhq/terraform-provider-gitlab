@@ -208,7 +208,9 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.ParentID = gitlab.Int(v.(int))
 	}
 
-	if v, ok := d.GetOk("default_branch_protection"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("default_branch_protection"); ok {
 		options.DefaultBranchProtection = gitlab.Int(v.(int))
 	}
 

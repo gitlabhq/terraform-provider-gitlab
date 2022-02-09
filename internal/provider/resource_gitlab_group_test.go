@@ -41,7 +41,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			},
 			// Update the group to change the description
 			{
-				Config: testAccGitlabGroupUpdateConfig(rInt),
+				Config: testAccGitlabGroupUpdateConfig(rInt, 1),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
@@ -60,6 +60,30 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						MentionsDisabled:        true,
 						ShareWithGroupLock:      true,
 						DefaultBranchProtection: 1,
+					}),
+				),
+			},
+			// Update the group to use zero-value `default_branch_protection`
+			{
+				Config: testAccGitlabGroupUpdateConfig(rInt, 0),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
+						Name:                    fmt.Sprintf("bar-name-%d", rInt),
+						Path:                    fmt.Sprintf("bar-path-%d", rInt),
+						Description:             "Terraform acceptance tests! Updated description",
+						LFSEnabled:              false,
+						Visibility:              "public", // default value
+						RequestAccessEnabled:    true,
+						ProjectCreationLevel:    "developer",
+						SubGroupCreationLevel:   "maintainer",
+						RequireTwoFactorAuth:    true,
+						TwoFactorGracePeriod:    56,
+						AutoDevopsEnabled:       true,
+						EmailsDisabled:          true,
+						MentionsDisabled:        true,
+						ShareWithGroupLock:      true,
+						DefaultBranchProtection: 0,
 					}),
 				),
 			},
@@ -398,7 +422,7 @@ resource "gitlab_group" "foo" {
   `, rInt, rInt)
 }
 
-func testAccGitlabGroupUpdateConfig(rInt int) string {
+func testAccGitlabGroupUpdateConfig(rInt int, defaultBranchProtection int) string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
   name = "bar-name-%d"
@@ -414,13 +438,13 @@ resource "gitlab_group" "foo" {
   emails_disabled = true
   mentions_disabled = true
   share_with_group_lock = true
-  default_branch_protection = 1
+  default_branch_protection = %d
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
 }
-  `, rInt, rInt)
+  `, rInt, rInt, defaultBranchProtection)
 }
 
 func testAccGitlabNestedGroupConfig(rInt int) string {
