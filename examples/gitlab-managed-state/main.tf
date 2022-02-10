@@ -34,9 +34,9 @@ resource "gitlab_group_membership" "group_membership" {
 }
 
 resource "gitlab_project" "api" {
-  name           = "api"
-  description    = "An example project"
-  namespace_id   = gitlab_group.group.id
+  name         = "api"
+  description  = "An example project"
+  namespace_id = gitlab_group.group.id
 
   only_allow_merge_if_all_discussions_are_resolved = true
   only_allow_merge_if_pipeline_succeeds            = true
