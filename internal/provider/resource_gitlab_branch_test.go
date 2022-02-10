@@ -76,7 +76,7 @@ func testAccCheckGitlabBranchExists(n string, b *gitlab.Branch) resource.TestChe
             *b = *branch
             return nil
         }
-		return fmt.Errorf("Branch does not exist")
+        return fmt.Errorf("Branch does not exist")
     }
 }
 
