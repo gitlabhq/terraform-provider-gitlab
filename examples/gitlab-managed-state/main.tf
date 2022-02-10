@@ -34,9 +34,10 @@ resource "gitlab_group_membership" "group_membership" {
 }
 
 resource "gitlab_project" "api" {
-  name         = "api"
-  description  = "An example project"
-  namespace_id = gitlab_group.group.id
+  name           = "api"
+  description    = "An example project"
+  namespace_id   = gitlab_group.group.id
+  default_branch = "main"
 
   only_allow_merge_if_all_discussions_are_resolved = true
   only_allow_merge_if_pipeline_succeeds            = true
@@ -55,9 +56,15 @@ resource "gitlab_project" "api" {
 
 resource "gitlab_branch_protection" "main" {
   project            = gitlab_project.api.id
-  branch             = "main"
+  branch             = gitlab_project.api.default_branch
   push_access_level  = "developer"
   merge_access_level = "developer"
+}
+
+resource "gitlab_branch" "develop" {
+  project = gitlab_project.api.id
+  name    = "develop"
+  ref     = gitlab_project.api.default_branch
 }
 
 resource "gitlab_project_approval_rule" "default" {
