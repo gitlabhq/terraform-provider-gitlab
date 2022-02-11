@@ -101,7 +101,6 @@ var _ = registerDataSource("gitlab_group_membership", func() *schema.Resource {
 func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	var gm []*gitlab.GroupMember
 	var group *gitlab.Group
 	var err error
 
@@ -129,15 +128,32 @@ func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.Resource
 	log.Printf("[INFO] Reading Gitlab group memberships")
 
 	// Get group memberships
-	gm, _, err = client.Groups.ListGroupMembers(group.ID, &gitlab.ListGroupMembersOptions{}, gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
+	listOptions := &gitlab.ListGroupMembersOptions{
+		ListOptions: gitlab.ListOptions{
+			PerPage: 20,
+			Page:    1,
+		},
+	}
+
+	var allGms []*gitlab.GroupMember
+	for {
+		gms, resp, err := client.Groups.ListGroupMembers(group.ID, listOptions, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		allGms = append(allGms, gms...)
+
+		if resp.NextPage == 0 {
+			break
+		}
+		listOptions.Page = resp.NextPage
 	}
 
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 
-	d.Set("members", flattenGitlabMembers(d, gm)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
+	d.Set("members", flattenGitlabMembers(d, allGms)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 
 	var optionsHash strings.Builder
 	optionsHash.WriteString(strconv.Itoa(group.ID))
