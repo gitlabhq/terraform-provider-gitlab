@@ -3,43 +3,20 @@
 page_title: "gitlab_branch Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage branch https://docs.gitlab.com/ee/user/project/repository/branches/ for your GitLab projects.
+  This resource allows you to create and manage GitLab branch.
 ---
 
 # gitlab_branch (Resource)
 
-This resource allows you to create and manage [branch](https://docs.gitlab.com/ee/user/project/repository/branches/) for your GitLab projects.
+This resource allows you to create and manage GitLab branch.
 
 ## Example Usage
 
 ```terraform
-resource "gitlab_group" "this" {
-  name        = "example"
-  path        = "example"
-  description = "An example group"
-}
-
-resource "gitlab_project" "this" {
-  name                   = "example"
-  namespace_id           = gitlab_group.this.id
-  default_branch         = "main"
-  initialize_with_readme = true
-}
-
-resource "gitlab_repository_file" "this" {
-  project        = gitlab_project.this.id
-  file_path      = "meow.txt"
-  branch         = gitlab_project.this.default_branch
-  content        = base64encode("Meow goes the cat")
-  author_email   = "terraform@example.com"
-  author_name    = "Terraform"
-  commit_message = "feature: add meow file"
-}
-
 resource "gitlab_branch" "this" {
-  project = gitlab_project.this.id
+  project = "12345"
   branch  = "develop"
-  ref     = gitlab_project.this.default_branch
+  ref     = "main"
 }
 ```
 
@@ -48,15 +25,19 @@ resource "gitlab_branch" "this" {
 
 ### Required
 
-- **project** (String) The id of the project to add the branch to.
-- **branch** (String) The name of the branch.
-- **ref* (String) The name of branch from which the new branch is created.
+- **branch** (String) The name of the new branch
+- **project** (String) The ID of the project
+- **ref** (String) The branch from which the new branch is created
+
+### Optional
+
+- **id** (String) The ID of this resource.
 
 ## Import
 
 Import is supported using the following syntax:
 
 ```shell
-# GitLab branch can be imported using an id made up of `{project_id}:{branch_name}`, e.g.
-terraform import gitlab_branch.this 12345:develop
+# Gitlab branches can be imported with a key composed of `<project_id>:<branch_name>`, e.g.
+terraform import gitlab_branch.this "12345:develop"
 ```
