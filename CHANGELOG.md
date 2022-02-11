@@ -1,3 +1,32 @@
+## 3.10.0 (Unreleased)
+
+FEATURES:
+
+* resource/gitlab_project_hook: added `releases_events` attribute (#773)
+* resource/gitlab_user: added `state` attribute to allow blocking users (#762)
+* resource/gitlab_project: added `ci_forward_deployment_enabled` attribute (#732)
+* datasource/gitlab_project: added `ci_forward_deployment_enabled` attribute (#732)
+* datasource/gitlab_projects: added `ci_forward_deployment_enabled` attribute (#732)
+* resource/gitlab_group_access_token: added support for Group Access Tokens (#860)
+* datasource/gitlab_group_membership: support pagination (#858)
+
+BUG FIXES
+
+* resource/gitlab_project: correctly handle push rules add and edit (#838)
+* datasource/gitlab_projects: allow to get archived and unarchived repositories (#855)
+* resource/gitlab_group: support setting `default_branch_protection` to `0` (#856)
+* resource/gitlab_project: support creating project in group without default branch protection (#856)
+
+ENHANCEMENTS:
+
+* docs: better provider introduction (#852)
+
+NOTES:
+
+* provider: aligned project structure to terraform provider scaffolding project (#815)
+* repository: changed default branch from `master` to `main` (#852)
+* repository: introduction of multiple GitHub workflows to improve developer experience
+
 ## 3.9.1 (2022-02-06)
 
 BUGFIXES:
@@ -20,7 +49,7 @@ FEATURES:
 
 ENHANCEMENTS:
 
-* 9863a61 - Add missing attributes to documentation (#802) 
+* 9863a61 - Add missing attributes to documentation (#802)
 * 84d729e - Improve documentation around authentication with GitLab (#803)
 * a9edc4a - Add environment scope to `gitlab_group_variable` (#717)
 * c5a2f34 - Support `issues_template` and `merge_requests_template` attributes in project resource (#796)
@@ -102,34 +131,34 @@ BUG FIXES:
 
 FEATURES:
 
-* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/516 ))  
+* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/516 ))
 
 ENHANCEMENTS:
 
-* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/523)) 
-* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/525)) 
-* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/527)) 
+* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/523))
+* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/525))
+* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/527))
 * gitlab_project: Check each push rule individually ([#531](https://github.com/gitlabhq/terraform-provider-gitlab/pull/531))
-* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/532)) 
-* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/535)) 
-* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/539)) 
+* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/532))
+* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/535))
+* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/539))
 * Increase gitlab_project import timeout ([#536](https://github.com/gitlabhq/terraform-provider-gitlab/pull/536))
-* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/554)) 
-* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/546)) 
-* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/558)) 
-* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/564)) 
-* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/568)) 
+* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/554))
+* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/546))
+* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/558))
+* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/564))
+* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/568))
 
 BUG FIXES:
 
-* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/510)) 
-* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/555)) 
+* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/510))
+* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/555))
 
 ## 3.4.0 (Jan 14, 2021)
 
 FEATURES:
 
-* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/511)) 
+* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/511))
 * Support Project Mirroring ([#512](https://github.com/gitlabhq/terraform-provider-gitlab/pull/512))
 
 ## 3.3.0 (Nov 30, 2020)
@@ -285,14 +314,14 @@ ENHANCEMENTS:
 
 BUGFIXES:
 
-* Support for soft-delete of groups and projects in Gitlab Enterprise Edition 
+* Support for soft-delete of groups and projects in Gitlab Enterprise Edition
   ([#282](https://github.com/gitlabhq/terraform-provider-gitlab/issues/282),
    [#283](https://github.com/gitlabhq/terraform-provider-gitlab/issues/283),
    [#285](https://github.com/gitlabhq/terraform-provider-gitlab/issues/285),
    [#291](https://github.com/gitlabhq/terraform-provider-gitlab/issues/291))
 
 ENHANCEMENTS:
-* Switched from Travis CI to Github Actions 
+* Switched from Travis CI to Github Actions
   ([#216](https://github.com/gitlabhq/terraform-provider-gitlab/issues/216))
 
 ## 2.5.0 (December 05, 2019)
