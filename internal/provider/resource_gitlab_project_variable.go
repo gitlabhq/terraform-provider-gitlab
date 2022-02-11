@@ -203,7 +203,7 @@ func resourceGitlabProjectVariableDelete(ctx context.Context, d *schema.Resource
 	// but it will be ignored in prior versions, causing nondeterministic destroy behavior when
 	// destroying or updating scoped variables.
 	// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209
-	_, err := client.ProjectVariables.RemoveVariable(project, key, withEnvironmentScopeFilter(ctx, environmentScope))
+	_, err := client.ProjectVariables.RemoveVariable(project, key, nil, withEnvironmentScopeFilter(ctx, environmentScope))
 	return augmentProjectVariableClientError(d, err)
 }
 

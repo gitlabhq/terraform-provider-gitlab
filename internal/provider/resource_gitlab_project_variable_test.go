@@ -106,7 +106,7 @@ resource "gitlab_project_variable" "foo" {
 			// Check that the variable is recreated if deleted out-of-band.
 			{
 				PreConfig: func() {
-					if _, err := testGitlabClient.ProjectVariables.RemoveVariable(ctx.project.ID, "my_key"); err != nil {
+					if _, err := testGitlabClient.ProjectVariables.RemoveVariable(ctx.project.ID, "my_key", nil); err != nil {
 						t.Fatalf("failed to remove variable: %v", err)
 					}
 				},

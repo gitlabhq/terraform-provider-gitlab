@@ -140,7 +140,7 @@ func testAccCheckGitlabGroupLabelExists(n string, label *gitlab.GroupLabel) reso
 			return fmt.Errorf("No group ID is set")
 		}
 
-		labels, _, err := testGitlabClient.GroupLabels.ListGroupLabels(groupName, &gitlab.ListGroupLabelsOptions{PerPage: 1000})
+		labels, _, err := testGitlabClient.GroupLabels.ListGroupLabels(groupName, &gitlab.ListGroupLabelsOptions{ListOptions: gitlab.ListOptions{PerPage: 1000}})
 		if err != nil {
 			return err
 		}

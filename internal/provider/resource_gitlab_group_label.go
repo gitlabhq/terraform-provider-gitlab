@@ -85,7 +85,7 @@ func resourceGitlabGroupLabelRead(ctx context.Context, d *schema.ResourceData, m
 	page := 1
 	labelsLen := 0
 	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.GroupLabels.ListGroupLabels(group, &gitlab.ListGroupLabelsOptions{Page: page}, gitlab.WithContext(ctx))
+		labels, _, err := client.GroupLabels.ListGroupLabels(group, &gitlab.ListGroupLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}}, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.FromErr(err)
 		}
