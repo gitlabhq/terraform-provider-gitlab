@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -618,6 +619,27 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		if err != nil {
 			return diag.Errorf("Failed to clean up undesired default branch %q for project %q: %s", oldDefaultBranch, d.Id(), err)
 		}
+	}
+
+	// Branch protection for a newly created branch is an async action, so use WaitForState to ensure it's protected
+	// before we continue. Note this check should only be required when there is a custom default branch set
+	// See issue 800: https://github.com/gitlabhq/terraform-provider-gitlab/issues/800
+	stateConf := &resource.StateChangeConf{
+		Pending: []string{"false"},
+		Target:  []string{"true"},
+		Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
+		Refresh: func() (interface{}, string, error) {
+			branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
+			if err != nil {
+				return nil, "", err
+			}
+
+			return branch, strconv.FormatBool(branch.Protected), nil
+		},
+	}
+
+	if _, err := stateConf.WaitForStateContext(ctx); err != nil {
+		return diag.Errorf("error while waiting for branch %s to reach 'protected' status, %s", project.DefaultBranch, err)
 	}
 
 	var editProjectOptions gitlab.EditProjectOptions
