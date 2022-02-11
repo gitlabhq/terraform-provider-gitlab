@@ -1,28 +1,86 @@
+## 3.9.1 (2022-02-06)
+
+BUGFIXES:
+
+* Fix crash in `gitlab_user` data source
+
+## 3.9.0 (2022-02-04)
+
+FEATURES:
+
+* 0519c96 - Add `gitlab_repository_file` resource (#724)
+* a915ccb - Add the `gitlab_project_access_token` resource (#588)
+* 8564a07 - Add `gitlab_group_custom_attribute`, `gitlab_project_custom_attribute`, and `gitlab_user_custom_attribute` (#731)
+* 39b0b6d - Add support for `gitlab_group_badge` resource (#673)
+* dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
+* febe745 - Add `gitlab_project_protected_branch` and `gitlab_project_protected_branches` data sources (#551)
+* b4d4f8d - Support `early_auth_check` flag in provider config (#787)
+* 1455db0 - Add `gitlab_managed_license` resource (#700)
+* be59cd1 - New `archive_on_destroy` attribute for `gitlab_project` (#816)
+
+ENHANCEMENTS:
+
+* 9863a61 - Add missing attributes to documentation (#802) 
+* 84d729e - Improve documentation around authentication with GitLab (#803)
+* a9edc4a - Add environment scope to `gitlab_group_variable` (#717)
+* c5a2f34 - Support `issues_template` and `merge_requests_template` attributes in project resource (#796)
+* 65b8e9c - Add minimal access level permissions (#747)
+* 12ae791 - Added missing scopes to deploy token (#769)
+* 1455db0 - Update allowed access levels in `gitlab_branch_protection`, `gitlab_group_ldap_link`, `gitlab_group_membership`, `gitlab_group_share_group`, `gitlab_project_membership`, `gitlab_project_share_group`, and `gitlab_tag_protection` (#819)
+* 1455db0 - New attribute `group_access` in `gitlab_project_share_group` and `gitlab_group_ldap_link` (attribute `access_level` is now considered deprecated on those resources) (#819)
+
+BUGFIXES:
+
+* f3b0f31 - Handle manually removed resources (#318)
+* fc84cc3 - Properly allow arguments `id`or `path_with_namespace` for project data source (#806)
+* d7059cf - Do not recreate project mirror on every run (#632)
+* e57bf1d - Fix branch_protection documentation (#780)
+* 912b647 - Fix docs for `gitlab_project_level_mr_approvals` import (#766)
+* e89922e - instance_cluster/group_cluster: Suppress whitespace diff for kubernetes_ca_cert (#728)
+* edda219 - gitlab_user: Do not set skip_confirmation on read (#491)
+
+## 3.8.0 (Nov 19, 2021)
+
+ENHANCEMENTS:
+* More examples and better documentation ([#654](https://github.com/gitlabhq/terraform-provider-gitlab/pull/654))
+* Adding a first complete example code ([#670](https://github.com/gitlabhq/terraform-provider-gitlab/pull/670))
+* Support running the provider using an OAuth token ([#686](https://github.com/gitlabhq/terraform-provider-gitlab/pull/686))
+* Allow merge on skipped pipeline ([#705](https://github.com/gitlabhq/terraform-provider-gitlab/pull/705))
+* support default_branch_protection on group ([#706](https://github.com/gitlabhq/terraform-provider-gitlab/pull/706))
+* Bump github.com/xanzy/go-gitlab from 0.50.0 to 0.51.1 ([#718](https://github.com/gitlabhq/terraform-provider-gitlab/pull/718))
+* Add squash option ([#719](https://github.com/gitlabhq/terraform-provider-gitlab/pull/719))
+
+BUGFIXES:
+* Suppress whitespace diffs for kubernetes_ca_cert attribute ([#665](https://github.com/gitlabhq/terraform-provider-gitlab/pull/665))
+* Fix GitLab project membership example ([#684](https://github.com/gitlabhq/terraform-provider-gitlab/pull/684))
+* Improve tests for initializing a project without README ([#730](https://github.com/gitlabhq/terraform-provider-gitlab/pull/730))
+
+
 ## 3.7.0 (July 20, 2021)
 
 FEATURES:
 
-* Add protected_branch_ids to gitlab_project_approval_rule #542
-* Add most Premium features for gitlab_branch_protection #556
-* Adds support for gitlab project badges #648
+* Add protected_branch_ids to gitlab_project_approval_rule ([#542](https://github.com/gitlabhq/terraform-provider-gitlab/pull/542))
+* Add most Premium features for gitlab_branch_protection ([#556](https://github.com/gitlabhq/terraform-provider-gitlab/pull/556))
+* Adds support for gitlab project badges ([#648](https://github.com/gitlabhq/terraform-provider-gitlab/pull/648))
 
 ENHANCEMENTS:
 
-* Add CustomCIPath to resource gitlab_project #662
-* add build coverage regex #627
-* Add tfproviderlint linter to CI #653
-* Documentation improvements #642
-* chore: add error handling to resourceGitlabProjectSetToState #649
-* Missing documentation for gitlab_instance_variable #602
-* Add support for importing Pipeline Schedules and Triggers #618
-* update reference to master branch to main #612
+* Add CustomCIPath to resource gitlab_project ([#662](https://github.com/gitlabhq/terraform-provider-gitlab/pull/662))
+* add build coverage regex ([#627](https://github.com/gitlabhq/terraform-provider-gitlab/pull/627))
+* Add tfproviderlint linter to CI ([#653](https://github.com/gitlabhq/terraform-provider-gitlab/pull/653))
+* Documentation improvements ([#642](https://github.com/gitlabhq/terraform-provider-gitlab/pull/642))
+* chore: add error handling to resourceGitlabProjectSetToState ([#649](https://github.com/gitlabhq/terraform-provider-gitlab/pull/649))
+* Missing documentation for gitlab_instance_variable ([#602](https://github.com/gitlabhq/terraform-provider-gitlab/pull/602))
+* Add support for importing Pipeline Schedules and Triggers ([#618](https://github.com/gitlabhq/terraform-provider-gitlab/pull/618))
+* update reference to master branch to main ([#612](https://github.com/gitlabhq/terraform-provider-gitlab/pull/612))
 
 BUGFIXES:
 
-* Fix project approval rule tests #660
-* Fix markdown linter errors in branch_protection.md #656
-* fix: update default branch name to "main" #643
-* gitlab_project: Wait for template projects to be cloned/imported #621
+* Fix project approval rule tests ([#660](https://github.com/gitlabhq/terraform-provider-gitlab/pull/660))
+* Fix markdown linter errors in branch_protection.md ([#656](https://github.com/gitlabhq/terraform-provider-gitlab/pull/656))
+* fix: update default branch name to "main" ([#643](https://github.com/gitlabhq/terraform-provider-gitlab/pull/643))
+* gitlab_project: Wait for template projects to be cloned/imported ([#621](https://github.com/gitlabhq/terraform-provider-gitlab/pull/621))
 
 
 

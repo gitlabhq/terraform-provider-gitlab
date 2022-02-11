@@ -1,48 +1,102 @@
-TEST?=./gitlab
-SERVICE?=gitlab-ce
-GITLAB_TOKEN?=ACCTEST1234567890123
-GITLAB_BASE_URL?=http://127.0.0.1:8080/api/v4
-GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+default: reviewable
+
+reviewable: build fmt generate test ## Run before committing.
+
+GOBIN = $(shell pwd)/bin
+PROVIDER_SRC_DIR := ./internal/provider
+
+build: ## Build the provider binary.
+	go mod tidy
+	GOBIN=$(GOBIN) go install
+
+generate: tool-tfplugindocs ## Generate files to be checked in.
+	@# Setting empty environment variables to work around issue: https://github.com/hashicorp/terraform-plugin-docs/issues/12
+	GITLAB_TOKEN="" $(GOBIN)/tfplugindocs generate
 
 ifdef RUN
 TESTARGS += -test.run $(RUN)
 endif
 
-default: build
+test: ## Run unit tests.
+	go test $(TESTARGS) $(PROVIDER_SRC_DIR)
 
-build:
-	go install
+TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
 
-test:
-	go test -i $(TEST) || exit 1
-	echo $(TEST) | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+fmt: tool-golangci-lint tool-tfproviderlintx tool-terraform tool-shfmt ## Format files and fix issues.
+	gofmt -w -s .
+	$(GOBIN)/golangci-lint run --fix
+	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) --fix ./...
+	$(GOBIN)/terraform fmt -recursive -list ./examples
+	$(GOBIN)/shfmt -l -s -w ./examples
 
-testacc-up:
+lint-golangci: tool-golangci-lint ## Run golangci-lint linter (same as fmt but without modifying files).
+	$(GOBIN)/golangci-lint run
+
+lint-tfprovider: tool-tfproviderlintx ## Run tfproviderlintx linter (same as fmt but without modifying files).
+	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) ./...
+
+lint-examples-tf: tool-terraform ## Run terraform linter on examples (same as fmt but without modifying files).
+	$(GOBIN)/terraform fmt -recursive -check ./examples
+
+lint-examples-sh: tool-shfmt ## Run shell linter on examples (same as fmt but without modifying files).
+	$(GOBIN)/shfmt -l -s -d ./examples
+
+lint-generated: generate ## Check that "make generate" was called. Note this only works if the git workspace is clean.
+	@echo "Checking git status"
+	@[ -z "$(shell git status --short)" ] || { \
+		echo "Error: Files should have been generated:"; \
+		git status --short; echo "Diff:"; \
+		git --no-pager diff HEAD; \
+		echo "Run \"make generate\" and try again"; \
+		exit 1; \
+	}
+
+apicovered: tool-apicovered ## Run an analysis tool to estimate the GitLab API coverage.
+	@$(GOBIN)/apicovered ./gitlab
+
+apiunused: tool-apiunused ## Run an analysis tool to output unused parts of the go-gitlab package.
+	@$(GOBIN)/apiunused ./gitlab
+
+SERVICE ?= gitlab-ce
+GITLAB_TOKEN ?= ACCTEST1234567890123
+GITLAB_BASE_URL ?= http://127.0.0.1:8080/api/v4
+
+testacc-up: ## Launch a GitLab instance.
 	docker-compose up -d $(SERVICE)
 	./scripts/await-healthy.sh
 
-testacc-down:
+testacc-down: ## Teardown a GitLab instance.
 	docker-compose down
 
-testacc:
-	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(TEST) $(TESTARGS) -timeout 40m
+testacc: ## Run acceptance tests against a GitLab instance.
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
 
-vet:
-	@echo "go vet ."
-	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
-		echo ""; \
-		echo "Vet found suspicious constructs. Please check the reported constructs"; \
-		echo "and fix them if necessary before submitting the code for review."; \
-		exit 1; \
-	fi
+# TOOLS
+# Tool dependencies are installed into a project-local /bin folder.
 
-fmt:
-	gofmt -w $(GOFMT_FILES)
+tool-golangci-lint:
+	@$(call install-tool, github.com/golangci/golangci-lint/cmd/golangci-lint)
 
-tfproviderlint:
-	go run github.com/bflad/tfproviderlint/cmd/tfproviderlintx \
-	-XAT001=false -XR003=false -XR005=false -XS001=false -XS002=false \
-	./...
+tool-tfproviderlintx:
+	@$(call install-tool, github.com/bflad/tfproviderlint/cmd/tfproviderlintx)
 
-.PHONY: default build test testacc-up testacc-down testacc vet fmt tfproviderlint
+tool-tfplugindocs:
+	@$(call install-tool, github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs)
+
+tool-shfmt:
+	@$(call install-tool, mvdan.cc/sh/v3/cmd/shfmt)
+
+tool-apicovered:
+	@$(call install-tool, ./cmd/apicovered)
+
+tool-apiunused:
+	@$(call install-tool, ./cmd/apiunused)
+
+define install-tool
+	cd tools && GOBIN=$(GOBIN) go install $(1)
+endef
+
+TERRAFORM_VERSION = v1.1.4
+tool-terraform:
+	@# See https://github.com/hashicorp/terraform/issues/30356
+	@[ -f $(GOBIN)/terraform ] || { mkdir -p tmp; cd tmp; rm -rf terraform; git clone --branch $(TERRAFORM_VERSION) --depth 1 https://github.com/hashicorp/terraform.git; cd terraform; GOBIN=$(GOBIN) go install; cd ..; rm -rf terraform; }

@@ -29,3 +29,4 @@ website/.vagrant
 website/build
 website/node_modules
 website/vendor
+/tmp
