@@ -193,7 +193,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 	},
 	"squash_option": {
-		Description:  "Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`.",
+		Description:  "Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]",
 		Type:         schema.TypeString,
 		Optional:     true,
 		Default:      "default_off",
@@ -386,7 +386,7 @@ var _ = registerResource("gitlab_project", func() *schema.Resource {
 	}
 })
 
-func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Project) error {
+func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceData, project *gitlab.Project) error {
 	d.SetId(fmt.Sprintf("%d", project.ID))
 	d.Set("name", project.Name)
 	d.Set("path", project.Path)
@@ -417,7 +417,11 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 		return err
 	}
 	d.Set("archived", project.Archived)
-	d.Set("squash_option", project.SquashOption)
+	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
+		return err
+	} else if supportsSquashOption {
+		d.Set("squash_option", project.SquashOption)
+	}
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
@@ -453,7 +457,6 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		OnlyAllowMergeIfAllDiscussionsAreResolved: gitlab.Bool(d.Get("only_allow_merge_if_all_discussions_are_resolved").(bool)),
 		AllowMergeOnSkippedPipeline:               gitlab.Bool(d.Get("allow_merge_on_skipped_pipeline").(bool)),
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
-		SquashOption:                              stringToSquashOptionValue(d.Get("squash_option").(string)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
@@ -513,6 +516,14 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if v, ok := d.GetOk("ci_config_path"); ok {
 		options.CIConfigPath = gitlab.String(v.(string))
+	}
+
+	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
+		return diag.FromErr(err)
+	} else if supportsSquashOption {
+		if v, ok := d.GetOk("squash_option"); ok {
+			options.SquashOption = stringToSquashOptionValue(v.(string))
+		}
 	}
 
 	log.Printf("[DEBUG] create gitlab project %q", *options.Name)
@@ -672,7 +683,7 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 		return nil
 	}
 
-	if err := resourceGitlabProjectSetToState(d, project); err != nil {
+	if err := resourceGitlabProjectSetToState(client, d, project); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -782,7 +793,9 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
 	}
 
-	if d.HasChange("squash_option") {
+	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
+		return diag.FromErr(err)
+	} else if supportsSquashOption && d.HasChange("squash_option") {
 		options.SquashOption = stringToSquashOptionValue(d.Get("squash_option").(string))
 	}
 

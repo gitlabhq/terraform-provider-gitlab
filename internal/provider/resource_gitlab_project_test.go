@@ -964,11 +964,11 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 				}
 			}
 
-			if err := resourceGitlabProjectSetToState(expectedData, expected); err != nil {
+			if err := resourceGitlabProjectSetToState(testGitlabClient, expectedData, expected); err != nil {
 				return err
 			}
 
-			if err := resourceGitlabProjectSetToState(receivedData, received); err != nil {
+			if err := resourceGitlabProjectSetToState(testGitlabClient, receivedData, received); err != nil {
 				return err
 			}
 
