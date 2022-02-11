@@ -38,7 +38,7 @@ resource "gitlab_repository_file" "this" {
 
 resource "gitlab_branch" "this" {
   project = gitlab_project.this.id
-  name    = "develop"
+  branch  = "develop"
   ref     = gitlab_project.this.default_branch
 }
 ```
@@ -48,8 +48,8 @@ resource "gitlab_branch" "this" {
 
 ### Required
 
-- **name** (String) The name of the branch.
 - **project** (String) The id of the project to add the branch to.
+- **branch** (String) The name of the branch.
 - **ref* (String) The name of branch from which the new branch is created.
 
 ## Import
@@ -58,5 +58,5 @@ Import is supported using the following syntax:
 
 ```shell
 # GitLab branch can be imported using an id made up of `{project_id}:{branch_name}`, e.g.
-terraform import gitlab_branch.this 1:develop
+terraform import gitlab_branch.this 12345:develop
 ```

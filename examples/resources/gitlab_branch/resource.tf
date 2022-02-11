@@ -1,5 +1,5 @@
 resource "gitlab_branch" "this" {
   project = "12345"
-  name    = "develop"
+  branch  = "develop"
   ref     = "main"
 }

@@ -14,7 +14,8 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 
     var b gitlab.Branch
     rInt := acctest.RandInt()
-    rmodifyInt := acctest.RandInt()
+    rSupportInt := acctest.RandInt()
+    rModifyInt := acctest.RandInt()
 
     resource.Test(t, resource.TestCase{
         PreCheck:          func() { testAccPreCheck(t) },
@@ -23,31 +24,27 @@ func TestAccGitlabBranch_basic(t *testing.T) {
         Steps: []resource.TestStep{
             // Create the branch
             {
-                Config: testAccGitlabBranchConfig(rInt),
+                Config: testAccGitlabBranchConfig(rInt, rSupportInt),
                 Check: resource.ComposeTestCheckFunc(
                     testAccCheckGitlabBranchExists("gitlab_branch.this", &b),
                     testAccCheckGitlabBranchAttributes(&b, &testAccGitlabBranchExpectedAttributes{
                         Name: fmt.Sprintf("example-%[1]d", rInt),
                     }),
                 ),
+            },
+            // Test ImportState
+            {
+                ResourceName:      "gitlab_branch.this",
+                ImportState:       true,
+                ImportStateVerify: true,
             },
             // Update the branch to toggle all the values to their inverse
             {
-                Config: testAccGitlabBranchConfig(rmodifyInt),
+                Config: testAccGitlabBranchConfig(rModifyInt, rSupportInt),
                 Check: resource.ComposeTestCheckFunc(
                     testAccCheckGitlabBranchExists("gitlab_branch.this", &b),
                     testAccCheckGitlabBranchAttributes(&b, &testAccGitlabBranchExpectedAttributes{
-                        Name: fmt.Sprintf("example-%[1]d", rmodifyInt),
-                    }),
-                ),
-            },
-            // Update the branch to toggle the options back
-            {
-                Config: testAccGitlabBranchConfig(rInt),
-                Check: resource.ComposeTestCheckFunc(
-                    testAccCheckGitlabBranchExists("gitlab_branch.this", &b),
-                    testAccCheckGitlabBranchAttributes(&b, &testAccGitlabBranchExpectedAttributes{
-                        Name: fmt.Sprintf("example-%[1]d", rInt),
+                        Name: fmt.Sprintf("example-%[1]d", rModifyInt),
                     }),
                 ),
             },
@@ -116,11 +113,11 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
     return nil
 }
 
-func testAccGitlabBranchConfig(rInt int) string {
+func testAccGitlabBranchConfig(rInt int, rSupportInt int) string {
     return fmt.Sprintf(`
 resource "gitlab_group" "this" {
   name        = "example-%[1]d"
-  path        = "example"
+  path        = "example-%[1]d"
   description = "An example group"
 }
 resource "gitlab_project" "this" {
@@ -140,14 +137,14 @@ resource "gitlab_repository_file" "this" {
 }
 resource "gitlab_branch" "this" {
   project = gitlab_project.this.id
-  name    = "example-%[1]d"
+  branch  = "example-%[2]d"
   ref     = gitlab_project.this.default_branch
 }
 resource "gitlab_branch_protection" "this" {
   project            = gitlab_project.this.id
-  branch             = gitlab_branch.this.name
+  branch             = gitlab_branch.this.branch
   push_access_level  = "maintainer"
   merge_access_level = "maintainer"
 }
-    `, rInt)
+    `, rSupportInt, rInt)
 }

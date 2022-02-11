@@ -28,7 +28,7 @@ var _ = registerResource("gitlab_branch", func() *schema.Resource {
                 Required:    true,
                 ForceNew:    true,
             },
-            "name": {
+            "branch": {
                 Description: "The name of the new branch",
                 Type:        schema.TypeString,
                 Required:    true,
@@ -48,13 +48,13 @@ func resourceGitlabBranchCreate(ctx context.Context, d *schema.ResourceData, met
     client := meta.(*gitlab.Client)
     project := d.Get("project").(string)
     options := &gitlab.CreateBranchOptions{
-        Branch: gitlab.String(d.Get("name").(string)),
+        Branch: gitlab.String(d.Get("branch").(string)),
         Ref:    gitlab.String(d.Get("ref").(string)),
     }
 
     log.Printf("[DEBUG] create gitlab branch %q", *options.Branch)
 
-    branch, _, err := client.Branches.CreateBranch(project, options)
+    branch, _, err := client.Branches.CreateBranch(project, options, gitlab.WithContext(ctx))
     if err != nil {
         return diag.FromErr(err)
     }
@@ -73,7 +73,7 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
 
     log.Printf("[DEBUG] read gitlab branch %s", branch_name)
 
-    branch, _, err := client.Branches.GetBranch(project, branch_name)
+    branch, _, err := client.Branches.GetBranch(project, branch_name, gitlab.WithContext(ctx))
     if err != nil {
         if is404(err) {
             log.Printf("[DEBUG] gitlab branch not found %s/%s", project, branch_name)
@@ -83,8 +83,21 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
         return diag.FromErr(err)
     }
 
+    c := &gitlab.GetCommitRefsOptions {
+        Type: gitlab.String("branch"),
+    }
+    commit_refs, _, err := client.Commits.GetCommitRefs(project, branch.Commit.ID, c, gitlab.WithContext(ctx))
+    if err != nil {
+            log.Fatal(err)
+    }
+    for _, br := range commit_refs {
+        if br.Name != branch.Name {
+            d.Set("ref", br.Name)
+        }
+    }
+
     d.Set("project", project)
-    d.Set("name", branch.Name)
+    d.Set("branch", branch.Name)
 
     d.SetId(buildTwoPartID(&project, &branch.Name))
 
@@ -93,12 +106,14 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
 
 func resourceGitlabBranchDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
     client := meta.(*gitlab.Client)
-    project := d.Get("project").(string)
-    branch_name := d.Get("name").(string)
+    project, branch_name, err := parseTwoPartID(d.Id())
+    if err != nil {
+        return diag.FromErr(err)
+    }
 
     log.Printf("[DEBUG] Delete gitlab branch %s", d.Id())
 
-    resp, err := client.Branches.DeleteBranch(project, branch_name)
+    resp, err := client.Branches.DeleteBranch(project, branch_name, gitlab.WithContext(ctx))
     if err != nil {
         return diag.Errorf("%s failed to delete branch: (%s) %v", branch_name, resp.Status, err)
     }
