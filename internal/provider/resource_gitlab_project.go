@@ -629,8 +629,16 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		Target:  []string{"true"},
 		Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
 		Refresh: func() (interface{}, string, error) {
-			branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
+			branch, response, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
 			if err != nil {
+				if response.StatusCode == 404 {
+					// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
+					// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
+					// We don't need to wait anymore, so return "true" to exist the wait loop.
+					return branch, "true", nil
+				}
+
+				//This is legit error, return the error.
 				return nil, "", err
 			}
 
