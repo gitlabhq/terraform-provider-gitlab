@@ -45,7 +45,7 @@ func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 }
 
 func TestAccDataSourceGitlabMembership_pagination(t *testing.T) {
-	testAccPreCheck(t)
+	testAccCheck(t)
 
 	userCount := 21
 
