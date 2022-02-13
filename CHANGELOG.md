@@ -17,16 +17,6 @@ BUG FIXES
 * resource/gitlab_group: support setting `default_branch_protection` to `0` (#856)
 * resource/gitlab_project: support creating project in group without default branch protection (#856)
 
-ENHANCEMENTS:
-
-* docs: better provider introduction (#852)
-
-NOTES:
-
-* provider: aligned project structure to terraform provider scaffolding project (#815)
-* repository: changed default branch from `master` to `main` (#852)
-* repository: introduction of multiple GitHub workflows to improve developer experience
-
 ## 3.9.1 (2022-02-06)
 
 BUGFIXES:
