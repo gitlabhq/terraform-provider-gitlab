@@ -2,10 +2,9 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
-	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -564,12 +563,11 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if _, ok := d.GetOk("push_rules"); ok {
 		err := editOrAddPushRules(ctx, client, d.Id(), d)
-		var httpError *gitlab.ErrorResponse
-		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
-			return diag.Errorf("Project push rules are not supported in your version of GitLab")
-		}
 		if err != nil {
+			if is404(err) {
+				log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
+				return diag.Errorf("Project push rules are not supported in your version of GitLab")
+			}
 			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
 	}
@@ -629,6 +627,35 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 	}
 
+	// Branch protection for a newly created branch is an async action, so use WaitForState to ensure it's protected
+	// before we continue. Note this check should only be required when there is a custom default branch set
+	// See issue 800: https://github.com/gitlabhq/terraform-provider-gitlab/issues/800
+	stateConf := &resource.StateChangeConf{
+		Pending: []string{"false"},
+		Target:  []string{"true"},
+		Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
+		Refresh: func() (interface{}, string, error) {
+			branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
+			if err != nil {
+				if is404(err) {
+					// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
+					// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
+					// We don't need to wait anymore, so return "true" to exist the wait loop.
+					return branch, "true", nil
+				}
+
+				//This is legit error, return the error.
+				return nil, "", err
+			}
+
+			return branch, strconv.FormatBool(branch.Protected), nil
+		},
+	}
+
+	if _, err := stateConf.WaitForStateContext(ctx); err != nil {
+		return diag.Errorf("error while waiting for branch %s to reach 'protected' status, %s", project.DefaultBranch, err)
+	}
+
 	var editProjectOptions gitlab.EditProjectOptions
 
 	if v, ok := d.GetOk("mirror_overwrites_diverged_branches"); ok {
@@ -679,8 +706,7 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 	log.Printf("[DEBUG] read gitlab project %q push rules", d.Id())
 
 	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id(), gitlab.WithContext(ctx))
-	var httpError *gitlab.ErrorResponse
-	if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+	if is404(err) {
 		log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
 	} else if err != nil {
 		return diag.Errorf("Failed to get push rules for project %q: %s", d.Id(), err)
@@ -868,12 +894,11 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("push_rules") {
 		err := editOrAddPushRules(ctx, client, d.Id(), d)
-		var httpError *gitlab.ErrorResponse
-		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
-			return diag.Errorf("Project push rules are not supported in your version of GitLab")
-		}
 		if err != nil {
+			if is404(err) {
+				log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
+				return diag.Errorf("Project push rules are not supported in your version of GitLab")
+			}
 			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
 	}
@@ -897,9 +922,9 @@ func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, me
 			Pending: []string{"Deleting"},
 			Target:  []string{"Deleted"},
 			Refresh: func() (interface{}, string, error) {
-				out, response, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
+				out, _, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
 				if err != nil {
-					if response.StatusCode == 404 {
+					if is404(err) {
 						return out, "Deleted", nil
 					}
 					log.Printf("[ERROR] Received error: %#v", err)
