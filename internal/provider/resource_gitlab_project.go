@@ -2,10 +2,8 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -565,12 +563,11 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if _, ok := d.GetOk("push_rules"); ok {
 		err := editOrAddPushRules(ctx, client, d.Id(), d)
-		var httpError *gitlab.ErrorResponse
-		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
-			return diag.Errorf("Project push rules are not supported in your version of GitLab")
-		}
 		if err != nil {
+			if is404(err) {
+				log.Printf("[DEBUG] Failed to edit push rules for project %q: %v", d.Id(), err)
+				return diag.Errorf("Project push rules are not supported in your version of GitLab")
+			}
 			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
 	}
@@ -629,9 +626,9 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		Target:  []string{"true"},
 		Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
 		Refresh: func() (interface{}, string, error) {
-			branch, response, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
+			branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
 			if err != nil {
-				if response.StatusCode == 404 {
+				if is404(err) {
 					// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
 					// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
 					// We don't need to wait anymore, so return "true" to exist the wait loop.
@@ -700,8 +697,7 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 	log.Printf("[DEBUG] read gitlab project %q push rules", d.Id())
 
 	pushRules, _, err := client.Projects.GetProjectPushRules(d.Id(), gitlab.WithContext(ctx))
-	var httpError *gitlab.ErrorResponse
-	if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
+	if is404(err) {
 		log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
 	} else if err != nil {
 		return diag.Errorf("Failed to get push rules for project %q: %s", d.Id(), err)
@@ -889,12 +885,11 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("push_rules") {
 		err := editOrAddPushRules(ctx, client, d.Id(), d)
-		var httpError *gitlab.ErrorResponse
-		if errors.As(err, &httpError) && httpError.Response.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
-			return diag.Errorf("Project push rules are not supported in your version of GitLab")
-		}
 		if err != nil {
+			if is404(err) {
+				log.Printf("[DEBUG] Failed to get push rules for project %q: %v", d.Id(), err)
+				return diag.Errorf("Project push rules are not supported in your version of GitLab")
+			}
 			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
 	}
@@ -918,9 +913,9 @@ func resourceGitlabProjectDelete(ctx context.Context, d *schema.ResourceData, me
 			Pending: []string{"Deleting"},
 			Target:  []string{"Deleted"},
 			Refresh: func() (interface{}, string, error) {
-				out, response, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
+				out, _, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
 				if err != nil {
-					if response.StatusCode == 404 {
+					if is404(err) {
 						return out, "Deleted", nil
 					}
 					log.Printf("[ERROR] Received error: %#v", err)
