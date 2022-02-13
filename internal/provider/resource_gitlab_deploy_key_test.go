@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccGitlabDeployKey_basic(t *testing.T) {
-	var deployKey gitlab.DeployKey
+	var deployKey gitlab.ProjectDeployKey
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -96,7 +96,7 @@ func TestAccGitlabDeployKey_import(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.DeployKey) resource.TestCheckFunc {
+func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.ProjectDeployKey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -126,7 +126,7 @@ type testAccGitlabDeployKeyExpectedAttributes struct {
 	CanPush bool
 }
 
-func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.DeployKey, want *testAccGitlabDeployKeyExpectedAttributes) resource.TestCheckFunc {
+func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.ProjectDeployKey, want *testAccGitlabDeployKeyExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if deployKey.Title != want.Title {
 			return fmt.Errorf("got title %q; want %q", deployKey.Title, want.Title)
@@ -136,8 +136,8 @@ func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.DeployKey, want *te
 			return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
 		}
 
-		if deployKey.CanPush != nil && *deployKey.CanPush != want.CanPush {
-			return fmt.Errorf("got can_push %t; want %t", *deployKey.CanPush, want.CanPush)
+		if deployKey.CanPush != want.CanPush {
+			return fmt.Errorf("got can_push %t; want %t", deployKey.CanPush, want.CanPush)
 		}
 
 		return nil
