@@ -43,6 +43,7 @@ data "gitlab_project" "example" {
 - **namespace_id** (Number) The namespace (group or user) of the project. Defaults to your user.
 - **path** (String) The path of the repository.
 - **pipelines_enabled** (Boolean) Enable pipelines for the project.
+- **printing_merge_request_link_enabled** (Boolean) Show link to create/view merge request when pushing from the command line
 - **push_rules** (List of Object) Push rules for the project. (see [below for nested schema](#nestedatt--push_rules))
 - **remove_source_branch_after_merge** (Boolean) Enable `Delete source branch` option by default for all new merge requests
 - **request_access_enabled** (Boolean) Allow users to request member access.

@@ -203,6 +203,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:        schema.TypeBool,
 		Optional:    true,
 	},
+	"printing_merge_request_link_enabled": {
+		Description: "Show link to create/view merge request when pushing from the command line",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Default:     true,
+	},
 	"packages_enabled": {
 		Description: "Enable packages repository for the project.",
 		Type:        schema.TypeBool,
@@ -422,6 +428,7 @@ func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceDa
 		d.Set("squash_option", project.SquashOption)
 	}
 	d.Set("remove_source_branch_after_merge", project.RemoveSourceBranchAfterMerge)
+	d.Set("printing_merge_request_link_enabled", project.PrintingMergeRequestLinkEnabled)
 	d.Set("packages_enabled", project.PackagesEnabled)
 	d.Set("pages_access_level", string(project.PagesAccessLevel))
 	d.Set("mirror", project.Mirror)
@@ -458,6 +465,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		SharedRunnersEnabled:                      gitlab.Bool(d.Get("shared_runners_enabled").(bool)),
 		RemoveSourceBranchAfterMerge:              gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool)),
 		PackagesEnabled:                           gitlab.Bool(d.Get("packages_enabled").(bool)),
+		PrintingMergeRequestLinkEnabled:           gitlab.Bool(d.Get("printing_merge_request_link_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 		BuildCoverageRegex:                        gitlab.String(d.Get("build_coverage_regex").(string)),
@@ -827,6 +835,10 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("remove_source_branch_after_merge") {
 		options.RemoveSourceBranchAfterMerge = gitlab.Bool(d.Get("remove_source_branch_after_merge").(bool))
+	}
+
+	if d.HasChange("printing_merge_request_link_enabled") {
+		options.PrintingMergeRequestLinkEnabled = gitlab.Bool(d.Get("printing_merge_request_link_enabled").(bool))
 	}
 
 	if d.HasChange("packages_enabled") {
