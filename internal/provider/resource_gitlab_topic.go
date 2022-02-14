@@ -11,7 +11,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
-var _ = registerResource("gitlab_topic", func() *schema.Resource {
+func resourceGitlabTopic() *schema.Resource {
 	return &schema.Resource{
 		Description: `This resource allows you to create and manage topics that are then assignable to projects. Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.  
 
@@ -45,7 +45,7 @@ For assigning topics, use the [project](./project.md) resource.
 			},
 		},
 	}
-})
+}
 
 func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
