@@ -13,6 +13,7 @@ import (
 
 func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 	rInt := acctest.RandInt()
+	resourceName := "gitlab_group_ldap_link.foo"
 
 	// PreCheck runs after Config so load test data here
 	var ldapLink gitlab.LDAPGroupLink
@@ -31,10 +32,19 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
+					testAccCheckGitlabGroupLdapLinkExists(resourceName, &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
 						accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 					})),
+			},
+
+			// Import the group LDAP link (re-uses testAccGitlabGroupLdapLinkCreateConfig for Config)
+			{
+				SkipFunc:          isRunningInCE,
+				ResourceName:      resourceName,
+				ImportStateIdFunc: getGitlabGroupLdapLinkImportID(resourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 
 			// Update the group LDAP link to change the access level (uses testAccGitlabGroupLdapLinkUpdateConfig for Config)
@@ -42,13 +52,37 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
+					testAccCheckGitlabGroupLdapLinkExists(resourceName, &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
 						accessLevel: fmt.Sprintf("maintainer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 					})),
 			},
 		},
 	})
+}
+
+func getGitlabGroupLdapLinkImportID(resourceName string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", resourceName)
+		}
+
+		groupID := rs.Primary.Attributes["group_id"]
+		if groupID == "" {
+			return "", fmt.Errorf("No group ID is set")
+		}
+		ldapProvider := rs.Primary.Attributes["ldap_provider"]
+		if ldapProvider == "" {
+			return "", fmt.Errorf("No LDAP provider is set")
+		}
+		ldapCN := rs.Primary.Attributes["cn"]
+		if ldapCN == "" {
+			return "", fmt.Errorf("No LDAP CN is set")
+		}
+
+		return fmt.Sprintf("%s:%s:%s", groupID, ldapProvider, ldapCN), nil
+	}
 }
 
 func testAccCheckGitlabGroupLdapLinkExists(resourceName string, ldapLink *gitlab.LDAPGroupLink) resource.TestCheckFunc {
