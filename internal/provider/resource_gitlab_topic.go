@@ -124,17 +124,12 @@ func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta
 func resourceGitlabTopicDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 
 	softDestroy := d.Get("soft_destroy").(bool)
-	warning := fmt.Sprintf("[WARN] Not deleting gitlab topic %s as gitlab API doens't support deleting topics", d.Id())
-
-	if softDestroy {
-		warning += ". Instead emptying its description"
-	}
-
-	log.Println(warning)
 
 	if !softDestroy {
-		return nil
+		return diag.Errorf("Destroying a topic is not yet supported. You can set soft_destroy=true to suppress this error")
 	}
+
+	log.Printf("[WARN] Not deleting gitlab topic %s. Instead emptying its description", d.Id())
 
 	client := meta.(*gitlab.Client)
 	options := &gitlab.UpdateTopicOptions{
