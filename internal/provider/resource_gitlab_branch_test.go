@@ -1,11 +1,11 @@
-package gitlab
+package provider
 
 import (
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 	"testing"
 )
@@ -17,9 +17,9 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 	fooBranchName := fmt.Sprintf("testbranch-%d", rInt)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabBranchDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabBranchDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccGitlabBranchConfig(rInt),
@@ -28,17 +28,26 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 					testAccCheckGitlabBranchExists("foo2", "test", &branch2, rInt),
 					testAccCheckGitlabBranchAttributes("foo", "test", &branch, &testAccGitlabBranchExpectedAttributes{
 						Name:    fmt.Sprintf("testbranch-%d", rInt),
+						Ref:     "main",
 						CanPush: true,
 						Commit:  true,
 					}),
 					testAccCheckGitlabBranchAttributes("foo2", "test", &branch2, &testAccGitlabBranchExpectedAttributes{
 						Name:    fmt.Sprintf("testbranch2-%d", rInt),
+						Ref:     fmt.Sprintf("testbranch-%d", rInt),
 						CanPush: true,
 						Commit:  true,
 					}),
+					testAccCheckGitlabBranchRef("foo", "main"),
 					testAccCheckGitlabBranchRef("foo2", fooBranchName),
 					testAccCheckGitlabBranchCommit("foo2"),
 				),
+			},
+			// Test ImportState
+			{
+				ResourceName:      "gitlab_branch.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -73,8 +82,7 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 		}
 		name := rs.Primary.Attributes["name"]
 		project := rs.Primary.Attributes["project"]
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		branch, resp, err := conn.Branches.GetBranch(project, name)
+		branch, resp, err := testGitlabClient.Branches.GetBranch(project, name)
 		if err == nil {
 			if branch != nil && branch.Name == name {
 				return fmt.Errorf("Branch still exists")
@@ -90,12 +98,20 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 
 func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want *testAccGitlabBranchExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)]
+		if !ok {
+			return fmt.Errorf("Not Found: %s", n)
+		}
+
+		_, branchName, err := parseTwoPartID(rs.Primary.ID)
+		if err != nil {
+			return errors.New("Error in splitting project and branch IDs")
+		}
 		if branch.WebURL == "" {
 			return errors.New("got empty web url")
 		}
-		projectID := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
-		if s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID != fmt.Sprintf("%s:%s", projectID, want.Name) {
-			return fmt.Errorf("Got ID: %s expected: %s-%s", s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)].Primary.ID, projectID, want.Name)
+		if branchName != want.Name || branchName != branch.Name {
+			return fmt.Errorf("got name %s; want %s", branch.Name, want.Name)
 		}
 		if want.Commit {
 			if branch.Commit == nil {
@@ -108,9 +124,6 @@ func testAccCheckGitlabBranchAttributes(n, p string, branch *gitlab.Branch, want
 			if branch.Commit != nil {
 				return fmt.Errorf("Unexpected commit %v", branch.Commit)
 			}
-		}
-		if branch.Name != want.Name {
-			return fmt.Errorf("got name %s; want %s", branch.Name, want.Name)
 		}
 		if branch.CanPush != want.CanPush {
 			return fmt.Errorf("can push %t; want %t", branch.CanPush, want.CanPush)
@@ -131,10 +144,14 @@ func testAccCheckGitlabBranchExists(n, p string, branch *gitlab.Branch, rInt int
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
-		name := rs.Primary.Attributes["name"]
-		pid := s.RootModule().Resources[fmt.Sprintf("gitlab_project.%s", p)].Primary.ID
-		conn := testAccProvider.Meta().(*gitlab.Client)
-		gotBranch, _, err := conn.Branches.GetBranch(pid, name)
+		pid, name, err := parseTwoPartID(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("Error in splitting project and branch IDs")
+		}
+		gotBranch, _, err := testGitlabClient.Branches.GetBranch(pid, name)
+		if err != nil {
+			return err
+		}
 		*branch = *gotBranch
 		return err
 	}
@@ -143,7 +160,7 @@ func testAccCheckGitlabBranchExists(n, p string, branch *gitlab.Branch, rInt int
 func testAccGitlabBranchConfig(rInt int) string {
 	return fmt.Sprintf(`
 	resource "gitlab_project" "test" {
-		name = "foo-%d"
+		name = "foo-%[1]d"
 		description = "Terraform acceptance tests"
 	  
 		# So that acceptance tests can be run in a gitlab organization
@@ -151,16 +168,16 @@ func testAccGitlabBranchConfig(rInt int) string {
 		visibility_level = "public"
 	}
 	resource "gitlab_branch" "foo" {
-		name = "testbranch-%d"
+		name = "testbranch-%[1]d"
 		ref = "main"
 		project = gitlab_project.test.id
 	}
 	resource "gitlab_branch" "foo2" {
-		name = "testbranch2-%d"
+		name = "testbranch2-%[1]d"
 		ref = gitlab_branch.foo.name
 		project = gitlab_project.test.id
 	}
-  `, rInt, rInt, rInt)
+  `, rInt)
 }
 
 type testAccGitlabBranchExpectedAttributes struct {

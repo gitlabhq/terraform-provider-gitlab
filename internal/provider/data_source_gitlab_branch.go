@@ -1,59 +1,86 @@
-package gitlab
+package provider
 
 import (
+	"context"
 	"log"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
 
-func dataSourceGitlabBranch() *schema.Resource {
+var _ = registerDataSource("gitlab_branch", func() *schema.Resource {
 	return &schema.Resource{
-		Read: dataSourceGitlabBranchRead,
+		Description: "Provide details about a gitlab project branch \n\n" +
+			"> **Note**: name and project must be specified.",
+
+		ReadContext: dataSourceGitlabBranchRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The name of the branch.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"project": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The full path or id of the group.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 			"web_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The url of the created branch (https)",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"default": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Bool, true if branch is the default branch for the project",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"can_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Bool, true if you can push to the branch",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"protected": {
+				Description: "Bool, true if branch has branch protection",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"merged": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Bool, true if the branch has been merged into it's parent",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"developer_can_merge": {
+				Description: "Bool, true if developer level access allows to merge branch",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"developer_can_push": {
+				Description: "Bool, true if developer level access allows git push",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"commit": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Set:      schema.HashResource(commitSchema),
-				Elem:     commitSchema,
+				Description: "The commit associated with the branch ref",
+				Type:        schema.TypeSet,
+				Computed:    true,
+				Set:         schema.HashResource(commitSchema),
+				Elem:        commitSchema,
 			},
 		},
 	}
-}
+})
 
-func dataSourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
+func dataSourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	name := d.Get("name").(string)
 	project := d.Get("project").(string)
 	log.Printf("[DEBUG] read gitlab branch %s", name)
-	branch, resp, err := client.Branches.GetBranch(project, name)
+	branch, resp, err := client.Branches.GetBranch(project, name, gitlab.WithContext(ctx))
 	if err != nil {
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(buildTwoPartID(&project, &name))
@@ -68,7 +95,7 @@ func dataSourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error 
 	d.Set("developer_can_push", branch.DevelopersCanPush)
 	commit := flattenCommit(branch.Commit)
 	if err := d.Set("commit", commit); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	return nil
 }

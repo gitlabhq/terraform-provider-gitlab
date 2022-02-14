@@ -1,114 +1,137 @@
-package gitlab
+package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"context"
 	"log"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func resourceGitlabBranch() *schema.Resource {
+var _ = registerResource("gitlab_branch", func() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceGitlabBranchCreate,
-		Read:   resourceGitlabBranchRead,
-		Delete: resourceGitlabBranchDelete,
+		Description: "This resource allows you to create and manage GitLab branches.",
+
+		CreateContext: resourceGitlabBranchCreate,
+		ReadContext:   resourceGitlabBranchRead,
+		DeleteContext: resourceGitlabBranchDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "The name for this branch",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"project": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Description: "The ID or full path of the project which the branch is created against",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"ref": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Optional: true,
-				Default:  "main", // Default value required for import logic -- api does not return consistent value to use for ref
+				Description: "The ref which the branch is created from",
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
 			},
 			"web_url": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Description: "The url of the created branch (https)",
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"default": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Bool, true if branch is the default branch for the project",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"can_push": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Bool, true if you can push to the branch",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"merged": {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Description: "Bool, true if the branch has been merged into it's parent",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 			"commit": {
-				Type:     schema.TypeSet,
-				Computed: true,
-				Set:      schema.HashResource(commitSchema),
-				Elem:     commitSchema,
+				Description: "The commit associated with the branch ref",
+				Type:        schema.TypeSet,
+				Computed:    true,
+				Set:         schema.HashResource(commitSchema),
+				Elem:        commitSchema,
 			},
 		},
 	}
-}
+})
 
 var commitSchema = &schema.Resource{
 	Schema: map[string]*schema.Schema{
 		"id": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The unique id assigned to the commit by gitlab.",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"author_email": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The email of the author.",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"author_name": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The name of the author.",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"authored_date": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The date which the commit was authored",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"committed_date": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The date at which the commit was pushed.",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"committer_email": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The email of the user that committed.",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"committer_name": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The name of the user that committed.",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"short_id": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The short id assigned to the commit by gitlab",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"title": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The title of the commit",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"message": {
-			Type:     schema.TypeString,
-			Computed: true,
+			Description: "The commit message",
+			Type:        schema.TypeString,
+			Computed:    true,
 		},
 		"parent_ids": {
-			Type:     schema.TypeSet,
-			Computed: true,
-			Elem:     &schema.Schema{Type: schema.TypeString},
-			Set:      schema.HashString,
+			Description: "The id of the parents of the commit",
+			Type:        schema.TypeSet,
+			Computed:    true,
+			Elem:        &schema.Schema{Type: schema.TypeString},
+			Set:         schema.HashString,
 		},
 	},
 }
 
-func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	name := d.Get("name").(string)
 	project := d.Get("project").(string)
@@ -118,63 +141,77 @@ func resourceGitlabBranchCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	log.Printf("[DEBUG] create gitlab branch %s for project %s with ref %s", name, project, ref)
-	branch, resp, err := client.Branches.CreateBranch(project, branchOptions)
+	branch, resp, err := client.Branches.CreateBranch(project, branchOptions, gitlab.WithContext(ctx))
 	if err != nil {
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(buildTwoPartID(&project, &name))
-	return resourceGitlabBranchRead(d, meta)
+	return resourceGitlabBranchRead(ctx, d, meta)
 }
 
-func resourceGitlabBranchRead(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, name, err := parseTwoPartID(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	log.Printf("[DEBUG] read gitlab branch %s", name)
-	branch, resp, err := client.Branches.GetBranch(project, name)
+	branch, resp, err := client.Branches.GetBranch(project, name, gitlab.WithContext(ctx))
 	if err != nil {
 		if resp.StatusCode == 404 {
 			log.Printf("[DEBUG] recieved 404 for gitlab branch %s, removing from state", name)
 			d.SetId("")
-			return err
+			return diag.FromErr(err)
 		}
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
-		return err
+		return diag.FromErr(err)
+	}
+	c := &gitlab.GetCommitRefsOptions{
+		Type: gitlab.String("branch"),
+	}
+	commitRefs, _, err := client.Commits.GetCommitRefs(project, branch.Commit.ID, c, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
 	}
 	ref := d.Get("ref").(string)
 	if ref == "" {
-		ref = "main" // on import this will be set
+		for _, br := range commitRefs {
+			if br.Name != branch.Name {
+				ref = br.Name
+				break
+			}
+		}
 	}
+	d.Set("ref", ref)
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
 	d.Set("project", project)
-	d.Set("ref", ref)
 	d.Set("web_url", branch.WebURL)
 	d.Set("default", branch.Default)
 	d.Set("can_push", branch.CanPush)
 	d.Set("merged", branch.Merged)
 	commit := flattenCommit(branch.Commit)
 	if err := d.Set("commit", commit); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-
 	return nil
 }
 
-func resourceGitlabBranchDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceGitlabBranchDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	name := d.Get("name").(string)
+	project, name, err := parseTwoPartID(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	log.Printf("[DEBUG] delete gitlab branch %s", name)
-	resp, err := client.Branches.DeleteBranch(project, name)
+	resp, err := client.Branches.DeleteBranch(project, name, gitlab.WithContext(ctx))
 	if err != nil {
 		log.Printf("[DEBUG] failed to delete gitlab branch %s response %v", name, resp)
+		return diag.FromErr(err)
 	}
-	return err
+	return nil
 }
 
 func flattenCommit(commit *gitlab.Commit) (values []map[string]interface{}) {

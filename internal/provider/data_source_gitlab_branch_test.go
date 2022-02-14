@@ -1,20 +1,19 @@
-package gitlab
+package provider
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccDataGitlabBranch_basic(t *testing.T) {
 	rInt := acctest.RandInt()
-
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccDataGitlabBranch(rInt),
@@ -45,6 +44,9 @@ func testAccDataSourceGitlabBranch(src, n string) resource.TestCheckFunc {
 			"merged",
 			"commit",
 			"parent_ids",
+			"protected",
+			"developer_can_merge",
+			"developer_can_push",
 		}
 
 		for _, attribute := range testAttributes {
@@ -69,18 +71,24 @@ data "gitlab_branch" "foo" {
 
 func testAccDataGitlabBranchSetup(rInt int) string {
 	return fmt.Sprintf(`
-	resource "gitlab_project" "test" {
-		name = "foo-%d"
-		description = "Terraform acceptance tests"
-	  
-		# So that acceptance tests can be run in a gitlab organization
-		# with no billing
-		visibility_level = "public"
-	}
-	resource "gitlab_branch" "foo" {
-		name = "testbranch-%d"
-		ref = "main"
-		project = gitlab_project.test.id
-	}
-  `, rInt, rInt)
+resource "gitlab_project" "test" {
+	name = "foo-%[1]d"
+	description = "Terraform acceptance tests"
+	
+	# So that acceptance tests can be run in a gitlab organization
+	# with no billing
+	visibility_level = "public"
+}
+resource "gitlab_branch" "foo" {
+	name = "testbranch-%[1]d"
+	ref = "main"
+	project = gitlab_project.test.id
+}
+  `, rInt)
+}
+
+type testAccGitlabBranchProtectionAttributes struct {
+	DevelopersCanMerge bool
+	DevelopersCanPush  bool
+	Protected          bool
 }
