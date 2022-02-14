@@ -21,7 +21,7 @@ var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
 		ReadContext:   resourceGitlabGroupLdapLinkRead,
 		DeleteContext: resourceGitlabGroupLdapLinkDelete,
 		Importer: &schema.ResourceImporter{
-			State: resourceGitlabGroupLdapLinkImporter,
+			StateContext: resourceGitlabGroupLdapLinkImporter,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -184,10 +184,10 @@ func resourceGitlabGroupLdapLinkDelete(ctx context.Context, d *schema.ResourceDa
 	return nil
 }
 
-func resourceGitlabGroupLdapLinkImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, diag.Diagnostics) {
+func resourceGitlabGroupLdapLinkImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	parts := strings.SplitN(d.Id(), ":", 3)
 	if len(parts) != 3 {
-		return nil, diag.FromErr(fmt.Errorf("invalid ldap link import id (should be <group id>:<ldap provider>:<ladp cn>): %s", d.Id()))
+		return nil, fmt.Errorf("invalid ldap link import id (should be <group id>:<ldap provider>:<ladp cn>): %s", d.Id())
 	}
 
 	groupId, ldapProvider, ldapCN := parts[0], parts[1], parts[2]
@@ -196,5 +196,8 @@ func resourceGitlabGroupLdapLinkImporter(ctx context.Context, d *schema.Resource
 	d.Set("force", false)
 
 	diag := resourceGitlabGroupLdapLinkRead(ctx, d, meta)
-	return []*schema.ResourceData{d}, diag
+	if diag.HasError() {
+		return nil, fmt.Errorf("%s", diag[0].Summary)
+	}
+	return []*schema.ResourceData{d}, nil
 }
