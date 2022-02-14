@@ -16,9 +16,9 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckGitlabTopicDestroy,
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabTopicDestroy,
 		Steps: []resource.TestStep{
 			// Create a topic with default options
 			{
@@ -89,14 +89,12 @@ func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.Test
 			return fmt.Errorf("not Found: %s", n)
 		}
 
-		conn := testAccProvider.Meta().(*gitlab.Client)
-
 		id, err := strconv.Atoi(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
-		topic, _, err := conn.Topics.GetTopic(id)
+		topic, _, err := testGitlabClient.Topics.GetTopic(id)
 		*assign = *topic
 
 		return err
@@ -131,8 +129,6 @@ func testAccCheckGitlabTopicDestroy(s *terraform.State) (err error) {
 		}
 	}()
 
-	conn := testAccProvider.Meta().(*gitlab.Client)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "gitlab_topic" {
 			continue
@@ -143,7 +139,7 @@ func testAccCheckGitlabTopicDestroy(s *terraform.State) (err error) {
 			return err
 		}
 
-		topic, resp, err := conn.Topics.GetTopic(id)
+		topic, resp, err := testGitlabClient.Topics.GetTopic(id)
 		if err == nil {
 			if topic != nil && fmt.Sprintf("%d", topic.ID) == rs.Primary.ID {
 
