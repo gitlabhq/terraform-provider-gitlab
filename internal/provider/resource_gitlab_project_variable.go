@@ -5,10 +5,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
 
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
@@ -228,19 +226,6 @@ func isInvalidValueError(err error) bool {
 		httpErr.Response.StatusCode == http.StatusBadRequest &&
 		strings.Contains(httpErr.Message, "value") &&
 		strings.Contains(httpErr.Message, "invalid")
-}
-
-func withEnvironmentScopeFilter(ctx context.Context, environmentScope string) gitlab.RequestOptionFunc {
-	return func(req *retryablehttp.Request) error {
-		*req = *req.WithContext(ctx)
-		query, err := url.ParseQuery(req.Request.URL.RawQuery)
-		if err != nil {
-			return err
-		}
-		query.Set("filter[environment_scope]", environmentScope)
-		req.Request.URL.RawQuery = query.Encode()
-		return nil
-	}
 }
 
 var errProjectVariableNotExist = errors.New("project variable does not exist")

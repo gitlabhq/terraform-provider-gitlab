@@ -6,26 +6,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
-
-// modifyRequestAddEnvironmentFilter returns a RequestOptionFunc function that
-// can be passed to the go-gitlab library calls to add the environment scope to
-// requests to lookup, modification, and deletion requests. Since gitlab 13.11,
-// an environment variable key is no longer unique and is composit-keyed with
-// the scope.
-// See https://docs.gitlab.com/ee/ci/variables/#add-a-cicd-variable-to-a-group
-func modifyRequestAddEnvironmentFilter(scope string) gitlab.RequestOptionFunc {
-	return func(r *retryablehttp.Request) error {
-		queryParams := r.URL.Query()
-		queryParams.Add("filter[environment_scope]", scope)
-		r.URL.RawQuery = queryParams.Encode()
-		return nil
-	}
-}
 
 var _ = registerResource("gitlab_group_variable", func() *schema.Resource {
 	return &schema.Resource{
@@ -145,7 +129,7 @@ func resourceGitlabGroupVariableRead(ctx context.Context, d *schema.ResourceData
 		group,
 		key,
 		gitlab.WithContext(ctx),
-		modifyRequestAddEnvironmentFilter(scope),
+		withEnvironmentScopeFilter(ctx, scope),
 	)
 	if err != nil {
 		if is404(err) {
@@ -191,7 +175,7 @@ func resourceGitlabGroupVariableUpdate(ctx context.Context, d *schema.ResourceDa
 		key,
 		options,
 		gitlab.WithContext(ctx),
-		modifyRequestAddEnvironmentFilter(environmentScope),
+		withEnvironmentScopeFilter(ctx, environmentScope),
 	)
 	if err != nil {
 		return diag.FromErr(err)
@@ -210,7 +194,7 @@ func resourceGitlabGroupVariableDelete(ctx context.Context, d *schema.ResourceDa
 		group,
 		key,
 		gitlab.WithContext(ctx),
-		modifyRequestAddEnvironmentFilter(environmentScope),
+		withEnvironmentScopeFilter(ctx, environmentScope),
 	)
 	if err != nil {
 		return diag.FromErr(err)
