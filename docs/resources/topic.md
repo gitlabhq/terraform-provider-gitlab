@@ -19,7 +19,7 @@ For assigning topics, use the [project](./project.md) resource.
 ## Example Usage
 
 ```terraform
-resource "gitlab_topic" "functional-programming" {
+resource "gitlab_topic" "functional_programming" {
   name        = "Functional Programming"
   description = "In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions."
 }
@@ -46,5 +46,5 @@ Import is supported using the following syntax:
 # You can import a topic to terraform state using `terraform import <resource> <id>`.
 # The `id` must be an integer for the id of the topic you want to import,
 # for example:
-terraform terraform import gitlab_topic.functional-programming 1
+terraform import gitlab_topic.functional_programming 1
 ```
