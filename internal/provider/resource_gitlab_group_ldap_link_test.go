@@ -28,7 +28,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 			// Create a group LDAP link as a developer (uses testAccGitlabGroupLdapLinkCreateConfig for Config)
 			{
-				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider),
+				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabGroupLdapLinkCreateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
@@ -39,7 +39,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 
 			// Update the group LDAP link to change the access level (uses testAccGitlabGroupLdapLinkUpdateConfig for Config)
 			{
-				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider),
+				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabGroupLdapLinkUpdateConfig(rInt, &testLdapLink),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.foo", &ldapLink),
@@ -47,29 +47,8 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 						accessLevel: fmt.Sprintf("maintainer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
 					})),
 			},
-
-			// Force create the same group LDAP link in a different resource (uses testAccGitlabGroupLdapLinkForceCreateConfig for Config)
-			{
-				SkipFunc: testAccGitlabGroupLdapLinkSkipFunc(testLdapLink.CN, testLdapLink.Provider),
-				Config:   testAccGitlabGroupLdapLinkForceCreateConfig(rInt, &testLdapLink),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupLdapLinkExists("gitlab_group_ldap_link.bar", &ldapLink),
-					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
-					})),
-			},
 		},
 	})
-}
-
-func testAccGitlabGroupLdapLinkSkipFunc(testCN string, testProvider string) func() (bool, error) {
-	return func() (bool, error) {
-		if testCN == "default" || testProvider == "default" {
-			return true, nil
-		}
-
-		return isRunningInCE()
-	}
 }
 
 func testAccCheckGitlabGroupLdapLinkExists(resourceName string, ldapLink *gitlab.LDAPGroupLink) resource.TestCheckFunc {
@@ -218,28 +197,4 @@ resource "gitlab_group_ldap_link" "foo" {
 	group_access 	= "maintainer"
 	ldap_provider   = "%s"
 }`, rInt, rInt, testLdapLink.CN, testLdapLink.Provider)
-}
-
-func testAccGitlabGroupLdapLinkForceCreateConfig(rInt int, testLdapLink *gitlab.LDAPGroupLink) string {
-	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-    name = "foo%d"
-	path = "foo%d"
-	description = "Terraform acceptance test - Group LDAP Links 3"
-}
-
-resource "gitlab_group_ldap_link" "foo" {
-    group_id 		= "${gitlab_group.foo.id}"
-    cn				= "%s"
-	group_access 	= "maintainer"
-	ldap_provider   = "%s"
-}
-
-resource "gitlab_group_ldap_link" "bar" {
-    group_id 		= "${gitlab_group.foo.id}"
-    cn				= "%s"
-	group_access 	= "developer"
-	ldap_provider   = "%s"
-	force			= true
-}`, rInt, rInt, testLdapLink.CN, testLdapLink.Provider, testLdapLink.CN, testLdapLink.Provider)
 }

@@ -140,7 +140,7 @@ func resourceGitlabGroupLdapLinkRead(ctx context.Context, d *schema.ResourceData
 			if buildTwoPartID(&ldapLink.Provider, &ldapLink.CN) == d.Id() {
 				d.Set("group_id", groupId)
 				d.Set("cn", ldapLink.CN)
-				d.Set("group_access", ldapLink.GroupAccess)
+				d.Set("group_access", accessLevelValueToName[ldapLink.GroupAccess])
 				d.Set("ldap_provider", ldapLink.Provider)
 				found = true
 				break
