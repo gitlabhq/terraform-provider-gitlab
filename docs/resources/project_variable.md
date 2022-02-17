@@ -41,7 +41,7 @@ resource "gitlab_project_variable" "example" {
 
 - **key** (String) The name of the variable.
 - **project** (String) The name or id of the project.
-- **value** (String, Sensitive) The value of the variable.
+- **value** (String) The value of the variable.
 
 ### Optional
 

@@ -34,7 +34,7 @@ resource "gitlab_group_variable" "example" {
 
 - **group** (String) The name or id of the group.
 - **key** (String) The name of the variable.
-- **value** (String, Sensitive) The value of the variable.
+- **value** (String) The value of the variable.
 
 ### Optional
 

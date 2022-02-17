@@ -31,7 +31,7 @@ resource "gitlab_instance_variable" "example" {
 ### Required
 
 - **key** (String) The name of the variable.
-- **value** (String, Sensitive) The value of the variable.
+- **value** (String) The value of the variable.
 
 ### Optional
 

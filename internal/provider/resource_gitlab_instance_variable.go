@@ -36,7 +36,6 @@ var _ = registerResource("gitlab_instance_variable", func() *schema.Resource {
 				Description: "The value of the variable.",
 				Type:        schema.TypeString,
 				Required:    true,
-				Sensitive:   true,
 			},
 			"variable_type": {
 				Description:  "The type of a variable. Available types are: env_var (default) and file.",
