@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -388,6 +389,12 @@ var _ = registerResource("gitlab_project", func() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 		Schema: resourceGitLabProjectSchema,
+		CustomizeDiff: customdiff.All(
+			customdiff.ComputedIf("path_with_namespace", namespaceOrPathChanged),
+			customdiff.ComputedIf("ssh_url_to_repo", namespaceOrPathChanged),
+			customdiff.ComputedIf("http_url_to_repo", namespaceOrPathChanged),
+			customdiff.ComputedIf("web_url", namespaceOrPathChanged),
+		),
 	}
 })
 
@@ -1136,4 +1143,8 @@ func flattenProjectPushRules(pushRules *gitlab.ProjectPushRules) (values []map[s
 			"max_file_size":                 pushRules.MaxFileSize,
 		},
 	}
+}
+
+func namespaceOrPathChanged(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
+	return d.HasChange("namespace_id") || d.HasChange("path")
 }
