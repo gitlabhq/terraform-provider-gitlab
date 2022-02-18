@@ -21,6 +21,7 @@ resource "gitlab_branch_protection" "BranchProtect" {
   branch                       = "BranchProtected"
   push_access_level            = "developer"
   merge_access_level           = "developer"
+  allow_force_push             = true
   code_owner_approval_required = true
   allowed_to_push {
     user_id = 5
@@ -64,6 +65,7 @@ resource "gitlab_branch_protection" "main" {
 
 ### Optional
 
+- **allow_force_push** (Boolean) Can be set to true to allow users with push access to force push.
 - **allowed_to_merge** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_merge))
 - **allowed_to_push** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_push))
 - **code_owner_approval_required** (Boolean) Can be set to true to require code owner approval before merging.
