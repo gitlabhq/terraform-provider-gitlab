@@ -600,6 +600,9 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		CIForwardDeploymentEnabled:      true,
 	}
 
+	pathBeforeTransfer := fmt.Sprintf("foogroup-%d/foo-%d", rInt, rInt)
+	pathAfterTransfer := fmt.Sprintf("foo2group-%d/foo-%d", rInt, rInt)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -607,17 +610,19 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project in a group
 			{
-				Config: testAccGitlabProjectInGroupConfig(rInt),
+				Config: testAccGitlabProjectTransferBetweenGroupsBefore(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
+					resource.TestCheckResourceAttrPtr("gitlab_project_variable.foo", "value", &pathBeforeTransfer),
 				),
 			},
 			// Create a second group and set the transfer the project to this group
 			{
-				Config: testAccGitlabProjectTransferBetweenGroups(rInt),
+				Config: testAccGitlabProjectTransferBetweenGroupsAfter(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
 					testAccCheckAggregateGitlabProject(&transferred, &received),
+					resource.TestCheckResourceAttrPtr("gitlab_project_variable.foo", "value", &pathAfterTransfer),
 				),
 			},
 		},
@@ -1117,7 +1122,35 @@ resource "gitlab_project" "foo" {
 	`, rInt, rInt, rInt)
 }
 
-func testAccGitlabProjectTransferBetweenGroups(rInt int) string {
+func testAccGitlabProjectTransferBetweenGroupsBefore(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foogroup-%d"
+  path = "foogroup-%d"
+  visibility_level = "public"
+}
+
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+  namespace_id = "${gitlab_group.foo.id}"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+  build_coverage_regex = "foo"
+}
+
+resource "gitlab_project_variable" "foo" {
+  project = "${gitlab_project.foo.id}"
+
+  key = "FOO"
+  value = "${gitlab_project.foo.path_with_namespace}"
+}
+	`, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectTransferBetweenGroupsAfter(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
   name = "foogroup-%d"
@@ -1140,6 +1173,13 @@ resource "gitlab_project" "foo" {
   # with no billing
   visibility_level = "public"
   build_coverage_regex = "foo"
+}
+
+resource "gitlab_project_variable" "foo" {
+  project = "${gitlab_project.foo.id}"
+
+  key = "FOO"
+  value = "${gitlab_project.foo.path_with_namespace}"
 }
 	`, rInt, rInt, rInt, rInt, rInt)
 }
