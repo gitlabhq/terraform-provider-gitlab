@@ -78,6 +78,13 @@ var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 				Required:         true,
 				ForceNew:         true,
 			},
+			"allow_force_push": {
+				Description: "Can be set to true to allow users with push access to force push.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				ForceNew:    true,
+			},
 			"allowed_to_push":  schemaAllowedTo(),
 			"allowed_to_merge": schemaAllowedTo(),
 			"code_owner_approval_required": {
@@ -114,6 +121,7 @@ func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.Resourc
 
 	mergeAccessLevel := accessLevelNameToValue[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelNameToValue[d.Get("push_access_level").(string)]
+	allowForcePush := d.Get("allow_force_push").(bool)
 	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	allowedToPush := expandBranchPermissionOptions(d.Get("allowed_to_push").(*schema.Set).List())
@@ -123,6 +131,7 @@ func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.Resourc
 		Name:                      &branch,
 		PushAccessLevel:           &pushAccessLevel,
 		MergeAccessLevel:          &mergeAccessLevel,
+		AllowForcePush:            &allowForcePush,
 		AllowedToPush:             &allowedToPush,
 		AllowedToMerge:            &allowedToMerge,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
@@ -172,6 +181,10 @@ func resourceGitlabBranchProtectionRead(ctx context.Context, d *schema.ResourceD
 		if err := d.Set("merge_access_level", mergeAccessLevels[0].AccessLevel); err != nil {
 			return diag.Errorf("error setting merge_access_level: %v", err)
 		}
+	}
+
+	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
+		return diag.Errorf("error setting allow_force_push: %v", err)
 	}
 
 	// lintignore: R004 // TODO: Resolve this tfproviderlint issue

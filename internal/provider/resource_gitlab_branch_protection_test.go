@@ -62,6 +62,33 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Update the Branch Protection with allow force push enabled
+			{
+				Config: testAccGitlabBranchProtectionUpdateConfigAllowForcePushTrue(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevelValueToName[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
+						AllowForcePush:   true,
+					}),
+				),
+			},
+			// Update the Branch Protection to get back to initial settings
+			{
+				Config: testAccGitlabBranchProtectionConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevelValueToName[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
 			// Update the the Branch Protection code owner approval setting
 			{
 				SkipFunc: isRunningInCE,
@@ -180,6 +207,59 @@ func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 	})
 }
 
+func TestAccGitlabBranchProtection_createWithAllowForcePush(t *testing.T) {
+	var pb gitlab.ProtectedBranch
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
+		Steps: []resource.TestStep{
+			// Start with allow force push disabled
+			{
+				Config: testAccGitlabBranchProtectionConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevelValueToName[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+			// Create a project and Branch Protection with allow force push enabled
+			{
+				Config: testAccGitlabBranchProtectionUpdateConfigAllowForcePushTrue(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevelValueToName[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
+						AllowForcePush:   true,
+					}),
+				),
+			},
+			// Update the Branch Protection to get back to initial settings
+			{
+				Config: testAccGitlabBranchProtectionConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionPersistsInStateCorrectly("gitlab_branch_protection.branch_protect", &pb),
+					testAccCheckGitlabBranchProtectionAttributes(&pb, &testAccGitlabBranchProtectionExpectedAttributes{
+						Name:             fmt.Sprintf("BranchProtect-%d", rInt),
+						PushAccessLevel:  accessLevelValueToName[gitlab.DeveloperPermissions],
+						MergeAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+		},
+	})
+}
+
 func TestAccGitlabBranchProtection_createWithMultipleAccessLevels(t *testing.T) {
 	var pb gitlab.ProtectedBranch
 	rInt := acctest.RandInt()
@@ -258,6 +338,10 @@ func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gi
 			return fmt.Errorf("push access level not persisted in state correctly")
 		}
 
+		if rs.Primary.Attributes["allow_force_push"] != strconv.FormatBool(pb.AllowForcePush) {
+			return fmt.Errorf("allow_force_push not persisted in state correctly")
+		}
+
 		if rs.Primary.Attributes["code_owner_approval_required"] != strconv.FormatBool(pb.CodeOwnerApprovalRequired) {
 			return fmt.Errorf("code_owner_approval_required not persisted in state correctly")
 		}
@@ -301,6 +385,7 @@ type testAccGitlabBranchProtectionExpectedAttributes struct {
 	Name                      string
 	PushAccessLevel           string
 	MergeAccessLevel          string
+	AllowForcePush            bool
 	UsersAllowedToPush        []string
 	UsersAllowedToMerge       []string
 	GroupsAllowedToPush       []string
@@ -334,6 +419,10 @@ func testAccCheckGitlabBranchProtectionAttributes(pb *gitlab.ProtectedBranch, wa
 		}
 		if mergeAccessLevel != accessLevelNameToValue[want.MergeAccessLevel] {
 			return fmt.Errorf("got Merge access level %v; want %v", mergeAccessLevel, accessLevelNameToValue[want.MergeAccessLevel])
+		}
+
+		if pb.AllowForcePush != want.AllowForcePush {
+			return fmt.Errorf("got allow_force_push %v; want %v", pb.AllowForcePush, want.AllowForcePush)
 		}
 
 		remainingWantedUserIDsAllowedToPush := map[int]struct{}{}
@@ -444,6 +533,27 @@ resource "gitlab_branch_protection" "branch_protect" {
   branch             = "BranchProtect-%[1]d"
   push_access_level  = "maintainer"
   merge_access_level = "maintainer"
+}
+	`, rInt)
+}
+
+func testAccGitlabBranchProtectionUpdateConfigAllowForcePushTrue(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%[1]d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_branch_protection" "branch_protect" {
+  project                      = gitlab_project.foo.id
+  branch                       = "BranchProtect-%[1]d"
+  push_access_level            = "developer"
+  merge_access_level           = "developer"
+  allow_force_push             = true
 }
 	`, rInt)
 }

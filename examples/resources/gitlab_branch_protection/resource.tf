@@ -3,6 +3,7 @@ resource "gitlab_branch_protection" "BranchProtect" {
   branch                       = "BranchProtected"
   push_access_level            = "developer"
   merge_access_level           = "developer"
+  allow_force_push             = true
   code_owner_approval_required = true
   allowed_to_push {
     user_id = 5
