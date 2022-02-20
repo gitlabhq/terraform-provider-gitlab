@@ -39,6 +39,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceJiraExists(jiraResourceName, &jiraService),
 					resource.TestCheckResourceAttr(jiraResourceName, "url", "https://testurl.com"),
+					resource.TestCheckResourceAttr(jiraResourceName, "api_url", "https://testurl.com/rest"),
 					resource.TestCheckResourceAttr(jiraResourceName, "username", "user2"),
 					resource.TestCheckResourceAttr(jiraResourceName, "password", "mypass_update"),
 					resource.TestCheckResourceAttr(jiraResourceName, "jira_issue_transition_id", "3"),
@@ -53,6 +54,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceJiraExists(jiraResourceName, &jiraService),
 					resource.TestCheckResourceAttr(jiraResourceName, "url", "https://test.com"),
+					resource.TestCheckResourceAttr(jiraResourceName, "api_url", "https://testurl.com/rest"),
 					resource.TestCheckResourceAttr(jiraResourceName, "username", "user1"),
 					resource.TestCheckResourceAttr(jiraResourceName, "password", "mypass"),
 					resource.TestCheckResourceAttr(jiraResourceName, "commit_events", "true"),
@@ -184,6 +186,7 @@ resource "gitlab_project" "foo" {
 resource "gitlab_service_jira" "jira" {
   project  = "${gitlab_project.foo.id}"
   url      = "https://testurl.com"
+  api_url  = "https://testurl.com/rest"
   username = "user2"
   password = "mypass_update"
   jira_issue_transition_id = "3"
