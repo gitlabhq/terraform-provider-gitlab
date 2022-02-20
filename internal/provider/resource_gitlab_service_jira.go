@@ -56,10 +56,11 @@ var _ = registerResource("gitlab_service_jira", func() *schema.Resource {
 				ValidateFunc: validateURLFunc,
 			},
 			"api_url": {
+				Description:  "The base URL to the Jira instance API. Web URL value is used if not set. For example, https://jira-api.example.com.",
 				Type:         schema.TypeString,
 				Optional:     true,
+				Computed:     true,
 				ValidateFunc: validateURLFunc,
-				Default:      "",
 			},
 			"project_key": {
 				Description: "The short identifier for your JIRA project, all uppercase, e.g., PROJ.",
@@ -188,6 +189,8 @@ func resourceGitlabServiceJiraRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
+	log.Printf("[TIMOOOO:] %+v", jiraService)
+
 	if v := jiraService.Properties.URL; v != "" {
 		d.Set("url", v)
 	}
@@ -253,10 +256,10 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 	setJiraServiceOptions.CommentOnEventEnabled = gitlab.Bool(d.Get("comment_on_event_enabled").(bool))
 
 	// Set optional properties
-	if val := d.Get("api_url"); val != nil {
+	if val, ok := d.GetOk("api_url"); ok {
 		setJiraServiceOptions.APIURL = gitlab.String(val.(string))
 	}
-	if val := d.Get("jira_issue_transition_id"); val != nil {
+	if val, ok := d.GetOk("jira_issue_transition_id"); ok {
 		setJiraServiceOptions.JiraIssueTransitionID = gitlab.String(val.(string))
 	}
 

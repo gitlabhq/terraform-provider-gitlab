@@ -39,6 +39,7 @@ resource "gitlab_service_jira" "jira" {
 
 ### Optional
 
+- **api_url** (String) The base URL to the Jira instance API. Web URL value is used if not set. For example, https://jira-api.example.com.
 - **comment_on_event_enabled** (Boolean) Enable comments inside Jira issues on each GitLab event (commit / merge request)
 - **commit_events** (Boolean) Enable notifications for commit events
 - **id** (String) The ID of this resource.
