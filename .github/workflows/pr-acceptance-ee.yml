@@ -55,7 +55,7 @@ jobs:
   acceptance-ee:
     # Only run EE tests if the LICENSE_ENCRYPTION_PASSWORD secret exists, so that the workflow
     # doesn't fail when code is pushed to a fork.
-    if: ${{ needs.license-encryption-password.outputs.defined }} && contains(github.event.pull_request.labels.*.name, 'safe to test')
+    if: needs.license-encryption-password.outputs.defined  && contains(github.event.pull_request.labels.*.name, 'safe to test')
     timeout-minutes: 60
     runs-on: ubuntu-latest
     needs: [go-version, license-encryption-password]
