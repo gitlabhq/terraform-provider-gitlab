@@ -11,12 +11,14 @@ import (
 
 func TestAccDataGitlabBranch_basic(t *testing.T) {
 	rInt := acctest.RandInt()
+	testAccCheck(t)
+	project := testAccCreateProject(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataGitlabBranch(rInt),
+				Config: testAccDataGitlabBranch(rInt, project.PathWithNamespace),
 				Check: resource.ComposeTestCheckFunc(
 					testAccDataSourceGitlabBranch("gitlab_branch.foo", "data.gitlab_branch.foo"),
 				),
@@ -58,37 +60,23 @@ func testAccDataSourceGitlabBranch(src, n string) resource.TestCheckFunc {
 	}
 }
 
-func testAccDataGitlabBranch(rInt int) string {
+func testAccDataGitlabBranch(rInt int, project string) string {
 	return fmt.Sprintf(`
 %s
 
 data "gitlab_branch" "foo" {
   name = "${gitlab_branch.foo.name}"
-  project = "${gitlab_branch.foo.project}"
+  project = "%s"
 }
-`, testAccDataGitlabBranchSetup(rInt))
+`, testAccDataGitlabBranchSetup(rInt, project), project)
 }
 
-func testAccDataGitlabBranchSetup(rInt int) string {
+func testAccDataGitlabBranchSetup(rInt int, project string) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "test" {
-	name = "foo-%[1]d"
-	description = "Terraform acceptance tests"
-	
-	# So that acceptance tests can be run in a gitlab organization
-	# with no billing
-	visibility_level = "public"
-}
 resource "gitlab_branch" "foo" {
 	name = "testbranch-%[1]d"
 	ref = "main"
-	project = gitlab_project.test.id
+	project = "%s"
 }
-  `, rInt)
-}
-
-type testAccGitlabBranchProtectionAttributes struct {
-	DevelopersCanMerge bool
-	DevelopersCanPush  bool
-	Protected          bool
+  `, rInt, project)
 }

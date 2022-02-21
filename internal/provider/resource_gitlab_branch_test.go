@@ -14,6 +14,8 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 	var branch gitlab.Branch
 	var branch2 gitlab.Branch
 	rInt := acctest.RandInt()
+	testAccCheck(t)
+	project := testAccCreateProject(t)
 	fooBranchName := fmt.Sprintf("testbranch-%d", rInt)
 
 	resource.Test(t, resource.TestCase{
@@ -22,7 +24,7 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabBranchDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabBranchConfig(rInt),
+				Config: testAccGitlabBranchConfig(rInt, project.PathWithNamespace),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabBranchExists("foo", "test", &branch, rInt),
 					testAccCheckGitlabBranchExists("foo2", "test", &branch2, rInt),
@@ -157,27 +159,19 @@ func testAccCheckGitlabBranchExists(n, p string, branch *gitlab.Branch, rInt int
 	}
 }
 
-func testAccGitlabBranchConfig(rInt int) string {
+func testAccGitlabBranchConfig(rInt int, project string) string {
 	return fmt.Sprintf(`
-	resource "gitlab_project" "test" {
-		name = "foo-%[1]d"
-		description = "Terraform acceptance tests"
-	  
-		# So that acceptance tests can be run in a gitlab organization
-		# with no billing
-		visibility_level = "public"
-	}
 	resource "gitlab_branch" "foo" {
 		name = "testbranch-%[1]d"
 		ref = "main"
-		project = gitlab_project.test.id
+		project = "%[2]s"
 	}
 	resource "gitlab_branch" "foo2" {
 		name = "testbranch2-%[1]d"
 		ref = gitlab_branch.foo.name
-		project = gitlab_project.test.id
+		project = "%[2]s"
 	}
-  `, rInt)
+  `, rInt, project)
 }
 
 type testAccGitlabBranchExpectedAttributes struct {

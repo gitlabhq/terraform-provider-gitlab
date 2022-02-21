@@ -4,14 +4,11 @@ page_title: "gitlab_branch Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   Provide details about a gitlab project branch
-  Note: name and project must be specified.
 ---
 
 # gitlab_branch (Data Source)
 
-Provide details about a gitlab project branch 
-
-> **Note**: name and project must be specified.
+Provide details about a gitlab project branch
 
 ## Example Usage
 
@@ -35,7 +32,7 @@ data "gitlab_branch" "foo" {
 ### Required
 
 - **name** (String) The name of the branch.
-- **project** (String) The full path or id of the group.
+- **project** (String) The full path or id of the project.
 
 ### Optional
 
@@ -43,14 +40,14 @@ data "gitlab_branch" "foo" {
 
 ### Read-Only
 
-- **can_push** (Boolean) Bool, true if you can push to the branch
-- **commit** (Set of Object) The commit associated with the branch ref (see [below for nested schema](#nestedatt--commit))
-- **default** (Boolean) Bool, true if branch is the default branch for the project
-- **developer_can_merge** (Boolean) Bool, true if developer level access allows to merge branch
-- **developer_can_push** (Boolean) Bool, true if developer level access allows git push
-- **merged** (Boolean) Bool, true if the branch has been merged into it's parent
-- **protected** (Boolean) Bool, true if branch has branch protection
-- **web_url** (String) The url of the created branch (https)
+- **can_push** (Boolean) Bool, true if you can push to the branch.
+- **commit** (Set of Object) The commit associated with the branch ref. (see [below for nested schema](#nestedatt--commit))
+- **default** (Boolean) Bool, true if branch is the default branch for the project.
+- **developer_can_merge** (Boolean) Bool, true if developer level access allows to merge branch.
+- **developer_can_push** (Boolean) Bool, true if developer level access allows git push.
+- **merged** (Boolean) Bool, true if the branch has been merged into it's parent.
+- **protected** (Boolean) Bool, true if branch has branch protection.
+- **web_url** (String) The url of the created branch (https.)
 
 <a id="nestedatt--commit"></a>
 ### Nested Schema for `commit`

@@ -21,45 +21,60 @@ var _ = registerResource("gitlab_branch", func() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Description: "The name for this branch",
+				Description: "The name for this branch.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
 			},
 			"project": {
-				Description: "The ID or full path of the project which the branch is created against",
+				Description: "The ID or full path of the project which the branch is created against.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
 			},
 			"ref": {
-				Description: "The ref which the branch is created from",
+				Description: "The ref which the branch is created from.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
 			},
 			"web_url": {
-				Description: "The url of the created branch (https)",
+				Description: "The url of the created branch (https).",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
 			"default": {
-				Description: "Bool, true if branch is the default branch for the project",
+				Description: "Bool, true if branch is the default branch for the project.",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"can_push": {
-				Description: "Bool, true if you can push to the branch",
+				Description: "Bool, true if you can push to the branch.",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"merged": {
-				Description: "Bool, true if the branch has been merged into it's parent",
+				Description: "Bool, true if the branch has been merged into it's parent.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"protected": {
+				Description: "Bool, true if branch has branch protection.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"developer_can_merge": {
+				Description: "Bool, true if developer level access allows to merge branch.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"developer_can_push": {
+				Description: "Bool, true if developer level access allows git push.",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"commit": {
-				Description: "The commit associated with the branch ref",
+				Description: "The commit associated with the branch ref.",
 				Type:        schema.TypeSet,
 				Computed:    true,
 				Set:         schema.HashResource(commitSchema),
@@ -72,7 +87,7 @@ var _ = registerResource("gitlab_branch", func() *schema.Resource {
 var commitSchema = &schema.Resource{
 	Schema: map[string]*schema.Schema{
 		"id": {
-			Description: "The unique id assigned to the commit by gitlab.",
+			Description: "The unique id assigned to the commit by Gitlab.",
 			Type:        schema.TypeString,
 			Computed:    true,
 		},
@@ -87,12 +102,12 @@ var commitSchema = &schema.Resource{
 			Computed:    true,
 		},
 		"authored_date": {
-			Description: "The date which the commit was authored",
+			Description: "The date which the commit was authored (format: yyyy-MM-ddTHH:mm:ssZ).",
 			Type:        schema.TypeString,
 			Computed:    true,
 		},
 		"committed_date": {
-			Description: "The date at which the commit was pushed.",
+			Description: "The date at which the commit was pushed (format: yyyy-MM-ddTHH:mm:ssZ).",
 			Type:        schema.TypeString,
 			Computed:    true,
 		},
@@ -107,7 +122,7 @@ var commitSchema = &schema.Resource{
 			Computed:    true,
 		},
 		"short_id": {
-			Description: "The short id assigned to the commit by gitlab",
+			Description: "The short id assigned to the commit by Gitlab.",
 			Type:        schema.TypeString,
 			Computed:    true,
 		},
@@ -160,7 +175,7 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
 	log.Printf("[DEBUG] read gitlab branch %s", name)
 	branch, resp, err := client.Branches.GetBranch(project, name, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp.StatusCode == 404 {
+		if is404(err) {
 			log.Printf("[DEBUG] recieved 404 for gitlab branch %s, removing from state", name)
 			d.SetId("")
 			return diag.FromErr(err)
@@ -168,15 +183,15 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
 		return diag.FromErr(err)
 	}
-	c := &gitlab.GetCommitRefsOptions{
-		Type: gitlab.String("branch"),
-	}
-	commitRefs, _, err := client.Commits.GetCommitRefs(project, branch.Commit.ID, c, gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
-	}
 	ref := d.Get("ref").(string)
 	if ref == "" {
+		c := &gitlab.GetCommitRefsOptions{
+			Type: gitlab.String("branch"),
+		}
+		commitRefs, _, err := client.Commits.GetCommitRefs(project, branch.Commit.ID, c, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
 		for _, br := range commitRefs {
 			if br.Name != branch.Name {
 				ref = br.Name
@@ -192,6 +207,9 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
 	d.Set("default", branch.Default)
 	d.Set("can_push", branch.CanPush)
 	d.Set("merged", branch.Merged)
+	d.Set("developer_can_merge", branch.DevelopersCanMerge)
+	d.Set("developer_can_push", branch.DevelopersCanPush)
+	d.Set("protected", branch.Protected)
 	commit := flattenCommit(branch.Commit)
 	if err := d.Set("commit", commit); err != nil {
 		return diag.FromErr(err)
