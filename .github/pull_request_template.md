@@ -2,16 +2,17 @@
 
 <!-- Which issue/s does this PR close? Is there any more context you can give the reviewer? -->
 
-## PR Checklist
+### PR Checklist Acknowledgement
 
-<!-- For a smooth review process, please run through this checklist before submitting a PR. -->
+<!-- For a smooth review process, please run through this checklist before submitting a PR, and check the box when done. -->
 
-- [ ] Resource attributes match 1:1 the names and structure of the API resource in [the GitLab API documentation](https://docs.gitlab.com/ee/api/).
-- [ ] [Examples](/examples) are updated with:
+- [ ] I acknowledge that all of the following items are true, where applicable:
+  - Resource attributes match 1:1 the names and structure of the API resource in [the GitLab API documentation](https://docs.gitlab.com/ee/api/).
+  - [Examples](https://github.com/gitlabhq/terraform-provider-gitlab/tree/main/examples) are updated with:
     - A \*.tf file for the resource/s with at least one usage example
     - A \*.sh file for the resource/s with an import example (if applicable)
-- [ ] New resources have at minimum a basic test with three steps:
+  - New resources have at minimum a basic test with three steps:
     - Create the resource
     - Update the attributes
     - Import the resource
-- [ ] No new `//lintignore` comments that came from copied code. Linter rules are meant to be enforced on new code.
+  - No new `//lintignore` comments were copied from existing code. (Linter rules are meant to be enforced on new code.)
