@@ -6,7 +6,7 @@
 # Be careful while making changes to this file.
 # See: https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
 
-name: pr-acceptance
+name: pr-acceptance-ce
 
 on:
   pull_request:
