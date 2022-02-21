@@ -189,8 +189,6 @@ func resourceGitlabServiceJiraRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[TIMOOOO:] %+v", jiraService)
-
 	if v := jiraService.Properties.URL; v != "" {
 		d.Set("url", v)
 	}
