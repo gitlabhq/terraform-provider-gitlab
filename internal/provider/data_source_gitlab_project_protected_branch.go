@@ -98,12 +98,10 @@ func dataSourceGitlabProjectProtectedBranchRead(ctx context.Context, d *schema.R
 		return diag.Errorf("error getting protected branch (Project: %v / Name %v): %v", project, name, err)
 	}
 
-	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
-	if err := d.Set("push_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
+	if err := d.Set("push_access_levels", flattenBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
 		return diag.FromErr(err)
 	}
-	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
-	if err := d.Set("merge_access_levels", convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
+	if err := d.Set("merge_access_levels", flattenBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return diag.FromErr(err)
 	}
 	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
@@ -118,33 +116,19 @@ func dataSourceGitlabProjectProtectedBranchRead(ctx context.Context, d *schema.R
 	return nil
 }
 
-type stateBranchAccessDescription struct {
-	AccessLevel            string `json:"access_level" mapstructure:"access_level"`
-	AccessLevelDescription string `json:"access_level_description" mapstructure:"access_level_description"`
-	GroupID                int    `json:"group_id,omitempty" mapstructure:"group_id,omitempty"`
-	UserID                 int    `json:"user_id,omitempty" mapstructure:"user_id,omitempty"`
-}
-
-func convertBranchAccessDescriptionsToStateBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
-	result := make([]stateBranchAccessDescription, 0)
-
+func flattenBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) (values []map[string]interface{}) {
 	for _, description := range descriptions {
-		result = append(result, convertBranchAccessDescriptionToStateBranchAccessDescription(description))
+		v := map[string]interface{}{
+			"access_level":             accessLevelValueToName[description.AccessLevel],
+			"access_level_description": description.AccessLevelDescription,
+		}
+		if description.UserID != 0 {
+			v["user_id"] = description.UserID
+		}
+		if description.GroupID != 0 {
+			v["group_id"] = description.GroupID
+		}
+		values = append(values, v)
 	}
-
-	return result
-}
-
-func convertBranchAccessDescriptionToStateBranchAccessDescription(description *gitlab.BranchAccessDescription) stateBranchAccessDescription {
-	stateDescription := stateBranchAccessDescription{
-		AccessLevel:            accessLevelValueToName[description.AccessLevel],
-		AccessLevelDescription: description.AccessLevelDescription,
-	}
-	if description.UserID != 0 {
-		stateDescription.UserID = description.UserID
-	}
-	if description.GroupID != 0 {
-		stateDescription.GroupID = description.GroupID
-	}
-	return stateDescription
+	return values
 }

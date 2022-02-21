@@ -169,30 +169,30 @@ func resourceGitlabBranchProtectionRead(ctx context.Context, d *schema.ResourceD
 	d.Set("project", project)
 	d.Set("branch", pb.Name)
 
-	pushAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.PushAccessLevels)
-	if len(pushAccessLevels) > 0 {
-		if err := d.Set("push_access_level", pushAccessLevels[0].AccessLevel); err != nil {
+	if pushAccessLevel, err := firstValidAccessLevel(pb.PushAccessLevels); err == nil {
+		if err := d.Set("push_access_level", accessLevelValueToName[*pushAccessLevel]); err != nil {
 			return diag.Errorf("error setting push_access_level: %v", err)
 		}
+	} else {
+		return diag.Errorf("unable to get push_access_level: %v", err)
 	}
 
-	mergeAccessLevels := convertAllowedAccessLevelsToBranchAccessDescriptions(pb.MergeAccessLevels)
-	if len(mergeAccessLevels) > 0 {
-		if err := d.Set("merge_access_level", mergeAccessLevels[0].AccessLevel); err != nil {
+	if mergeAccessLevels, err := firstValidAccessLevel(pb.MergeAccessLevels); err == nil {
+		if err := d.Set("merge_access_level", accessLevelValueToName[*mergeAccessLevels]); err != nil {
 			return diag.Errorf("error setting merge_access_level: %v", err)
 		}
+	} else {
+		return diag.Errorf("unable to get merge_access_level: %v", err)
 	}
 
 	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
 		return diag.Errorf("error setting allow_force_push: %v", err)
 	}
 
-	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
-	if err := d.Set("allowed_to_push", convertAllowedToToBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
+	if err := d.Set("allowed_to_push", flattenNonZeroBranchAccessDescriptions(pb.PushAccessLevels)); err != nil {
 		return diag.Errorf("error setting allowed_to_push: %v", err)
 	}
-	// lintignore: R004 // TODO: Resolve this tfproviderlint issue
-	if err := d.Set("allowed_to_merge", convertAllowedToToBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
+	if err := d.Set("allowed_to_merge", flattenNonZeroBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return diag.Errorf("error setting allowed_to_merge: %v", err)
 	}
 
@@ -284,36 +284,31 @@ func schemaAllowedTo() *schema.Schema {
 	}
 }
 
-func convertAllowedAccessLevelsToBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
-	result := make([]stateBranchAccessDescription, 0)
-
+func firstValidAccessLevel(descriptions []*gitlab.BranchAccessDescription) (*gitlab.AccessLevelValue, error) {
 	for _, description := range descriptions {
 		if description.UserID != 0 || description.GroupID != 0 {
 			continue
 		}
-		result = append(result, stateBranchAccessDescription{
-			AccessLevel:            accessLevelValueToName[description.AccessLevel],
-			AccessLevelDescription: description.AccessLevelDescription,
-		})
+		return &description.AccessLevel, nil
 	}
 
-	return result
+	return nil, fmt.Errorf("no valid access level found")
 }
 
-func convertAllowedToToBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) []stateBranchAccessDescription {
-	result := make([]stateBranchAccessDescription, 0)
-
+// flattenNonZeroBranchAccessDescriptions flattens the list of branch access descriptions for the tf state.
+// only descriptions with non-zero user id and group id are included in the tf state.
+func flattenNonZeroBranchAccessDescriptions(descriptions []*gitlab.BranchAccessDescription) (values []map[string]interface{}) {
 	for _, description := range descriptions {
 		if description.UserID == 0 && description.GroupID == 0 {
 			continue
 		}
-		result = append(result, stateBranchAccessDescription{
-			AccessLevel:            accessLevelValueToName[description.AccessLevel],
-			AccessLevelDescription: description.AccessLevelDescription,
-			UserID:                 description.UserID,
-			GroupID:                description.GroupID,
+		values = append(values, map[string]interface{}{
+			"access_level":             accessLevelValueToName[description.AccessLevel],
+			"access_level_description": description.AccessLevelDescription,
+			"user_id":                  description.UserID,
+			"group_id":                 description.GroupID,
 		})
 	}
 
-	return result
+	return values
 }
