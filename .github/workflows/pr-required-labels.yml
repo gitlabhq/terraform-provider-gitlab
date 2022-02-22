@@ -27,3 +27,9 @@ jobs:
           mode: exactly
           count: 0
           labels: needs-rebase
+      - name: Check "safe to test" or "skip-ee-test"
+        uses: mheap/github-action-required-labels@v1
+        with:
+          mode: minimum
+          count: 1
+          labels: safe to test, skip-ee-test
