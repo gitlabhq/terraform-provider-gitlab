@@ -1,21 +1,33 @@
-## 3.10.0 (Unreleased)
+## 3.10.0 (2022-02-23)
 
 FEATURES:
 
-* resource/gitlab_project_hook: added `releases_events` attribute (#773)
-* resource/gitlab_user: added `state` attribute to allow blocking users (#762)
-* resource/gitlab_project: added `ci_forward_deployment_enabled` attribute (#732)
-* datasource/gitlab_project: added `ci_forward_deployment_enabled` attribute (#732)
-* datasource/gitlab_projects: added `ci_forward_deployment_enabled` attribute (#732)
-* resource/gitlab_group_access_token: added support for Group Access Tokens (#860)
-* datasource/gitlab_group_membership: support pagination (#858)
+* **New Resource:** `gitlab_group_access_token` ([#860](https://github.com/gitlabhq/terraform-provider-gitlab/pull/860))
+* **New Resource:** `gitlab_topic` ([#871](https://github.com/gitlabhq/terraform-provider-gitlab/pull/871))
+
+IMPROVEMENTS:
+
+* datasource/gitlab_project: Add `printing_merge_request_link_enabled` attribute ([#783](https://github.com/gitlabhq/terraform-provider-gitlab/pull/783))
+* datasource/gitlab_project: Add `ci_forward_deployment_enabled` attribute ([#732](https://github.com/gitlabhq/terraform-provider-gitlab/pull/732))
+* datasource/gitlab_projects: Add `ci_forward_deployment_enabled` attribute ([#732](https://github.com/gitlabhq/terraform-provider-gitlab/pull/732))
+* datasource/gitlab_group_membership: Support pagination ([#858](https://github.com/gitlabhq/terraform-provider-gitlab/pull/858))
+* resource/gitlab_group_ldap_link: Add import support ([#771](https://github.com/gitlabhq/terraform-provider-gitlab/pull/771))
+* resource/gitlab_project: Add `ci_forward_deployment_enabled` attribute ([#732](https://github.com/gitlabhq/terraform-provider-gitlab/pull/732))
+* resource/gitlab_project: Add `printing_merge_request_link_enabled` attribute ([#783](https://github.com/gitlabhq/terraform-provider-gitlab/pull/783))
+* resource/gitlab_project_hook: Add `releases_events` attribute ([#773](https://github.com/gitlabhq/terraform-provider-gitlab/pull/773))
+* resource/gitlab_branch_protection: Add `allow_force_push` attribute ([#877](https://github.com/gitlabhq/terraform-provider-gitlab/pull/877))
+* resource/gitlab_service_jira: Add `api_url` attribute ([#597](https://github.com/gitlabhq/terraform-provider-gitlab/pull/597))
+* resource/gitlab_user: Add `state` attribute to allow blocking users ([#762](https://github.com/gitlabhq/terraform-provider-gitlab/pull/762))
 
 BUG FIXES
 
-* resource/gitlab_project: correctly handle push rules add and edit (#838)
-* datasource/gitlab_projects: allow to get archived and unarchived repositories (#855)
-* resource/gitlab_group: support setting `default_branch_protection` to `0` (#856)
-* resource/gitlab_project: support creating project in group without default branch protection (#856)
+* datasource/gitlab_projects: Allow to get archived and unarchived repositories ([#855](https://github.com/gitlabhq/terraform-provider-gitlab/pull/855))
+* resource/gitlab_group: Support setting `default_branch_protection` to `0` ([#856](https://github.com/gitlabhq/terraform-provider-gitlab/pull/856))
+* resource/gitlab_group_ldap_link: Fix panic when setting group access level ([#873](https://github.com/gitlabhq/terraform-provider-gitlab/pull/873))
+* resource/gitlab_project: Correctly handle push rules add and edit ([#838](https://github.com/gitlabhq/terraform-provider-gitlab/pull/838))
+* resource/gitlab_project: Support creating project in group without default branch protection ([#856](https://github.com/gitlabhq/terraform-provider-gitlab/pull/856))
+* resource/gitlab_project: Fix backwards-compatibility with 14.1 regarding the `squash_option` ([#867](https://github.com/gitlabhq/terraform-provider-gitlab/pull/867))
+* resource/gitlab_project: Re-compute `path_with_namespace`, `ssh_url_to_repo`, `http_url_to_repo` and `web_url` attributes if `path` changes ([#875](https://github.com/gitlabhq/terraform-provider-gitlab/pull/875))
 
 ## 3.9.1 (2022-02-06)
 
