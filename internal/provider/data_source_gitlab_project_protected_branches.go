@@ -57,15 +57,6 @@ var _ = registerDataSource("gitlab_project_protected_branches", func() *schema.R
 	}
 })
 
-type stateProtectedBranch struct {
-	ID                        int                            `json:"id,omitempty" mapstructure:"id,omitempty"`
-	Name                      string                         `json:"name,omitempty" mapstructure:"name,omitempty"`
-	PushAccessLevels          []stateBranchAccessDescription `json:"push_access_levels,omitempty" mapstructure:"push_access_levels,omitempty"`
-	MergeAccessLevels         []stateBranchAccessDescription `json:"merge_access_levels,omitempty" mapstructure:"merge_access_levels,omitempty"`
-	AllowForcePush            bool                           `json:"allow_force_push,omitempty" mapstructure:"allow_force_push,omitempty"`
-	CodeOwnerApprovalRequired bool                           `json:"code_owner_approval_required,omitempty" mapstructure:"code_owner_approval_required,omitempty"`
-}
-
 func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
@@ -78,7 +69,7 @@ func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema
 		return diag.FromErr(err)
 	}
 
-	allProtectedBranches := make([]stateProtectedBranch, 0)
+	var allProtectedBranches []*gitlab.ProtectedBranch
 	totalPages := -1
 	opts := &gitlab.ListProtectedBranchesOptions{}
 	for opts.Page = 0; opts.Page != totalPages; opts.Page++ {
@@ -88,20 +79,10 @@ func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema
 			return diag.FromErr(err)
 		}
 		totalPages = resp.TotalPages
-		for _, pb := range pbs {
-			allProtectedBranches = append(allProtectedBranches, stateProtectedBranch{
-				ID:                        pb.ID,
-				Name:                      pb.Name,
-				PushAccessLevels:          convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.PushAccessLevels),
-				MergeAccessLevels:         convertBranchAccessDescriptionsToStateBranchAccessDescriptions(pb.MergeAccessLevels),
-				AllowForcePush:            pb.AllowForcePush,
-				CodeOwnerApprovalRequired: pb.CodeOwnerApprovalRequired,
-			})
-		}
+		allProtectedBranches = append(allProtectedBranches, pbs...)
 	}
 
-	// lintignore:R004 // TODO: Resolve this tfproviderlint issue
-	if err := d.Set("protected_branches", allProtectedBranches); err != nil {
+	if err := d.Set("protected_branches", flattenProtectedBranches(allProtectedBranches)); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -113,4 +94,18 @@ func dataSourceGitlabProjectProtectedBranchesRead(ctx context.Context, d *schema
 	d.SetId(fmt.Sprintf("%d-%d", projectObject.ID, h))
 
 	return nil
+}
+
+func flattenProtectedBranches(protectedBranches []*gitlab.ProtectedBranch) (values []map[string]interface{}) {
+	for _, protectedBranch := range protectedBranches {
+		values = append(values, map[string]interface{}{
+			"id":                           protectedBranch.ID,
+			"name":                         protectedBranch.Name,
+			"push_access_levels":           flattenBranchAccessDescriptions(protectedBranch.PushAccessLevels),
+			"merge_access_levels":          flattenBranchAccessDescriptions(protectedBranch.MergeAccessLevels),
+			"allow_force_push":             protectedBranch.AllowForcePush,
+			"code_owner_approval_required": protectedBranch.CodeOwnerApprovalRequired,
+		})
+	}
+	return values
 }
