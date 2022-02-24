@@ -173,16 +173,12 @@ func resourceGitlabBranchProtectionRead(ctx context.Context, d *schema.ResourceD
 		if err := d.Set("push_access_level", accessLevelValueToName[*pushAccessLevel]); err != nil {
 			return diag.Errorf("error setting push_access_level: %v", err)
 		}
-	} else {
-		return diag.Errorf("unable to get push_access_level: %v", err)
 	}
 
 	if mergeAccessLevels, err := firstValidAccessLevel(pb.MergeAccessLevels); err == nil {
 		if err := d.Set("merge_access_level", accessLevelValueToName[*mergeAccessLevels]); err != nil {
 			return diag.Errorf("error setting merge_access_level: %v", err)
 		}
-	} else {
-		return diag.Errorf("unable to get merge_access_level: %v", err)
 	}
 
 	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {

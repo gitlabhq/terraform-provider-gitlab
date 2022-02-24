@@ -1,3 +1,9 @@
+## 3.10.0 (2022-02-24)
+
+BUG FIXES:
+
+* resource/gitlab_branch_protection: Fix issue which claimed that `no valid access level` can be found ([#892](https://github.com/gitlabhq/terraform-provider-gitlab/pull/892))
+
 ## 3.10.0 (2022-02-23)
 
 FEATURES:
@@ -19,7 +25,7 @@ IMPROVEMENTS:
 * resource/gitlab_service_jira: Add `api_url` attribute ([#597](https://github.com/gitlabhq/terraform-provider-gitlab/pull/597))
 * resource/gitlab_user: Add `state` attribute to allow blocking users ([#762](https://github.com/gitlabhq/terraform-provider-gitlab/pull/762))
 
-BUG FIXES
+BUG FIXES:
 
 * datasource/gitlab_projects: Allow to get archived and unarchived repositories ([#855](https://github.com/gitlabhq/terraform-provider-gitlab/pull/855))
 * resource/gitlab_group: Support setting `default_branch_protection` to `0` ([#856](https://github.com/gitlabhq/terraform-provider-gitlab/pull/856))
