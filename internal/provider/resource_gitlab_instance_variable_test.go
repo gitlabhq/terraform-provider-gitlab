@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -39,6 +40,46 @@ func TestAccGitlabInstanceVariable_basic(t *testing.T) {
 						Key:       fmt.Sprintf("key_%s", rString),
 						Value:     fmt.Sprintf("value-inverse-%s", rString),
 						Protected: true,
+					}),
+				),
+			},
+			// Update the instance variable to toggle the options back
+			{
+				Config: testAccGitlabInstanceVariableConfig(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabInstanceVariableExists("gitlab_instance_variable.foo", &instanceVariable),
+					testAccCheckGitlabInstanceVariableAttributes(&instanceVariable, &testAccGitlabInstanceVariableExpectedAttributes{
+						Key:       fmt.Sprintf("key_%s", rString),
+						Value:     fmt.Sprintf("value-%s", rString),
+						Protected: false,
+					}),
+				),
+			},
+			// Update the instance variable to enable "masked" for a value that does not meet masking requirements, and expect an error with no state change.
+			// ref: https://docs.gitlab.com/ce/ci/variables/README.html#masked-variable-requirements
+			{
+				Config: testAccGitlabInstanceVariableUpdateConfigMaskedBad(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabInstanceVariableExists("gitlab_instance_variable.foo", &instanceVariable),
+					testAccCheckGitlabInstanceVariableAttributes(&instanceVariable, &testAccGitlabInstanceVariableExpectedAttributes{
+						Key:   fmt.Sprintf("key_%s", rString),
+						Value: fmt.Sprintf("value-%s", rString),
+					}),
+				),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(
+					"Invalid value for a masked variable. Check the masked variable requirements: https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements",
+				)),
+			},
+			// Update the instance variable to to enable "masked" and meet masking requirements
+			// ref: https://docs.gitlab.com/ce/ci/variables/README.html#masked-variable-requirements
+			{
+				Config: testAccGitlabInstanceVariableUpdateConfigMaskedGood(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabInstanceVariableExists("gitlab_instance_variable.foo", &instanceVariable),
+					testAccCheckGitlabInstanceVariableAttributes(&instanceVariable, &testAccGitlabInstanceVariableExpectedAttributes{
+						Key:    fmt.Sprintf("key_%s", rString),
+						Value:  fmt.Sprintf("value-%s", rString),
+						Masked: true,
 					}),
 				),
 			},
@@ -126,6 +167,29 @@ resource "gitlab_instance_variable" "foo" {
   value = "value-inverse-%s"
   protected = true
   masked = false
+}
+	`, rString, rString)
+}
+
+func testAccGitlabInstanceVariableUpdateConfigMaskedBad(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_instance_variable" "foo" {
+  key = "key_%s"
+  value = <<EOF
+value-%s"
+i am multiline
+EOF
+  masked = true
+}
+	`, rString, rString)
+}
+
+func testAccGitlabInstanceVariableUpdateConfigMaskedGood(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_instance_variable" "foo" {
+  key = "key_%s"
+  value = "value-%s"
+  masked = true
 }
 	`, rString, rString)
 }

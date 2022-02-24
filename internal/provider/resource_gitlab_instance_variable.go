@@ -81,7 +81,7 @@ func resourceGitlabInstanceVariableCreate(ctx context.Context, d *schema.Resourc
 
 	_, _, err := client.InstanceVariables.CreateVariable(&options, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 
 	d.SetId(key)
@@ -103,7 +103,7 @@ func resourceGitlabInstanceVariableRead(ctx context.Context, d *schema.ResourceD
 			d.SetId("")
 			return nil
 		}
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 
 	d.Set("key", v.Key)
@@ -133,7 +133,7 @@ func resourceGitlabInstanceVariableUpdate(ctx context.Context, d *schema.Resourc
 
 	_, _, err := client.InstanceVariables.UpdateVariable(key, options, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 	return resourceGitlabInstanceVariableRead(ctx, d, meta)
 }
@@ -145,7 +145,7 @@ func resourceGitlabInstanceVariableDelete(ctx context.Context, d *schema.Resourc
 
 	_, err := client.InstanceVariables.RemoveVariable(key, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 
 	return nil
