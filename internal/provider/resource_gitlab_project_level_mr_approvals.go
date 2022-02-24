@@ -45,13 +45,14 @@ var _ = registerResource("gitlab_project_level_mr_approvals", func() *schema.Res
 				Optional:    true,
 			},
 			"merge_requests_disable_committers_approval": {
-				Description: "Set to `true` if you want to prevent approval of merge requests by merge request committers. Default is `false`.",
+				Description: "Set to `true` if you want to prevent approval of merge requests by merge request committers.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 			},
 			"require_password_to_approve": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Description: "Set to `true` if you want to require authentication when approving a merge request.",
+				Type:        schema.TypeBool,
+				Optional:    true,
 			},
 		},
 	}
