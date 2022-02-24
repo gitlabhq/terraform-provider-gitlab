@@ -60,8 +60,10 @@ resource "gitlab_project" "example-two" {
 - **issues_template** (String) Sets the template for new issues in the project.
 - **lfs_enabled** (Boolean) Enable LFS for the project.
 - **merge_method** (String) Set to `ff` to create fast-forward merges
+- **merge_pipelines_enabled** (Boolean) Enable or disable merge pipelines.
 - **merge_requests_enabled** (Boolean) Enable merge requests for the project.
 - **merge_requests_template** (String) Sets the template for new merge requests in the project.
+- **merge_trains_enabled** (Boolean) Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
 - **mirror** (Boolean) Enable project pull mirror.
 - **mirror_overwrites_diverged_branches** (Boolean) Enable overwrite diverged branches for a mirrored project.
 - **mirror_trigger_builds** (Boolean) Enable trigger builds on pushes for a mirrored project.
