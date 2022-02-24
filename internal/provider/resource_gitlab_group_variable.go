@@ -98,7 +98,7 @@ func resourceGitlabGroupVariableCreate(ctx context.Context, d *schema.ResourceDa
 
 	_, _, err := client.GroupVariables.CreateVariable(group, &options, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 
 	keyScope := fmt.Sprintf("%s:%s", key, environmentScope)
@@ -137,7 +137,7 @@ func resourceGitlabGroupVariableRead(ctx context.Context, d *schema.ResourceData
 			d.SetId("")
 			return nil
 		}
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 
 	d.Set("key", v.Key)
@@ -178,7 +178,7 @@ func resourceGitlabGroupVariableUpdate(ctx context.Context, d *schema.ResourceDa
 		withEnvironmentScopeFilter(ctx, environmentScope),
 	)
 	if err != nil {
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 	return resourceGitlabGroupVariableRead(ctx, d, meta)
 }
@@ -197,7 +197,7 @@ func resourceGitlabGroupVariableDelete(ctx context.Context, d *schema.ResourceDa
 		withEnvironmentScopeFilter(ctx, environmentScope),
 	)
 	if err != nil {
-		return diag.FromErr(err)
+		return augmentVariableClientError(d, err)
 	}
 
 	return nil
