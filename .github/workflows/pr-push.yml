@@ -14,5 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - uses: actions-ecosystem/action-remove-labels@v1
-        with:
-          labels: 'safe to test'
+       with:
+        labels: 'safe to test'
