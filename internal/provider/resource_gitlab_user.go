@@ -14,6 +14,12 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+var validUserStateValues = []string{
+	"active",
+	"deactivated",
+	"blocked",
+}
+
 var _ = registerResource("gitlab_user", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage GitLab users.\n" +
@@ -94,11 +100,11 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 				Optional:    true,
 			},
 			"state": {
-				Description:      "String, defaults to 'active'. The state of the user account. Valid values are either 'active' or 'blocked'",
+				Description:      fmt.Sprintf("String, defaults to 'active'. The state of the user account. Valid values are %s.", renderValueListForDocs(validUserStateValues)),
 				Type:             schema.TypeString,
 				Optional:         true,
 				Default:          "active",
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice([]string{"active", "blocked"}, false)),
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validUserStateValues, false)),
 			},
 		},
 	}
@@ -147,6 +153,12 @@ func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta 
 
 	if d.Get("state") == "blocked" {
 		err := client.Users.BlockUser(user.ID)
+
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	} else if d.Get("state") == "deactivated" {
+		err := client.Users.DeactivateUser(user.ID)
 
 		if err != nil {
 			return diag.FromErr(err)
@@ -224,18 +236,33 @@ func resourceGitlabUserUpdate(ctx context.Context, d *schema.ResourceData, meta 
 	}
 
 	if d.HasChange("state") {
-		if d.Get("state") == "active" {
-			err := client.Users.UnblockUser(id)
-
+		oldState, newState := d.GetChange("state")
+		var err error
+		// NOTE: yes, this can be written much more consice, however, for the sake of understanding the behavior,
+		//       of the API and the allowed state transitions of GitLab, let's keep it as-is and enjoy the readability.
+		if newState == "active" && oldState == "blocked" {
+			err = client.Users.UnblockUser(id)
+		} else if newState == "active" && oldState == "deactivated" {
+			err = client.Users.ActivateUser(id)
+		} else if newState == "blocked" && oldState == "active" {
+			err = client.Users.BlockUser(id)
+		} else if newState == "blocked" && oldState == "deactivated" {
+			err = client.Users.BlockUser(id)
+		} else if newState == "deactivated" && oldState == "active" {
+			err = client.Users.DeactivateUser(id)
+		} else if newState == "deactivated" && oldState == "blocked" {
+			// a blocked user cannot be deactivated, GitLab will return an error, like:
+			// `403 Forbidden - A blocked user cannot be deactivated by the API`
+			// we have to unblock the user first
+			err = client.Users.UnblockUser(id)
 			if err != nil {
 				return diag.FromErr(err)
 			}
-		} else if d.Get("state") == "blocked" {
-			err := client.Users.BlockUser(id)
+			err = client.Users.DeactivateUser(id)
+		}
 
-			if err != nil {
-				return diag.FromErr(err)
-			}
+		if err != nil {
+			return diag.FromErr(err)
 		}
 	}
 

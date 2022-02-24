@@ -205,6 +205,108 @@ func TestAccGitlabUser_basic(t *testing.T) {
 					"skip_confirmation",
 				},
 			},
+			// Deactivate the user
+			{
+				Config: testAccGitlabUserConfigDeactivated(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "deactivated",
+					}),
+				),
+			},
+			// Re-activate the user
+			{
+				Config: testAccGitlabUserConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "active",
+					}),
+				),
+			},
+			// Block the user
+			{
+				Config: testAccGitlabUserConfigBlocked(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "blocked",
+					}),
+				),
+			},
+			// Deactivate the user from blocked state
+			{
+				Config: testAccGitlabUserConfigDeactivated(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "deactivated",
+					}),
+				),
+			},
+			// Block the user from deactivate state
+			{
+				Config: testAccGitlabUserConfigBlocked(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "blocked",
+					}),
+				),
+			},
+			// Unblock the user
+			{
+				Config: testAccGitlabUserConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.foo", &user),
+					testAccCheckGitlabUserAttributes(&user, &testAccGitlabUserExpectedAttributes{
+						Email:          fmt.Sprintf("listest%d@ssss.com", rInt),
+						Username:       fmt.Sprintf("listest%d", rInt),
+						Name:           fmt.Sprintf("foo %d", rInt),
+						ProjectsLimit:  0,
+						Admin:          false,
+						CanCreateGroup: false,
+						External:       false,
+						State:          "active",
+					}),
+				),
+			},
 		},
 	})
 }
@@ -439,4 +541,20 @@ resource "gitlab_user" "foo" {
   email            = "listest%d@ssss.com"
 }
   `, rInt, rInt, rInt)
+}
+
+func testAccGitlabUserConfigDeactivated(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_user" "foo" {
+  name             = "foo %d"
+  username         = "listest%d"
+  password         = "test%dtt"
+  email            = "listest%d@ssss.com"
+  is_admin         = false
+  projects_limit   = 0
+  can_create_group = false
+  is_external      = false
+  state            = "deactivated"
+}
+  `, rInt, rInt, rInt, rInt)
 }
