@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
@@ -55,6 +56,49 @@ func TestAccGitlabGroupVariable_basic(t *testing.T) {
 						Value:            fmt.Sprintf("value-%s", rString),
 						Protected:        false,
 						EnvironmentScope: "*",
+					}),
+				),
+			},
+			// Update the group variable to enable "masked" for a value that does not meet masking requirements, and expect an error with no state change.
+			// ref: https://docs.gitlab.com/ce/ci/variables/README.html#masked-variable-requirements
+			{
+				Config: testAccGitlabGroupVariableUpdateConfigMaskedBad(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						EnvironmentScope: "*",
+					}),
+				),
+				ExpectError: regexp.MustCompile(regexp.QuoteMeta(
+					"Invalid value for a masked variable. Check the masked variable requirements: https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements",
+				)),
+			},
+			// Update the group variable to to enable "masked" and meet masking requirements
+			// ref: https://docs.gitlab.com/ce/ci/variables/README.html#masked-variable-requirements
+			{
+				Config: testAccGitlabGroupVariableUpdateConfigMaskedGood(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						EnvironmentScope: "*",
+						Masked:           true,
+					}),
+				),
+			},
+			// Update the group variable to toggle the options back
+			{
+				Config: testAccGitlabGroupVariableConfig(rString),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupVariableExists("gitlab_group_variable.foo", &groupVariable),
+					testAccCheckGitlabGroupVariableAttributes(&groupVariable, &testAccGitlabGroupVariableExpectedAttributes{
+						Key:              fmt.Sprintf("key_%s", rString),
+						Value:            fmt.Sprintf("value-%s", rString),
+						EnvironmentScope: "*",
+						Protected:        false,
 					}),
 				),
 			},
@@ -290,4 +334,41 @@ resource "gitlab_group_variable" "b" {
   environment_scope = "%s"
 }
 	`, rString, rString, rString, valueA, scopeA, rString, valueB, scopeB)
+}
+
+func testAccGitlabGroupVariableUpdateConfigMaskedBad(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo%v"
+  path = "foo%v"
+}
+
+resource "gitlab_group_variable" "foo" {
+  group = "${gitlab_group.foo.id}"
+  key = "key_%s"
+  value = <<EOF
+value-%s"
+i am multiline
+EOF
+  variable_type = "env_var"
+  masked = true
+}
+	`, rString, rString, rString, rString)
+}
+
+func testAccGitlabGroupVariableUpdateConfigMaskedGood(rString string) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo%v"
+  path = "foo%v"
+}
+
+resource "gitlab_group_variable" "foo" {
+  group = "${gitlab_group.foo.id}"
+  key = "key_%s"
+  value = "value-%s"
+  variable_type = "env_var"
+  masked = true
+}
+	`, rString, rString, rString, rString)
 }
