@@ -60,6 +60,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [go-version, license-encryption-password]
     steps:
+      - uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: 'safe to test'
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ needs.go-version.outputs.go-version }}
