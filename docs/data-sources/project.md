@@ -38,9 +38,9 @@ data "gitlab_project" "example" {
 - **http_url_to_repo** (String) URL that can be provided to `git clone` to clone the
 - **issues_enabled** (Boolean) Enable issue tracking for the project.
 - **lfs_enabled** (Boolean) Enable LFS for the project.
-- **merge_pipelines_enabled** (Boolean) Whether merged results pipelines are enabled or not.
+- **merge_pipelines_enabled** (Boolean) Enable or disable merge pipelines.
 - **merge_requests_enabled** (Boolean) Enable merge requests for the project.
-- **merge_trains_enabled** (Boolean) Whether merge trains are enabled or not.
+- **merge_trains_enabled** (Boolean) Enable or disable merge trains.
 - **name** (String) The name of the project.
 - **namespace_id** (Number) The namespace (group or user) of the project. Defaults to your user.
 - **path** (String) The path of the repository.

@@ -140,12 +140,12 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Computed:    true,
 			},
 			"merge_pipelines_enabled": {
-				Description: "Whether merged results pipelines are enabled or not.",
+				Description: "Enable or disable merge pipelines.",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
 			"merge_trains_enabled": {
-				Description: "Whether merge trains are enabled or not.",
+				Description: "Enable or disable merge trains.",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
