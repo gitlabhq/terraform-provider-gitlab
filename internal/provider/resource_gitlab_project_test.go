@@ -55,8 +55,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeRequestsTemplate:           "",
 		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
 		CIForwardDeploymentEnabled:      true,
-		MergePipelinesEnabled:           true,
-		MergeTrainsEnabled:              true,
 	}
 
 	defaultsMainBranch = defaults
@@ -104,8 +102,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						PagesAccessLevel:            gitlab.DisabledAccessControl,
 						BuildCoverageRegex:          "bar",
 						CIForwardDeploymentEnabled:  false,
-						MergePipelinesEnabled:       false,
-						MergeTrainsEnabled:          false,
 					}, &received),
 				),
 			},
