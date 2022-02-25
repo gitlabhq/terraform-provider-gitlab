@@ -1,35 +1,25 @@
 package provider
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
-	"net/url"
-	"os"
-	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
-	"golang.org/x/crypto/ssh"
 )
 
+var testRSAPubKey string = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCi+ErxScCKIVqg2ZRJ6Mx2Yd/RTsh2DGyhUR8z8Iey4rpi1YOBlpTgjxxnSLy26J++Un/iWYDP8wMvEjXElkWz3z4I+Z3mfF3dv039FTCu+O17Mw20Ek4DJxdrKvOgul040sUG/ABVHo6DjqjokjoVJwzUrUmoOtbeMMD8hFN9bWdEVyTj18XQO8nvEe/VkbhCRhAlZC1l60fM07/7Tw83SV5UNAnBtOB+nfa3b24baO+Ijc4+PqYcBuUAF6DvhXW2gZPqf5wjDBJqlDlRTYDdHarMXZAKBpWfWj0gntbtEOM+Fnp6hS1HajaeveNSs6yQwgQEDN2boQnDuvXJ8Y7zW3YQKZp8z0uqWYJSIrYRKVEVYL7gDWL9NvdRV52d/RKPnE/BlL2chiAWBRCT8buQdjVtEPPoYbA1667PXZg6PI9yhCGEIjCj71XzPssA6VL/R7yUafsmNLsirWz9Uyh3HJWCcgNuO9mglP5nfFHIXSHQVhEUEYMfzv1iX5FrenU= terraform@gitlab.com"
+var testRSAPubKeyUpdatedComment string = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCi+ErxScCKIVqg2ZRJ6Mx2Yd/RTsh2DGyhUR8z8Iey4rpi1YOBlpTgjxxnSLy26J++Un/iWYDP8wMvEjXElkWz3z4I+Z3mfF3dv039FTCu+O17Mw20Ek4DJxdrKvOgul040sUG/ABVHo6DjqjokjoVJwzUrUmoOtbeMMD8hFN9bWdEVyTj18XQO8nvEe/VkbhCRhAlZC1l60fM07/7Tw83SV5UNAnBtOB+nfa3b24baO+Ijc4+PqYcBuUAF6DvhXW2gZPqf5wjDBJqlDlRTYDdHarMXZAKBpWfWj0gntbtEOM+Fnp6hS1HajaeveNSs6yQwgQEDN2boQnDuvXJ8Y7zW3YQKZp8z0uqWYJSIrYRKVEVYL7gDWL9NvdRV52d/RKPnE/BlL2chiAWBRCT8buQdjVtEPPoYbA1667PXZg6PI9yhCGEIjCj71XzPssA6VL/R7yUafsmNLsirWz9Uyh3HJWCcgNuO9mglP5nfFHIXSHQVhEUEYMfzv1iX5FrenU= terraform2@foo.com"
+var updatedRSAPubKey string = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDStVqW58VZ5afXFphIvu2JahndXslJZMkgWsNiYCNdk/NvrEbc4i7yZVoDPFQsbS9I6Ty1RMW7qy3KxJalMsVHcw8arCQFDxs/ka1NHGCUPl68t5ZxUOl900KRQ0lOzGnDQMqG/UUZdPw4CCmigTr6Z9ZBcD1fXAiUwbXR4tWrr5z9KWXC2HgF4WkIJUTIct7ilY1m9W0y79dI/+K8bZrurn3q2QK83pxqqWkLwvUsCxtlhMpwuyflyzyuz8xPZl2GlZgxeIpr68gsPHIzzWizibwFfbRYKCZO4wD0r7JCDOYs9KjcIPpCG6d3HUqijClgdQSBnLwHTdE04ZtdzO8akvy0hMzRCooI5TSc8IAHos53Gp9aaW92sPA8za+WRP6OSH6UsOW4N+iQc4jyl7/fckMSgIZlJouNqqV+P8iqIFJGs70Tj5L8G/m+P2lc3kcE4Vjmj+Fc0xG5+I/PsSOpcc6DfDfZdVDRe8yklYd/qC1jI89OCeqjxu3XcUGHj9s= terraform@gitlab.com"
+var updatedRSAPubKeyWithoutComment string = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDStVqW58VZ5afXFphIvu2JahndXslJZMkgWsNiYCNdk/NvrEbc4i7yZVoDPFQsbS9I6Ty1RMW7qy3KxJalMsVHcw8arCQFDxs/ka1NHGCUPl68t5ZxUOl900KRQ0lOzGnDQMqG/UUZdPw4CCmigTr6Z9ZBcD1fXAiUwbXR4tWrr5z9KWXC2HgF4WkIJUTIct7ilY1m9W0y79dI/+K8bZrurn3q2QK83pxqqWkLwvUsCxtlhMpwuyflyzyuz8xPZl2GlZgxeIpr68gsPHIzzWizibwFfbRYKCZO4wD0r7JCDOYs9KjcIPpCG6d3HUqijClgdQSBnLwHTdE04ZtdzO8akvy0hMzRCooI5TSc8IAHos53Gp9aaW92sPA8za+WRP6OSH6UsOW4N+iQc4jyl7/fckMSgIZlJouNqqV+P8iqIFJGs70Tj5L8G/m+P2lc3kcE4Vjmj+Fc0xG5+I/PsSOpcc6DfDfZdVDRe8yklYd/qC1jI89OCeqjxu3XcUGHj9s="
+
 func TestAccGitlabUserSSHKey_basic(t *testing.T) {
+	testAccCheck(t)
+
 	var key gitlab.SSHKey
-	rInt := acctest.RandInt()
-	gitlabURL, _ := url.Parse(os.Getenv("GITLAB_BASE_URL"))
-
-	pubKey, _, _ := testMakeSSHKeyPair()
-	// gitlab is rewriting the last part of the key with the username and gitlab hostname
-	gitlabPubKey := fmt.Sprintf("%s foo %d (%s)", strings.TrimSpace(pubKey), rInt, gitlabURL.Host)
-
-	pubKey2, _, _ := testMakeSSHKeyPair()
-	gitlabPubKey2 := fmt.Sprintf("%s foo %d (%s)", strings.TrimSpace(pubKey2), rInt, gitlabURL.Host)
+	testUser := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -38,23 +28,29 @@ func TestAccGitlabUserSSHKey_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a user + sshkey
 			{
-				Config: testAccGitlabUserSSHKeyConfig(rInt, gitlabPubKey),
+				Config: testAccGitlabUserSSHKeyConfig(testUser.ID, testRSAPubKey),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserSSHKeyExists("gitlab_user_sshkey.foo_key", &key),
 					testAccCheckGitlabUserSSHKeyAttributes(&key, &testAccGitlabUserSSHKeyExpectedAttributes{
-						Title: fmt.Sprintf("foo-key %d", rInt),
-						Key:   gitlabPubKey,
+						Title: "foo-key",
+						Key:   testRSAPubKey,
 					}),
 				),
 			},
+			// Only update key comment (which is a no-op plan)
+			{
+				Config:   testAccGitlabUserSSHKeyConfig(testUser.ID, testRSAPubKeyUpdatedComment),
+				PlanOnly: true,
+			},
 			// Update the key and title
 			{
-				Config: testAccGitlabUserSSHKeyUpdateConfig(rInt, gitlabPubKey2),
+				Config: testAccGitlabUserSSHKeyUpdateConfig(testUser.ID, updatedRSAPubKey),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabUserSSHKeyExists("gitlab_user_sshkey.foo_key", &key),
 					testAccCheckGitlabUserSSHKeyAttributes(&key, &testAccGitlabUserSSHKeyExpectedAttributes{
-						Title: fmt.Sprintf("key %d", rInt),
-						Key:   gitlabPubKey2,
+						Title:     "key",
+						Key:       updatedRSAPubKey,
+						ExpiresAt: "3016-01-21T00:00:00Z",
 					}),
 				),
 			},
@@ -62,56 +58,25 @@ func TestAccGitlabUserSSHKey_basic(t *testing.T) {
 				ResourceName:      "gitlab_user_sshkey.foo_key",
 				ImportState:       true,
 				ImportStateVerify: true,
-				ImportStateIdFunc: getSSHKeyImportID("gitlab_user_sshkey.foo_key"),
+			},
+			// Change pub key to one without a comment
+			{
+				Config: testAccGitlabUserSSHKeyConfig(testUser.ID, updatedRSAPubKeyWithoutComment),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabUserSSHKeyExists("gitlab_user_sshkey.foo_key", &key),
+					testAccCheckGitlabUserSSHKeyAttributes(&key, &testAccGitlabUserSSHKeyExpectedAttributes{
+						Title: "foo-key",
+						Key:   updatedRSAPubKeyWithoutComment,
+					}),
+				),
+			},
+			{
+				ResourceName:      "gitlab_user_sshkey.foo_key",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
-}
-
-func getSSHKeyImportID(resourceName string) resource.ImportStateIdFunc {
-	return func(s *terraform.State) (string, error) {
-		rs, ok := s.RootModule().Resources[resourceName]
-		if !ok {
-			return "", fmt.Errorf("Resource not found: %s", resourceName)
-		}
-
-		id := rs.Primary.ID
-		if id == "" {
-			return "", fmt.Errorf("No SSH key ID is set")
-		}
-		userID := rs.Primary.Attributes["user_id"]
-		if userID == "" {
-			return "", fmt.Errorf("No user ID is set")
-		}
-
-		return fmt.Sprintf("%s:%s", userID, id), nil
-	}
-}
-
-func testMakeSSHKeyPair() (string, string, error) {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 1024)
-	if err != nil {
-		return "", "", err
-	}
-
-	// generate and write private key as PEM
-	var privKeyBuf strings.Builder
-
-	privateKeyPEM := &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)}
-	if err := pem.Encode(&privKeyBuf, privateKeyPEM); err != nil {
-		return "", "", err
-	}
-
-	// generate and write public key
-	pub, err := ssh.NewPublicKey(&privateKey.PublicKey)
-	if err != nil {
-		return "", "", err
-	}
-
-	var pubKeyBuf strings.Builder
-	pubKeyBuf.Write(ssh.MarshalAuthorizedKey(pub))
-
-	return pubKeyBuf.String(), privKeyBuf.String(), nil
 }
 
 func testAccCheckGitlabUserSSHKeyDestroy(s *terraform.State) error {
@@ -120,14 +85,12 @@ func testAccCheckGitlabUserSSHKeyDestroy(s *terraform.State) error {
 			continue
 		}
 
-		id, _ := strconv.Atoi(rs.Primary.ID)
-		userID, _ := strconv.Atoi(rs.Primary.Attributes["user_id"])
-
-		keys, resp, err := testGitlabClient.Users.ListSSHKeysForUser(userID, &gitlab.ListSSHKeysForUserOptions{})
-		// User deleted as well as its keys
-		if resp.StatusCode == 404 {
-			return nil
+		userID, keyID, err := resourceGitlabUserSSHKeyParseID(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("failed to parse user ssh key resource ID: %s", err)
 		}
+
+		keys, _, err := testGitlabClient.Users.ListSSHKeysForUser(userID, &gitlab.ListSSHKeysForUserOptions{})
 		if err != nil {
 			return err
 		}
@@ -135,7 +98,7 @@ func testAccCheckGitlabUserSSHKeyDestroy(s *terraform.State) error {
 		var gotKey *gitlab.SSHKey
 
 		for _, k := range keys {
-			if k.ID == id {
+			if k.ID == keyID {
 				gotKey = k
 				break
 			}
@@ -156,13 +119,10 @@ func testAccCheckGitlabUserSSHKeyExists(n string, key *gitlab.SSHKey) resource.T
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		keyID := rs.Primary.ID
-		if keyID == "" {
-			return fmt.Errorf("No key ID is set")
+		userID, keyID, err := resourceGitlabUserSSHKeyParseID(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("failed to parse user ssh key resource ID: %s", err)
 		}
-
-		id, _ := strconv.Atoi(keyID)
-		userID, _ := strconv.Atoi(rs.Primary.Attributes["user_id"])
 
 		keys, _, err := testGitlabClient.Users.ListSSHKeysForUser(userID, &gitlab.ListSSHKeysForUserOptions{})
 		if err != nil {
@@ -172,13 +132,13 @@ func testAccCheckGitlabUserSSHKeyExists(n string, key *gitlab.SSHKey) resource.T
 		var gotKey *gitlab.SSHKey
 
 		for _, k := range keys {
-			if k.ID == id {
+			if k.ID == keyID {
 				gotKey = k
 				break
 			}
 		}
 		if gotKey == nil {
-			return fmt.Errorf("Could not find sshkey %d for user %d", id, userID)
+			return fmt.Errorf("Could not find sshkey %d for user %d", keyID, userID)
 		}
 
 		*key = *gotKey
@@ -190,6 +150,7 @@ type testAccGitlabUserSSHKeyExpectedAttributes struct {
 	Title     string
 	Key       string
 	CreatedAt string
+	ExpiresAt string
 }
 
 func testAccCheckGitlabUserSSHKeyAttributes(key *gitlab.SSHKey, want *testAccGitlabUserSSHKeyExpectedAttributes) resource.TestCheckFunc {
@@ -209,44 +170,23 @@ func testAccCheckGitlabUserSSHKeyAttributes(key *gitlab.SSHKey, want *testAccGit
 	}
 }
 
-func testAccGitlabUserSSHKeyConfig(rInt int, pubKey string) string {
+func testAccGitlabUserSSHKeyConfig(userID int, pubKey string) string {
 	return fmt.Sprintf(`
-resource "gitlab_user" "foo" {
-  name             = "foo %d"
-  username         = "listest%d"
-  password         = "test%dtt"
-  email            = "listest%d@ssss.com"
-  is_admin         = false
-  projects_limit   = 0
-  can_create_group = false
-  is_external      = false
-}
-
 resource "gitlab_user_sshkey" "foo_key" {
-  title = "foo-key %d"
+  title = "foo-key"
   key = "%s"
-  user_id = gitlab_user.foo.id
+  user_id = %d
 }
-  `, rInt, rInt, rInt, rInt, rInt, pubKey)
+  `, pubKey, userID)
 }
 
-func testAccGitlabUserSSHKeyUpdateConfig(rInt int, pubKey string) string {
+func testAccGitlabUserSSHKeyUpdateConfig(userID int, pubKey string) string {
 	return fmt.Sprintf(`
-resource "gitlab_user" "foo" {
-  name             = "foo %d"
-  username         = "listest%d"
-  password         = "test%dtt"
-  email            = "listest%d@ssss.com"
-  is_admin         = false
-  projects_limit   = 0
-  can_create_group = false
-  is_external      = false
-}
-
 resource "gitlab_user_sshkey" "foo_key" {
-  title = "key %d"
+  title = "key"
   key = "%s"
-  user_id = gitlab_user.foo.id
+  user_id = %d
+  expires_at = "3016-01-21T00:00:00Z"
 }
-  `, rInt, rInt, rInt, rInt, rInt, pubKey)
+  `, pubKey, userID)
 }
