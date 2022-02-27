@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
+func TestAccDataSourceGitlabGroupMembership_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -46,7 +46,7 @@ func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 	})
 }
 
-func TestAccDataSourceGitlabMembership_pagination(t *testing.T) {
+func TestAccDataSourceGitlabGroupMembership_pagination(t *testing.T) {
 	userCount := 21
 
 	group := testAccCreateGroups(t, 1)[0]

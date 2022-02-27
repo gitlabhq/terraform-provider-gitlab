@@ -154,7 +154,7 @@ func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.Resource
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 
-	d.Set("members", flattenGitlabMembers(d, allGms)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
+	d.Set("members", flattenGitlabGroupMembers(d, allGms)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 
 	var optionsHash strings.Builder
 	optionsHash.WriteString(strconv.Itoa(group.ID))
@@ -169,7 +169,7 @@ func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func flattenGitlabMembers(d *schema.ResourceData, members []*gitlab.GroupMember) []interface{} {
+func flattenGitlabGroupMembers(d *schema.ResourceData, members []*gitlab.GroupMember) []interface{} {
 	membersList := []interface{}{}
 
 	var filterAccessLevel gitlab.AccessLevelValue = gitlab.NoPermissions
