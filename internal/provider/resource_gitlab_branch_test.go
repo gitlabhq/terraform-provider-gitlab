@@ -104,15 +104,13 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 		name := rs.Primary.Attributes["name"]
 		project := rs.Primary.Attributes["project"]
 		branch, resp, err := testGitlabClient.Branches.GetBranch(project, name)
-		if err == nil {
-			if branch != nil && branch.Name == name {
-				return fmt.Errorf("Branch still exists")
+		if err != nil {
+			if is404(err) {
+				return nil
 			}
-		}
-		if resp.StatusCode != 404 {
 			return err
 		}
-		return nil
+		return errors.New("branch still exists")
 	}
 	return nil
 }
@@ -124,14 +122,10 @@ func testAccCheckGitlabBranchAttributes(n string, branch *gitlab.Branch, want *t
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		_, branchName, err := parseTwoPartID(rs.Primary.ID)
-		if err != nil {
-			return errors.New("Error in splitting project and branch IDs")
-		}
 		if branch.WebURL == "" {
 			return errors.New("got empty web url")
 		}
-		if branchName != want.Name || branchName != branch.Name {
+		if branch.Name != want.Name {
 			return fmt.Errorf("got name %s; want %s", branch.Name, want.Name)
 		}
 		if want.Commit {
