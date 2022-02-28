@@ -463,6 +463,60 @@ func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_MergePipelines(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectMergePipelinesEnabled(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						if project.MergePipelinesEnabled != true {
+							return fmt.Errorf("expected merge pipelines to be enabled")
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_MergeTrains(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabProjectMergeTrainsEnabled(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						if project.MergeTrainsEnabled != true {
+							return fmt.Errorf("expected merge trains to be enabled")
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_willError(t *testing.T) {
 	var received, defaults gitlab.Project
 	rInt := acctest.RandInt()
@@ -1283,6 +1337,8 @@ resource "gitlab_project" "foo" {
   pages_access_level = "disabled"
   build_coverage_regex = "bar"
   ci_forward_deployment_enabled = false
+  merge_pipelines_enabled = false
+  merge_trains_enabled = false
 }
 	`, rInt, rInt)
 }
@@ -1500,6 +1556,37 @@ resource "gitlab_project" "foo" {
   description = "Terraform acceptance tests"
   archive_on_destroy = true
   archived = false
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitLabProjectMergePipelinesEnabled(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  merge_pipelines_enabled = true
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitLabProjectMergeTrainsEnabled(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  merge_pipelines_enabled = true
+  merge_trains_enabled = true
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing

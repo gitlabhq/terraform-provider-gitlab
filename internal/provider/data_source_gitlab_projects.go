@@ -165,6 +165,8 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"packages_enabled":                                 project.PackagesEnabled,
 				"build_coverage_regex":                             project.BuildCoverageRegex,
 				"ci_forward_deployment_enabled":                    project.CIForwardDeploymentEnabled,
+				"merge_pipelines_enabled":                          project.MergePipelinesEnabled,
+				"merge_trains_enabled":                             project.MergeTrainsEnabled,
 			}
 			values = append(values, v)
 		}
@@ -774,6 +776,16 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 						},
 						"ci_forward_deployment_enabled": {
 							Description: "When a new deployment job starts, skip older deployment jobs that are still pending.",
+							Type:        schema.TypeBool,
+							Computed:    true,
+						},
+						"merge_pipelines_enabled": {
+							Description: "Enable or disable merge pipelines.",
+							Type:        schema.TypeBool,
+							Computed:    true,
+						},
+						"merge_trains_enabled": {
+							Description: "Enable or disable merge trains.",
 							Type:        schema.TypeBool,
 							Computed:    true,
 						},

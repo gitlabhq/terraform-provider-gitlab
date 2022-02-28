@@ -375,6 +375,18 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 		Default:     true,
 	},
+	"merge_pipelines_enabled": {
+		Description: "Enable or disable merge pipelines.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Default:     false,
+	},
+	"merge_trains_enabled": {
+		Description: "Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Default:     false,
+	},
 }
 
 var _ = registerResource("gitlab_project", func() *schema.Resource {
@@ -447,6 +459,8 @@ func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceDa
 	d.Set("merge_requests_template", project.MergeRequestsTemplate)
 	d.Set("ci_config_path", project.CIConfigPath)
 	d.Set("ci_forward_deployment_enabled", project.CIForwardDeploymentEnabled)
+	d.Set("merge_pipelines_enabled", project.MergePipelinesEnabled)
+	d.Set("merge_trains_enabled", project.MergeTrainsEnabled)
 	return nil
 }
 
@@ -702,6 +716,14 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		editProjectOptions.MergeRequestsTemplate = gitlab.String(v.(string))
 	}
 
+	if v, ok := d.GetOk("merge_pipelines_enabled"); ok {
+		editProjectOptions.MergePipelinesEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("merge_trains_enabled"); ok {
+		editProjectOptions.MergeTrainsEnabled = gitlab.Bool(v.(bool))
+	}
+
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
 		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions, gitlab.WithContext(ctx)); err != nil {
 			return diag.Errorf("Could not update project %q: %s", d.Id(), err)
@@ -894,6 +916,14 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("ci_forward_deployment_enabled") {
 		options.CIForwardDeploymentEnabled = gitlab.Bool(d.Get("ci_forward_deployment_enabled").(bool))
+	}
+
+	if d.HasChange("merge_pipelines_enabled") {
+		options.MergePipelinesEnabled = gitlab.Bool(d.Get("merge_pipelines_enabled").(bool))
+	}
+
+	if d.HasChange("merge_trains_enabled") {
+		options.MergeTrainsEnabled = gitlab.Bool(d.Get("merge_trains_enabled").(bool))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {

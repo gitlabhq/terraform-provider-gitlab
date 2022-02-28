@@ -139,6 +139,16 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
+			"merge_pipelines_enabled": {
+				Description: "Enable or disable merge pipelines.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"merge_trains_enabled": {
+				Description: "Enable or disable merge trains.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
 			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
 				Description: "Push rules for the project.",
@@ -247,6 +257,8 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("runners_token", found.RunnersToken)
 	d.Set("archived", found.Archived)
 	d.Set("remove_source_branch_after_merge", found.RemoveSourceBranchAfterMerge)
+	d.Set("merge_pipelines_enabled", found.MergePipelinesEnabled)
+	d.Set("merge_trains_enabled", found.MergeTrainsEnabled)
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 
