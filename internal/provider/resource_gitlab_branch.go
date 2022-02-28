@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -161,6 +162,7 @@ func resourceGitlabBranchCreate(ctx context.Context, d *schema.ResourceData, met
 		log.Printf("[DEBUG] failed to create gitlab branch %v response %v", branch, resp)
 		return diag.FromErr(err)
 	}
+	d.Set("ref", ref)
 	d.SetId(buildTwoPartID(&project, &name))
 	return resourceGitlabBranchRead(ctx, d, meta)
 }
@@ -183,23 +185,6 @@ func resourceGitlabBranchRead(ctx context.Context, d *schema.ResourceData, meta 
 		log.Printf("[DEBUG] failed to read gitlab branch %s response %v", name, resp)
 		return diag.FromErr(err)
 	}
-	ref := d.Get("ref").(string)
-	if ref == "" {
-		c := &gitlab.GetCommitRefsOptions{
-			Type: gitlab.String("branch"),
-		}
-		commitRefs, _, err := client.Commits.GetCommitRefs(project, branch.Commit.ID, c, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		for _, br := range commitRefs {
-			if br.Name != branch.Name {
-				ref = br.Name
-				break
-			}
-		}
-	}
-	d.Set("ref", ref)
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("name", branch.Name)
 	d.Set("project", project)

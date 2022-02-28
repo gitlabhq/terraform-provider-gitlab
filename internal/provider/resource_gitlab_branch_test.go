@@ -46,9 +46,10 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 			},
 			// Test ImportState
 			{
-				ResourceName:      "gitlab_branch.foo",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "gitlab_branch.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"ref"},
 			},
 			// update properties in resource
 			{
@@ -103,7 +104,7 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 		}
 		name := rs.Primary.Attributes["name"]
 		project := rs.Primary.Attributes["project"]
-		branch, resp, err := testGitlabClient.Branches.GetBranch(project, name)
+		_, _, err := testGitlabClient.Branches.GetBranch(project, name)
 		if err != nil {
 			if is404(err) {
 				return nil
@@ -117,11 +118,6 @@ func testAccCheckGitlabBranchDestroy(s *terraform.State) error {
 
 func testAccCheckGitlabBranchAttributes(n string, branch *gitlab.Branch, want *testAccGitlabBranchExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[fmt.Sprintf("gitlab_branch.%s", n)]
-		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
-		}
-
 		if branch.WebURL == "" {
 			return errors.New("got empty web url")
 		}
