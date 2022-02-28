@@ -43,6 +43,11 @@ var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource
 				Type:        schema.TypeInt,
 				Required:    true,
 			},
+			"rule_type": {
+				Description: "The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Other rules are `regular`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+			},
 			"user_ids": {
 				Description: "A list of specific User IDs to add to the list of approvers.",
 				Type:        schema.TypeSet,
@@ -72,6 +77,7 @@ func resourceGitlabProjectApprovalRuleCreate(ctx context.Context, d *schema.Reso
 	options := gitlab.CreateProjectLevelRuleOptions{
 		Name:               gitlab.String(d.Get("name").(string)),
 		ApprovalsRequired:  gitlab.Int(d.Get("approvals_required").(int)),
+		RuleType:           gitlab.String(d.Get("rule_type").(string)),
 		UserIDs:            expandApproverIds(d.Get("user_ids")),
 		GroupIDs:           expandApproverIds(d.Get("group_ids")),
 		ProtectedBranchIDs: expandProtectedBranchIDs(d.Get("protected_branch_ids")),
@@ -115,6 +121,7 @@ func resourceGitlabProjectApprovalRuleRead(ctx context.Context, d *schema.Resour
 
 	d.Set("name", rule.Name)
 	d.Set("approvals_required", rule.ApprovalsRequired)
+	d.Set("rule_type", rule.RuleType)
 
 	if err := d.Set("group_ids", flattenApprovalRuleGroupIDs(rule.Groups)); err != nil {
 		return diag.FromErr(err)
