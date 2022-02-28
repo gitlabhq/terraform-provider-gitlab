@@ -1,12 +1,12 @@
 # This GitHub action can publish assets for release when a tag is created.
 # Currently its setup to run on any tag that matches the pattern "v*" (ie. v0.1.0).
 #
-# This uses an action (paultyng/ghaction-import-gpg) that assumes you set your
+# This uses an action (hashicorp/ghaction-import-gpg) that assumes you set your 
 # private key in the `GPG_PRIVATE_KEY` secret and passphrase in the `PASSPHRASE`
 # secret. If you would rather own your own GPG handling, please fork this action
 # or use an alternative one for key handling.
 #
-# You will need to pass the `--batch` flag to `gpg` in your signing step
+# You will need to pass the `--batch` flag to `gpg` in your signing step 
 # in `goreleaser` to indicate this is being used in a non-interactive mode.
 #
 name: release
@@ -24,30 +24,36 @@ jobs:
       # Read the .go-version file and output it for other jobs to use.
       - id: go-version
         run: echo "::set-output name=go-version::$(cat .go-version)"
-
   goreleaser:
     runs-on: ubuntu-latest
     needs: [go-version]
     steps:
-      - uses: actions/setup-go@v2
+      -
+        name: Checkout
+        uses: actions/checkout@v2.4.0
+      -
+        name: Unshallow
+        run: git fetch --prune --unshallow
+      -
+        name: Set up Go
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ needs.go-version.outputs.go-version }}
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('go.sum') }}-no-tools
-      - name: Unshallow
-        run: git fetch --prune --unshallow
-      - uses: paultyng/ghaction-import-gpg@v2.1.0
+      -
+        name: Import GPG key
         id: import_gpg
+        uses: hashicorp/ghaction-import-gpg@v2.1.0
         env:
+          # These secrets will need to be configured for the repository:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      - uses: goreleaser/goreleaser-action@v2
+      -
+        name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2.8.1
         with:
           version: latest
           args: release --rm-dist
         env:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+          # GitHub sets this automatically
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
