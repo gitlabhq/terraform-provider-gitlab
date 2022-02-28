@@ -5,6 +5,9 @@
 # SECURITY ADVISORY
 # Be careful while making changes to this file.
 # See: https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+#
+# We are using "persist-credentials: false" on all checkout actions in this workflow as a
+# precaution.
 
 name: pr-acceptance-ee
 
@@ -21,6 +24,9 @@ on:
       - 'CHANGELOG.md'
       - 'CONTRIBUTING.md'
 
+# Disable permissions on the GITHUB_TOKEN for all scopes.
+permissions: {}
+
 concurrency: 
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -35,6 +41,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
       # Read the .go-version file and output it for other jobs to use.
       - id: go-version
         run: echo "::set-output name=go-version::$(cat .go-version)"
@@ -66,6 +73,9 @@ jobs:
       # Check out the target project (as opposed to the pull request code).
       # Yes, this is intentional. We are using trusted code while working with the GitLab license.
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
       - name: Decrypt license
         run: |
           openssl version
@@ -77,6 +87,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
       # Cache the Go modules.
       - uses: actions/cache@v2
         with:
