@@ -1,4 +1,25 @@
+## 3.11.0 (2022-03-01)
+
+FEATURES:
+
+* **New Resource:** `resource/gitlab_user_sshkey` ([#903](https://github.com/gitlabhq/terraform-provider-gitlab/pull/903))
+
+IMPROVEMENTS:
+
+* resource/gitlab_instance_variable: better error message for invalid masked variable values ([#895](https://github.com/gitlabhq/terraform-provider-gitlab/pull/895))
+* resource/gitlab_group_variable: better error message for invalid masked variable values ([#895](https://github.com/gitlabhq/terraform-provider-gitlab/pull/895))
+* resource/gitlab_project: Add `merge_pipelines_enabled` and `merge_trains_enabled` attributes ([#900](https://github.com/gitlabhq/terraform-provider-gitlab/pull/900))
+* resource/gitlab_project_level_mr_approvals: Add `required_password_to_approve` attribute ([#808](https://github.com/gitlabhq/terraform-provider-gitlab/pull/808))
+* resource/gitlab_user: Add support for `deactivated` user state ([#899](https://github.com/gitlabhq/terraform-provider-gitlab/pull/899))
+
+BUG FIXES:
+
+* resource/gitlab_branch_protection: fix issue claiming that no valid access level([#892](https://github.com/gitlabhq/terraform-provider-gitlab/pull/892))
+
 ## 3.10.1 (2022-02-24)
+
+**ATTENTION:** this bug fix release was never released due to [#896](https://github.com/gitlabhq/terraform-provider-gitlab/issues/896).
+Please use `v3.11.0` instead.
 
 BUG FIXES:
 
