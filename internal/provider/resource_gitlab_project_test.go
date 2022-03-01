@@ -428,6 +428,14 @@ func TestAccGitlabProject_groupWithoutDefaultBranchProtection(t *testing.T) {
 				Config: testAccGitlabProjectConfigWithoutDefaultBranchProtection(rInt),
 				Check:  testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 			},
+			{
+				Config:  testAccGitlabProjectConfigWithoutDefaultBranchProtection(rInt),
+				Destroy: true,
+			},
+			{
+				Config: testAccGitlabProjectConfigWithoutDefaultBranchProtectionInitializeReadme(rInt),
+				Check:  testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+			},
 		},
 	})
 }
@@ -1172,6 +1180,24 @@ resource "gitlab_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
   namespace_id = "${gitlab_group.foo.id}"
+}
+	`, rInt, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigWithoutDefaultBranchProtectionInitializeReadme(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foogroup2-%d"
+  path = "foogroup2-%d"
+  default_branch_protection = 0
+  visibility_level = "public"
+}
+
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+  namespace_id = "${gitlab_group.foo.id}"
+  initialize_with_readme = true
 }
 	`, rInt, rInt, rInt)
 }

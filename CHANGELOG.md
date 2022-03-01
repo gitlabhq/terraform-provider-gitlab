@@ -1,3 +1,9 @@
+## 3.11.1 (2022-03-02)
+
+BUG FIXES:
+
+* resource/gitlab_project: fix waiting for default branch protection during creation ([#908](https://github.com/gitlabhq/terraform-provider-gitlab/pull/908))
+
 ## 3.11.0 (2022-03-01)
 
 FEATURES:

@@ -667,33 +667,42 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 	}
 
-	// Branch protection for a newly created branch is an async action, so use WaitForState to ensure it's protected
-	// before we continue. Note this check should only be required when there is a custom default branch set
-	// See issue 800: https://github.com/gitlabhq/terraform-provider-gitlab/issues/800
-	stateConf := &resource.StateChangeConf{
-		Pending: []string{"false"},
-		Target:  []string{"true"},
-		Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
-		Refresh: func() (interface{}, string, error) {
-			branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
-			if err != nil {
-				if is404(err) {
-					// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
-					// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
-					// We don't need to wait anymore, so return "true" to exist the wait loop.
-					return branch, "true", nil
-				}
-
-				//This is legit error, return the error.
-				return nil, "", err
-			}
-
-			return branch, strconv.FormatBool(branch.Protected), nil
-		},
+	// If the project is assigned to a group namespace and the group has *default branch protection*
+	// disabled (`default_branch_protection = 0`) then we don't have to wait for one.
+	waitForDefaultBranchProtection, err := expectDefaultBranchProtection(ctx, client, project)
+	if err != nil {
+		return diag.Errorf("Failed to fetch group the project %d is owned by: %+v", project.ID, err)
 	}
 
-	if _, err := stateConf.WaitForStateContext(ctx); err != nil {
-		return diag.Errorf("error while waiting for branch %s to reach 'protected' status, %s", project.DefaultBranch, err)
+	if waitForDefaultBranchProtection {
+		// Branch protection for a newly created branch is an async action, so use WaitForState to ensure it's protected
+		// before we continue. Note this check should only be required when there is a custom default branch set
+		// See issue 800: https://github.com/gitlabhq/terraform-provider-gitlab/issues/800
+		stateConf := &resource.StateChangeConf{
+			Pending: []string{"false"},
+			Target:  []string{"true"},
+			Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
+			Refresh: func() (interface{}, string, error) {
+				branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
+				if err != nil {
+					if is404(err) {
+						// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
+						// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
+						// We don't need to wait anymore, so return "true" to exist the wait loop.
+						return branch, "true", nil
+					}
+
+					//This is legit error, return the error.
+					return nil, "", err
+				}
+
+				return branch, strconv.FormatBool(branch.Protected), nil
+			},
+		}
+
+		if _, err := stateConf.WaitForStateContext(ctx); err != nil {
+			return diag.Errorf("error while waiting for branch %s to reach 'protected' status, %s", project.DefaultBranch, err)
+		}
 	}
 
 	var editProjectOptions gitlab.EditProjectOptions
@@ -1177,4 +1186,19 @@ func flattenProjectPushRules(pushRules *gitlab.ProjectPushRules) (values []map[s
 
 func namespaceOrPathChanged(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
 	return d.HasChange("namespace_id") || d.HasChange("path")
+}
+
+func expectDefaultBranchProtection(ctx context.Context, client *gitlab.Client, project *gitlab.Project) (bool, error) {
+	if project.Namespace.Kind == "group" {
+		group, _, err := client.Groups.GetGroup(project.Namespace.ID, nil, gitlab.WithContext(ctx))
+		if err != nil {
+			return false, err
+		}
+
+		return group.DefaultBranchProtection != 0, nil
+	}
+
+	// projects which are not assigned to a group can't have a "no branch protection" default,
+	// thus, we always expect a default branch protection.
+	return true, nil
 }
