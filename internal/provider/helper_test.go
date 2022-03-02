@@ -182,27 +182,42 @@ func testAccCreateGroups(t *testing.T, n int) []*gitlab.Group {
 	return groups
 }
 
+// testAccCreateBranches is a test helper for creating a specified number of branches.
+// It assumes the project will be destroyed at the end of the test and will not cleanup created branches.
+func testAccCreateBranches(t *testing.T, project *gitlab.Project, n int) []*gitlab.Branch {
+	t.Helper()
+
+	branches := make([]*gitlab.Branch, n)
+
+	for i := range branches {
+		var err error
+		branches[i], _, err = testGitlabClient.Branches.CreateBranch(project.ID, &gitlab.CreateBranchOptions{
+			Branch: gitlab.String(acctest.RandomWithPrefix("acctest")),
+			Ref:    gitlab.String(project.DefaultBranch),
+		})
+		if err != nil {
+			t.Fatalf("could not create test branches: %v", err)
+		}
+	}
+
+	return branches
+}
+
 // testAccCreateProtectedBranches is a test helper for creating a specified number of protected branches.
 // It assumes the project will be destroyed at the end of the test and will not cleanup created branches.
 func testAccCreateProtectedBranches(t *testing.T, project *gitlab.Project, n int) []*gitlab.ProtectedBranch {
 	t.Helper()
 
+	branches := testAccCreateBranches(t, project, n)
 	protectedBranches := make([]*gitlab.ProtectedBranch, n)
 
-	for i := range protectedBranches {
-		branch, _, err := testGitlabClient.Branches.CreateBranch(project.ID, &gitlab.CreateBranchOptions{
-			Branch: gitlab.String(acctest.RandomWithPrefix("acctest")),
-			Ref:    gitlab.String(project.DefaultBranch),
-		})
-		if err != nil {
-			t.Fatalf("could not create test branch: %v", err)
-		}
-
+	for i := range make([]int, n) {
+		var err error
 		protectedBranches[i], _, err = testGitlabClient.ProtectedBranches.ProtectRepositoryBranches(project.ID, &gitlab.ProtectRepositoryBranchesOptions{
-			Name: gitlab.String(branch.Name),
+			Name: gitlab.String(branches[i].Name),
 		})
 		if err != nil {
-			t.Fatalf("could not protect test branch: %v", err)
+			t.Fatalf("could not protect test branches: %v", err)
 		}
 	}
 
