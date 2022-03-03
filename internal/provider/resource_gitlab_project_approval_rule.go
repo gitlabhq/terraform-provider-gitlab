@@ -16,12 +16,11 @@ import (
 // https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-project-level-rule
 var errApprovalRuleNotFound = errors.New("approval rule not found")
 
-var validRuleTypeValues = []string{
-	"regular",
-	"any_approver",
-}
-
 var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource {
+	var validRuleTypeValues = []string{
+		"regular",
+		"any_approver",
+	}
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).\n\n" +
 			"-> This feature requires GitLab Premium.",
