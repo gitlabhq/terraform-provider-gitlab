@@ -81,7 +81,7 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	})
 }
 
-func TestAccGitLabProjectApprovalRule_any_approver(t *testing.T) {
+func TestAccGitLabProjectApprovalRule_AnyApprover(t *testing.T) {
 	// Set up project, groups, users, and branches to use in the test.
 
 	testAccCheck(t)

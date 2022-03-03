@@ -14,6 +14,11 @@ import (
 // https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-project-level-rule
 var errApprovalRuleNotFound = errors.New("approval rule not found")
 
+var validRuleTypeValues = []string{
+	"regular",
+	"any_approver",
+}
+
 var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource {
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).\n\n" +
@@ -44,9 +49,11 @@ var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource
 				Required:    true,
 			},
 			"rule_type": {
-				Description: "The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Other rules are `regular`.",
-				Type:        schema.TypeString,
-				Optional:    true,
+				Description:      fmt.Sprintf("String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are %s.", renderValueListForDocs(validRuleTypeValues)),
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          "regular",
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validRuleTypeValues, false)),
 			},
 			"user_ids": {
 				Description: "A list of specific User IDs to add to the list of approvers.",
@@ -77,10 +84,13 @@ func resourceGitlabProjectApprovalRuleCreate(ctx context.Context, d *schema.Reso
 	options := gitlab.CreateProjectLevelRuleOptions{
 		Name:               gitlab.String(d.Get("name").(string)),
 		ApprovalsRequired:  gitlab.Int(d.Get("approvals_required").(int)),
-		RuleType:           gitlab.String(d.Get("rule_type").(string)),
 		UserIDs:            expandApproverIds(d.Get("user_ids")),
 		GroupIDs:           expandApproverIds(d.Get("group_ids")),
 		ProtectedBranchIDs: expandProtectedBranchIDs(d.Get("protected_branch_ids")),
+	}
+
+	if v, ok := d.GetOk("rule_type"); ok {
+		options.RuleType = gitlab.String(v.(string))
 	}
 
 	project := d.Get("project").(string)
