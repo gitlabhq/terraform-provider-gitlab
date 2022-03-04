@@ -246,6 +246,33 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
+	var group gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					func(s *terraform.State) error {
+						if group.PreventForkingOutsideGroup != true {
+							return fmt.Errorf("expected forking outside the group to be disabled")
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		_, err := testGitlabClient.Groups.DeleteGroup(group.ID)
@@ -406,33 +433,6 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
-}
-
-func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
-	var group gitlab.Group
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabGroupDestroy,
-		Steps: []resource.TestStep{
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
-					func(s *terraform.State) error {
-						if group.PreventForkingOutsideGroup != true {
-							return fmt.Errorf("expected forking outside the group to be disabled")
-						}
-
-						return nil
-					},
-				),
-			},
-		},
-	})
 }
 
 func testAccGitlabGroupConfig(rInt int) string {
