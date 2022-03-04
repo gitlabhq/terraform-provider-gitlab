@@ -3,13 +3,11 @@ package provider
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -17,10 +15,6 @@ import (
 var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource {
-	var validRuleTypeValues = []string{
-		"regular",
-		"any_approver",
-	}
 	return &schema.Resource{
 		Description: "This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).\n\n" +
 			"-> This feature requires GitLab Premium.",
@@ -48,13 +42,6 @@ var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource
 				Description: "The number of approvals required for this rule.",
 				Type:        schema.TypeInt,
 				Required:    true,
-			},
-			"rule_type": {
-				Description:      fmt.Sprintf("String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are %s.", renderValueListForDocs(validRuleTypeValues)),
-				Type:             schema.TypeString,
-				Optional:         true,
-				Default:          "regular",
-				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validRuleTypeValues, false)),
 			},
 			"user_ids": {
 				Description: "A list of specific User IDs to add to the list of approvers.",
@@ -88,10 +75,6 @@ func resourceGitlabProjectApprovalRuleCreate(ctx context.Context, d *schema.Reso
 		UserIDs:            expandApproverIds(d.Get("user_ids")),
 		GroupIDs:           expandApproverIds(d.Get("group_ids")),
 		ProtectedBranchIDs: expandProtectedBranchIDs(d.Get("protected_branch_ids")),
-	}
-
-	if v, ok := d.GetOk("rule_type"); ok {
-		options.RuleType = gitlab.String(v.(string))
 	}
 
 	project := d.Get("project").(string)
@@ -132,7 +115,6 @@ func resourceGitlabProjectApprovalRuleRead(ctx context.Context, d *schema.Resour
 
 	d.Set("name", rule.Name)
 	d.Set("approvals_required", rule.ApprovalsRequired)
-	d.Set("rule_type", rule.RuleType)
 
 	if err := d.Set("group_ids", flattenApprovalRuleGroupIDs(rule.Groups)); err != nil {
 		return diag.FromErr(err)

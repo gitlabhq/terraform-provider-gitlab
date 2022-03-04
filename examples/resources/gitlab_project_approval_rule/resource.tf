@@ -36,11 +36,3 @@ resource "gitlab_project_approval_rule" "example-three" {
   approvals_required = 3
   user_ids           = [for user in data.gitlab_user.users : user.id]
 }
-
-# Example using `approval_rule`
-resource "gitlab_branch_protection" "any-approver" {
-  project            = 5
-  name               = "Any name"
-  rule_type          = "any_approver"
-  approvals_required = 1
-}
