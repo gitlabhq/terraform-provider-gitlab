@@ -260,13 +260,15 @@ func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
 				Config:   testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
-					func(s *terraform.State) error {
-						if group.PreventForkingOutsideGroup != true {
-							return fmt.Errorf("expected forking outside the group to be disabled")
-						}
-
-						return nil
-					},
+					resource.TestCheckResourceAttr("gitlab_group.foo", "prevent_forking_outside_group", "true"),
+				),
+			},
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabGroupPreventForkingOutsideGroupUpdateConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					resource.TestCheckResourceAttr("gitlab_group.foo", "prevent_forking_outside_group", "false"),
 				),
 			},
 		},
@@ -584,6 +586,22 @@ resource "gitlab_group" "foo" {
   visibility_level = "public"
 
   prevent_forking_outside_group = true
+}
+  `, rInt, rInt)
+}
+
+func testAccGitlabGroupPreventForkingOutsideGroupUpdateConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  prevent_forking_outside_group = false
 }
   `, rInt, rInt)
 }
