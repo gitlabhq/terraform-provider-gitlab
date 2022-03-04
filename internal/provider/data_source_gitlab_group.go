@@ -92,7 +92,7 @@ var _ = registerDataSource("gitlab_group", func() *schema.Resource {
 				Computed:    true,
 			},
 			"prevent_forking_outside_group": {
-				Description: "When enabled, users can not fork projects from this group to external namespaces",
+				Description: "When enabled, users can not fork projects from this group to external namespaces.",
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},

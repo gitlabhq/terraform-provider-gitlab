@@ -149,7 +149,7 @@ var _ = registerResource("gitlab_group", func() *schema.Resource {
 				Sensitive:   true,
 			},
 			"prevent_forking_outside_group": {
-				Description: "When enabled, users can not fork projects from this group to external namespaces",
+				Description: "When enabled, users can not fork projects from this group to external namespaces.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
@@ -237,7 +237,7 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 
 	if (updateOptions != gitlab.UpdateGroupOptions{}) {
 		if _, _, err = client.Groups.UpdateGroup(d.Id(), &updateOptions, gitlab.WithContext(ctx)); err != nil {
-			return diag.Errorf("could not update group %q: %s", d.Id(), err)
+			return diag.Errorf("could not update group after creation %q: %s", d.Id(), err)
 		}
 	}
 
