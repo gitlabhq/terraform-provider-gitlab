@@ -148,6 +148,12 @@ var _ = registerResource("gitlab_group", func() *schema.Resource {
 				Computed:    true,
 				Sensitive:   true,
 			},
+			"prevent_forking_outside_group": {
+				Description: "When enabled, users can not fork projects from this group to external namespaces",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
 		},
 	}
 })
@@ -223,6 +229,18 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
+	var updateOptions gitlab.UpdateGroupOptions
+
+	if v, ok := d.GetOk("prevent_forking_outside_group"); ok {
+		updateOptions.PreventForkingOutsideGroup = gitlab.Bool(v.(bool))
+	}
+
+	if (updateOptions != gitlab.UpdateGroupOptions{}) {
+		if _, _, err = client.Groups.UpdateGroup(d.Id(), &updateOptions, gitlab.WithContext(ctx)); err != nil {
+			return diag.Errorf("could not update group %q: %s", d.Id(), err)
+		}
+	}
+
 	return resourceGitlabGroupRead(ctx, d, meta)
 }
 
@@ -266,6 +284,7 @@ func resourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta i
 	d.Set("runners_token", group.RunnersToken)
 	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 	d.Set("default_branch_protection", group.DefaultBranchProtection)
+	d.Set("prevent_forking_outside_group", group.PreventForkingOutsideGroup)
 
 	return nil
 }
@@ -335,6 +354,10 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 
 	if d.HasChange("default_branch_protection") {
 		options.DefaultBranchProtection = gitlab.Int(d.Get("default_branch_protection").(int))
+	}
+
+	if d.HasChange("prevent_forking_outside_group") {
+		options.PreventForkingOutsideGroup = gitlab.Bool(d.Get("prevent_forking_outside_group").(bool))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

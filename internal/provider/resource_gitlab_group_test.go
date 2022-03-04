@@ -408,6 +408,33 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 	return nil
 }
 
+func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
+	var group gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					func(s *terraform.State) error {
+						if group.PreventForkingOutsideGroup != true {
+							return fmt.Errorf("expected forking outside the group to be disabled")
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func testAccGitlabGroupConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
@@ -543,4 +570,20 @@ resource "gitlab_group" "nested_foo" {
   visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  prevent_forking_outside_group = true
+}
+  `, rInt, rInt)
 }
