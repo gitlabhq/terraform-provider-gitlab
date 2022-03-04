@@ -45,7 +45,7 @@ data "gitlab_group" "foo" {
 - **name** (String) The name of this group.
 - **parent_id** (Number) Integer, ID of the parent group.
 - **path** (String) The path of the group.
-- **prevent_forking_outside_group** (Boolean) When enabled, users can not fork projects from this group to external namespaces
+- **prevent_forking_outside_group** (Boolean) When enabled, users can not fork projects from this group to external namespaces.
 - **request_access_enabled** (Boolean) Boolean, is request for access enabled to the group.
 - **runners_token** (String, Sensitive) The group level registration token to use during runner setup.
 - **visibility_level** (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.
