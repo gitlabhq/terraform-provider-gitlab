@@ -91,6 +91,11 @@ var _ = registerDataSource("gitlab_group", func() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 			},
+			"prevent_forking_outside_group": {
+				Description: "When enabled, users can not fork projects from this group to external namespaces.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
 		},
 	}
 })
@@ -135,6 +140,7 @@ func dataSourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta
 	d.Set("parent_id", group.ParentID)
 	d.Set("runners_token", group.RunnersToken)
 	d.Set("default_branch_protection", group.DefaultBranchProtection)
+	d.Set("prevent_forking_outside_group", group.PreventForkingOutsideGroup)
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 

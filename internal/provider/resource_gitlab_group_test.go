@@ -246,6 +246,35 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
+	var group gitlab.Group
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					resource.TestCheckResourceAttr("gitlab_group.foo", "prevent_forking_outside_group", "true"),
+				),
+			},
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabGroupPreventForkingOutsideGroupUpdateConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					resource.TestCheckResourceAttr("gitlab_group.foo", "prevent_forking_outside_group", "false"),
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		_, err := testGitlabClient.Groups.DeleteGroup(group.ID)
@@ -543,4 +572,36 @@ resource "gitlab_group" "nested_foo" {
   visibility_level = "public"
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
+}
+
+func testAccGitlabGroupPreventForkingOutsideGroupConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  prevent_forking_outside_group = true
+}
+  `, rInt, rInt)
+}
+
+func testAccGitlabGroupPreventForkingOutsideGroupUpdateConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group" "foo" {
+  name = "foo-name-%d"
+  path = "foo-path-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+
+  prevent_forking_outside_group = false
+}
+  `, rInt, rInt)
 }
