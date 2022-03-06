@@ -12,7 +12,9 @@ import (
 
 var _ = registerResource("gitlab_service_microsoft_teams", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to manage Microsoft Teams integration.",
+		Description: `The ` + "`gitlab_service_microsoft_teams`" + ` resource allows to manage the lifecycle of a project integration with Microsoft Teams.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#microsoft-teams)`,
 
 		CreateContext: resourceGitlabServiceMicrosoftTeamsCreate,
 		ReadContext:   resourceGitlabServiceMicrosoftTeamsRead,
