@@ -3,12 +3,15 @@
 page_title: "gitlab_group_ldap_link Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add an LDAP link to an existing GitLab group.
+  The gitlab_group_ldap_link resource allows to manage the lifecycle of an LDAP integration with a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#ldap-group-links
 ---
 
 # gitlab_group_ldap_link (Resource)
 
-This resource allows you to add an LDAP link to an existing GitLab group.
+The `gitlab_group_ldap_link` resource allows to manage the lifecycle of an LDAP integration with a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#ldap-group-links)
 
 ## Example Usage
 
