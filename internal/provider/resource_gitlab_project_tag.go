@@ -11,13 +11,13 @@ import (
 
 var _ = registerResource("gitlab_project_tag", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `This resource allows you to create and manage GitLab tags.
+		Description: `The ` + "`gitlab_project_tag`" + ` resource allows to manage the lifecycle of a tag in a project.
 
 **Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
 
-		CreateContext: resourceGitlabTagCreate,
-		ReadContext:   resourceGitlabTagRead,
-		DeleteContext: resourceGitlabTagDelete,
+		CreateContext: resourceGitlabProjectTagCreate,
+		ReadContext:   resourceGitlabProjectTagRead,
+		DeleteContext: resourceGitlabProjectTagDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
@@ -89,7 +89,7 @@ var releaseNoteSchema = &schema.Resource{
 	},
 }
 
-func resourceGitlabTagCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceGitlabProjectTagCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	name := d.Get("name").(string)
 	project := d.Get("project").(string)
@@ -107,10 +107,10 @@ func resourceGitlabTagCreate(ctx context.Context, d *schema.ResourceData, meta i
 	}
 	d.SetId(buildTwoPartID(&project, &name))
 	d.Set("ref", ref)
-	return resourceGitlabTagRead(ctx, d, meta)
+	return resourceGitlabProjectTagRead(ctx, d, meta)
 }
 
-func resourceGitlabTagRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceGitlabProjectTagRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, name, err := parseTwoPartID(d.Id())
 	if err != nil {
@@ -144,7 +144,7 @@ func resourceGitlabTagRead(ctx context.Context, d *schema.ResourceData, meta int
 	return nil
 }
 
-func resourceGitlabTagDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func resourceGitlabProjectTagDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project, name, err := parseTwoPartID(d.Id())
 	if err != nil {

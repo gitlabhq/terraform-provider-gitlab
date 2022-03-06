@@ -11,11 +11,11 @@ import (
 
 var _ = registerDataSource("gitlab_project_tag", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `Provide details about a gitlab project tag
-				
+		Description: `The ` + "`gitlab_project_tag`" + ` data source allows details of a project tag to be retrieved by its name.
+
 **Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
 
-		ReadContext: dataSourceGitlabTagRead,
+		ReadContext: dataSourceGitlabProjectTagRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Description: "The name of a tag.",
@@ -60,7 +60,7 @@ var _ = registerDataSource("gitlab_project_tag", func() *schema.Resource {
 	}
 })
 
-func dataSourceGitlabTagRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func dataSourceGitlabProjectTagRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	name := d.Get("name").(string)
 	project := d.Get("project").(string)

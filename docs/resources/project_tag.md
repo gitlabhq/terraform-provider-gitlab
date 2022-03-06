@@ -3,13 +3,13 @@
 page_title: "gitlab_project_tag Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage GitLab tags.
+  The gitlab_project_tag resource allows to manage the lifecycle of a tag in a project.
   Upstream API : GitLab API docs https://docs.gitlab.com/ee/api/tags.html
 ---
 
 # gitlab_project_tag (Resource)
 
-This resource allows you to create and manage GitLab tags.
+The `gitlab_project_tag` resource allows to manage the lifecycle of a tag in a project.
 
 **Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)
 

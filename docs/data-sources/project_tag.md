@@ -3,14 +3,14 @@
 page_title: "gitlab_project_tag Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a gitlab project tag
+  The gitlab_project_tag data source allows details of a project tag to be retrieved by its name.
   Upstream API : GitLab API docs https://docs.gitlab.com/ee/api/tags.html
 ---
 
 # gitlab_project_tag (Data Source)
 
-Provide details about a gitlab project tag
-				
+The `gitlab_project_tag` data source allows details of a project tag to be retrieved by its name.
+
 **Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)
 
 ## Example Usage

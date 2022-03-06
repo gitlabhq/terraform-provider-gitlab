@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
-func TestAccDataGitlabTag_basic(t *testing.T) {
+func TestAccDataGitlabProjectTag_basic(t *testing.T) {
 	testAccCheck(t)
 	rInt := acctest.RandInt()
 	project := testAccCreateProject(t)
@@ -19,16 +19,16 @@ func TestAccDataGitlabTag_basic(t *testing.T) {
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataGitlabTag(rInt, project.PathWithNamespace),
+				Config: testAccDataGitlabProjectTag(rInt, project.PathWithNamespace),
 				Check: resource.ComposeTestCheckFunc(
-					testAccDataSourceGitlabTag("gitlab_project_tag.foo", "data.gitlab_project_tag.foo"),
+					testAccDataSourceGitlabProjectTag("gitlab_project_tag.foo", "data.gitlab_project_tag.foo"),
 				),
 			},
 		},
 	})
 }
 
-func testAccDataSourceGitlabTag(src, n string) resource.TestCheckFunc {
+func testAccDataSourceGitlabProjectTag(src, n string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 
 		tag := s.RootModule().Resources[src]
@@ -57,17 +57,17 @@ func testAccDataSourceGitlabTag(src, n string) resource.TestCheckFunc {
 	}
 }
 
-func testAccDataGitlabTag(rInt int, project string) string {
+func testAccDataGitlabProjectTag(rInt int, project string) string {
 	return fmt.Sprintf(`
 %s
 data "gitlab_project_tag" "foo" {
   name    = "${gitlab_project_tag.foo.name}"
   project = "%s"
 }
-`, testAccDataGitlabTagSetup(rInt, project), project)
+`, testAccDataGitlabProjectTagSetup(rInt, project), project)
 }
 
-func testAccDataGitlabTagSetup(rInt int, project string) string {
+func testAccDataGitlabProjectTagSetup(rInt int, project string) string {
 	return fmt.Sprintf(`
 resource "gitlab_project_tag" "foo" {
     name    = "tag-%[1]d"
