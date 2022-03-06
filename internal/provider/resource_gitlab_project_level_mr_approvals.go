@@ -12,8 +12,11 @@ import (
 
 var _ = registerResource("gitlab_project_level_mr_approvals", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to configure project-level MR approvals. for your GitLab projects.\n" +
-			"For further information on merge request approvals, consult the [GitLab API documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).",
+		Description: `The ` + "`" + `gitlab_project_level_mr_approval_rule` + "`" + ` resource allows to manage the lifecycle of a Merge Request-level approval rule.
+
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/merge_request_approvals.html#merge-request-level-mr-approvals)`,
 
 		CreateContext: resourceGitlabProjectLevelMRApprovalsCreate,
 		ReadContext:   resourceGitlabProjectLevelMRApprovalsRead,
