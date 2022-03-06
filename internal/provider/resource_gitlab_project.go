@@ -748,10 +748,15 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 
 	project, _, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] gitlab project %s has already been deleted, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 	if project.MarkedForDeletionAt != nil {
-		log.Printf("[DEBUG] gitlab project %s is marked for deletion", d.Id())
+		log.Printf("[DEBUG] gitlab project %s is marked for deletion, removing from state", d.Id())
 		d.SetId("")
 		return nil
 	}
