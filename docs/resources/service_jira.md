@@ -3,12 +3,15 @@
 page_title: "gitlab_service_jira Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to manage Jira integration.
+  The gitlab_service_jira resource allows to manage the lifecycle of a project integration with Jira.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/services.html#jira
 ---
 
 # gitlab_service_jira (Resource)
 
-This resource allows you to manage Jira integration.
+The `gitlab_service_jira` resource allows to manage the lifecycle of a project integration with Jira.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/services.html#jira)
 
 ## Example Usage
 
