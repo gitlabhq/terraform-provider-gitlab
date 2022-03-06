@@ -16,17 +16,11 @@ const encoding = "base64"
 
 var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage GitLab repository files.\n\n" +
-			"**Limitations**:\n\n" +
-			"The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html)\n" +
-			"can only create, update or delete a single file at the time.\n" +
-			"The API will also\n" +
-			"[fail with a `400`](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository)\n" +
-			"response status code if the underlying repository is changed while the API tries to make changes.\n" +
-			"Therefore, it's recommended to make sure that you execute it with\n" +
-			"[`-parallelism=1`](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n)\n" +
-			"and that no other entity than the terraform at hand makes changes to the\n" +
-			"underlying repository while it's executing.",
+		Description: `The ` + "`gitlab_repository_file`" + ` resource allows to manage the lifecycle of a file within a repository.
+
+~> **Limitations**: The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html) can only create, update or delete a single file at the time.  The API will also [fail with a 400](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository) response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with [-parallelism=1](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n) and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)`,
 
 		CreateContext: resourceGitlabRepositoryFileCreate,
 		ReadContext:   resourceGitlabRepositoryFileRead,

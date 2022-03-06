@@ -3,34 +3,18 @@
 page_title: "gitlab_repository_file Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage GitLab repository files.
-  Limitations:
-  The GitLab Repository Files API https://docs.gitlab.com/ee/api/repository_files.html
-  can only create, update or delete a single file at the time.
-  The API will also
-  fail with a 400 https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository
-  response status code if the underlying repository is changed while the API tries to make changes.
-  Therefore, it's recommended to make sure that you execute it with
-  -parallelism=1 https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n
-  and that no other entity than the terraform at hand makes changes to the
-  underlying repository while it's executing.
+  The gitlab_repository_file resource allows to manage the lifecycle of a file within a repository.
+  ~> Limitations: The GitLab Repository Files API https://docs.gitlab.com/ee/api/repository_files.html can only create, update or delete a single file at the time.  The API will also fail with a 400 https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with -parallelism=1 https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/repository_files.html
 ---
 
 # gitlab_repository_file (Resource)
 
-This resource allows you to create and manage GitLab repository files.
+The `gitlab_repository_file` resource allows to manage the lifecycle of a file within a repository.
 
-**Limitations**:
+~> **Limitations**: The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html) can only create, update or delete a single file at the time.  The API will also [fail with a 400](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository) response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with [-parallelism=1](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n) and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
 
-The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html)
-can only create, update or delete a single file at the time.
-The API will also
-[fail with a `400`](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository)
-response status code if the underlying repository is changed while the API tries to make changes.
-Therefore, it's recommended to make sure that you execute it with
-[`-parallelism=1`](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n)
-and that no other entity than the terraform at hand makes changes to the
-underlying repository while it's executing.
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)
 
 ## Example Usage
 
