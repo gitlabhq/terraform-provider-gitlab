@@ -120,7 +120,7 @@ $ make testacc GITLAB_TOKEN=example123 GITLAB_BASE_URL=https://example.com/api/v
 
   Features that only work on one flavour can use the following helpers as
   SkipFunc: `isRunningInEE` and `isRunningInCE`. You can see an example of this
-  for [gitlab_project_level_mr_approvals](gitlab/resource_gitlab_project_level_mr_approvals_test.go)
+  for [gitlab_project_level_mr_approvals](internal/provider/resource_gitlab_project_level_mr_approvals_test.go)
   tests.
 
 * **Run EE tests:**
