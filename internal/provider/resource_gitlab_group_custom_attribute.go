@@ -17,6 +17,8 @@ var _ = registerResource("gitlab_group_custom_attribute", func() *schema.Resourc
 		func(client *gitlab.Client) CustomAttributeDeleter {
 			return client.CustomAttribute.DeleteCustomGroupAttribute
 		},
-		"This resource allows you to set custom attributes for a group.",
+		`The `+"`gitlab_group_custom_attribute`"+` resource allows to manage custom attributes for a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/custom_attributes.html)`,
 	)
 })
