@@ -3,12 +3,15 @@
 page_title: "gitlab_branch Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a gitlab project branch
+  The gitlab_branch data source allows details of a repository branch to be retrieved by its name and project.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch
 ---
 
 # gitlab_branch (Data Source)
 
-Provide details about a gitlab project branch
+The `gitlab_branch` data source allows details of a repository branch to be retrieved by its name and project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch)
 
 ## Example Usage
 
