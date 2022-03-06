@@ -8,8 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-cty/cty"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func renderValueListForDocs(values []string) string {
@@ -209,6 +211,17 @@ func stringSetToStringSlice(stringSet *schema.Set) *[]string {
 	return &ret
 }
 
+func intSetToIntSlice(intSet *schema.Set) *[]int {
+	ret := []int{}
+	if intSet == nil {
+		return &ret
+	}
+	for _, envVal := range intSet.List() {
+		ret = append(ret, envVal.(int))
+	}
+	return &ret
+}
+
 // isGitLabVersionLessThan is a SkipFunc that returns true if the provided version is lower then
 // the current version of GitLab. It only checks the major and minor version numbers, not the patch.
 func isGitLabVersionLessThan(client *gitlab.Client, version string) func() (bool, error) {
@@ -271,4 +284,119 @@ func is404(err error) bool {
 		return true
 	}
 	return false
+}
+
+// ISO 8601 date format
+const iso8601 = "2006-01-02"
+
+// isISO8601 validates if the given value is a ISO8601 compatible date in the YYYY-MM-DD format.
+func isISO6801Date(i interface{}, p cty.Path) diag.Diagnostics {
+	v := i.(string)
+
+	if _, err := time.Parse(iso8601, v); err != nil {
+		return diag.Errorf("expected %q to be a valid YYYY-MM-DD date, got %q: %+v", p, i, err)
+	}
+
+	return nil
+}
+
+func parseISO8601Date(v string) (*gitlab.ISOTime, error) {
+	iso8601Date, err := time.Parse(iso8601, v)
+	if err != nil {
+		return nil, fmt.Errorf("expected %q to be a valid YYYY-MM-DD date", v)
+	}
+
+	x := gitlab.ISOTime(iso8601Date)
+	return &x, nil
+}
+
+// contains checks if a string is present in a slice
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
+func constructSchema(schemas ...map[string]*schema.Schema) map[string]*schema.Schema {
+	schema := make(map[string]*schema.Schema)
+	for _, s := range schemas {
+		for k, v := range s {
+			schema[k] = v
+		}
+	}
+	return schema
+}
+
+func attributeNamesFromSchema(schema map[string]*schema.Schema) []string {
+	names := make([]string, 0, len(schema))
+	for name := range schema {
+		names = append(names, name)
+	}
+	return names
+}
+
+// datasourceSchemaFromResourceSchema is a recursive func that
+// converts an existing Resource schema to a Datasource schema.
+// All schema elements are copied, but certain attributes are ignored or changed:
+// - all attributes have Computed = true
+// - all attributes have ForceNew, Required = false
+// - Validation funcs and attributes (e.g. MaxItems) are not copied
+// Adapted from https://github.com/hashicorp/terraform-provider-google/blob/1a72f93a8dcf6f1e59d5f25aefcb6d794a116bf5/google/datasource_helpers.go#L13
+func datasourceSchemaFromResourceSchema(rs map[string]*schema.Schema, arguments ...string) map[string]*schema.Schema {
+	ds := make(map[string]*schema.Schema, len(rs))
+	for k, v := range rs {
+		dv := &schema.Schema{
+			ForceNew:    false,
+			Description: v.Description,
+			Type:        v.Type,
+		}
+		if contains(arguments, k) {
+			dv.Computed = false
+			dv.Required = true
+		} else {
+			dv.Computed = true
+			dv.Required = false
+		}
+
+		switch v.Type {
+		case schema.TypeSet:
+			dv.Set = v.Set
+			fallthrough
+		case schema.TypeList:
+			// List & Set types are generally used for 2 cases:
+			// - a list/set of simple primitive values (e.g. list of strings)
+			// - a sub resource
+			if elem, ok := v.Elem.(*schema.Resource); ok {
+				// handle the case where the Element is a sub-resource
+				dv.Elem = &schema.Resource{
+					Schema: datasourceSchemaFromResourceSchema(elem.Schema),
+				}
+			} else {
+				// handle simple primitive case
+				dv.Elem = v.Elem
+			}
+
+		default:
+			// Elem of all other types are copied as-is
+			dv.Elem = v.Elem
+
+		}
+		ds[k] = dv
+
+	}
+	return ds
+}
+
+func setStateMapInResourceData(stateMap map[string]interface{}, d *schema.ResourceData) error {
+	for k, v := range stateMap {
+		// lintignore: R001 // for convenience sake, to reduce maintenance burden we are ok not having literals here.
+		if err := d.Set(k, v); err != nil {
+			return fmt.Errorf("failed to set state for %q to %v: %w", k, v, err)
+		}
+	}
+
+	return nil
 }
