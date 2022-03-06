@@ -41,8 +41,11 @@ var (
 
 var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.\n\n" +
-			"-> The `allowed_to_push`, `allowed_to_merge` and `code_owner_approval_required` arguments require a GitLab Premium account or above.  Please refer to [Gitlab API documentation](https://docs.gitlab.com/ee/api/protected_branches.html) for further information.",
+		Description: `The ` + "`gitlab_branch_protection`" + ` resource allows to manage the lifecycle of a protected branch of a repository.
+
+~> The allowed_to_push, allowed_to_merge and code_owner_approval_required attributes require a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_branches.html)`,
 
 		CreateContext: resourceGitlabBranchProtectionCreate,
 		ReadContext:   resourceGitlabBranchProtectionRead,
