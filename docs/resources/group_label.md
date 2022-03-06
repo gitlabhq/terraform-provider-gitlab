@@ -3,16 +3,15 @@
 page_title: "gitlab_group_label Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage labels for your GitLab groups.
-  For further information on labels, consult the gitlab
-  documentation https://docs.gitlab.com/ee/user/project/labels.html#group-labels.
+  The gitlab_group_label resource allows to manage the lifecycle of labels within a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/user/project/labels.html#group-labels
 ---
 
 # gitlab_group_label (Resource)
 
-This resource allows you to create and manage labels for your GitLab groups.
-For further information on labels, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/user/project/labels.html#group-labels).
+The `gitlab_group_label` resource allows to manage the lifecycle of labels within a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/labels.html#group-labels)
 
 ## Example Usage
 

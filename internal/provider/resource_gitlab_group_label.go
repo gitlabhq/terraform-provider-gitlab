@@ -14,9 +14,9 @@ import (
 
 var _ = registerResource("gitlab_group_label", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage labels for your GitLab groups.\n" +
-			"For further information on labels, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ee/user/project/labels.html#group-labels).",
+		Description: `The ` + "`gitlab_group_label`" + ` resource allows to manage the lifecycle of labels within a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/labels.html#group-labels)`,
 
 		CreateContext: resourceGitlabGroupLabelCreate,
 		ReadContext:   resourceGitlabGroupLabelRead,
