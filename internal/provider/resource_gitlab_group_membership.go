@@ -15,7 +15,11 @@ import (
 
 var _ = registerResource("gitlab_group_membership", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to add a user to an existing group.",
+		Description: `The ` + "`gitlab_group_membership`" + ` resource allows to manage the lifecycle of a users group membersip.
+
+-> If a group should grant membership to another group use the ` + "`gitlab_group_share_group`" + ` resource instead.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html)`,
 
 		CreateContext: resourceGitlabGroupMembershipCreate,
 		ReadContext:   resourceGitlabGroupMembershipRead,
