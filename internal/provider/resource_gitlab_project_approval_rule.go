@@ -16,8 +16,11 @@ var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).\n\n" +
-			"-> This feature requires GitLab Premium.",
+		Description: `The ` + "`" + `gitlab_project_approval_rule` + "`" + ` resource allows to manage the lifecycle of a project-level approval rule.
+
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals)`,
 
 		CreateContext: resourceGitlabProjectApprovalRuleCreate,
 		ReadContext:   resourceGitlabProjectApprovalRuleRead,

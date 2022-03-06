@@ -3,15 +3,18 @@
 page_title: "gitlab_project_approval_rule Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the gitlab documentation https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals.
-  -> This feature requires GitLab Premium.
+  The gitlab_project_approval_rule resource allows to manage the lifecycle of a project-level approval rule.
+  -> This resource requires a GitLab Enterprise instance.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals
 ---
 
 # gitlab_project_approval_rule (Resource)
 
-This resource allows you to create and manage multiple approval rules for your GitLab projects. For further information on approval rules, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
+The `gitlab_project_approval_rule` resource allows to manage the lifecycle of a project-level approval rule.
 
--> This feature requires GitLab Premium.
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals)
 
 ## Example Usage
 
