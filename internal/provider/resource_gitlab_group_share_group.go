@@ -17,7 +17,9 @@ import (
 
 var _ = registerResource("gitlab_group_share_group", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to share a group with another group",
+		Description: `The ` + "`" + `gitlab_group_share_group` + "`" + ` resource allows to manage the lifecycle of group shared with another group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#share-groups-with-groups)`,
 
 		CreateContext: resourceGitlabGroupShareGroupCreate,
 		ReadContext:   resourceGitlabGroupShareGroupRead,
