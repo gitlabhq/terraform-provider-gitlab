@@ -13,11 +13,14 @@ import (
 
 var _ = registerResource("gitlab_topic", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `This resource allows you to create and manage topics that are then assignable to projects. Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.  
+		Description: `The ` + "`gitlab_topic`" + ` resource allows to manage the lifecycle of topics that are then assignable to projects.
 
-For assigning topics, use the [project](./project.md) resource.
+Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
 
-~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.`,
+~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.
+
+**Upstream API**: [GitLab REST API docs for topics](https://docs.gitlab.com/ee/api/topics.html)
+`,
 
 		CreateContext: resourceGitlabTopicCreate,
 		ReadContext:   resourceGitlabTopicRead,
