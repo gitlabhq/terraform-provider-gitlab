@@ -3,12 +3,15 @@
 page_title: "gitlab_project_share_group Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to share a project with a group
+  The gitlab_project_share_group resource allows to manage the lifecycle of project shared with a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#share-project-with-group
 ---
 
 # gitlab_project_share_group (Resource)
 
-This resource allows you to share a project with a group
+The `gitlab_project_share_group` resource allows to manage the lifecycle of project shared with a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#share-project-with-group)
 
 ## Example Usage
 
