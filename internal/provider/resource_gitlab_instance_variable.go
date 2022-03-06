@@ -12,9 +12,9 @@ import (
 
 var _ = registerResource("gitlab_instance_variable", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage CI/CD variables for your GitLab instance.\n" +
-			"For further information on variables, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ee/api/instance_level_ci_variables.html).",
+		Description: `The ` + "`" + `gitlab_instance_variable` + "`" + ` resource allows to manage the lifecycle of a CI/CD variable for an instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_variables.html)`,
 
 		CreateContext: resourceGitlabInstanceVariableCreate,
 		ReadContext:   resourceGitlabInstanceVariableRead,
