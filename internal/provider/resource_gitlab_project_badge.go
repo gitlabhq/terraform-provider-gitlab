@@ -90,6 +90,11 @@ func resourceGitlabProjectBadgeRead(ctx context.Context, d *schema.ResourceData,
 
 	badge, _, err := client.ProjectBadges.GetProjectBadge(projectID, badgeID, gitlab.WithContext(ctx))
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] project badge %d in project %s doesn't exist anymore, removing from state", badgeID, projectID)
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
