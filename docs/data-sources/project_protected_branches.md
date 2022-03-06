@@ -3,12 +3,15 @@
 page_title: "gitlab_project_protected_branches Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provides details about all protected branches in a given project.
+  The gitlab_protected_branches data source allows details of the protected branches of a given project.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_branches.html#list-protected-branches
 ---
 
 # gitlab_project_protected_branches (Data Source)
 
-Provides details about all protected branches in a given project.
+The `gitlab_protected_branches` data source allows details of the protected branches of a given project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_branches.html#list-protected-branches)
 
 ## Example Usage
 
