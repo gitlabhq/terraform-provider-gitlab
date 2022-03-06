@@ -3,13 +3,13 @@
 page_title: "gitlab_project_issue Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This data source allows you to access GitLab Project Issues.
+  The gitlab_project_issue data source allows to retrieve details about an issue in a project.
   Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/issues.html
 ---
 
 # gitlab_project_issue (Data Source)
 
-This data source allows you to access GitLab Project Issues.
+The `gitlab_project_issue` data source allows to retrieve details about an issue in a project.
 
 **Upstream API:** [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
 

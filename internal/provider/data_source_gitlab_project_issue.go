@@ -10,7 +10,7 @@ import (
 
 var _ = registerDataSource("gitlab_project_issue", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `This data source allows you to access GitLab Project Issues.
+		Description: `The ` + "`gitlab_project_issue`" + ` data source allows to retrieve details about an issue in a project.
 
 **Upstream API:** [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)`,
 
