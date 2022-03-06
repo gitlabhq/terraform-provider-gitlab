@@ -3,12 +3,18 @@
 page_title: "gitlab_group_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage Group Access Token for your GitLab Groups. (Introduced in GitLab 14.7)
+  The gitlab_group_accesstoken resource allows to manage the lifecycle of a group access token.
+  -> Group Access Token were introduced in GitLab 14.7
+  Upstream API: GitLab REST API https://docs.gitlab.com/ee/api/group_access_tokens.html
 ---
 
 # gitlab_group_access_token (Resource)
 
-This resource allows you to create and manage Group Access Token for your GitLab Groups. (Introduced in GitLab 14.7)
+The `gitlab_group_access`token resource allows to manage the lifecycle of a group access token.
+
+-> Group Access Token were introduced in GitLab 14.7
+
+**Upstream API**: [GitLab REST API](https://docs.gitlab.com/ee/api/group_access_tokens.html)
 
 ## Example Usage
 
