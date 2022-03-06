@@ -12,7 +12,9 @@ import (
 
 var _ = registerResource("gitlab_branch", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage GitLab branches.",
+		Description: `The ` + "`gitlab_branch`" + ` resource allows to manage the lifecycle of a repository branch.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/branches.html)`,
 
 		CreateContext: resourceGitlabBranchCreate,
 		ReadContext:   resourceGitlabBranchRead,
