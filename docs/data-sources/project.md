@@ -3,12 +3,15 @@
 page_title: "gitlab_project Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a specific project in the gitlab provider. The results include the name of the project, path, description, default branch, etc.
+  The gitlab_project data source allows details of a project to be retrieved by either its ID or its path with namespace.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#get-single-project
 ---
 
 # gitlab_project (Data Source)
 
-Provide details about a specific project in the gitlab provider. The results include the name of the project, path, description, default branch, etc.
+The `gitlab_project` data source allows details of a project to be retrieved by either its ID or its path with namespace.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#get-single-project)
 
 ## Example Usage
 
