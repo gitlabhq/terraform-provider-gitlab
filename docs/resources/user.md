@@ -3,17 +3,21 @@
 page_title: "gitlab_user Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage GitLab users.
-  Note your provider will need to be configured with admin-level access for this resource to work.
+  The gitlab_user resource allows to manage the lifecycle of a user.
+  -> the provider needs to be configured with admin-level access for this resource to work.
   -> You must specify either password or reset_password.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html
 ---
 
 # gitlab_user (Resource)
 
-This resource allows you to create and manage GitLab users.
-Note your provider will need to be configured with admin-level access for this resource to work.
+The `gitlab_user` resource allows to manage the lifecycle of a user.
 
--> You must specify either `password` or `reset_password`.
+-> the provider needs to be configured with admin-level access for this resource to work.
+
+-> You must specify either password or reset_password.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html)
 
 ## Example Usage
 
