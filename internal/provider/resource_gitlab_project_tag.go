@@ -12,7 +12,7 @@ import (
 var _ = registerResource("gitlab_project_tag", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `This resource allows you to create and manage GitLab tags.
-		
+
 **Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
 
 		CreateContext: resourceGitlabTagCreate,
@@ -35,7 +35,7 @@ var _ = registerResource("gitlab_project_tag", func() *schema.Resource {
 				Required:    true,
 			},
 			"ref": {
-				Description: "Create tag using commit SHA, another tag name, or branch name.",
+				Description: "Create tag using commit SHA, another tag name, or branch name. This attribute is not available for imported resources.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,

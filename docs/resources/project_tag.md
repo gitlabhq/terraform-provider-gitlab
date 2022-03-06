@@ -10,7 +10,7 @@ description: |-
 # gitlab_project_tag (Resource)
 
 This resource allows you to create and manage GitLab tags.
-		
+
 **Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)
 
 ## Example Usage
@@ -37,7 +37,7 @@ resource "gitlab_project_tag" "example" {
 
 - **name** (String) The name of a tag.
 - **project** (String) The ID or URL-encoded path of the project owned by the authenticated user.
-- **ref** (String) Create tag using commit SHA, another tag name, or branch name.
+- **ref** (String) Create tag using commit SHA, another tag name, or branch name. This attribute is not available for imported resources.
 
 ### Optional
 
@@ -84,4 +84,6 @@ Import is supported using the following syntax:
 ```shell
 # Gitlab project tags can be imported with a key composed of `<project_id>:<tag_name>`, e.g.
 terraform import gitlab_project_tag.example "12345:develop"
+
+# NOTE: the `ref` attribute won't be available for imported `gitlab_project_tag` resources.
 ```
