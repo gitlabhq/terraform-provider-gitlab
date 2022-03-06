@@ -13,7 +13,9 @@ import (
 
 var _ = registerResource("gitlab_service_pipelines_email", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource manages a [Pipelines email integration](https://docs.gitlab.com/ee/user/project/integrations/overview.html#integrations-listing) that emails the pipeline status to a list of recipients.",
+		Description: `The ` + "`gitlab_service_pipelines_email`" + ` resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails)`,
 
 		CreateContext: resourceGitlabServicePipelinesEmailCreate,
 		ReadContext:   resourceGitlabServicePipelinesEmailRead,
