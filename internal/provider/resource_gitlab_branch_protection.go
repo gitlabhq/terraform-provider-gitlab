@@ -71,14 +71,16 @@ var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 				Description:      fmt.Sprintf("Access levels allowed to merge. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchTagAccessLevelNames, false)),
-				Required:         true,
+				Optional:         true,
+				Default:          accessLevelValueToName[gitlab.MaintainerPermissions],
 				ForceNew:         true,
 			},
 			"push_access_level": {
 				Description:      fmt.Sprintf("Access levels allowed to push. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchTagAccessLevelNames, false)),
-				Required:         true,
+				Optional:         true,
+				Default:          accessLevelValueToName[gitlab.MaintainerPermissions],
 				ForceNew:         true,
 			},
 			"allow_force_push": {
