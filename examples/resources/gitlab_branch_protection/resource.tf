@@ -3,6 +3,7 @@ resource "gitlab_branch_protection" "BranchProtect" {
   branch                       = "BranchProtected"
   push_access_level            = "developer"
   merge_access_level           = "developer"
+  unprotect_access_level       = "developer"
   allow_force_push             = true
   code_owner_approval_required = true
   allowed_to_push {
@@ -17,14 +18,21 @@ resource "gitlab_branch_protection" "BranchProtect" {
   allowed_to_merge {
     user_id = 37
   }
+  allowed_to_unprotect {
+    user_id = 15
+  }
+  allowed_to_unprotect {
+    group_id = 42
+  }
 }
 
 # Example using dynamic block
 resource "gitlab_branch_protection" "main" {
-  project            = "12345"
-  branch             = "main"
-  push_access_level  = "maintainer"
-  merge_access_level = "maintainer"
+  project                = "12345"
+  branch                 = "main"
+  push_access_level      = "maintainer"
+  merge_access_level     = "maintainer"
+  unprotect_access_level = "maintainer"
 
   dynamic "allowed_to_push" {
     for_each = [50, 55, 60]
