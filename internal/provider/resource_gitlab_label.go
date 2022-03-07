@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -43,6 +44,12 @@ var _ = registerResource("gitlab_label", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 			},
+			"priority": {
+				Description:      "The priority of the label. Must be greater or equal than zero or null to remove the priority.",
+				Type:             schema.TypeInt,
+				Optional:         true,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.IntAtLeast(0)),
+			},
 		},
 	}
 })
@@ -57,6 +64,10 @@ func resourceGitlabLabelCreate(ctx context.Context, d *schema.ResourceData, meta
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("priority"); ok {
+		options.Priority = gitlab.Int(v.(int))
 	}
 
 	log.Printf("[DEBUG] create gitlab label %s", *options.Name)
@@ -89,6 +100,7 @@ func resourceGitlabLabelRead(ctx context.Context, d *schema.ResourceData, meta i
 				d.Set("description", label.Description)
 				d.Set("color", label.Color)
 				d.Set("name", label.Name)
+				d.Set("priority", label.Priority)
 				return nil
 			}
 		}
@@ -111,6 +123,10 @@ func resourceGitlabLabelUpdate(ctx context.Context, d *schema.ResourceData, meta
 
 	if d.HasChange("description") {
 		options.Description = gitlab.String(d.Get("description").(string))
+	}
+
+	if d.HasChange("priority") {
+		options.Priority = gitlab.Int(d.Get("priority").(int))
 	}
 
 	log.Printf("[DEBUG] update gitlab label %s", d.Id())

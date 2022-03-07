@@ -46,5 +46,6 @@ resource "gitlab_label" "devops_create" {
 
 - **description** (String) The description of the label.
 - **id** (String) The ID of this resource.
+- **priority** (Number) The priority of the label. Must be greater or equal than zero or null to remove the priority.
 
 

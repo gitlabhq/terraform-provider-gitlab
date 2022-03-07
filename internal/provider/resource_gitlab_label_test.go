@@ -28,6 +28,7 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 						Name:        fmt.Sprintf("FIXME-%d", rInt),
 						Color:       "#ffcc00",
 						Description: "fix this test",
+						Priority:    5,
 					}),
 				),
 			},
@@ -40,6 +41,7 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 						Name:        fmt.Sprintf("FIXME-%d", rInt),
 						Color:       "#ff0000",
 						Description: "red label",
+						Priority:    1,
 					}),
 				),
 			},
@@ -52,6 +54,7 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 						Name:        fmt.Sprintf("FIXME-%d", rInt),
 						Color:       "#ffcc00",
 						Description: "fix this test",
+						Priority:    5,
 					}),
 				),
 			},
@@ -120,6 +123,7 @@ type testAccGitlabLabelExpectedAttributes struct {
 	Name        string
 	Color       string
 	Description string
+	Priority    int
 }
 
 func testAccCheckGitlabLabelAttributes(label *gitlab.Label, want *testAccGitlabLabelExpectedAttributes) resource.TestCheckFunc {
@@ -134,6 +138,10 @@ func testAccCheckGitlabLabelAttributes(label *gitlab.Label, want *testAccGitlabL
 
 		if label.Color != want.Color {
 			return fmt.Errorf("got color %q; want %q", label.Color, want.Color)
+		}
+
+		if label.Priority != want.Priority {
+			return fmt.Errorf("got priority %d; want %d", label.Priority, want.Priority)
 		}
 
 		return nil
@@ -178,6 +186,7 @@ resource "gitlab_label" "fixme" {
   name = "FIXME-%d"
   color = "#ffcc00"
   description = "fix this test"
+  priority = 5
 }
 	`, rInt, rInt)
 }
@@ -198,6 +207,7 @@ resource "gitlab_label" "fixme" {
   name = "FIXME-%d"
   color = "#ff0000"
   description = "red label"
+  priority = 1
 }
 	`, rInt, rInt)
 }
