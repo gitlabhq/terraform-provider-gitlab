@@ -20,7 +20,7 @@ jobs:
     outputs:
       go-version: ${{ steps.go-version.outputs.go-version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Read the .go-version file and output it for other jobs to use.
       - id: go-version
         run: echo "::set-output name=go-version::$(cat .go-version)"
@@ -29,7 +29,7 @@ jobs:
     needs: [go-version]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
       - name: Unshallow
         run: git fetch --prune --unshallow
       - name: Set up Go
@@ -50,7 +50,7 @@ jobs:
           sed -n "/## $LATEST_TAG/,/## $PREVIOUS_TAG"'/{//!p;}' CHANGELOG.md > /tmp/RELEASE-NOTES.md
           cat /tmp/RELEASE-NOTES.md
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2.8.1
+        uses: goreleaser/goreleaser-action@v2.9.1
         with:
           version: latest
           args: release --release-notes /tmp/RELEASE-NOTES.md --rm-dist
