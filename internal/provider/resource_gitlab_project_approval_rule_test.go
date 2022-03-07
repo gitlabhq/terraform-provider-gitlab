@@ -12,7 +12,7 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
+func TestAccGitLabProjectApprovalRule_Basic(t *testing.T) {
 	// Set up project, groups, users, and branches to use in the test.
 
 	testAccCheck(t)
@@ -43,10 +43,10 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create rule
 			{
-				Config: testAccGitlabProjectApprovalRuleConfig(project.ID, 3, projectUsers[0].ID, groups[0].ID, branches[0].ID),
+				Config: testAccGitlabProjectApprovalRuleConfig_Basic(project.ID, 3, projectUsers[0].ID, groups[0].ID, branches[0].ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
-					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
+					testAccCheckGitlabProjectApprovalRuleAttributes_Basic(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes_Basic{
 						Name:                "foo",
 						ApprovalsRequired:   3,
 						EligibleApproverIDs: []int{currentUser.ID, projectUsers[0].ID, group0Users[0].ID},
@@ -57,10 +57,10 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 			},
 			// Update rule
 			{
-				Config: testAccGitlabProjectApprovalRuleConfig(project.ID, 2, projectUsers[1].ID, groups[1].ID, branches[1].ID),
+				Config: testAccGitlabProjectApprovalRuleConfig_Basic(project.ID, 2, projectUsers[1].ID, groups[1].ID, branches[1].ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.foo", &projectApprovalRule),
-					testAccCheckGitlabProjectApprovalRuleAttributes(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes{
+					testAccCheckGitlabProjectApprovalRuleAttributes_Basic(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes_Basic{
 						Name:                "foo",
 						ApprovalsRequired:   2,
 						EligibleApproverIDs: []int{currentUser.ID, projectUsers[1].ID, group1Users[0].ID},
@@ -79,7 +79,69 @@ func TestAccGitLabProjectApprovalRule_basic(t *testing.T) {
 	})
 }
 
-type testAccGitlabProjectApprovalRuleExpectedAttributes struct {
+func TestAccGitLabProjectApprovalRule_AnyApprover(t *testing.T) {
+	// Set up project, groups, users, and branches to use in the test.
+
+	testAccCheck(t)
+	testAccCheckEE(t)
+
+	project := testAccCreateProject(t)
+
+	// Terraform test starts here.
+
+	var projectApprovalRule gitlab.ProjectApprovalRule
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectApprovalRuleDestroy(project.ID),
+		Steps: []resource.TestStep{
+			// Create rule
+			{
+				Config: testAccGitlabProjectApprovalRuleConfig_AnyApprover(project.ID, 3, "any_approver"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.bar", &projectApprovalRule),
+					testAccCheckGitlabProjectApprovalRuleAttributes_AnyApprover(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes_AnyApprover{
+						Name:              "bar",
+						ApprovalsRequired: 3,
+						RuleType:          "any_approver",
+					}),
+				),
+			},
+			// Update rule
+			{
+				Config: testAccGitlabProjectApprovalRuleConfig_AnyApprover(project.ID, 2, "any_approver"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.bar", &projectApprovalRule),
+					testAccCheckGitlabProjectApprovalRuleAttributes_AnyApprover(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes_AnyApprover{
+						Name:              "bar",
+						ApprovalsRequired: 2,
+						RuleType:          "any_approver",
+					}),
+				),
+			},
+			// Re-create rule
+			{
+				Config: testAccGitlabProjectApprovalRuleConfig_AnyApprover(project.ID, 2, "regular"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectApprovalRuleExists("gitlab_project_approval_rule.bar", &projectApprovalRule),
+					testAccCheckGitlabProjectApprovalRuleAttributes_AnyApprover(&projectApprovalRule, &testAccGitlabProjectApprovalRuleExpectedAttributes_AnyApprover{
+						Name:              "bar",
+						ApprovalsRequired: 2,
+						RuleType:          "regular",
+					}),
+				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_project_approval_rule.bar",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+type testAccGitlabProjectApprovalRuleExpectedAttributes_Basic struct {
 	Name                string
 	ApprovalsRequired   int
 	EligibleApproverIDs []int
@@ -87,7 +149,13 @@ type testAccGitlabProjectApprovalRuleExpectedAttributes struct {
 	ProtectedBranchIDs  []int
 }
 
-func testAccCheckGitlabProjectApprovalRuleAttributes(got *gitlab.ProjectApprovalRule, want *testAccGitlabProjectApprovalRuleExpectedAttributes) resource.TestCheckFunc {
+type testAccGitlabProjectApprovalRuleExpectedAttributes_AnyApprover struct {
+	Name              string
+	ApprovalsRequired int
+	RuleType          string
+}
+
+func testAccCheckGitlabProjectApprovalRuleAttributes_Basic(got *gitlab.ProjectApprovalRule, want *testAccGitlabProjectApprovalRuleExpectedAttributes_Basic) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		return InterceptGomegaFailure(func() {
 			Expect(got.Name).To(Equal(want.Name), "name")
@@ -114,7 +182,17 @@ func testAccCheckGitlabProjectApprovalRuleAttributes(got *gitlab.ProjectApproval
 	}
 }
 
-func testAccGitlabProjectApprovalRuleConfig(project, approvals, userID, groupID, protectedBranchID int) string {
+func testAccCheckGitlabProjectApprovalRuleAttributes_AnyApprover(got *gitlab.ProjectApprovalRule, want *testAccGitlabProjectApprovalRuleExpectedAttributes_AnyApprover) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return InterceptGomegaFailure(func() {
+			Expect(got.Name).To(Equal(want.Name), "name")
+			Expect(got.ApprovalsRequired).To(Equal(want.ApprovalsRequired), "approvals_required")
+			Expect(got.RuleType).To(Equal(want.RuleType), "rule_type")
+		})
+	}
+}
+
+func testAccGitlabProjectApprovalRuleConfig_Basic(project, approvals, userID, groupID, protectedBranchID int) string {
 	return fmt.Sprintf(`
 resource "gitlab_project_approval_rule" "foo" {
   project              = %d
@@ -124,6 +202,16 @@ resource "gitlab_project_approval_rule" "foo" {
   group_ids            = [%d]
   protected_branch_ids = [%d]
 }`, project, approvals, userID, groupID, protectedBranchID)
+}
+
+func testAccGitlabProjectApprovalRuleConfig_AnyApprover(project, approvals int, rule_type string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project_approval_rule" "bar" {
+  project              = %d
+  name                 = "bar"
+  approvals_required   = %d
+  rule_type            = "%s"
+}`, project, approvals, rule_type)
 }
 
 func testAccCheckGitlabProjectApprovalRuleExists(n string, projectApprovalRule *gitlab.ProjectApprovalRule) resource.TestCheckFunc {
