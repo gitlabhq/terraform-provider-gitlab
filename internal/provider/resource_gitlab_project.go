@@ -748,7 +748,9 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 
 	project, _, err := client.Projects.GetProject(d.Id(), nil, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(err)
+		log.Printf("[DEBUG] gitlab project %s has been deleted", d.Id())
+		d.SetId("")
+		return nil
 	}
 	if project.MarkedForDeletionAt != nil {
 		log.Printf("[DEBUG] gitlab project %s is marked for deletion", d.Id())
