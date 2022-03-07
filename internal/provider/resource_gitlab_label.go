@@ -78,7 +78,6 @@ func resourceGitlabLabelCreate(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	d.SetId(label.Name)
-
 	return resourceGitlabLabelRead(ctx, d, meta)
 }
 
