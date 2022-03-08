@@ -1,3 +1,24 @@
+## 3.12.0 (2022-03-08)
+
+FEATURES:
+
+* **New Resource:** `gitlab_project_tag` ([#910](https://github.com/gitlabhq/terraform-provider-gitlab/pull/910))
+* **New Resource:** `gitlab_project_issue` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+* **New Data Source:** `gitlab_project_issue` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+* **New Data Source:** `gitlab_project_issues` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+
+IMPROVEMENTS:
+
+* datasource/gitlab_group: Add `prevent_forking_outside_group` attribute ([#914](https://github.com/gitlabhq/terraform-provider-gitlab/pull/914))
+* resource/gitlab_group: Add `prevent_forking_outside_group` attribute ([#914](https://github.com/gitlabhq/terraform-provider-gitlab/pull/914))
+* resource/gitlab_project_approval_rule: Add `rule_type` attribute ([#916](https://github.com/gitlabhq/terraform-provider-gitlab/pull/916))
+
+BUG FIXES:
+
+* resource/gitlab_project: Fix deletion drift handling ([#924](https://github.com/gitlabhq/terraform-provider-gitlab/pull/924))
+* resource/gitlab_project_badge: Fix deletion drift handling ([#924](https://github.com/gitlabhq/terraform-provider-gitlab/pull/924))
+* resource/gitlab_group_badge: Fix deletion drift handling ([#924](https://github.com/gitlabhq/terraform-provider-gitlab/pull/924))
+
 ## 3.11.1 (2022-03-02)
 
 BUG FIXES:
