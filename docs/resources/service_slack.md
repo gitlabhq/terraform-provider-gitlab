@@ -3,12 +3,15 @@
 page_title: "gitlab_service_slack Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to manage Slack notifications integration.
+  The gitlab_service_slack resource allows to manage the lifecycle of a project integration with Slack.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#slack-notifications
 ---
 
 # gitlab_service_slack (Resource)
 
-This resource allows you to manage Slack notifications integration.
+The `gitlab_service_slack` resource allows to manage the lifecycle of a project integration with Slack.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#slack-notifications)
 
 ## Example Usage
 

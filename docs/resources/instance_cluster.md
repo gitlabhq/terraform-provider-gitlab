@@ -3,16 +3,18 @@
 page_title: "gitlab_instance_cluster Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage instance clusters for your GitLab instances.
-  For further information on clusters, consult the gitlab
-  documentation https://docs.gitlab.com/ee/user/instance/clusters/.
+  The gitlab_instance_cluster resource allows to manage the lifecycle of an instance cluster.
+  ~> This is deprecated GitLab feature since 14.5
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/instance_clusters.html
 ---
 
 # gitlab_instance_cluster (Resource)
 
-This resource allows you to create and manage instance clusters for your GitLab instances.
-For further information on clusters, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/user/instance/clusters/).
+The `gitlab_instance_cluster` resource allows to manage the lifecycle of an instance cluster.
+
+~> This is deprecated GitLab feature since 14.5
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_clusters.html)
 
 ## Example Usage
 

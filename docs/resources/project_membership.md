@@ -3,12 +3,18 @@
 page_title: "gitlab_project_membership Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add a current user to an existing project with a set access level.
+  The gitlab_project_membership resource allows to manage the lifecycle of a users project membersip.
+  -> If a project should grant membership to an entire group use the gitlab_project_share_group resource instead.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
 ---
 
 # gitlab_project_membership (Resource)
 
-This resource allows you to add a current user to an existing project with a set access level.
+The `gitlab_project_membership` resource allows to manage the lifecycle of a users project membersip.
+
+-> If a project should grant membership to an entire group use the `gitlab_project_share_group` resource instead.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html)
 
 ## Example Usage
 

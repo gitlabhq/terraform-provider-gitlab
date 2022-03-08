@@ -3,15 +3,18 @@
 page_title: "gitlab_user Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.
-  -> Some attributes might not be returned depending on if you're an admin or not. Please refer to Gitlab documentation https://docs.gitlab.com/ce/api/users.html#single-user for more details.
+  The gitlab_user data source allows details of a user to be retrieved by either the user ID, username or email address.
+  -> Some attributes might not be returned depending on if you're an admin or not.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html#single-user
 ---
 
 # gitlab_user (Data Source)
 
-Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.
+The `gitlab_user` data source allows details of a user to be retrieved by either the user ID, username or email address.
 
--> Some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.
+-> Some attributes might not be returned depending on if you're an admin or not.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#single-user)
 
 ## Example Usage
 

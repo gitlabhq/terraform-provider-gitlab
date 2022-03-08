@@ -3,12 +3,15 @@
 page_title: "gitlab_service_microsoft_teams Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to manage Microsoft Teams integration.
+  The gitlab_service_microsoft_teams resource allows to manage the lifecycle of a project integration with Microsoft Teams.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#microsoft-teams
 ---
 
 # gitlab_service_microsoft_teams (Resource)
 
-This resource allows you to manage Microsoft Teams integration.
+The `gitlab_service_microsoft_teams` resource allows to manage the lifecycle of a project integration with Microsoft Teams.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#microsoft-teams)
 
 ## Example Usage
 

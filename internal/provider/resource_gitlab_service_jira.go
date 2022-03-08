@@ -12,7 +12,9 @@ import (
 
 var _ = registerResource("gitlab_service_jira", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to manage Jira integration.",
+		Description: `The ` + "`gitlab_service_jira`" + ` resource allows to manage the lifecycle of a project integration with Jira.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/services.html#jira)`,
 
 		CreateContext: resourceGitlabServiceJiraCreate,
 		ReadContext:   resourceGitlabServiceJiraRead,

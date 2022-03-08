@@ -13,7 +13,9 @@ import (
 
 var _ = registerResource("gitlab_tag_protection", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to protect a specific tag or wildcard by an access level so that the user with less access level cannot Create the tags.",
+		Description: `The ` + "`" + `gitlab_tag_protection` + "`" + ` resource allows to manage the lifecycle of a tag protection.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_tags.html)`,
 
 		CreateContext: resourceGitlabTagProtectionCreate,
 		ReadContext:   resourceGitlabTagProtectionRead,

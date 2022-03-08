@@ -177,9 +177,13 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Description: "Provide details about a list of projects in the Gitlab provider. Listing all projects and group projects with [project filtering](https://docs.gitlab.com/ee/api/projects.html#list-user-projects) or [group project filtering](https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects) is supported.\n\n" +
-			"> **NOTE**: This data source supports all available filters exposed by the `xanzy/go-gitlab` package, which might not expose all available filters exposed by the Gitlab APIs.\n\n" +
-			"> **NOTE**: The [owner sub-attributes](#nestedobjatt--projects--owner) are only populated if the Gitlab token used has an administrator scope.",
+		Description: `The ` + "`gitlab_projects`" + ` data source allows details of multiple projects to be retrieved. Optionally filtered by the set attributes.
+
+-> This data source supports all available filters exposed by the xanzy/go-gitlab package, which might not expose all available filters exposed by the Gitlab APIs.
+
+-> The [owner sub-attributes](#nestedobjatt--projects--owner) are only populated if the Gitlab token used has an administrator scope.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#list-all-projects)`,
 
 		ReadContext: dataSourceGitlabProjectsRead,
 

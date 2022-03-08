@@ -3,15 +3,18 @@
 page_title: "gitlab_branch_protection Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.
-  -> The allowed_to_push, allowed_to_merge and code_owner_approval_required arguments require a GitLab Premium account or above.  Please refer to Gitlab API documentation https://docs.gitlab.com/ee/api/protected_branches.html for further information.
+  The gitlab_branch_protection resource allows to manage the lifecycle of a protected branch of a repository.
+  ~> The allowedtopush, allowedtomerge and codeownerapproval_required attributes require a GitLab Enterprise instance.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_branches.html
 ---
 
 # gitlab_branch_protection (Resource)
 
-This resource allows you to protect a specific branch by an access level so that the user with less access level cannot Merge/Push to the branch.
+The `gitlab_branch_protection` resource allows to manage the lifecycle of a protected branch of a repository.
 
--> The `allowed_to_push`, `allowed_to_merge` and `code_owner_approval_required` arguments require a GitLab Premium account or above.  Please refer to [Gitlab API documentation](https://docs.gitlab.com/ee/api/protected_branches.html) for further information.
+~> The allowed_to_push, allowed_to_merge and code_owner_approval_required attributes require a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_branches.html)
 
 ## Example Usage
 

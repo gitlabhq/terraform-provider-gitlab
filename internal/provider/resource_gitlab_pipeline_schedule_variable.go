@@ -14,7 +14,9 @@ import (
 
 var _ = registerResource("gitlab_pipeline_schedule_variable", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage variables for pipeline schedules.",
+		Description: `The ` + "`" + `gitlab_pipeline_schedule_variable` + "`" + ` resource allows to manage the lifecycle of a variable for a pipeline schedule.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pipeline_schedules.html#pipeline-schedule-variables)`,
 
 		CreateContext: resourceGitlabPipelineScheduleVariableCreate,
 		ReadContext:   resourceGitlabPipelineScheduleVariableRead,

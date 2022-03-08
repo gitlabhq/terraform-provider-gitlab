@@ -3,16 +3,15 @@
 page_title: "gitlab_label Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage labels for your GitLab projects.
-  For further information on labels, consult the gitlab
-  documentation https://docs.gitlab.com/ee/user/project/labels.html#project-labels.
+  The gitlab_label resource allows to manage the lifecycle of a project label.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/labels.html#project-labels
 ---
 
 # gitlab_label (Resource)
 
-This resource allows you to create and manage labels for your GitLab projects.
-For further information on labels, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/user/project/labels.html#project-labels).
+The `gitlab_label` resource allows to manage the lifecycle of a project label.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/labels.html#project-labels)
 
 ## Example Usage
 

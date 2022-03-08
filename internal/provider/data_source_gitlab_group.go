@@ -12,8 +12,9 @@ import (
 
 var _ = registerDataSource("gitlab_group", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provide details about a specific group in the gitlab provider.\n\n" +
-			"> **Note**: exactly one of group_id or full_path must be provided.",
+		Description: `The ` + "`gitlab_group`" + ` data source allows details of a group to be retrieved by its id or full path.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#details-of-a-group)`,
 
 		ReadContext: dataSourceGitlabGroupRead,
 		Schema: map[string]*schema.Schema{

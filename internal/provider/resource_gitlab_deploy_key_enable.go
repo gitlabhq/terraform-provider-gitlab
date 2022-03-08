@@ -14,8 +14,9 @@ import (
 
 var _ = registerResource("gitlab_deploy_key_enable", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to enable pre-existing deploy keys for your GitLab projects.\n\n" +
-			"> **NOTE**: the GITLAB KEY_ID for the deploy key must be known",
+		Description: `The ` + "`gitlab_deploy_key_enable`" + ` resource allows to enable an already existing deploy key (see ` + "`gitlab_deploy_key resource`" + `) for a specific project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/deploy_keys.html#enable-a-deploy-key)`,
 
 		CreateContext: resourceGitlabDeployKeyEnableCreate,
 		ReadContext:   resourceGitlabDeployKeyEnableRead,

@@ -12,9 +12,9 @@ import (
 var _ = registerResource("gitlab_label", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage labels for your GitLab projects.\n" +
-			"For further information on labels, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ee/user/project/labels.html#project-labels).",
+		Description: `The ` + "`" + `gitlab_label` + "`" + ` resource allows to manage the lifecycle of a project label.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/labels.html#project-labels)`,
 
 		CreateContext: resourceGitlabLabelCreate,
 		ReadContext:   resourceGitlabLabelRead,

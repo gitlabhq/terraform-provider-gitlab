@@ -3,18 +3,21 @@
 page_title: "gitlab_projects Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a list of projects in the Gitlab provider. Listing all projects and group projects with project filtering https://docs.gitlab.com/ee/api/projects.html#list-user-projects or group project filtering https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects is supported.
-  NOTE: This data source supports all available filters exposed by the xanzy/go-gitlab package, which might not expose all available filters exposed by the Gitlab APIs.
-  NOTE: The owner sub-attributes are only populated if the Gitlab token used has an administrator scope.
+  The gitlab_projects data source allows details of multiple projects to be retrieved. Optionally filtered by the set attributes.
+  -> This data source supports all available filters exposed by the xanzy/go-gitlab package, which might not expose all available filters exposed by the Gitlab APIs.
+  -> The owner sub-attributes are only populated if the Gitlab token used has an administrator scope.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#list-all-projects
 ---
 
 # gitlab_projects (Data Source)
 
-Provide details about a list of projects in the Gitlab provider. Listing all projects and group projects with [project filtering](https://docs.gitlab.com/ee/api/projects.html#list-user-projects) or [group project filtering](https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects) is supported.
+The `gitlab_projects` data source allows details of multiple projects to be retrieved. Optionally filtered by the set attributes.
 
-> **NOTE**: This data source supports all available filters exposed by the `xanzy/go-gitlab` package, which might not expose all available filters exposed by the Gitlab APIs.
+-> This data source supports all available filters exposed by the xanzy/go-gitlab package, which might not expose all available filters exposed by the Gitlab APIs.
 
-> **NOTE**: The [owner sub-attributes](#nestedobjatt--projects--owner) are only populated if the Gitlab token used has an administrator scope.
+-> The [owner sub-attributes](#nestedobjatt--projects--owner) are only populated if the Gitlab token used has an administrator scope.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#list-all-projects)
 
 ## Example Usage
 

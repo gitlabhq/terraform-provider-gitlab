@@ -3,15 +3,15 @@
 page_title: "gitlab_group Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a specific group in the gitlab provider.
-  Note: exactly one of groupid or fullpath must be provided.
+  The gitlab_group data source allows details of a group to be retrieved by its id or full path.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#details-of-a-group
 ---
 
 # gitlab_group (Data Source)
 
-Provide details about a specific group in the gitlab provider.
+The `gitlab_group` data source allows details of a group to be retrieved by its id or full path.
 
-> **Note**: exactly one of group_id or full_path must be provided.
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#details-of-a-group)
 
 ## Example Usage
 

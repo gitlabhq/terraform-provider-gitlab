@@ -15,8 +15,9 @@ import (
 
 var _ = registerDataSource("gitlab_group_membership", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provide details about a list of group members in the gitlab provider. The results include id, username, name and more about the requested members.\n\n" +
-			"> **Note**: exactly one of group_id or full_path must be provided.",
+		Description: `The ` + "`gitlab_group_membership`" + ` data source allows to list and filter all members of a group specified by either its id or full path.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html#list-all-members-of-a-group-or-project)`,
 
 		ReadContext: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{

@@ -3,12 +3,15 @@
 page_title: "gitlab_project_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage Project Access Token for your GitLab projects.
+  The gitlab_project_access_token resource allows to manage the lifecycle of a project access token.
+  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/project_access_tokens.html
 ---
 
 # gitlab_project_access_token (Resource)
 
-This resource allows you to create and manage Project Access Token for your GitLab projects.
+The `gitlab_project_access_token` resource allows to manage the lifecycle of a project access token.
+
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/project_access_tokens.html)
 
 ## Example Usage
 

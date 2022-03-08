@@ -13,7 +13,9 @@ import (
 
 var _ = registerDataSource("gitlab_project_protected_branch", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provides details about a specific protected branch in a given project.",
+		Description: `The ` + "`gitlab_protected_branch`" + ` data source allows details of a protected branch to be retrieved by its name and the project it belongs to.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_branches.html#get-a-single-protected-branch-or-wildcard-protected-branch)`,
 
 		ReadContext: dataSourceGitlabProjectProtectedBranchRead,
 		Schema: map[string]*schema.Schema{

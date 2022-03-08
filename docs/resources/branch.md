@@ -3,12 +3,15 @@
 page_title: "gitlab_branch Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage GitLab branches.
+  The gitlab_branch resource allows to manage the lifecycle of a repository branch.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/branches.html
 ---
 
 # gitlab_branch (Resource)
 
-This resource allows you to create and manage GitLab branches.
+The `gitlab_branch` resource allows to manage the lifecycle of a repository branch.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/branches.html)
 
 ## Example Usage
 

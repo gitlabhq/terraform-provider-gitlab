@@ -13,9 +13,9 @@ import (
 
 var _ = registerResource("gitlab_group_variable", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage CI/CD variables for your GitLab groups.\n" +
-			"For further information on variables, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ce/ci/variables/README.html#variables).",
+		Description: `The ` + "`" + `gitlab_group_variable` + "`" + ` resource allows to manage the lifecycle of a CI/CD variable for a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_level_variables.html)`,
 
 		CreateContext: resourceGitlabGroupVariableCreate,
 		ReadContext:   resourceGitlabGroupVariableRead,

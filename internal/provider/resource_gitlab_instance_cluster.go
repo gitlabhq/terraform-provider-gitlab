@@ -15,9 +15,11 @@ import (
 
 var _ = registerResource("gitlab_instance_cluster", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage instance clusters for your GitLab instances.\n" +
-			"For further information on clusters, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ee/user/instance/clusters/).",
+		Description: `The ` + "`" + `gitlab_instance_cluster` + "`" + ` resource allows to manage the lifecycle of an instance cluster.
+
+~> This is deprecated GitLab feature since 14.5
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_clusters.html)`,
 
 		CreateContext: resourceGitlabInstanceClusterCreate,
 		ReadContext:   resourceGitlabInstanceClusterRead,

@@ -3,12 +3,15 @@
 page_title: "gitlab_project_freeze_period Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the gitlab documentation https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period.
+  The gitlab_project_freeze_period resource allows to manage the lifecycle of a freeze period for a project.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/freeze_periods.html
 ---
 
 # gitlab_project_freeze_period (Resource)
 
-This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period).
+The `gitlab_project_freeze_period` resource allows to manage the lifecycle of a freeze period for a project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/freeze_periods.html)
 
 ## Example Usage
 

@@ -3,16 +3,15 @@
 page_title: "gitlab_project_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage hooks for your GitLab projects.
-  For further information on hooks, consult the gitlab
-  documentation https://docs.gitlab.com/ce/user/project/integrations/webhooks.html.
+  The gitlab_project_hook resource allows to manage the lifecycle of a project hook.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#hooks
 ---
 
 # gitlab_project_hook (Resource)
 
-This resource allows you to create and manage hooks for your GitLab projects.
-For further information on hooks, consult the [gitlab
-documentation](https://docs.gitlab.com/ce/user/project/integrations/webhooks.html).
+The `gitlab_project_hook` resource allows to manage the lifecycle of a project hook.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#hooks)
 
 ## Example Usage
 

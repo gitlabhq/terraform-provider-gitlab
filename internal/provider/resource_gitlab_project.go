@@ -391,7 +391,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 
 var _ = registerResource("gitlab_project", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage projects within your GitLab group or within your user.",
+		Description: `The ` + "`gitlab_project`" + ` resource allows to manage the lifecycle of a project.
+
+A project can either be created in a group or user namespace.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/projects.html)`,
 
 		CreateContext: resourceGitlabProjectCreate,
 		ReadContext:   resourceGitlabProjectRead,

@@ -14,9 +14,9 @@ import (
 var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage hooks for your GitLab projects.\n" +
-			"For further information on hooks, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ce/user/project/integrations/webhooks.html).",
+		Description: `The ` + "`" + `gitlab_project_hook` + "`" + ` resource allows to manage the lifecycle of a project hook.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#hooks)`,
 
 		CreateContext: resourceGitlabProjectHookCreate,
 		ReadContext:   resourceGitlabProjectHookRead,

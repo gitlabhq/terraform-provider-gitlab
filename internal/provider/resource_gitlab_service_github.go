@@ -12,8 +12,11 @@ import (
 
 var _ = registerResource("gitlab_service_github", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "**NOTE**: requires either EE (self-hosted) or Silver and above (GitLab.com).\n\n" +
-			"This resource manages a [GitHub integration](https://docs.gitlab.com/ee/user/project/integrations/github.html) that updates pipeline statuses on a GitHub repo's pull requests.",
+		Description: `The ` + "`gitlab_service_github`" + ` resource allows to manage the lifecycle of a project integration with GitHub.
+
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#github)`,
 
 		CreateContext: resourceGitlabServiceGithubCreate,
 		ReadContext:   resourceGitlabServiceGithubRead,

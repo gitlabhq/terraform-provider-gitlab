@@ -17,6 +17,8 @@ var _ = registerResource("gitlab_project_custom_attribute", func() *schema.Resou
 		func(client *gitlab.Client) CustomAttributeDeleter {
 			return client.CustomAttribute.DeleteCustomProjectAttribute
 		},
-		"This resource allows you to set custom attributes for a project.",
+		`The `+"`gitlab_project_custom_attribute`"+` resource allows to manage custom attributes for a project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/custom_attributes.html)`,
 	)
 })

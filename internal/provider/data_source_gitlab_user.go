@@ -13,8 +13,11 @@ import (
 
 var _ = registerDataSource("gitlab_user", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.\n\n" +
-			"-> Some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.",
+		Description: `The ` + "`gitlab_user`" + ` data source allows details of a user to be retrieved by either the user ID, username or email address.
+
+-> Some attributes might not be returned depending on if you're an admin or not.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#single-user)`,
 
 		ReadContext: dataSourceGitlabUserRead,
 		Schema: map[string]*schema.Schema{

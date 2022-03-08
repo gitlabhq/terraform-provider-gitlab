@@ -3,12 +3,18 @@
 page_title: "gitlab_project Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage projects within your GitLab group or within your user.
+  The gitlab_project resource allows to manage the lifecycle of a project.
+  A project can either be created in a group or user namespace.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ce/api/projects.html
 ---
 
 # gitlab_project (Resource)
 
-This resource allows you to create and manage projects within your GitLab group or within your user.
+The `gitlab_project` resource allows to manage the lifecycle of a project.
+
+A project can either be created in a group or user namespace.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/projects.html)
 
 ## Example Usage
 

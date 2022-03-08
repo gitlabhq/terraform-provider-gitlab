@@ -14,11 +14,11 @@ import (
 
 var _ = registerResource("gitlab_managed_license", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to add rules for managing licenses on a project.\n" +
-			"For additional information, please see the " +
-			"[gitlab documentation](https://docs.gitlab.com/ee/user/compliance/license_compliance/).\n\n" +
-			"~> Using this resource requires an active [gitlab ultimate](https://about.gitlab.com/pricing/)" +
-			"subscription.",
+		Description: `The ` + "`" + `gitlab_managed_license` + "`" + ` resource allows to manage the lifecycle of a managed license.
+
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/managed_licenses.html)`,
 
 		CreateContext: resourceGitlabManagedLicenseCreate,
 		ReadContext:   resourceGitlabManagedLicenseRead,

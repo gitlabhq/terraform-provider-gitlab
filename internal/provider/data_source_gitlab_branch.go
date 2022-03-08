@@ -11,7 +11,9 @@ import (
 
 var _ = registerDataSource("gitlab_branch", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "Provide details about a gitlab project branch",
+		Description: `The ` + "`gitlab_branch`" + ` data source allows details of a repository branch to be retrieved by its name and project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch)`,
 
 		ReadContext: dataSourceGitlabBranchRead,
 		Schema: map[string]*schema.Schema{

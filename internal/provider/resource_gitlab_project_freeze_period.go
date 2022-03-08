@@ -14,7 +14,9 @@ import (
 
 var _ = registerResource("gitlab_project_freeze_period", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period).",
+		Description: `The ` + "`" + `gitlab_project_freeze_period` + "`" + ` resource allows to manage the lifecycle of a freeze period for a project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/freeze_periods.html)`,
 
 		CreateContext: resourceGitlabProjectFreezePeriodCreate,
 		ReadContext:   resourceGitlabProjectFreezePeriodRead,

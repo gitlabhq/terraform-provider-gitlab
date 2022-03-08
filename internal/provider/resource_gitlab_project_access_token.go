@@ -16,7 +16,9 @@ import (
 var _ = registerResource("gitlab_project_access_token", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage Project Access Token for your GitLab projects.",
+		Description: `The ` + "`" + `gitlab_project_access_token` + "`" + ` resource allows to manage the lifecycle of a project access token.
+
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/project_access_tokens.html)`,
 
 		CreateContext: resourceGitlabProjectAccessTokenCreate,
 		ReadContext:   resourceGitlabProjectAccessTokenRead,

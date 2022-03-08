@@ -13,9 +13,9 @@ import (
 
 var _ = registerResource("gitlab_project_badge", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage badges for your GitLab projects.\n" +
-			"For further information consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ce/user/project/badges.html).",
+		Description: `The ` + "`gitlab_project_badge`" + ` resource allows to mange the lifecycle of project badges.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/badges.html#project-badges)`,
 
 		CreateContext: resourceGitlabProjectBadgeCreate,
 		ReadContext:   resourceGitlabProjectBadgeRead,

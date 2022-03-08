@@ -15,9 +15,11 @@ import (
 
 var _ = registerResource("gitlab_project_cluster", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage project clusters for your GitLab projects.\n" +
-			"For further information on clusters, consult the [gitlab\n" +
-			"documentation](https://docs.gitlab.com/ce/user/project/clusters/index.html).",
+		Description: `The ` + "`" + `gitlab_project_cluster` + "`" + ` resource allows to manage the lifecycle of a project cluster.
+
+~> This is deprecated GitLab feature since 14.5
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_clusters.html)`,
 
 		CreateContext: resourceGitlabProjectClusterCreate,
 		ReadContext:   resourceGitlabProjectClusterRead,

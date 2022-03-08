@@ -15,7 +15,9 @@ import (
 var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
 	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
-		Description: "This resource allows you to add an LDAP link to an existing GitLab group.",
+		Description: `The ` + "`gitlab_group_ldap_link`" + ` resource allows to manage the lifecycle of an LDAP integration with a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#ldap-group-links)`,
 
 		CreateContext: resourceGitlabGroupLdapLinkCreate,
 		ReadContext:   resourceGitlabGroupLdapLinkRead,

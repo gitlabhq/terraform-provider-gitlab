@@ -11,7 +11,9 @@ import (
 
 var _ = registerResource("gitlab_service_slack", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to manage Slack notifications integration.",
+		Description: `The ` + "`gitlab_service_slack`" + ` resource allows to manage the lifecycle of a project integration with Slack.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#slack-notifications)`,
 
 		CreateContext: resourceGitlabServiceSlackCreate,
 		ReadContext:   resourceGitlabServiceSlackRead,
