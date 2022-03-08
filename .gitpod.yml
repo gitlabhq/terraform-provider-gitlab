@@ -11,3 +11,4 @@ ports:
 vscode:
     extensions:
         - golang.Go
+        - hashicorp.terraform
