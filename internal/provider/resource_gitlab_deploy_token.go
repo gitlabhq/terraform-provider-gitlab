@@ -165,40 +165,63 @@ func resourceGitlabDeployTokenRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	var deployTokens []*gitlab.DeployToken
+	var deployToken *gitlab.DeployToken
+
+	extractDeployToken := func(paginatedDeployTokens []*gitlab.DeployToken) *gitlab.DeployToken {
+		for _, token := range paginatedDeployTokens {
+			if token.ID == deployTokenID {
+				return token
+			}
+		}
+		return nil
+	}
 
 	if isProject {
 		log.Printf("[DEBUG] Read GitLab deploy token %d in project %s", deployTokenID, project.(string))
-		deployTokens, _, err = client.DeployTokens.ListProjectDeployTokens(project, nil, gitlab.WithContext(ctx))
-
-	} else if isGroup {
-		log.Printf("[DEBUG] Read GitLab deploy token %d in group %s", deployTokenID, group.(string))
-		deployTokens, _, err = client.DeployTokens.ListGroupDeployTokens(group, nil, gitlab.WithContext(ctx))
-	}
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	for _, token := range deployTokens {
-		if token.ID == deployTokenID {
-			d.Set("name", token.Name)
-			d.Set("username", token.Username)
-
-			if token.ExpiresAt != nil {
-				d.Set("expires_at", token.ExpiresAt.Format(time.RFC3339))
-			}
-
-			if err := d.Set("scopes", token.Scopes); err != nil {
+		options := gitlab.ListProjectDeployTokensOptions{
+			Page:    1,
+			PerPage: 20,
+		}
+		for options.Page != 0 && deployToken == nil {
+			paginatedDeployTokens, resp, err := client.DeployTokens.ListProjectDeployTokens(project, &options, gitlab.WithContext(ctx))
+			if err != nil {
 				return diag.FromErr(err)
 			}
-
-			return nil
+			deployToken = extractDeployToken(paginatedDeployTokens)
+			options.Page = resp.NextPage
+		}
+	} else if isGroup {
+		log.Printf("[DEBUG] Read GitLab deploy token %d in group %s", deployTokenID, group.(string))
+		options := gitlab.ListGroupDeployTokensOptions{
+			Page:    1,
+			PerPage: 20,
+		}
+		for options.Page != 0 && deployToken == nil {
+			paginatedDeployTokens, resp, err := client.DeployTokens.ListGroupDeployTokens(group, &options, gitlab.WithContext(ctx))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			deployToken = extractDeployToken(paginatedDeployTokens)
+			options.Page = resp.NextPage
 		}
 	}
 
-	log.Printf("[DEBUG] GitLab deploy token %d in group %s was not found", deployTokenID, group.(string))
+	if deployToken == nil {
+		log.Printf("[DEBUG] GitLab deploy token %d in was not found, removing from state", deployTokenID)
+		d.SetId("")
+		return nil
+	}
 
-	d.SetId("")
+	d.Set("name", deployToken.Name)
+	d.Set("username", deployToken.Username)
+
+	if deployToken.ExpiresAt != nil {
+		d.Set("expires_at", deployToken.ExpiresAt.Format(time.RFC3339))
+	}
+
+	if err := d.Set("scopes", deployToken.Scopes); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return nil
 }
