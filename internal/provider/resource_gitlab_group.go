@@ -244,10 +244,6 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 		updateOptions.FileTemplateProjectID = gitlab.Int(v.(int))
 	}
 
-	if v, ok := d.GetOk("prevent_forking_outside_group"); ok {
-		updateOptions.PreventForkingOutsideGroup = gitlab.Bool(v.(bool))
-	}
-
 	if (updateOptions != gitlab.UpdateGroupOptions{}) {
 		if _, _, err = client.Groups.UpdateGroup(d.Id(), &updateOptions, gitlab.WithContext(ctx)); err != nil {
 			return diag.Errorf("could not update group after creation %q: %s", d.Id(), err)
