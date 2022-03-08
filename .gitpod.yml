@@ -1,8 +1,6 @@
 image: gitpod/workspace-go
 tasks:
-  - init: |
-      go get
-      go mod tidy  
+  - init: go mod tidy  
   - name: Start acceptance environment
     command: make testacc-up
     openMode: split-right
