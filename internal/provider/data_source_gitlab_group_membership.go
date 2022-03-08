@@ -22,22 +22,18 @@ var _ = registerDataSource("gitlab_group_membership", func() *schema.Resource {
 		ReadContext: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Description: "The ID of the group.",
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Optional:    true,
-				ConflictsWith: []string{
-					"full_path",
-				},
+				Description:  "The ID of the group.",
+				Type:         schema.TypeInt,
+				Computed:     true,
+				Optional:     true,
+				ExactlyOneOf: []string{"group_id", "full_path"},
 			},
 			"full_path": {
-				Description: "The full path of the group.",
-				Type:        schema.TypeString,
-				Computed:    true,
-				Optional:    true,
-				ConflictsWith: []string{
-					"group_id",
-				},
+				Description:  "The full path of the group.",
+				Type:         schema.TypeString,
+				Computed:     true,
+				Optional:     true,
+				ExactlyOneOf: []string{"group_id", "full_path"},
 			},
 			"access_level": {
 				Description:      "Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.",
