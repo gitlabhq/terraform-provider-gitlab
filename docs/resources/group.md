@@ -47,11 +47,12 @@ resource "gitlab_project" "example" {
 - **default_branch_protection** (Number) Int, defaults to 2.
 - **description** (String) The description of the group.
 - **emails_disabled** (Boolean) Boolean, defaults to false.  Disable email notifications
+- **file_template_project_id** (Number) The ID of a project to load custom file templates from. Requires GitLab Premium.
 - **id** (String) The ID of this resource.
 - **lfs_enabled** (Boolean) Boolean, defaults to true.  Whether to enable LFS
 - **mentions_disabled** (Boolean) Boolean, defaults to false.  Disable the capability
 - **parent_id** (Number) Integer, id of the parent group (creates a nested group).
-- **prevent_forking_outside_group** (Boolean) When enabled, users can not fork projects from this group to external namespaces.
+- **prevent_forking_outside_group** (Boolean) When enabled, users can not fork projects from this group to external namespaces. Requires GitLab Premium.
 - **project_creation_level** (String) , defaults to Maintainer.
 - **request_access_enabled** (Boolean) Boolean, defaults to false.  Whether to
 - **require_two_factor_authentication** (Boolean) Boolean, defaults to false.

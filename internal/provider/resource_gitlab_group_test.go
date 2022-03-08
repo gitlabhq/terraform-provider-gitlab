@@ -275,6 +275,67 @@ func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_updatedAttributes(t *testing.T) {
+	var group gitlab.Group
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				//This test requires EE because without it, the two "Shared Runner" settings will always return 0,
+				//  even though they will work. They also require an admin token.
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitLabGroupWithProjectTemplate(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.test-group", &group),
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					resource.TestCheckResourceAttr("gitlab_group.test-group",
+						"file_template_project_id", fmt.Sprintf("%d", project.ID)),
+					resource.TestCheckResourceAttr("gitlab_group.test-group",
+						"shared_runners_minutes_limit", "1"),
+					resource.TestCheckResourceAttr("gitlab_group.test-group",
+						"extra_shared_runners_minutes_limit", "1"),
+				),
+			},
+		},
+	})
+}
+
+func testAccGitLabGroupWithProjectTemplate(rInt int) string {
+	return fmt.Sprintf(`
+	resource "gitlab_group" "foo" {
+		name = "foo-top-group-%d"
+		path = "foo-top-group-%d"
+		description = "Terraform acceptance tests"
+	  
+		# So that acceptance tests can be run in a gitlab organization
+		# with no billing
+		visibility_level = "public"
+	  }
+	 
+	  resource "gitlab_project" "foo" {
+		name = "foo-template-project-%d"
+		description = "Terraform acceptance tests"
+	  
+		namespace_id = gitlab_group.foo.id
+	  }
+
+	  resource "gitlab_group" "test-group" {
+		name = "foo-template-group-%d"
+		path = "foo-template-group-%d"
+		description = "template-group"
+
+		parent_id = gitlab_group.foo.id
+		file_template_project_id = gitlab_project.foo.id
+		visibility_level = "private"
+	  }
+	  `, rInt, rInt, rInt, rInt, rInt)
+}
+
 func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		_, err := testGitlabClient.Groups.DeleteGroup(group.ID)
@@ -321,22 +382,24 @@ func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestC
 }
 
 type testAccGitlabGroupExpectedAttributes struct {
-	Name                    string
-	Path                    string
-	Description             string
-	Parent                  *gitlab.Group
-	LFSEnabled              bool
-	RequestAccessEnabled    bool
-	Visibility              gitlab.VisibilityValue
-	ShareWithGroupLock      bool
-	AutoDevopsEnabled       bool
-	EmailsDisabled          bool
-	MentionsDisabled        bool
-	ProjectCreationLevel    gitlab.ProjectCreationLevelValue
-	SubGroupCreationLevel   gitlab.SubGroupCreationLevelValue
-	RequireTwoFactorAuth    bool
-	TwoFactorGracePeriod    int
-	DefaultBranchProtection int
+	Name                       string
+	Path                       string
+	Description                string
+	Parent                     *gitlab.Group
+	LFSEnabled                 bool
+	RequestAccessEnabled       bool
+	Visibility                 gitlab.VisibilityValue
+	ShareWithGroupLock         bool
+	AutoDevopsEnabled          bool
+	EmailsDisabled             bool
+	MentionsDisabled           bool
+	ProjectCreationLevel       gitlab.ProjectCreationLevelValue
+	SubGroupCreationLevel      gitlab.SubGroupCreationLevelValue
+	RequireTwoFactorAuth       bool
+	TwoFactorGracePeriod       int
+	DefaultBranchProtection    int
+	FileTemplateProjectID      int
+	PreventForkingOutsideGroup bool
 }
 
 func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabGroupExpectedAttributes) resource.TestCheckFunc {
@@ -399,6 +462,14 @@ func testAccCheckGitlabGroupAttributes(group *gitlab.Group, want *testAccGitlabG
 
 		if group.DefaultBranchProtection != want.DefaultBranchProtection {
 			return fmt.Errorf("got default_branch_protection %d; want %d", group.DefaultBranchProtection, want.DefaultBranchProtection)
+		}
+
+		if group.FileTemplateProjectID != want.FileTemplateProjectID {
+			return fmt.Errorf("got file_template_id %d; want %d", group.FileTemplateProjectID, want.FileTemplateProjectID)
+		}
+
+		if group.PreventForkingOutsideGroup != want.PreventForkingOutsideGroup {
+			return fmt.Errorf("got prevent_forking_outside_group %t; want %t", group.PreventForkingOutsideGroup, want.PreventForkingOutsideGroup)
 		}
 
 		if want.Parent != nil {

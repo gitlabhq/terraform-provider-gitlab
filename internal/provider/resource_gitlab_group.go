@@ -149,11 +149,16 @@ var _ = registerResource("gitlab_group", func() *schema.Resource {
 				Computed:    true,
 				Sensitive:   true,
 			},
-			"prevent_forking_outside_group": {
-				Description: "When enabled, users can not fork projects from this group to external namespaces.",
-				Type:        schema.TypeBool,
+			"file_template_project_id": {
+				Description: "The ID of a project to load custom file templates from. Requires GitLab Premium.",
+				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     false,
+			},
+			"prevent_forking_outside_group": {
+				Description: "When enabled, users can not fork projects from this group to external namespaces. " +
+					"Requires GitLab Premium.",
+				Type:     schema.TypeBool,
+				Optional: true,
 			},
 		},
 	}
@@ -227,10 +232,17 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
 	var updateOptions gitlab.UpdateGroupOptions
+
+	if v, ok := d.GetOk("prevent_forking_outside_group"); ok {
+		updateOptions.PreventForkingOutsideGroup = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("file_template_project_id"); ok {
+		updateOptions.FileTemplateProjectID = gitlab.Int(v.(int))
+	}
 
 	if v, ok := d.GetOk("prevent_forking_outside_group"); ok {
 		updateOptions.PreventForkingOutsideGroup = gitlab.Bool(v.(bool))
@@ -285,6 +297,7 @@ func resourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta i
 	d.Set("runners_token", group.RunnersToken)
 	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 	d.Set("default_branch_protection", group.DefaultBranchProtection)
+	d.Set("file_template_project_id", group.FileTemplateProjectID)
 	d.Set("prevent_forking_outside_group", group.PreventForkingOutsideGroup)
 
 	return nil
@@ -355,6 +368,10 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 
 	if d.HasChange("default_branch_protection") {
 		options.DefaultBranchProtection = gitlab.Int(d.Get("default_branch_protection").(int))
+	}
+
+	if d.HasChange("file_template_project_id") {
+		options.FileTemplateProjectID = gitlab.Int(d.Get("file_template_project_id").(int))
 	}
 
 	if d.HasChange("prevent_forking_outside_group") {
