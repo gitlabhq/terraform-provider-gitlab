@@ -4,7 +4,7 @@ tasks:
   - name: Start acceptance environment
     command: make testacc-up
     openMode: split-right
-# Port 8080 is used for acceptance testing, and we don't need to option it when the container comes up
+# Port 8080 is used for acceptance testing, and we don't need to open it when the container comes up
 ports:
   - port: 8080
     onOpen: ignore
