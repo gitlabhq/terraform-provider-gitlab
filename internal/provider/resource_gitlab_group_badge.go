@@ -90,6 +90,11 @@ func resourceGitlabGroupBadgeRead(ctx context.Context, d *schema.ResourceData, m
 
 	badge, _, err := client.GroupBadges.GetGroupBadge(groupID, badgeID, gitlab.WithContext(ctx))
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] group badge %d in group %s doesn't exist anymore, removing from state", badgeID, groupID)
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
