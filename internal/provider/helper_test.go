@@ -5,10 +5,12 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/onsi/gomega"
 	"github.com/xanzy/go-gitlab"
 )
@@ -240,6 +242,25 @@ func testAccAddProjectMembers(t *testing.T, pid interface{}, users []*gitlab.Use
 	}
 }
 
+func testAccCreateProjectIssues(t *testing.T, pid interface{}, n int) []*gitlab.Issue {
+	t.Helper()
+
+	dueDate := gitlab.ISOTime(time.Now().Add(time.Hour))
+	var issues []*gitlab.Issue
+	for i := 0; i < n; i++ {
+		issue, _, err := testGitlabClient.Issues.CreateIssue(pid, &gitlab.CreateIssueOptions{
+			Title:       gitlab.String(fmt.Sprintf("Issue %d", i)),
+			Description: gitlab.String(fmt.Sprintf("Description %d", i)),
+			DueDate:     &dueDate,
+		})
+		if err != nil {
+			t.Fatalf("could not create test issue: %v", err)
+		}
+		issues = append(issues, issue)
+	}
+	return issues
+}
+
 // testAccAddGroupMembers is a test helper for adding users as members of a group.
 // It assumes the group will be destroyed at the end of the test and will not cleanup members.
 func testAccAddGroupMembers(t *testing.T, gid interface{}, users []*gitlab.User) {
@@ -254,6 +275,22 @@ func testAccAddGroupMembers(t *testing.T, gid interface{}, users []*gitlab.User)
 			t.Fatalf("could not add test group member: %v", err)
 		}
 	}
+}
+
+func testAccAddProjectMilestone(t *testing.T, pid interface{}) *gitlab.Milestone {
+	t.Helper()
+
+	milestone, _, err := testGitlabClient.Milestones.CreateMilestone(pid, &gitlab.CreateMilestoneOptions{Title: gitlab.String("Test Milestone")})
+	if err != nil {
+		t.Fatalf("failed to create milestone during test for project %v: %v", pid, err)
+	}
+	t.Cleanup(func() {
+		_, err := testGitlabClient.Milestones.DeleteMilestone(pid, milestone.ID)
+		if err != nil {
+			t.Fatalf("failed to delete milestone %d during test for project %v: %v", milestone.ID, pid, err)
+		}
+	})
+	return milestone
 }
 
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
@@ -290,5 +327,13 @@ func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
 	return testAccGitlabProjectContext{
 		t:       t,
 		project: project,
+	}
+}
+
+// testCheckResourceAttrLazy works like resource.TestCheckResourceAttr, but lazy evaluates the value parameter.
+// See also: resource.TestCheckResourceAttrPtr.
+func testCheckResourceAttrLazy(name string, key string, value func() string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return resource.TestCheckResourceAttr(name, key, value())(s)
 	}
 }
