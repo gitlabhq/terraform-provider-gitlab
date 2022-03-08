@@ -12,8 +12,8 @@ See the [Developing The Provider](#developing-the-provider) section below for sp
 
 ### GitPod Environment Setup
 
-You can choose to use your own development environment if desired, however a `.gitpod.yml` file is included within the repository to allow the use of GitPod easily. 
-This will allow you to use GitPod's integration with GitHub to instantly stand up a web-based development environment including Go and Docker, which are necessary 
+You can choose to use your own development environment if desired, however a `.gitpod.yml` file is included within the repository to allow the use of [GitPod](https://gitpod.io/) easily. 
+This will allow you to use GitPod's integration with GitHub to quickly start a web-based development environment including Go and Docker, which are necessary 
 for running tests. To use GitPod's integration, you have two different options described below. After you've completed one of the two options, your development environment 
 will be ready within a minute or two. As part of starting up, your development environment will automatically start up the `gitlab-ce` container necessary for running 
 tests, as described in the "Running Tests/Option 1" section below.
