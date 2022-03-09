@@ -49,6 +49,12 @@ var validProtectedBranchTagAccessLevelNames = []string{
 	"no one", "developer", "maintainer",
 }
 
+// The only access levels allowed to be configured to unprotect a protected branch
+// The API states the others are either forbidden (via 403) or invalid
+var validProtectedBranchUnprotectAccessLevelNames = []string{
+	"developer", "maintainer",
+}
+
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
 	"no one":     gitlab.NoPermissions,
 	"minimal":    gitlab.MinimalAccessPermissions,

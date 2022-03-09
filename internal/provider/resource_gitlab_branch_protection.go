@@ -43,7 +43,7 @@ var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_branch_protection`" + ` resource allows to manage the lifecycle of a protected branch of a repository.
 
-~> The allowed_to_push, allowed_to_merge and code_owner_approval_required attributes require a GitLab Enterprise instance.
+~> The ` + "`allowed_to_push`" + `, ` + "`allowed_to_merge`" + `, ` + "`allowed_to_unprotect`" + `, ` + "`unprotect_access_level`" + ` and ` + "`code_owner_approval_required`" + ` attributes require a GitLab Enterprise instance.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_branches.html)`,
 
@@ -71,14 +71,24 @@ var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 				Description:      fmt.Sprintf("Access levels allowed to merge. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchTagAccessLevelNames, false)),
-				Required:         true,
+				Optional:         true,
+				Default:          accessLevelValueToName[gitlab.MaintainerPermissions],
 				ForceNew:         true,
 			},
 			"push_access_level": {
 				Description:      fmt.Sprintf("Access levels allowed to push. Valid values are: %s.", renderValueListForDocs(validProtectedBranchTagAccessLevelNames)),
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchTagAccessLevelNames, false)),
-				Required:         true,
+				Optional:         true,
+				Default:          accessLevelValueToName[gitlab.MaintainerPermissions],
+				ForceNew:         true,
+			},
+			"unprotect_access_level": {
+				Description:      fmt.Sprintf("Access levels allowed to unprotect. Valid values are: %s.", renderValueListForDocs(validProtectedBranchUnprotectAccessLevelNames)),
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProtectedBranchUnprotectAccessLevelNames, false)),
+				Optional:         true,
+				Default:          accessLevelValueToName[gitlab.MaintainerPermissions],
 				ForceNew:         true,
 			},
 			"allow_force_push": {
@@ -88,8 +98,9 @@ var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 				Default:     false,
 				ForceNew:    true,
 			},
-			"allowed_to_push":  schemaAllowedTo(),
-			"allowed_to_merge": schemaAllowedTo(),
+			"allowed_to_push":      schemaAllowedTo(),
+			"allowed_to_merge":     schemaAllowedTo(),
+			"allowed_to_unprotect": schemaAllowedTo(),
 			"code_owner_approval_required": {
 				Description: "Can be set to true to require code owner approval before merging.",
 				Type:        schema.TypeBool,
@@ -124,19 +135,24 @@ func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.Resourc
 
 	mergeAccessLevel := accessLevelNameToValue[d.Get("merge_access_level").(string)]
 	pushAccessLevel := accessLevelNameToValue[d.Get("push_access_level").(string)]
+	unprotectAccessLevel := accessLevelNameToValue[d.Get("unprotect_access_level").(string)]
+
 	allowForcePush := d.Get("allow_force_push").(bool)
 	codeOwnerApprovalRequired := d.Get("code_owner_approval_required").(bool)
 
 	allowedToPush := expandBranchPermissionOptions(d.Get("allowed_to_push").(*schema.Set).List())
 	allowedToMerge := expandBranchPermissionOptions(d.Get("allowed_to_merge").(*schema.Set).List())
+	allowedToUnprotect := expandBranchPermissionOptions(d.Get("allowed_to_unprotect").(*schema.Set).List())
 
 	pb, _, err := client.ProtectedBranches.ProtectRepositoryBranches(project, &gitlab.ProtectRepositoryBranchesOptions{
 		Name:                      &branch,
 		PushAccessLevel:           &pushAccessLevel,
 		MergeAccessLevel:          &mergeAccessLevel,
+		UnprotectAccessLevel:      &unprotectAccessLevel,
 		AllowForcePush:            &allowForcePush,
 		AllowedToPush:             &allowedToPush,
 		AllowedToMerge:            &allowedToMerge,
+		AllowedToUnprotect:        &allowedToUnprotect,
 		CodeOwnerApprovalRequired: &codeOwnerApprovalRequired,
 	}, gitlab.WithContext(ctx))
 	if err != nil {
@@ -184,6 +200,12 @@ func resourceGitlabBranchProtectionRead(ctx context.Context, d *schema.ResourceD
 		}
 	}
 
+	if unprotectAccessLevels, err := firstValidAccessLevel(pb.UnprotectAccessLevels); err == nil {
+		if err := d.Set("unprotect_access_level", accessLevelValueToName[*unprotectAccessLevels]); err != nil {
+			return diag.Errorf("error setting unprotect_access_level: %v", err)
+		}
+	}
+
 	if err := d.Set("allow_force_push", pb.AllowForcePush); err != nil {
 		return diag.Errorf("error setting allow_force_push: %v", err)
 	}
@@ -193,6 +215,10 @@ func resourceGitlabBranchProtectionRead(ctx context.Context, d *schema.ResourceD
 	}
 	if err := d.Set("allowed_to_merge", flattenNonZeroBranchAccessDescriptions(pb.MergeAccessLevels)); err != nil {
 		return diag.Errorf("error setting allowed_to_merge: %v", err)
+	}
+
+	if err := d.Set("allowed_to_unprotect", flattenNonZeroBranchAccessDescriptions(pb.UnprotectAccessLevels)); err != nil {
+		return diag.Errorf("error setting allowed_to_unprotect: %v", err)
 	}
 
 	if err := d.Set("code_owner_approval_required", pb.CodeOwnerApprovalRequired); err != nil {
