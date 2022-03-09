@@ -17,8 +17,9 @@ import (
 
 var _ = registerResource("gitlab_group", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage GitLab groups.\n" +
-			"Note your provider will need to be configured with admin-level access for this resource to work.",
+		Description: "This resource allows you to create and manage GitLab groups.\n\n" +
+			"Note your provider will need to be configured with admin-level access for this resource to work.\n\n" +
+			"**Upstream API**: [GitLab Groups API](https://docs.gitlab.com/ee/api/groups.html)",
 
 		CreateContext: resourceGitlabGroupCreate,
 		ReadContext:   resourceGitlabGroupRead,

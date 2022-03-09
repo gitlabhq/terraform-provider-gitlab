@@ -17,7 +17,7 @@ The `gitlab_project_issue` resource allows to manage the lifecycle of an issue w
 
 ~> **Experimental**: while the base functionality of this resource works, it may be subject to minor change.
 
-**Upstream API:** [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
 
 ## Example Usage
 

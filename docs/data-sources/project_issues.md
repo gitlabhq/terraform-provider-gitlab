@@ -11,7 +11,7 @@ description: |-
 
 The `gitlab_project_issues` data source allows to retrieve details about issues in a project.
 
-**Upstream API:** [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
 
 ## Example Usage
 
