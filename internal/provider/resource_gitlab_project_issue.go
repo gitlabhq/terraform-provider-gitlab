@@ -25,7 +25,7 @@ var _ = registerResource("gitlab_project_issue", func() *schema.Resource {
 
 ~> **Experimental**: while the base functionality of this resource works, it may be subject to minor change.
 
-**Upstream API:** [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
 		`,
 
 		CreateContext: resourceGitlabProjectIssueCreate,

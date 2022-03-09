@@ -13,7 +13,7 @@ var _ = registerResource("gitlab_project_tag", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_project_tag`" + ` resource allows to manage the lifecycle of a tag in a project.
 
-**Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
 
 		CreateContext: resourceGitlabProjectTagCreate,
 		ReadContext:   resourceGitlabProjectTagRead,

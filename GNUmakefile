@@ -51,6 +51,9 @@ lint-generated: generate ## Check that "make generate" was called. Note this onl
 		exit 1; \
 	}
 
+lint-custom: ## Run custom checks and validations that do not fit into an existing lint framework.
+	@./scripts/lint-custom.sh
+
 apicovered: tool-apicovered ## Run an analysis tool to estimate the GitLab API coverage.
 	@$(GOBIN)/apicovered ./gitlab
 

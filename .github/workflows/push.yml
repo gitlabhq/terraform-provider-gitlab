@@ -44,6 +44,7 @@ jobs:
           - lint-examples-tf
           - lint-examples-sh
           - lint-generated
+          - lint-custom
     steps:
       - uses: actions/setup-go@v2
         with:

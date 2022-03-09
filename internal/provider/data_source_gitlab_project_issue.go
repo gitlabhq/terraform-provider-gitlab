@@ -12,7 +12,7 @@ var _ = registerDataSource("gitlab_project_issue", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_project_issue`" + ` data source allows to retrieve details about an issue in a project.
 
-**Upstream API:** [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)`,
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)`,
 
 		ReadContext: dataSourceGitlabProjectIssueRead,
 		Schema:      datasourceSchemaFromResourceSchema(gitlabProjectIssueGetSchema(), "project", "iid"),

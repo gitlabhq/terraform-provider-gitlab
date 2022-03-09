@@ -13,7 +13,7 @@ var _ = registerDataSource("gitlab_project_tag", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_project_tag`" + ` data source allows details of a project tag to be retrieved by its name.
 
-**Upstream API** : [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
 
 		ReadContext: dataSourceGitlabProjectTagRead,
 		Schema: map[string]*schema.Schema{

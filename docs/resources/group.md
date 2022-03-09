@@ -5,12 +5,16 @@ subcategory: ""
 description: |-
   This resource allows you to create and manage GitLab groups.
   Note your provider will need to be configured with admin-level access for this resource to work.
+  Upstream API: GitLab Groups API https://docs.gitlab.com/ee/api/groups.html
 ---
 
 # gitlab_group (Resource)
 
 This resource allows you to create and manage GitLab groups.
+
 Note your provider will need to be configured with admin-level access for this resource to work.
+
+**Upstream API**: [GitLab Groups API](https://docs.gitlab.com/ee/api/groups.html)
 
 ## Example Usage
 
