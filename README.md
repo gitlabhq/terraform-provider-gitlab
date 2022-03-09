@@ -5,6 +5,7 @@
 # Terraform Provider for Gitlab
 
 [![Tests](https://github.com/gitlabhq/terraform-provider-gitlab/actions/workflows/push.yml/badge.svg)](https://github.com/gitlabhq/terraform-provider-gitlab/actions/workflows/push.yml)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/from-referrer/)
 
 - [Documentation](https://www.terraform.io/docs/providers/gitlab/index.html)
 - [Issues](https://github.com/gitlabhq/terraform-provider-gitlab/issues)
