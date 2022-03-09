@@ -83,7 +83,7 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_label.fixme", "name", fmt.Sprintf("FIXME-%d", rInt)),
 					resource.TestCheckResourceAttr("gitlab_label.fixme", "color", "#ffcc00"),
 					resource.TestCheckResourceAttr("gitlab_label.fixme", "description", "fix this test"),
-					resource.TestCheckResourceAttr("gitlab_label.fixme", "priority", "0"),
+					resource.TestCheckResourceAttr("gitlab_label.fixme", "priority", "null"),
 				),
 			},
 		},

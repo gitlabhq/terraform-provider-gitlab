@@ -2,8 +2,10 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -130,7 +132,29 @@ func resourceGitlabLabelUpdate(ctx context.Context, d *schema.ResourceData, meta
 
 	log.Printf("[DEBUG] update gitlab label %s", d.Id())
 
-	_, _, err := client.Labels.UpdateLabel(project, options, gitlab.WithContext(ctx))
+	_, _, err := client.Labels.UpdateLabel(project, options, gitlab.WithContext(ctx), func(req *retryablehttp.Request) error {
+		if _, ok := d.GetOk("priority"); !ok {
+			hackedOptions := struct {
+				Name        *string `url:"name,omitempty" json:"name,omitempty"`
+				Color       *string `url:"color,omitempty" json:"color,omitempty"`
+				Description *string `url:"description,omitempty" json:"description,omitempty"`
+				Priority    *int    `url:"priority" json:"priority"`
+			}{
+				Name:        options.Name,
+				Color:       options.Color,
+				Description: options.Description,
+				Priority:    nil,
+			}
+			body, err := json.Marshal(hackedOptions)
+			if err != nil {
+				return err
+			}
+			if err := req.SetBody(body); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 	if err != nil {
 		return diag.FromErr(err)
 	}
