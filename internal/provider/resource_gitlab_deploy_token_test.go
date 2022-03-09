@@ -33,6 +33,30 @@ func TestAccGitlabDeployToken_basic(t *testing.T) {
 		},
 	})
 }
+func TestAccGitlabDeployToken_pagination(t *testing.T) {
+	testAccCheck(t)
+
+	testGroup := testAccCreateGroups(t, 1)[0]
+	testProject := testAccCreateProject(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployTokenDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitlabDeployTokenPaginationConfig(25, testGroup.ID, testProject.ID),
+			},
+			// In case pagination wouldn't properly work, we would get that the plan isn't empty,
+			// because some of the deploy tokens wouldn't be in the first page and therefore
+			// considered non-existing, ...
+			{
+				Config:   testAccGitlabDeployTokenPaginationConfig(25, testGroup.ID, testProject.ID),
+				PlanOnly: true,
+			},
+		},
+	})
+}
 
 func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployToken) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
@@ -161,6 +185,26 @@ resource "gitlab_deploy_token" "foo" {
   ]
 }
   `, rInt, rInt)
+}
+
+func testAccGitlabDeployTokenPaginationConfig(numberOfTokens int, groupID int, projectID int) string {
+	return fmt.Sprintf(`
+resource "gitlab_deploy_token" "example_group" {
+  group  = %d
+  name   = "deploy-token-${count.index}"
+  scopes = ["read_registry"]
+
+  count = %d
+}
+
+resource "gitlab_deploy_token" "example_project" {
+  project  = %d
+  name   = "deploy-token-${count.index}"
+  scopes = ["read_registry"]
+
+  count = %d
+}
+  `, groupID, numberOfTokens, projectID, numberOfTokens)
 }
 
 type expiresAtSuppressFuncTest struct {
