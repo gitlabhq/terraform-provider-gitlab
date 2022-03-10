@@ -65,6 +65,7 @@ resource "gitlab_project" "example-two" {
 - **issues_enabled** (Boolean) Enable issue tracking for the project.
 - **issues_template** (String) Sets the template for new issues in the project.
 - **lfs_enabled** (Boolean) Enable LFS for the project.
+- **merge_commit_template** (String) The commit message used when merging, if the merge method creates a merge commit.
 - **merge_method** (String) Set to `ff` to create fast-forward merges
 - **merge_pipelines_enabled** (Boolean) Enable or disable merge pipelines.
 - **merge_requests_enabled** (Boolean) Enable merge requests for the project.
@@ -87,6 +88,7 @@ resource "gitlab_project" "example-two" {
 - **request_access_enabled** (Boolean) Allow users to request member access.
 - **shared_runners_enabled** (Boolean) Enable shared runners for this project.
 - **snippets_enabled** (Boolean) Enable snippets for the project.
+- **squash_commit_template** (String) The commit message used when squashing commits.
 - **squash_option** (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]
 - **tags** (Set of String) Tags (topics) of the project.
 - **template_name** (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.

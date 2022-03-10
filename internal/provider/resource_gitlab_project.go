@@ -387,6 +387,24 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 		Default:     false,
 	},
+	"merge_commit_template": {
+		Description: "The commit message used when merging, if the merge method creates a merge commit.",
+		Type:        schema.TypeString,
+		Optional:    true,
+		Default: `Merge branch '%{source_branch}' into '%{target_branch}'
+
+%{title}
+
+%{issues}
+
+See merge request %{reference}`,
+	},
+	"squash_commit_template": {
+		Description: "The commit message used when squashing commits.",
+		Type:        schema.TypeString,
+		Optional:    true,
+		Default:     "%{title}",
+	},
 }
 
 var _ = registerResource("gitlab_project", func() *schema.Resource {
@@ -465,6 +483,8 @@ func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceDa
 	d.Set("ci_forward_deployment_enabled", project.CIForwardDeploymentEnabled)
 	d.Set("merge_pipelines_enabled", project.MergePipelinesEnabled)
 	d.Set("merge_trains_enabled", project.MergeTrainsEnabled)
+	d.Set("merge_commit_template", project.MergeCommitTemplate)
+	d.Set("squash_commit_template", project.SquashCommitTemplate)
 	return nil
 }
 
@@ -743,6 +763,14 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 	}
 
+	if v, ok := d.GetOk("merge_commit_template"); ok {
+		editProjectOptions.MergeCommitTemplate = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("squash_commit_template"); ok {
+		editProjectOptions.SquashCommitTemplate = gitlab.String(v.(string))
+	}
+
 	return resourceGitlabProjectRead(ctx, d, meta)
 }
 
@@ -942,6 +970,14 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("merge_trains_enabled") {
 		options.MergeTrainsEnabled = gitlab.Bool(d.Get("merge_trains_enabled").(bool))
+	}
+
+	if d.HasChange("merge_commit_template") {
+		options.MergeCommitTemplate = gitlab.String(d.Get("merge_commit_template").(string))
+	}
+
+	if d.HasChange("squash_commit_template") {
+		options.SquashCommitTemplate = gitlab.String(d.Get("squash_commit_template").(string))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {

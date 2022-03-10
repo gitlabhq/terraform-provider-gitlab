@@ -55,6 +55,14 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeRequestsTemplate:           "",
 		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
 		CIForwardDeploymentEnabled:      true,
+		MergeCommitTemplate: `Merge branch '%{source_branch}' into '%{target_branch}'
+
+%{title}
+
+%{issues}
+
+See merge request %{reference}`,
+		SquashCommitTemplate: "%{title}",
 	}
 
 	defaultsMainBranch = defaults
