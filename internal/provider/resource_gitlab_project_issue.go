@@ -23,7 +23,7 @@ var _ = registerResource("gitlab_project_issue", func() *schema.Resource {
 
 -> During a terraform destroy this resource will close the issue. Set the delete_on_destroy flag to true to delete the issue instead of closing it.
 
-~> **Experimental** while the base functionality of this resource works, it may be subject to minor change.
+~> **Experimental** While the base functionality of this resource works, it may be subject to minor change.
 
 **Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
 		`,
