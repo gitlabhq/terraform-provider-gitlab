@@ -55,14 +55,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeRequestsTemplate:           "",
 		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
 		CIForwardDeploymentEnabled:      true,
-		MergeCommitTemplate: `Merge branch '%{source_branch}' into '%{target_branch}'
-
-%{title}
-
-%{issues}
-
-See merge request %{reference}`,
-		SquashCommitTemplate: "%{title}",
 	}
 
 	defaultsMainBranch = defaults
@@ -523,6 +515,67 @@ func TestAccGitlabProject_MergeTrains(t *testing.T) {
 					func(s *terraform.State) error {
 						if project.MergeTrainsEnabled != true {
 							return fmt.Errorf("expected merge trains to be enabled")
+						}
+
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_MergeSquashTemplates(t *testing.T) {
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+	customMergeCommitTemplate := `Merge branch '%{source_branch}' into '%{target_branch}'
+
+%{title}
+
+Test value for merge commit template inserted here
+
+%{issues}
+
+See merge request %{reference}`
+
+	customSquashCommitTemplate := `%{title}
+Test value for squash commit template inserted here`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccGitLabProjectMergeSquashTemplatesDefault(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						if project.MergeCommitTemplate != "" {
+							return fmt.Errorf("expected default merge_commit_template, which is null")
+						}
+
+						if project.SquashCommitTemplate != "" {
+							return fmt.Errorf("expected default squash_commit_template, which is null")
+						}
+
+						return nil
+					},
+				),
+			},
+			{
+				Config: testAccGitLabProjectMergeSquashTemplates(rInt, customMergeCommitTemplate, customSquashCommitTemplate),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						// Need to trim the extra whitespace coming from injecting the string
+						if strings.Trim(project.MergeCommitTemplate, "\n") != customMergeCommitTemplate {
+							return fmt.Errorf("expected new merge_commit_template, got %s", project.MergeCommitTemplate)
+						}
+
+						// Need to trim the extra whitespace coming from injecting the string
+						if strings.Trim(project.SquashCommitTemplate, "\n") != customSquashCommitTemplate {
+							return fmt.Errorf("expected new squash_commit_template, got %s", project.SquashCommitTemplate)
 						}
 
 						return nil
@@ -1627,4 +1680,39 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 	`, rInt, rInt)
+}
+
+func testAccGitLabProjectMergeSquashTemplatesDefault(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitLabProjectMergeSquashTemplates(rInt int, mergeCommitTemplate string, squashCommitTemplate string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+
+  merge_commit_template = <<EOT
+%s
+EOT
+  squash_commit_template = <<EOT
+%s
+EOT
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+	`, rInt, rInt, strings.Replace(mergeCommitTemplate, "%", "%%", -1), strings.Replace(squashCommitTemplate, "%", "%%", -1))
 }

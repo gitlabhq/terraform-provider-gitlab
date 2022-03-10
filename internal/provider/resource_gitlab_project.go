@@ -391,19 +391,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Description: "The commit message used when merging, if the merge method creates a merge commit.",
 		Type:        schema.TypeString,
 		Optional:    true,
-		Default: `Merge branch '%{source_branch}' into '%{target_branch}'
-
-%{title}
-
-%{issues}
-
-See merge request %{reference}`,
 	},
 	"squash_commit_template": {
 		Description: "The commit message used when squashing commits.",
 		Type:        schema.TypeString,
 		Optional:    true,
-		Default:     "%{title}",
 	},
 }
 
