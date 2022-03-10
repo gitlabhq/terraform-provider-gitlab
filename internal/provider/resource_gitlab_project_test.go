@@ -568,12 +568,12 @@ Test value for squash commit template inserted here`
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
 					func(s *terraform.State) error {
-						// Need to trim the extra whitespace coming from injecting the string
+						// Need to trim the extra newline coming from injecting the string
 						if strings.Trim(project.MergeCommitTemplate, "\n") != customMergeCommitTemplate {
 							return fmt.Errorf("expected new merge_commit_template, got %s", project.MergeCommitTemplate)
 						}
 
-						// Need to trim the extra whitespace coming from injecting the string
+						// Need to trim the extra newline coming from injecting the string
 						if strings.Trim(project.SquashCommitTemplate, "\n") != customSquashCommitTemplate {
 							return fmt.Errorf("expected new squash_commit_template, got %s", project.SquashCommitTemplate)
 						}
