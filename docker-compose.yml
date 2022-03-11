@@ -36,8 +36,8 @@ services:
       - config-ee:/etc/gitlab
       - logs-ee:/var/log/gitlab
       - data-ee:/var/opt/gitlab
-      - ${PWD}/scripts/healthcheck-and-setup.sh:/healthcheck-and-setup.sh
-      - ${PWD}/Gitlab-license.txt:/Gitlab-license.txt
+      - ${PWD}/scripts/healthcheck-and-setup.sh:/healthcheck-and-setup.sh:Z
+      - ${PWD}/Gitlab-license.txt:/Gitlab-license.txt:Z
     healthcheck:
       test: /healthcheck-and-setup.sh
       interval: 10s
