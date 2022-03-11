@@ -59,6 +59,10 @@ var validProtectedEnvironmentDeploymentLevelNames = []string{
 	"developer", "maintainer",
 }
 
+var validProjectEnvironmentStates = []string{
+	"available", "stopped",
+}
+
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
 	"no one":     gitlab.NoPermissions,
 	"minimal":    gitlab.MinimalAccessPermissions,

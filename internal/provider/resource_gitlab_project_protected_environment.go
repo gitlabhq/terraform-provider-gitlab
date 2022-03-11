@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -12,10 +11,11 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-// https://docs.gitlab.com/ee/ci/environments/protected_environments.html
 var _ = registerResource("gitlab_project_protected_environment", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_project_protected_environment`" + ` resource you to create and manage a protected environment in your GitLab project`,
+		Description: `The ` + "`gitlab_project_protected_environment`" + ` resource allows to manage the lifecycle of a protected environment in a project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_environments.html)`,
 
 		CreateContext: resourceGitlabProjectProtectedEnvironmentCreate,
 		ReadContext:   resourceGitlabProjectProtectedEnvironmentRead,
@@ -38,15 +38,24 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
+			// Uncomment and validate after 14.9 is released, update acceptance tests
+			// 	"required_approval_count": {
+			// 		Description:  "The number of approvals required to deploy to this environment. This is part of Deployment Approvals, which isn't yet available for use.",
+			// 		Type:         schema.TypeString,
+			// 		ForceNew:     true,
+			// 		Required:     false,
+			// 		ValidateFunc: validation.StringIsNotEmpty,
+			// },
 			"deploy_access_levels": {
 				Description: "Array of access levels allowed to deploy, with each described by a hash.",
 				Type:        schema.TypeList,
+				MaxItems:    1,
 				ForceNew:    true,
 				Required:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"access_level": {
-							Description:  fmt.Sprintf("Levels of access required to deploy to this protected environment: %s", renderValueListForDocs(validProtectedEnvironmentDeploymentLevelNames)),
+							Description:  fmt.Sprintf("Levels of access required to deploy to this protected environment. Valid values are %s.", renderValueListForDocs(validProtectedEnvironmentDeploymentLevelNames)),
 							Type:         schema.TypeString,
 							ForceNew:     true,
 							Optional:     true,
@@ -83,10 +92,9 @@ func resourceGitlabProjectProtectedEnvironmentCreate(ctx context.Context, d *sch
 	if err != nil {
 		return diag.Errorf("error expanding deploy_access_levels: %v", err)
 	}
-	environment := d.Get("environment").(string)
-	options := gitlab.ProtectRepositoryEnvironmentsOptions{
-		Name: &environment,
-		// IDK What needs to go here instead but everything seems to be prepended by ampersands for these
+
+	options := &gitlab.ProtectRepositoryEnvironmentsOptions{
+		Name: gitlab.String(d.Get("environment").(string)),
 		DeployAccessLevels: &deployAccessLevels,
 	}
 
@@ -96,7 +104,7 @@ func resourceGitlabProjectProtectedEnvironmentCreate(ctx context.Context, d *sch
 
 	client := meta.(*gitlab.Client)
 
-	protectedEnvironment, _, err := client.ProtectedEnvironments.ProtectRepositoryEnvironments(project, &options)
+	protectedEnvironment, _, err := client.ProtectedEnvironments.ProtectRepositoryEnvironments(project, options, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
 			return diag.Errorf("feature Protected Environments is not available")
@@ -123,17 +131,16 @@ func resourceGitlabProjectProtectedEnvironmentRead(ctx context.Context, d *schem
 
 	client := meta.(*gitlab.Client)
 
-	protectedEnvironment, _, err := client.ProtectedEnvironments.GetProtectedEnvironment(project, environment)
+	protectedEnvironment, _, err := client.ProtectedEnvironments.GetProtectedEnvironment(project, environment, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
-			log.Printf("[DEBUG] Project %s gitlab protected environment %q not found", project, environment)
+			log.Printf("[DEBUG] Project %s gitlab protected environment %q not found, removing from state", project, environment)
 			d.SetId("")
 			return nil
 		}
 		return diag.Errorf("error getting gitlab project %q protected environment %q: %v", project, environment, err)
 	}
 
-	d.Set("environment", protectedEnvironment.Name)
 	if err := d.Set("deploy_access_levels", flattenDeployAccessLevels(protectedEnvironment.DeployAccessLevels)); err != nil {
 		return diag.Errorf("error setting deploy_access_levels: %v", err)
 	}
@@ -151,7 +158,7 @@ func resourceGitlabProjectProtectedEnvironmentDelete(ctx context.Context, d *sch
 
 	client := meta.(*gitlab.Client)
 
-	_, err = client.ProtectedEnvironments.UnprotectEnvironment(project, environmentName)
+	_, err = client.ProtectedEnvironments.UnprotectEnvironment(project, environmentName, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}

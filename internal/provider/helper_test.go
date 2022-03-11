@@ -116,7 +116,7 @@ func testAccCurrentUser(t *testing.T) *gitlab.User {
 	return user
 }
 
-// testAccCreateGroups is a test helper for creating a project.
+// testAccCreateProject is a test helper for creating a project.
 func testAccCreateProject(t *testing.T) *gitlab.Project {
 	t.Helper()
 
@@ -324,6 +324,30 @@ func testAccCreateDeployKey(t *testing.T, projectID int, options *gitlab.AddDepl
 	})
 
 	return deployKey
+}
+
+// testAccCreateProjectEnvironment is a test helper function for creating a project environment
+func testAccCreateProjectEnvironment(t *testing.T, projectID int, options *gitlab.CreateEnvironmentOptions) *gitlab.Environment {
+	t.Helper()
+
+	projectEnvironment, _, err := testGitlabClient.Environments.CreateEnvironment(projectID, options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		if projectEnvironment.State != "stopped" {
+			_, err = testGitlabClient.Environments.StopEnvironment(projectID, projectEnvironment.ID)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		if _, err := testGitlabClient.Environments.DeleteEnvironment(projectID, projectEnvironment.ID); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	return projectEnvironment
 }
 
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an

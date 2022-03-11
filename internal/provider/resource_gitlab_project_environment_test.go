@@ -2,8 +2,10 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,9 +16,12 @@ import (
 func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	var env gitlab.Environment = gitlab.Environment{
+	testProject := testAccCreateProject(t)
+
+	var env1 gitlab.Environment = gitlab.Environment{
 		Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
 	}
+
 	var env2 gitlab.Environment = gitlab.Environment{
 		Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
 		ExternalURL: "https://example.com",
@@ -27,88 +32,76 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{
-			// Create a project and Environment with default options
+			// Create an Environment with default options
 			{
-				Config: testAccGitlabProjectEnvironmentConfig(rInt),
+				Config: testAccGitlabProjectEnvironmentConfig(testProject.ID, rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
+					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.this", &env1),
+					testAccCheckGitlabProjectEnvironmentAttributes(&env1, &testAccGitlabProjectEnvironmentExpectedAttributes{
 						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
 					}),
+					testCheckResourceAttrLazy("gitlab_project_environment.this", "created_at", func() string { return env1.CreatedAt.Format(time.RFC3339) }),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_project_environment.this",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the Environment
 			{
-				Config: testAccGitlabProjectEnvironmentUpdateConfig(rInt),
+				Config: testAccGitlabProjectEnvironmentUpdateConfig(testProject.ID, rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
+					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.this", &env2),
 					testAccCheckGitlabProjectEnvironmentAttributes(&env2, &testAccGitlabProjectEnvironmentExpectedAttributes{
 						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
 						ExternalURL: "https://example.com",
 					}),
+					testCheckResourceAttrLazy("gitlab_project_environment.this", "created_at", func() string { return env2.CreatedAt.Format(time.RFC3339) }),
+					testCheckResourceAttrLazy("gitlab_project_environment.this", "updated_at", func() string { return env2.UpdatedAt.Format(time.RFC3339) }),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_project_environment.this",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the Environment to get back to initial settings
 			{
-				Config: testAccGitlabProjectEnvironmentConfig(rInt),
+				Config: testAccGitlabProjectEnvironmentConfig(testProject.ID, rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
+					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.this", &env1),
+					testAccCheckGitlabProjectEnvironmentAttributes(&env1, &testAccGitlabProjectEnvironmentExpectedAttributes{
 						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
 					}),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_project_environment.this",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
-func TestAccGitlabProjectEnvironment_wildcard(t *testing.T) {
+func TestAccGitlabProjectEnvironment_stop_before_destroy(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	var env gitlab.Environment = gitlab.Environment{
-		Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
-	}
-
-	var env2 gitlab.Environment = gitlab.Environment{
-		Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
-		ExternalURL: "https://example.com",
-	}
+	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{
-			// Create a project and Environment with default options
+			// Create environment with required values only
 			{
-				Config: testAccGitlabProjectEnvironmentConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
-					}),
-				),
-			},
-			// Update the Environment
-			{
-				Config: testAccGitlabProjectEnvironmentUpdateConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env2, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
-						ExternalURL: "https://example.com",
-					}),
-				),
-			},
-			// Update the Environment to get back to initial settings
-			{
-				Config: testAccGitlabProjectEnvironmentConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.ProjectEnvironment", &env),
-					testAccCheckGitlabProjectEnvironmentAttributes(&env, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
-					}),
-				),
+				Config:      testAccGitlabProjectEnvironmentConfig(testProject.ID, rInt),
+				ExpectError: regexp.MustCompile("Environment must be in a stopped state before deletion"),
 			},
 		},
 	})
@@ -120,6 +113,7 @@ func testAccCheckGitlabProjectEnvironmentExists(n string, env *gitlab.Environmen
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
+
 		project, environment, err := parseTwoPartID(rs.Primary.ID)
 		if err != nil {
 			return fmt.Errorf("Error in Splitting Project ID and Environment Name")
@@ -140,6 +134,7 @@ func testAccCheckGitlabProjectEnvironmentExists(n string, env *gitlab.Environmen
 type testAccGitlabProjectEnvironmentExpectedAttributes struct {
 	Name        string
 	ExternalURL string
+	State       string
 }
 
 func testAccCheckGitlabProjectEnvironmentAttributes(env *gitlab.Environment, want *testAccGitlabProjectEnvironmentExpectedAttributes) resource.TestCheckFunc {
@@ -152,70 +147,77 @@ func testAccCheckGitlabProjectEnvironmentAttributes(env *gitlab.Environment, wan
 			return fmt.Errorf("got external URL %q; want %q", env.ExternalURL, want.ExternalURL)
 		}
 
+		if env.State != want.State {
+			return fmt.Errorf("got State %q; want %q", env.State, want.State)
+		}
+
 		return nil
 	}
 }
 
 func testAccCheckGitlabProjectEnvironmentDestroy(s *terraform.State) error {
 	var project string
-	var environment int
+	var environmentIDString string
+	var environmentIDInt int
 	var err error
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type == "gitlab_project" {
 			project = rs.Primary.ID
 		} else if rs.Type == "gitlab_project_environment" {
-			environment, err = strconv.Atoi(rs.Primary.ID)
+			project, environmentIDString, err = parseTwoPartID(rs.Primary.ID)
 			if err != nil {
-				return fmt.Errorf("error converting environment ID to int: %v", err)
+				return fmt.Errorf("[ERROR] cannot get project and environmentID from input: %v", rs.Primary.ID)
+			}
+
+			environmentIDInt, err = strconv.Atoi(environmentIDString)
+			if err != nil {
+				return fmt.Errorf("[ERROR] cannot convert environment ID to int: %v", err)
 			}
 		}
 	}
 
-	env, response, err := testGitlabClient.Environments.GetEnvironment(project, environment)
+	env, _, err := testGitlabClient.Environments.GetEnvironment(project, environmentIDInt)
 	if err == nil {
 		if env != nil {
-			return fmt.Errorf("project Environment %v still exists", environment)
+			return fmt.Errorf("[ERROR] project Environment %v still exists", environmentIDInt)
 		}
 	}
-	if response != nil && response.StatusCode != 404 {
+
+	if is404(err) {
 		return err
 	}
+
 	return nil
 }
 
-func testAccGitlabProjectEnvironmentConfig(rInt int) string {
+func testAccGitlabProjectEnvironmentConfig(projectID int, rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name        = "foo-%[1]d"
-  description = "Terraform acceptance tests"
+resource "gitlab_project_environment" "this" {
+  project = %d
+  name    = "ProjectEnvironment-%d"
 
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level       = "public"
+	stop_before_destroy = true
+}
+`, projectID, rInt)
 }
 
-resource "gitlab_project_environment" "ProjectEnvironment" {
-  project = gitlab_project.foo.id
-  name    = "ProjectEnvironment-%[1]d"
-}
-`, rInt)
-}
-
-func testAccGitlabProjectEnvironmentUpdateConfig(rInt int) string {
+func testAccGitlabProjectEnvironmentUpdateConfig(projectID int, rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name        = "foo-%[1]d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level       = "public"
-}
-
-resource "gitlab_project_environment" "ProjectEnvironment" {
-  project      = gitlab_project.foo.id
-  name         = "ProjectEnvironment-%[1]d"
+resource "gitlab_project_environment" "this" {
+  project      = %d
+  name         = "ProjectEnvironment-%d"
   external_url = "https://example.com"
 }
-`, rInt)
+`, projectID, rInt)
+}
+
+func testAccGitlabProjectEnvironmentStopBeforeDestroyFalse(projectID int, rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project_environment" "this" {
+  project = %d
+  name    = "ProjectEnvironment-%d"
+
+  stop_before_destroy = false
+}
+`, projectID, rInt)
 }
