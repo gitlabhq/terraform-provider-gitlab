@@ -77,27 +77,19 @@ func resourceGitlabLabelRead(ctx context.Context, d *schema.ResourceData, meta i
 	labelName := d.Id()
 	log.Printf("[DEBUG] read gitlab label %s/%s", project, labelName)
 
-	page := 1
-	labelsLen := 0
-	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}}, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
+	label, _, err := client.Labels.GetLabel(project, labelName, gitlab.WithContext(ctx))
+	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] failed to read gitlab label %s/%s", project, labelName)
+			d.SetId("")
+			return nil
 		}
-		for _, label := range labels {
-			if label.Name == labelName {
-				d.Set("description", label.Description)
-				d.Set("color", label.Color)
-				d.Set("name", label.Name)
-				return nil
-			}
-		}
-		labelsLen = len(labels)
-		page = page + 1
+		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] failed to read gitlab label %s/%s", project, labelName)
-	d.SetId("")
+	d.Set("description", label.Description)
+	d.Set("color", label.Color)
+	d.Set("name", label.Name)
 	return nil
 }
 
