@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/xanzy/go-gitlab"
 )
 
 func testAccCheckGitlabProjectVariableExists(name string) resource.TestCheckFunc {
@@ -26,7 +27,7 @@ func testAccCheckGitlabProjectVariableExists(name string) resource.TestCheckFunc
 		func(state *terraform.State) error {
 			attributes := state.RootModule().Resources[name].Primary.Attributes
 
-			got, err := getProjectVariable(context.Background(), testGitlabClient, attributes["project"], attributes["key"], attributes["environment_scope"])
+			got, _, err := testGitlabClient.ProjectVariables.GetVariable(attributes["project"], attributes["key"], nil, gitlab.WithContext(context.Background()), withEnvironmentScopeFilter(context.Background(), attributes["environment_scope"]))
 			if err != nil {
 				return err
 			}
