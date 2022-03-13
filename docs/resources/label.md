@@ -46,4 +46,11 @@ resource "gitlab_label" "devops_create" {
 - **description** (String) The description of the label.
 - **id** (String) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# Gitlab labels can be imported using an id made up of `{project_id}:{group_label_id}`, e.g.
+terraform import gitlab_label.example 12345:fixme
+```

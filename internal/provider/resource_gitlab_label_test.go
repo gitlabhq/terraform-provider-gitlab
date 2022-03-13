@@ -55,8 +55,35 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_label.fixme",
+				ImportStateIdFunc: getLabelImportID("gitlab_label.fixme"),
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
+}
+
+func getLabelImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
+		}
+
+		labelID := rs.Primary.ID
+		if labelID == "" {
+			return "", fmt.Errorf("No label key ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("No project ID is set")
+		}
+
+		return fmt.Sprintf("%s:%s", projectID, labelID), nil
+	}
 }
 
 func testAccCheckGitlabLabelExists(n string, label *gitlab.Label) resource.TestCheckFunc {
