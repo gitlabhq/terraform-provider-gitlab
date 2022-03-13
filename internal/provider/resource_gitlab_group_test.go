@@ -286,8 +286,8 @@ func TestAccGitlabGroup_updatedAttributes(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
 			{
-				//This test requires EE because without it, the two "Shared Runner" settings will always return 0,
-				//  even though they will work. They also require an admin token.
+				//This test requires EE because without it, "file_template_project_id" will never return nil
+				// and the test will always fail.
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitLabGroupWithProjectTemplate(rInt),
 				Check: resource.ComposeTestCheckFunc(
@@ -296,6 +296,12 @@ func TestAccGitlabGroup_updatedAttributes(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_group.test-group",
 						"file_template_project_id", fmt.Sprintf("%d", project.ID)),
 				),
+			},
+			{
+				SkipFunc:          isRunningInCE,
+				ResourceName:      "gitlab_group.test-group",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
