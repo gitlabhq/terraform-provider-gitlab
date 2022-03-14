@@ -5,15 +5,19 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployToken_basic(t *testing.T) {
-	var deployToken gitlab.DeployToken
-	rInt := acctest.RandInt()
+	testAccCheck(t)
+
+	var projectDeployToken gitlab.DeployToken
+	var groupDeployToken gitlab.DeployToken
+
+	testProject := testAccCreateProject(t)
+	testGroup := testAccCreateGroups(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -21,14 +25,28 @@ func TestAccGitlabDeployToken_basic(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabDeployTokenDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabDeployTokenConfig(rInt),
+				Config: testAccGitlabDeployTokenConfig(testProject.ID, testGroup.ID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployTokenExists("gitlab_deploy_token.foo", &deployToken),
-					testAccCheckGitlabDeployTokenAttributes(&deployToken, &testAccCheckGitlabDeployTokenExpectedAttributes{
-						Name:     fmt.Sprintf("deployToken-%d", rInt),
-						Username: "my-username",
-					}),
+					testAccCheckGitlabDeployTokenExists("gitlab_deploy_token.project_token", &projectDeployToken),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_token.project_token", "token"),
+					testAccCheckGitlabDeployTokenExists("gitlab_deploy_token.group_token", &groupDeployToken),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_token.group_token", "token"),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:            "gitlab_deploy_token.project_token",
+				ImportStateIdFunc:       getDeployTokenImportID("gitlab_deploy_token.project_token"),
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"token"},
+			},
+			{
+				ResourceName:            "gitlab_deploy_token.group_token",
+				ImportStateIdFunc:       getDeployTokenImportID("gitlab_deploy_token.group_token"),
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"token"},
 			},
 		},
 	})
@@ -98,23 +116,27 @@ func testAccCheckGitlabDeployTokenExists(n string, deployToken *gitlab.DeployTok
 	}
 }
 
-type testAccCheckGitlabDeployTokenExpectedAttributes struct {
-	Name     string
-	Username string
-}
-
-func testAccCheckGitlabDeployTokenAttributes(deployToken *gitlab.DeployToken, want *testAccCheckGitlabDeployTokenExpectedAttributes) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-
-		if deployToken.Name != want.Name {
-			return fmt.Errorf("got name %q; want %q", deployToken.Name, want.Name)
+func getDeployTokenImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
 		}
 
-		if deployToken.Username != want.Username {
-			return fmt.Errorf("got username %q; want %q", deployToken.Username, want.Username)
+		deployTokenID := rs.Primary.ID
+		if deployTokenID == "" {
+			return "", fmt.Errorf("No deploy token ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID != "" {
+			return fmt.Sprintf("project:%s:%s", projectID, deployTokenID), nil
+		}
+		groupID := rs.Primary.Attributes["group"]
+		if groupID != "" {
+			return fmt.Sprintf("group:%s:%s", groupID, deployTokenID), nil
 		}
 
-		return nil
+		return "", fmt.Errorf("No project or group ID is set")
 	}
 }
 
@@ -158,20 +180,11 @@ func testAccCheckGitlabDeployTokenDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabDeployTokenConfig(rInt int) string {
+func testAccGitlabDeployTokenConfig(projectID int, groupID int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name        = "foo-%d"
-  description = "Terraform acceptance test"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_deploy_token" "foo" {
-  project  = "${gitlab_project.foo.id}"
-  name     = "deployToken-%d"
+resource "gitlab_deploy_token" "project_token" {
+  project  = "%d"
+  name     = "project-deploy-token"
   username = "my-username"
 
   expires_at = "2021-03-14T07:20:50.000Z"
@@ -184,7 +197,23 @@ resource "gitlab_deploy_token" "foo" {
 	"write_package_registry",
   ]
 }
-  `, rInt, rInt)
+
+resource "gitlab_deploy_token" "group_token" {
+  group  = "%d"
+  name     = "group-deploy-token"
+  username = "my-username"
+
+  expires_at = "2021-03-14T07:20:50.000Z"
+
+  scopes = [
+	"read_registry",
+	"read_repository",
+	"read_package_registry",
+	"write_registry",
+	"write_package_registry",
+  ]
+}
+  `, projectID, groupID)
 }
 
 func testAccGitlabDeployTokenPaginationConfig(numberOfTokens int, groupID int, projectID int) string {
