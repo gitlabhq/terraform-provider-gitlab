@@ -34,7 +34,7 @@ var testGitlabConfig = Config{
 var testGitlabClient *gitlab.Client
 
 func init() {
-	if os.Getenv(resource.TestEnvVar) != "" {
+	if os.Getenv(resource.EnvTfAcc) != "" {
 		client, err := testGitlabConfig.Client()
 		if err != nil {
 			panic("failed to create test client: " + err.Error()) // lintignore: R009 // TODO: Resolve this tfproviderlint issue

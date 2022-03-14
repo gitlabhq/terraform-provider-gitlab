@@ -66,8 +66,8 @@ func isRunningInCE() (bool, error) {
 func testAccCheck(t *testing.T) {
 	t.Helper()
 
-	if os.Getenv(resource.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	if os.Getenv(resource.EnvTfAcc) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
 	}
 }
 
@@ -318,8 +318,8 @@ type testAccGitlabProjectContext struct {
 // testAccGitlabProjectStart initializes the GitLab client and creates a test project. Remember to
 // call testAccGitlabProjectContext.finish() when finished with the testAccGitlabProjectContext.
 func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
-	if os.Getenv(resource.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	if os.Getenv(resource.EnvTfAcc) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
 		return testAccGitlabProjectContext{}
 	}
 

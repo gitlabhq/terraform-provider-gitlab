@@ -694,8 +694,8 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 // lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURL(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
-	if os.Getenv(resource.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	if os.Getenv(resource.EnvTfAcc) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
 	}
 
 	rInt := acctest.RandInt()
@@ -822,8 +822,8 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 // lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
-	if os.Getenv(resource.TestEnvVar) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.TestEnvVar))
+	if os.Getenv(resource.EnvTfAcc) == "" {
+		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
 	}
 
 	var mirror gitlab.Project
