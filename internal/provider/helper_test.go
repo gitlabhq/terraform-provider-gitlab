@@ -293,6 +293,21 @@ func testAccAddProjectMilestone(t *testing.T, pid interface{}) *gitlab.Milestone
 	return milestone
 }
 
+func testAccCreateDeployKey(t *testing.T, projectID int, options *gitlab.AddDeployKeyOptions) *gitlab.ProjectDeployKey {
+	deployKey, _, err := testGitlabClient.DeployKeys.AddDeployKey(projectID, options)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		if _, err := testGitlabClient.DeployKeys.DeleteDeployKey(projectID, deployKey.ID); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	return deployKey
+}
+
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
 // acceptance test.
 type testAccGitlabProjectContext struct {
