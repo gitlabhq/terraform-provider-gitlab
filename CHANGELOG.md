@@ -4,6 +4,7 @@ FEATURES:
 
 * **New Resource:** `gitlab_project_tag` ([#910](https://github.com/gitlabhq/terraform-provider-gitlab/pull/910))
 * **New Resource:** `gitlab_project_issue` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+* **New Data Source:** `gitlab_project_tag` ([#910](https://github.com/gitlabhq/terraform-provider-gitlab/pull/910))
 * **New Data Source:** `gitlab_project_issue` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
 * **New Data Source:** `gitlab_project_issues` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
 
