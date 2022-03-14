@@ -14,7 +14,6 @@ import (
 )
 
 var _ = registerResource("gitlab_project_access_token", func() *schema.Resource {
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: `The ` + "`" + `gitlab_project_access_token` + "`" + ` resource allows to manage the lifecycle of a project access token.
 
@@ -23,6 +22,9 @@ var _ = registerResource("gitlab_project_access_token", func() *schema.Resource 
 		CreateContext: resourceGitlabProjectAccessTokenCreate,
 		ReadContext:   resourceGitlabProjectAccessTokenRead,
 		DeleteContext: resourceGitlabProjectAccessTokenDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -63,7 +65,7 @@ var _ = registerResource("gitlab_project_access_token", func() *schema.Resource 
 				ForceNew: true,
 			},
 			"token": {
-				Description: "The secret token. This is only populated when creating a new project access token.",
+				Description: "The secret token. **Note**: the token is not available for imported resources.",
 				Type:        schema.TypeString,
 				Computed:    true,
 				Sensitive:   true,
