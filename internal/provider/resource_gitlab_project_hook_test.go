@@ -68,6 +68,14 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify import
+			{
+				ResourceName:            "gitlab_project_hook.foo",
+				ImportStateIdFunc:       getProjectHookImportID("gitlab_project_hook.foo"),
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"token"},
+			},
 		},
 	})
 }
@@ -201,6 +209,25 @@ func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
+}
+
+func getProjectHookImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
+		}
+
+		hookID := rs.Primary.ID
+		if hookID == "" {
+			return "", fmt.Errorf("No hook ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("No project ID is set")
+		}
+		return fmt.Sprintf("%s:%s", projectID, hookID), nil
+	}
 }
 
 func testAccGitlabProjectHookConfig(rInt int) string {
