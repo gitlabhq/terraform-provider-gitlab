@@ -13,7 +13,6 @@ import (
 )
 
 var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_group_ldap_link`" + ` resource allows to manage the lifecycle of an LDAP integration with a group.
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -12,7 +13,6 @@ import (
 )
 
 var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: `The ` + "`" + `gitlab_project_hook` + "`" + ` resource allows to manage the lifecycle of a project hook.
 
@@ -22,6 +22,9 @@ var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
 		ReadContext:   resourceGitlabProjectHookRead,
 		UpdateContext: resourceGitlabProjectHookUpdate,
 		DeleteContext: resourceGitlabProjectHookDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceGitlabProjectHookStateImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -35,7 +38,7 @@ var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
 				Required:    true,
 			},
 			"token": {
-				Description: "A token to present when invoking the hook.",
+				Description: "A token to present when invoking the hook. The token is not available for imported resources.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Sensitive:   true,
@@ -160,6 +163,7 @@ func resourceGitlabProjectHookCreate(ctx context.Context, d *schema.ResourceData
 	}
 
 	d.SetId(fmt.Sprintf("%d", hook.ID))
+	d.Set("token", options.Token)
 
 	return resourceGitlabProjectHookRead(ctx, d, meta)
 }
@@ -255,4 +259,18 @@ func resourceGitlabProjectHookDelete(ctx context.Context, d *schema.ResourceData
 	}
 
 	return nil
+}
+
+func resourceGitlabProjectHookStateImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 2 {
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Project Hook import format; expected '{project_id}:{hook_id}'")
+	}
+	project, id := s[0], s[1]
+
+	d.SetId(id)
+	d.Set("project", project)
+
+	return []*schema.ResourceData{d}, nil
 }

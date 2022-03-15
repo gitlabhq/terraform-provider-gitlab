@@ -47,7 +47,16 @@ resource "gitlab_project_hook" "example" {
 - **push_events_branch_filter** (String) Invoke the hook for push events on matching branches only.
 - **releases_events** (Boolean) Invoke the hook for releases events.
 - **tag_push_events** (Boolean) Invoke the hook for tag push events.
-- **token** (String, Sensitive) A token to present when invoking the hook.
+- **token** (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
 - **wiki_page_events** (Boolean) Invoke the hook for wiki page events.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# A GitLab Project Hook can be imported using a key composed of `<project-id>:<hook-id>`, e.g.
+terraform import gitlab_project_hook.example "12345:1"
+
+# NOTE: the `token` resource attribute is not available for imported resources as this information cannot be read from the GitLab API.
+```

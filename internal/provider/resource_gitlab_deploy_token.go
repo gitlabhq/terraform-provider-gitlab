@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,7 +16,6 @@ import (
 )
 
 var _ = registerResource("gitlab_deploy_token", func() *schema.Resource {
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_deploy_token`" + ` resource allows to manage the lifecycle of group and project deploy tokens.
 
@@ -24,6 +24,9 @@ var _ = registerResource("gitlab_deploy_token", func() *schema.Resource {
 		CreateContext: resourceGitlabDeployTokenCreate,
 		ReadContext:   resourceGitlabDeployTokenRead,
 		DeleteContext: resourceGitlabDeployTokenDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceGitlabDeployTokenStateImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -80,7 +83,7 @@ var _ = registerResource("gitlab_deploy_token", func() *schema.Resource {
 			},
 
 			"token": {
-				Description: "The secret token. This is only populated when creating a new deploy token.",
+				Description: "The secret token. This is only populated when creating a new deploy token. **Note**: The token is not available for imported resources.",
 				Type:        schema.TypeString,
 				Computed:    true,
 				Sensitive:   true,
@@ -256,4 +259,26 @@ func resourceGitlabDeployTokenDelete(ctx context.Context, d *schema.ResourceData
 	}
 
 	return nil
+}
+
+func resourceGitlabDeployTokenStateImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	s := strings.Split(d.Id(), ":")
+	if len(s) != 3 {
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Deploy Token import format; expected '{type}:{type_id}:{deploy_token_id}' where the type can either be a group or project")
+	}
+
+	tokenType, typeID, id := s[0], s[1], s[2]
+
+	d.SetId(id)
+	switch tokenType {
+	case "project":
+		d.Set("project", typeID)
+	case "group":
+		d.Set("group", typeID)
+	default:
+		d.SetId("")
+		return nil, fmt.Errorf("Invalid Deploy Token import format; expected '{type}:{type_id}:{deploy_token_id}' where the type can either be a group or project")
+	}
+	return []*schema.ResourceData{d}, nil
 }

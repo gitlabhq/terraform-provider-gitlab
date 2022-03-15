@@ -73,6 +73,16 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_project_access_token.bar",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					// the token is only known during creating. We explicitly mention this limitation in the docs.
+					"token",
+				},
+			},
 			//Destroy Project Access Token
 			{
 				Config: testAccGitlabProjectAccessTokenDestroyToken(rInt),

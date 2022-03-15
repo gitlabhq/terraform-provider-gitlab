@@ -50,7 +50,16 @@ resource "gitlab_project_variable" "example" {
 - **active** (Boolean) True if the token is active.
 - **created_at** (String) Time the token has been created, RFC3339 format.
 - **revoked** (Boolean) True if the token is revoked.
-- **token** (String, Sensitive) The secret token. This is only populated when creating a new project access token.
+- **token** (String, Sensitive) The secret token. **Note**: the token is not available for imported resources.
 - **user_id** (Number) The user_id associated to the token.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# A GitLab Project Access Token can be imported using a key composed of `<project-id>:<token-id>`, e.g.
+terraform import gitlab_project_access_token.example "12345:1"
+
+# NOTE: the `token` resource attribute is not available for imported resources as this information cannot be read from the GitLab API.
+```
