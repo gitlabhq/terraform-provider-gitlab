@@ -98,41 +98,21 @@ func resourceGitlabPipelineScheduleRead(ctx context.Context, d *schema.ResourceD
 
 	log.Printf("[DEBUG] read gitlab PipelineSchedule %s/%d", project, pipelineScheduleID)
 
-	opt := &gitlab.ListPipelineSchedulesOptions{
-		Page:    1,
-		PerPage: 20,
+	pipelineSchedule, _, err := client.PipelineSchedules.GetPipelineSchedule(project, pipelineScheduleID, gitlab.WithContext(ctx))
+	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] PipelineSchedule %d in project %s does not exist, removing from state", pipelineScheduleID, project)
+			d.SetId("")
+			return nil
+		}
+		return diag.FromErr(err)
 	}
 
-	found := false
-	for {
-		pipelineSchedules, resp, err := client.PipelineSchedules.ListPipelineSchedules(project, opt, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
-		}
-		for _, pipelineSchedule := range pipelineSchedules {
-			if pipelineSchedule.ID == pipelineScheduleID {
-				d.Set("description", pipelineSchedule.Description)
-				d.Set("ref", pipelineSchedule.Ref)
-				d.Set("cron", pipelineSchedule.Cron)
-				d.Set("cron_timezone", pipelineSchedule.CronTimezone)
-				d.Set("active", pipelineSchedule.Active)
-				found = true
-				break
-			}
-		}
-
-		if found || resp.CurrentPage >= resp.TotalPages {
-			break
-		}
-
-		opt.Page = resp.NextPage
-	}
-	if !found {
-		log.Printf("[DEBUG] PipelineSchedule %d no longer exists in gitlab", pipelineScheduleID)
-		d.SetId("")
-		return nil
-	}
-
+	d.Set("description", pipelineSchedule.Description)
+	d.Set("ref", pipelineSchedule.Ref)
+	d.Set("cron", pipelineSchedule.Cron)
+	d.Set("cron_timezone", pipelineSchedule.CronTimezone)
+	d.Set("active", pipelineSchedule.Active)
 	return nil
 }
 
