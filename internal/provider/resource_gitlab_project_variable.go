@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"log"
 	"strings"
 
@@ -139,23 +138,23 @@ func resourceGitlabProjectVariableRead(ctx context.Context, d *schema.ResourceDa
 
 	log.Printf("[DEBUG] read gitlab project variable %q", d.Id())
 
-	v, err := getProjectVariable(ctx, client, project, key, environmentScope)
+	variable, _, err := client.ProjectVariables.GetVariable(project, key, nil, gitlab.WithContext(ctx), withEnvironmentScopeFilter(ctx, environmentScope))
 	if err != nil {
-		if errors.Is(err, errProjectVariableNotExist) {
-			log.Printf("[DEBUG] read gitlab project variable %q was not found", d.Id())
+		if is404(err) {
+			log.Printf("[DEBUG] read gitlab project variable %q was not found, removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
 		return augmentVariableClientError(d, err)
 	}
 
-	d.Set("key", v.Key)
-	d.Set("value", v.Value)
-	d.Set("variable_type", v.VariableType)
+	d.Set("key", variable.Key)
+	d.Set("value", variable.Value)
+	d.Set("variable_type", variable.VariableType)
 	d.Set("project", project)
-	d.Set("protected", v.Protected)
-	d.Set("masked", v.Masked)
-	d.Set("environment_scope", v.EnvironmentScope)
+	d.Set("protected", variable.Protected)
+	d.Set("masked", variable.Masked)
+	d.Set("environment_scope", variable.EnvironmentScope)
 	return nil
 }
 
@@ -200,32 +199,4 @@ func resourceGitlabProjectVariableDelete(ctx context.Context, d *schema.Resource
 	// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209
 	_, err := client.ProjectVariables.RemoveVariable(project, key, nil, withEnvironmentScopeFilter(ctx, environmentScope))
 	return augmentVariableClientError(d, err)
-}
-
-var errProjectVariableNotExist = errors.New("project variable does not exist")
-
-func getProjectVariable(ctx context.Context, client *gitlab.Client, project interface{}, key, environmentScope string) (*gitlab.ProjectVariable, error) {
-	// List and filter variables manually to support GitLab versions < v13.4 (2020-08-22)
-	// ref: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/39209
-
-	page := 1
-
-	for {
-		projectVariables, resp, err := client.ProjectVariables.ListVariables(project, &gitlab.ListProjectVariablesOptions{Page: page}, gitlab.WithContext(ctx))
-		if err != nil {
-			return nil, err
-		}
-
-		for _, v := range projectVariables {
-			if v.Key == key && v.EnvironmentScope == environmentScope {
-				return v, nil
-			}
-		}
-
-		if resp.NextPage == 0 {
-			return nil, errProjectVariableNotExist
-		}
-
-		page++
-	}
 }
