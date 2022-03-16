@@ -4,12 +4,24 @@ page_title: "gitlab_repository_file Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_repository_file resource allows to manage the lifecycle of a file within a repository.
+  -> Timeouts Default timeout for Create, Update and Delete is one minute and can be configured in the timeouts block.
+  -> Implementation Detail GitLab is unable to handle concurrent calls to the GitLab repository files API for the same project.
+     Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
+     execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
+     changed the repository at the same time.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/repository_files.html
 ---
 
 # gitlab_repository_file (Resource)
 
 The `gitlab_repository_file` resource allows to manage the lifecycle of a file within a repository.
+
+-> **Timeouts** Default timeout for *Create*, *Update* and *Delete* is one minute and can be configured in the `timeouts` block.
+
+-> **Implementation Detail** GitLab is unable to handle concurrent calls to the GitLab repository files API for the same project.
+   Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
+   execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
+   changed the repository at the same time.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)
 
@@ -54,6 +66,7 @@ resource "gitlab_repository_file" "this" {
 - `author_name` (String) Name of the commit author.
 - `id` (String) The ID of this resource.
 - `start_branch` (String) Name of the branch to start the new commit from.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
@@ -65,6 +78,15 @@ resource "gitlab_repository_file" "this" {
 - `last_commit_id` (String) The last known commit id.
 - `ref` (String) The name of branch, tag or commit.
 - `size` (Number) The file size.
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 ## Import
 
