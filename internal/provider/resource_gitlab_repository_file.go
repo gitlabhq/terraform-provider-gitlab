@@ -14,11 +14,22 @@ import (
 
 const encoding = "base64"
 
+// NOTE: this lock is a bit of a hack to prevent parallel calls to the GitLab Repository Files API.
+//       If it is called concurrently, the API will return a 400 error along the lines of:
+//       ```
+//       (400 Bad Request) DELETE https://gitlab.com/api/v4/projects/30716/repository/files/somefile.yaml: 400
+//       {message: 9:Could not update refs/heads/master. Please refresh and try again..}
+//       ```
+//
+//       This lock only solves half of the problem, where the provider is responsible for
+//       the concurrency. The other half is if the API is called outside of terraform at the same time
+//       this resource makes calls to the API.
+//       To mitigate this, simple retries are used.
+var resourceGitlabRepositoryFileApiLock = newLock()
+
 var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_repository_file`" + ` resource allows to manage the lifecycle of a file within a repository.
-
-~> **Limitations**: The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html) can only create, update or delete a single file at the time.  The API will also [fail with a 400](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository) response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with [-parallelism=1](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n) and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)`,
 
@@ -69,9 +80,17 @@ var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 })
 
 func resourceGitlabRepositoryFileCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	filePath := d.Get("file_path").(string)
+
+	log.Printf("[DEBUG] gitlab_repository_file: waiting for lock to create %s/%s", project, filePath)
+	if err := resourceGitlabRepositoryFileApiLock.lock(ctx); err != nil {
+		return diag.FromErr(err)
+	}
+	defer resourceGitlabRepositoryFileApiLock.unlock()
+	log.Printf("[DEBUG] gitlab_repository_file: got lock to create %s/%s", project, filePath)
+
+	client := meta.(*gitlab.Client)
 
 	options := &gitlab.CreateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
@@ -126,11 +145,19 @@ func resourceGitlabRepositoryFileRead(ctx context.Context, d *schema.ResourceDat
 }
 
 func resourceGitlabRepositoryFileUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
 	project, branch, filePath, err := resourceGitLabRepositoryFileParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	log.Printf("[DEBUG] gitlab_repository_file: waiting for lock to update %s/%s", project, filePath)
+	if err := resourceGitlabRepositoryFileApiLock.lock(ctx); err != nil {
+		return diag.FromErr(err)
+	}
+	defer resourceGitlabRepositoryFileApiLock.unlock()
+	log.Printf("[DEBUG] gitlab_repository_file: got lock to update %s/%s", project, filePath)
+
+	client := meta.(*gitlab.Client)
 
 	readOptions := &gitlab.GetFileOptions{
 		Ref: gitlab.String(branch),
@@ -163,11 +190,19 @@ func resourceGitlabRepositoryFileUpdate(ctx context.Context, d *schema.ResourceD
 }
 
 func resourceGitlabRepositoryFileDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
 	project, branch, filePath, err := resourceGitLabRepositoryFileParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	log.Printf("[DEBUG] gitlab_repository_file: waiting for lock to delete %s/%s", project, filePath)
+	if err := resourceGitlabRepositoryFileApiLock.lock(ctx); err != nil {
+		return diag.FromErr(err)
+	}
+	defer resourceGitlabRepositoryFileApiLock.unlock()
+	log.Printf("[DEBUG] gitlab_repository_file: got lock to delete %s/%s", project, filePath)
+
+	client := meta.(*gitlab.Client)
 
 	readOptions := &gitlab.GetFileOptions{
 		Ref: gitlab.String(branch),

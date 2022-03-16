@@ -62,6 +62,32 @@ func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T)
 	})
 }
 
+func TestAccGitlabRepositoryFile_concurrentResources(t *testing.T) {
+	testAccCheck(t)
+
+	testProject := testAccCreateProject(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
+		Steps: []resource.TestStep{
+			// NOTE: we don't need to check anything here, just make sure no terraform errors are being raised,
+			//       the other test cases will do the actual testing :)
+			{
+				Config: testAccGitlabRepositoryFileConcurrentResourcesConfig(testProject.ID),
+			},
+			{
+				Config: testAccGitlabRepositoryFileConcurrentResourcesConfigUpdate(testProject.ID),
+			},
+			{
+				Config:  testAccGitlabRepositoryFileConcurrentResourcesConfigUpdate(testProject.ID),
+				Destroy: true,
+			},
+		},
+	})
+}
+
 func TestAccGitlabRepositoryFile_validationOfBase64Content(t *testing.T) {
 	cases := []struct {
 		givenContent           string
@@ -365,4 +391,32 @@ resource "gitlab_repository_file" "bar_file" {
   commit_message = "feature: add launch codes"
 }
 	`, rInt, rInt)
+}
+
+func testAccGitlabRepositoryFileConcurrentResourcesConfig(projectID int) string {
+	return fmt.Sprintf(`
+resource "gitlab_repository_file" "this" {
+  project = "%d"
+  file_path = "file-${count.index}.txt"
+  branch = "main"
+  content = base64encode("content-${count.index}")
+  commit_message = "Add file ${count.index}"
+
+  count = 50
+}
+	`, projectID)
+}
+
+func testAccGitlabRepositoryFileConcurrentResourcesConfigUpdate(projectID int) string {
+	return fmt.Sprintf(`
+resource "gitlab_repository_file" "this" {
+  project = "%d"
+  file_path = "file-${count.index}.txt"
+  branch = "main"
+  content = base64encode("updated-content-${count.index}")
+  commit_message = "Add file ${count.index}"
+
+  count = 50
+}
+	`, projectID)
 }
