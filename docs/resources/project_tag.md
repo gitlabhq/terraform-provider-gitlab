@@ -42,7 +42,7 @@ resource "gitlab_project_tag" "example" {
 ### Optional
 
 - **id** (String) The ID of this resource.
-- **message** (String) Creates annotated tag.
+- **message** (String) The message of the annotated tag.
 
 ### Read-Only
 

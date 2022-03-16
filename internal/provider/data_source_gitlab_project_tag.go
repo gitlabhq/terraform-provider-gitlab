@@ -16,47 +16,16 @@ var _ = registerDataSource("gitlab_project_tag", func() *schema.Resource {
 **Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/tags.html)`,
 
 		ReadContext: dataSourceGitlabProjectTagRead,
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Description: "The name of a tag.",
-				Type:        schema.TypeString,
-				Required:    true,
+		Schema: constructSchema(
+			datasourceSchemaFromResourceSchema(gitlabProjectTagGetSchema(), "name"),
+			map[string]*schema.Schema{
+				"project": {
+					Description: "The ID or URL-encoded path of the project owned by the authenticated user.",
+					Type:        schema.TypeString,
+					Required:    true,
+				},
 			},
-			"project": {
-				Description: "The ID or URL-encoded path of the project owned by the authenticated user.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"message": {
-				Description: "Creates annotated tag.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"protected": {
-				Description: "Bool, true if tag has tag protection.",
-				Type:        schema.TypeBool,
-				Computed:    true,
-			},
-			"target": {
-				Description: "The unique id assigned to the commit by Gitlab.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"release": {
-				Description: "The release associated with the tag.",
-				Type:        schema.TypeSet,
-				Computed:    true,
-				Set:         schema.HashResource(releaseNoteSchema),
-				Elem:        releaseNoteSchema,
-			},
-			"commit": {
-				Description: "The commit associated with the tag ref.",
-				Type:        schema.TypeSet,
-				Computed:    true,
-				Set:         schema.HashResource(commitSchema),
-				Elem:        commitSchema,
-			},
-		},
+		),
 	}
 })
 

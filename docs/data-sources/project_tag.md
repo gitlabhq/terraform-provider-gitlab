@@ -43,8 +43,8 @@ data "gitlab_project_tag" "foo" {
 
 ### Read-Only
 
-- **commit** (Set of Object) The commit associated with the tag ref. (see [below for nested schema](#nestedatt--commit))
-- **message** (String) Creates annotated tag.
+- **commit** (Set of Object) The commit associated with the tag. (see [below for nested schema](#nestedatt--commit))
+- **message** (String) The message of the annotated tag.
 - **protected** (Boolean) Bool, true if tag has tag protection.
 - **release** (Set of Object) The release associated with the tag. (see [below for nested schema](#nestedatt--release))
 - **target** (String) The unique id assigned to the commit by Gitlab.
