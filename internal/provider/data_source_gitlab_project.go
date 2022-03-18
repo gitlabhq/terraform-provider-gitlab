@@ -151,6 +151,144 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
+			"resolve_outdated_diff_discussions": {
+				Description: "Automatically resolve merge request diffs discussions on lines changed with a push.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"analytics_access_level": {
+				Description: fmt.Sprintf("Set the analytics access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"auto_cancel_pending_pipelines": {
+				Description: "Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"auto_devops_deploy_strategy": {
+				Description: fmt.Sprintf("Auto Deploy strategy. Valid values are %s.", renderValueListForDocs(validProjectAutoDevOpsDeployStrategyValues)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"auto_devops_enabled": {
+				Description: "Enable Auto DevOps for this project.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"autoclose_referenced_issues": {
+				Description: "Set whether auto-closing referenced issues on default branch.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"build_git_strategy": {
+				Description: "The Git strategy. Defaults to fetch.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"build_timeout": {
+				Description: "The maximum amount of time, in seconds, that a job can run.",
+				Type:        schema.TypeInt,
+				Computed:    true,
+			},
+			"builds_access_level": {
+				Description: fmt.Sprintf("Set the builds access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"container_expiration_policy": {
+				Description: "Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API.",
+				Type:        schema.TypeList,
+				Elem:        containerExpirationPolicyAttributesSchema,
+				Computed:    true,
+			},
+			"container_registry_access_level": {
+				Description: fmt.Sprintf("Set visibility of container registry, for this project. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"emails_disabled": {
+				Description: "Disable email notifications.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"external_authorization_classification_label": {
+				Description: "The classification label for the project.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"forking_access_level": {
+				Description: fmt.Sprintf("Set the forking access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"issues_access_level": {
+				Description: fmt.Sprintf("Set the issues access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"merge_requests_access_level": {
+				Description: fmt.Sprintf("Set the merge requests access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"operations_access_level": {
+				Description: fmt.Sprintf("Set the operations access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"public_builds": {
+				Description: "If true, jobs can be viewed by non-project members.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+			},
+			"repository_access_level": {
+				Description: fmt.Sprintf("Set the repository access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"repository_storage": {
+				Description: "	Which storage shard the repository is on. (administrator only)",
+				Type:     schema.TypeString,
+				Computed: true,
+			},
+			"requirements_access_level": {
+				Description: fmt.Sprintf("Set the requirements access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"security_and_compliance_access_level": {
+				Description: fmt.Sprintf("Set the security and compliance access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"snippets_access_level": {
+				Description: fmt.Sprintf("Set the snippets access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"topics": {
+				Description: "The list of topics for the project.",
+				Type:        schema.TypeSet,
+				Set:         schema.HashString,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
+			},
+			"wiki_access_level": {
+				Description: fmt.Sprintf("Set the wiki access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"squash_commit_template": {
+				Description: "Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"merge_commit_template": {
+				Description: "Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
 				Description: "Push rules for the project.",
@@ -261,6 +399,37 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("remove_source_branch_after_merge", found.RemoveSourceBranchAfterMerge)
 	d.Set("merge_pipelines_enabled", found.MergePipelinesEnabled)
 	d.Set("merge_trains_enabled", found.MergeTrainsEnabled)
+	d.Set("resolve_outdated_diff_discussions", found.ResolveOutdatedDiffDiscussions)
+	d.Set("analytics_access_level", string(found.AnalyticsAccessLevel))
+	d.Set("auto_cancel_pending_pipelines", found.AutoCancelPendingPipelines)
+	d.Set("auto_devops_deploy_strategy", found.AutoDevopsDeployStrategy)
+	d.Set("auto_devops_enabled", found.AutoDevopsEnabled)
+	d.Set("autoclose_referenced_issues", found.AutocloseReferencedIssues)
+	d.Set("build_git_strategy", found.BuildGitStrategy)
+	d.Set("build_timeout", found.BuildTimeout)
+	d.Set("builds_access_level", string(found.BuildsAccessLevel))
+	if err := d.Set("container_expiration_policy", flattenContainerExpirationPolicy(found.ContainerExpirationPolicy)); err != nil {
+		return diag.Errorf("error setting container_expiration_policy: %v", err)
+	}
+	d.Set("container_registry_access_level", string(found.ContainerRegistryAccessLevel))
+	d.Set("emails_disabled", found.EmailsDisabled)
+	d.Set("external_authorization_classification_label", found.ExternalAuthorizationClassificationLabel)
+	d.Set("forking_access_level", string(found.ForkingAccessLevel))
+	d.Set("issues_access_level", string(found.IssuesAccessLevel))
+	d.Set("merge_requests_access_level", string(found.MergeRequestsAccessLevel))
+	d.Set("operations_access_level", string(found.OperationsAccessLevel))
+	d.Set("public_builds", found.PublicBuilds)
+	d.Set("repository_access_level", string(found.RepositoryAccessLevel))
+	d.Set("repository_storage", found.RepositoryStorage)
+	d.Set("requirements_access_level", string(found.RequirementsAccessLevel))
+	d.Set("security_and_compliance_access_level", string(found.SecurityAndComplianceAccessLevel))
+	d.Set("snippets_access_level", string(found.SnippetsAccessLevel))
+	if err := d.Set("topics", found.Topics); err != nil {
+		return diag.Errorf("error setting topics: %v", err)
+	}
+	d.Set("wiki_access_level", string(found.WikiAccessLevel))
+	d.Set("squash_commit_template", found.SquashCommitTemplate)
+	d.Set("merge_commit_template", found.MergeCommitTemplate)
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 

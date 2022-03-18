@@ -20,6 +20,35 @@ type testAccGitlabProjectExpectedAttributes struct {
 	DefaultBranch string
 }
 
+func TestAccGitlabProject_minimal(t *testing.T) {
+	var received gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+						visibility_level = "public"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_basic(t *testing.T) {
 	var received, defaults, defaultsMainBranch gitlab.Project
 	rInt := acctest.RandInt()
@@ -29,7 +58,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		Name:                             fmt.Sprintf("foo-%d", rInt),
 		Path:                             fmt.Sprintf("foo.%d", rInt),
 		Description:                      "Terraform acceptance tests",
-		TagList:                          []string{"tag1"},
+		TagList:                          []string{"foo", "bar"},
 		RequestAccessEnabled:             true,
 		IssuesEnabled:                    true,
 		MergeRequestsEnabled:             true,
@@ -55,6 +84,37 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		MergeRequestsTemplate:           "",
 		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
 		CIForwardDeploymentEnabled:      true,
+		ResolveOutdatedDiffDiscussions:  true,
+		AnalyticsAccessLevel:            gitlab.EnabledAccessControl,
+		AutoCancelPendingPipelines:      "enabled",
+		AutoDevopsDeployStrategy:        "continuous",
+		AutoDevopsEnabled:               true,
+		AutocloseReferencedIssues:       true,
+		BuildGitStrategy:                "fetch",
+		BuildTimeout:                    42 * 60,
+		BuildsAccessLevel:               gitlab.EnabledAccessControl,
+		ContainerExpirationPolicy: &gitlab.ContainerExpirationPolicy{
+			Enabled:   true,
+			Cadence:   "1month",
+			KeepN:     10,
+			OlderThan: "10d",
+		},
+		ContainerRegistryAccessLevel: gitlab.EnabledAccessControl,
+		EmailsDisabled:               true,
+		ForkingAccessLevel:           gitlab.EnabledAccessControl,
+		IssuesAccessLevel:            gitlab.EnabledAccessControl,
+		MergeRequestsAccessLevel:     gitlab.EnabledAccessControl,
+		OperationsAccessLevel:        gitlab.EnabledAccessControl,
+		PublicBuilds:                 false,
+		RepositoryAccessLevel:        gitlab.EnabledAccessControl,
+		RepositoryStorage:            "default",
+		// FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
+		// SecurityAndComplianceAccessLevel:         gitlab.EnabledAccessControl,
+		SnippetsAccessLevel:  gitlab.EnabledAccessControl,
+		Topics:               []string{"foo", "bar"},
+		WikiAccessLevel:      gitlab.EnabledAccessControl,
+		SquashCommitTemplate: "hello squash",
+		MergeCommitTemplate:  "hello merge",
 	}
 
 	defaultsMainBranch = defaults
@@ -83,7 +143,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Name:                             fmt.Sprintf("foo-%d", rInt),
 						Path:                             fmt.Sprintf("foo.%d", rInt),
 						Description:                      "Terraform acceptance tests!",
-						TagList:                          []string{"tag1", "tag2"},
+						TagList:                          []string{"foo", "bar"},
 						JobsEnabled:                      false,
 						ApprovalsBeforeMerge:             0,
 						RequestAccessEnabled:             false,
@@ -95,13 +155,44 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						PrintingMergeRequestLinkEnabled:  true,
 						OnlyAllowMergeIfPipelineSucceeds: true,
 						OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-						SquashOption:                gitlab.SquashOptionDefaultOn,
-						AllowMergeOnSkippedPipeline: true,
-						Archived:                    true,
-						PackagesEnabled:             false,
-						PagesAccessLevel:            gitlab.DisabledAccessControl,
-						BuildCoverageRegex:          "bar",
-						CIForwardDeploymentEnabled:  false,
+						SquashOption:                   gitlab.SquashOptionDefaultOn,
+						AllowMergeOnSkippedPipeline:    true,
+						Archived:                       true,
+						PackagesEnabled:                false,
+						PagesAccessLevel:               gitlab.DisabledAccessControl,
+						BuildCoverageRegex:             "bar",
+						CIForwardDeploymentEnabled:     false,
+						ResolveOutdatedDiffDiscussions: false,
+						AnalyticsAccessLevel:           gitlab.DisabledAccessControl,
+						AutoCancelPendingPipelines:     "disabled",
+						AutoDevopsDeployStrategy:       "manual",
+						AutoDevopsEnabled:              false,
+						AutocloseReferencedIssues:      false,
+						BuildGitStrategy:               "fetch",
+						BuildTimeout:                   10 * 60,
+						BuildsAccessLevel:              gitlab.DisabledAccessControl,
+						ContainerExpirationPolicy: &gitlab.ContainerExpirationPolicy{
+							Enabled:   true,
+							Cadence:   "4h",
+							KeepN:     10,
+							OlderThan: "10d",
+						},
+						ContainerRegistryAccessLevel: gitlab.DisabledAccessControl,
+						EmailsDisabled:               false,
+						ForkingAccessLevel:           gitlab.DisabledAccessControl,
+						IssuesAccessLevel:            gitlab.DisabledAccessControl,
+						MergeRequestsAccessLevel:     gitlab.DisabledAccessControl,
+						OperationsAccessLevel:        gitlab.DisabledAccessControl,
+						PublicBuilds:                 false,
+						RepositoryAccessLevel:        gitlab.DisabledAccessControl,
+						RepositoryStorage:            "default",
+						// FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
+						// SecurityAndComplianceAccessLevel:         gitlab.DisabledAccessControl,
+						SnippetsAccessLevel:  gitlab.DisabledAccessControl,
+						Topics:               []string{},
+						WikiAccessLevel:      gitlab.DisabledAccessControl,
+						SquashCommitTemplate: "goodby squash",
+						MergeCommitTemplate:  "goodby merge",
 					}, &received),
 				),
 			},
@@ -525,39 +616,10 @@ func TestAccGitlabProject_MergeTrains(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProject_willError(t *testing.T) {
-	var received, defaults gitlab.Project
+func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
+	var received gitlab.Project
 	rInt := acctest.RandInt()
-	defaults = gitlab.Project{
-		Namespace:                        &gitlab.ProjectNamespace{ID: 0},
-		Name:                             fmt.Sprintf("foo-%d", rInt),
-		Path:                             fmt.Sprintf("foo.%d", rInt),
-		Description:                      "Terraform acceptance tests",
-		TagList:                          []string{"tag1"},
-		RequestAccessEnabled:             true,
-		IssuesEnabled:                    true,
-		MergeRequestsEnabled:             true,
-		JobsEnabled:                      true,
-		ApprovalsBeforeMerge:             0,
-		WikiEnabled:                      true,
-		SnippetsEnabled:                  true,
-		ContainerRegistryEnabled:         true,
-		LFSEnabled:                       true,
-		SharedRunnersEnabled:             true,
-		Visibility:                       gitlab.PublicVisibility,
-		MergeMethod:                      gitlab.FastForwardMerge,
-		PrintingMergeRequestLinkEnabled:  true,
-		OnlyAllowMergeIfPipelineSucceeds: true,
-		OnlyAllowMergeIfAllDiscussionsAreResolved: true,
-		SquashOption:               gitlab.SquashOptionDefaultOff,
-		PackagesEnabled:            true,
-		PagesAccessLevel:           gitlab.PublicAccessControl,
-		BuildCoverageRegex:         "foo",
-		CIConfigPath:               ".gitlab-ci.yml@mynamespace/myproject",
-		CIForwardDeploymentEnabled: true,
-	}
-	willError := defaults
-	willError.TagList = []string{"notatag"}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
@@ -565,26 +627,38 @@ func TestAccGitlabProject_willError(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Step0 Create a project
 			{
-				Config: testAccGitlabProjectConfig(rInt),
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+
+						visibility_level = "public"
+					}`, rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(&defaults, &received),
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
 				),
 			},
 			// Step1 Verify that passing bad values will fail.
 			{
-				Config:      testAccGitlabProjectConfig(rInt),
-				ExpectError: regexp.MustCompile(`\stags\sexpected\s.+notatag.+\sreceived`),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAggregateGitlabProject(&willError, &received),
-				),
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+						repository_storage = "non-existing"
+
+						visibility_level = "public"
+					}`, rInt),
+				// This will fail because the repository_storage is not valid.
+				ExpectError: regexp.MustCompile(`\[is invalid\]`),
 			},
 			// Step2 Reset
 			{
-				Config: testAccGitlabProjectConfig(rInt),
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+
+						visibility_level = "public"
+					}`, rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &received),
-					testAccCheckAggregateGitlabProject(&defaults, &received),
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
 				),
 			},
 		},
@@ -600,7 +674,12 @@ func TestAccGitlabProject_import(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabProjectConfig(rInt),
+				SkipFunc: isRunningInEE,
+				Config:   testAccGitlabProjectConfig(rInt),
+			},
+			{
+				SkipFunc: isRunningInCE,
+				Config:   testAccGitlabProjectConfigEE(rInt),
 			},
 			{
 				ResourceName:      "gitlab_project.foo",
@@ -956,6 +1035,89 @@ func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_containerExpirationPolicy(t *testing.T) {
+	var received gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+
+						container_expiration_policy {
+							enabled = true
+							cadence = "1d"
+						}
+
+						visibility_level = "public"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.enabled", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.cadence", "1d"),
+				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Set more attributes
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+
+						container_expiration_policy {
+							enabled = true
+							cadence = "1month"
+							name_regex_keep = "bar"
+						}
+
+						visibility_level = "public"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.enabled", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.cadence", "1month"),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.name_regex_keep", "bar"),
+					resource.TestCheckResourceAttrSet("gitlab_project.this", "container_expiration_policy.0.next_run_at"),
+				),
+			},
+			// Clear attributes
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+
+						container_expiration_policy {}
+
+						visibility_level = "public"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.enabled", "true"),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.cadence", "1month"),
+					resource.TestCheckResourceAttr("gitlab_project.this", "container_expiration_policy.0.name_regex_keep", "bar"),
+					resource.TestCheckResourceAttrSet("gitlab_project.this", "container_expiration_policy.0.next_run_at"),
+				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		var err error
@@ -1041,6 +1203,11 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 
 			if err := resourceGitlabProjectSetToState(testGitlabClient, receivedData, received); err != nil {
 				return err
+			}
+
+			// ignored for now
+			if attribute == "container_expiration_policy" {
+				return nil
 			}
 
 			return testAccCompareGitLabAttribute(attribute, expectedData, receivedData)
@@ -1279,9 +1446,10 @@ resource "gitlab_project" "foo" {
 
   %s
 
-  tags = [
-	"tag1",
-  ]
+  # NOTE: replaces by topics
+  # tags = [
+  # "tag1",
+  # ]
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
@@ -1294,6 +1462,35 @@ resource "gitlab_project" "foo" {
   build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
+  resolve_outdated_diff_discussions = true
+  analytics_access_level = "enabled"
+  auto_cancel_pending_pipelines = "enabled"
+  auto_devops_deploy_strategy = "continuous"
+  auto_devops_enabled = true
+  autoclose_referenced_issues = true
+  build_git_strategy = "fetch"
+  build_timeout = 42 * 60
+  builds_access_level = "enabled"
+  container_expiration_policy {
+	enabled = true
+  	cadence = "1month"
+  }
+  container_registry_access_level = "enabled"
+  emails_disabled = true
+  forking_access_level = "enabled"
+  issues_access_level = "enabled"
+  merge_requests_access_level = "enabled"
+  operations_access_level = "enabled"
+  public_builds = false
+  repository_access_level = "enabled"
+  repository_storage = "default"
+  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
+  # security_and_compliance_access_level = "enabled"
+  snippets_access_level = "enabled"
+  topics = ["foo", "bar"]
+  wiki_access_level = "enabled"
+  squash_commit_template = "hello squash"
+  merge_commit_template = "hello merge"
 }
 	`, rInt, rInt, defaultBranchStatement)
 }
@@ -1334,10 +1531,11 @@ resource "gitlab_project" "foo" {
   path = "foo.%d"
   description = "Terraform acceptance tests!"
 
-  tags = [
-	"tag1",
-	"tag2",
-  ]
+  # NOTE: replaces by topics
+  # tags = [
+  # "tag1",
+  # "tag2"
+  # ]
 
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
@@ -1365,6 +1563,35 @@ resource "gitlab_project" "foo" {
   ci_forward_deployment_enabled = false
   merge_pipelines_enabled = false
   merge_trains_enabled = false
+  resolve_outdated_diff_discussions = false
+  analytics_access_level = "disabled"
+  auto_cancel_pending_pipelines = "disabled"
+  auto_devops_deploy_strategy = "manual"
+  auto_devops_enabled = false
+  autoclose_referenced_issues = false
+  build_git_strategy = "fetch"
+  build_timeout = 10 * 60
+  builds_access_level = "disabled"
+  container_expiration_policy {
+	enabled = true
+  	cadence = "3month"
+  }
+  container_registry_access_level = "disabled"
+  emails_disabled = false
+  forking_access_level = "disabled"
+  issues_access_level = "disabled"
+  merge_requests_access_level = "disabled"
+  operations_access_level = "disabled"
+  public_builds = false
+  repository_access_level = "disabled"
+  repository_storage = "default"
+  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
+  # security_and_compliance_access_level = "disabled"
+  snippets_access_level = "disabled"
+  topics = []
+  wiki_access_level = "disabled"
+  squash_commit_template = "goodby squash"
+  merge_commit_template = "goodby merge"
 }
 	`, rInt, rInt)
 }
@@ -1477,6 +1704,36 @@ resource "gitlab_project" "foo" {
   push_rules {
 %[2]s
   }
+
+  resolve_outdated_diff_discussions = true
+  analytics_access_level = "enabled"
+  auto_cancel_pending_pipelines = "enabled"
+  auto_devops_deploy_strategy = "continuous"
+  auto_devops_enabled = true
+  autoclose_referenced_issues = true
+  build_git_strategy = "fetch"
+  build_timeout = 42 * 60
+  builds_access_level = "enabled"
+  container_expiration_policy {
+	enabled = true
+  	cadence = "1month"
+  }
+  container_registry_access_level = "enabled"
+  emails_disabled = true
+  forking_access_level = "enabled"
+  issues_access_level = "enabled"
+  merge_requests_access_level = "enabled"
+  operations_access_level = "enabled"
+  public_builds = false
+  repository_access_level = "enabled"
+  repository_storage = "default"
+  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
+  # security_and_compliance_access_level = "enabled"
+  snippets_access_level = "enabled"
+  topics = ["foo", "bar"]
+  wiki_access_level = "enabled"
+  squash_commit_template = "hello squash"
+  merge_commit_template = "hello merge"
 
   # So that acceptance tests can be run in a gitlab organization with no billing.
   visibility_level = "public"
@@ -1617,6 +1874,71 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
+}
+	`, rInt, rInt)
+}
+
+func testAccGitlabProjectConfigEE(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  path = "foo.%d"
+  description = "Terraform acceptance tests"
+  default_branch = "main"
+
+  # NOTE: replaces by topics
+  # tags = [
+  # "tag1",
+  # ]
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+  merge_method = "ff"
+  only_allow_merge_if_pipeline_succeeds = true
+  only_allow_merge_if_all_discussions_are_resolved = true
+  squash_option = "default_off"
+  pages_access_level = "public"
+  build_coverage_regex = "foo"
+  allow_merge_on_skipped_pipeline = false
+  ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
+  resolve_outdated_diff_discussions = true
+  analytics_access_level = "enabled"
+  auto_cancel_pending_pipelines = "enabled"
+  auto_devops_deploy_strategy = "continuous"
+  auto_devops_enabled = true
+  autoclose_referenced_issues = true
+  build_git_strategy = "fetch"
+  build_timeout = 42 * 60
+  builds_access_level = "enabled"
+  container_expiration_policy {
+	enabled = true
+  	cadence = "1month"
+  }
+  container_registry_access_level = "enabled"
+  emails_disabled = true
+  forking_access_level = "enabled"
+  issues_access_level = "enabled"
+  merge_requests_access_level = "enabled"
+  operations_access_level = "enabled"
+  public_builds = false
+  repository_access_level = "enabled"
+  repository_storage = "default"
+  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
+  # security_and_compliance_access_level = "enabled"
+  snippets_access_level = "enabled"
+  topics = ["foo", "bar"]
+  wiki_access_level = "enabled"
+  squash_commit_template = "hello squash"
+  merge_commit_template = "hello merge"
+
+  # EE features
+  approvals_before_merge = 2
+  external_authorization_classification_label = "test"
+  requirements_access_level = "enabled"
+  # are tested in separate test case
+  # mirror_trigger_builds = true
+  # mirror = true
 }
 	`, rInt, rInt)
 }

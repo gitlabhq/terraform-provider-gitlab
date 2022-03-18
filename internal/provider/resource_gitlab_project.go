@@ -15,6 +15,27 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+var (
+	validProjectAccessLevels = []string{
+		"disabled",
+		"private",
+		"enabled",
+	}
+	validProjectAutoCancelPendingPipelinesValues = []string{
+		"enabled",
+		"disabled",
+	}
+	validProjectBuildGitStrategyValues = []string{
+		"clone",
+		"fetch",
+	}
+	validProjectAutoDevOpsDeployStrategyValues = []string{
+		"continuous",
+		"manual",
+		"timed_incremental",
+	}
+)
+
 var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	"name": {
 		Description: "The name of the project.",
@@ -174,9 +195,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Computed:    true,
 	},
 	"tags": {
-		Description: "Tags (topics) of the project.",
+		Description: "The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.",
 		Type:        schema.TypeSet,
 		Optional:    true,
+		Computed:    true,
 		ForceNew:    false,
 		Elem:        &schema.Schema{Type: schema.TypeString},
 		Set:         schema.HashString,
@@ -387,6 +409,232 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 		Default:     false,
 	},
+	"resolve_outdated_diff_discussions": {
+		Description: "Automatically resolve merge request diffs discussions on lines changed with a push.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+	},
+	"analytics_access_level": {
+		Description:      fmt.Sprintf("Set the analytics access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"auto_cancel_pending_pipelines": {
+		Description:      "Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.",
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAutoCancelPendingPipelinesValues, false)),
+	},
+	"auto_devops_deploy_strategy": {
+		Description:      fmt.Sprintf("Auto Deploy strategy. Valid values are %s.", renderValueListForDocs(validProjectAutoDevOpsDeployStrategyValues)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAutoDevOpsDeployStrategyValues, false)),
+	},
+	"auto_devops_enabled": {
+		Description: "Enable Auto DevOps for this project.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Computed:    true,
+	},
+	"autoclose_referenced_issues": {
+		Description: "Set whether auto-closing referenced issues on default branch.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Computed:    true,
+	},
+	"build_git_strategy": {
+		Description:      "The Git strategy. Defaults to fetch.",
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectBuildGitStrategyValues, false)),
+	},
+	"build_timeout": {
+		Description: "The maximum amount of time, in seconds, that a job can run.",
+		Type:        schema.TypeInt,
+		Optional:    true,
+		Computed:    true,
+	},
+	"builds_access_level": {
+		Description:      fmt.Sprintf("Set the builds access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"container_expiration_policy": {
+		Description: "Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API.",
+		Type:        schema.TypeList,
+		MaxItems:    1,
+		Elem:        containerExpirationPolicyAttributesSchema,
+		Optional:    true,
+		Computed:    true,
+	},
+	"container_registry_access_level": {
+		Description:      fmt.Sprintf("Set visibility of container registry, for this project. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"emails_disabled": {
+		Description: "Disable email notifications.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+	},
+	"external_authorization_classification_label": {
+		Description: "The classification label for the project.",
+		Type:        schema.TypeString,
+		Optional:    true,
+	},
+	"forking_access_level": {
+		Description:      fmt.Sprintf("Set the forking access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"issues_access_level": {
+		Description:      fmt.Sprintf("Set the issues access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"merge_requests_access_level": {
+		Description:      fmt.Sprintf("Set the merge requests access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"operations_access_level": {
+		Description:      fmt.Sprintf("Set the operations access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"public_builds": {
+		Description: "If true, jobs can be viewed by non-project members.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+	},
+	"repository_access_level": {
+		Description:      fmt.Sprintf("Set the repository access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"repository_storage": {
+		Description: "	Which storage shard the repository is on. (administrator only)",
+		Type:     schema.TypeString,
+		Optional: true,
+		Computed: true,
+	},
+	"requirements_access_level": {
+		Description:      fmt.Sprintf("Set the requirements access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"security_and_compliance_access_level": {
+		Description:      fmt.Sprintf("Set the security and compliance access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"snippets_access_level": {
+		Description:      fmt.Sprintf("Set the snippets access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"topics": {
+		Description: "The list of topics for the project.",
+		Type:        schema.TypeSet,
+		Set:         schema.HashString,
+		Elem:        &schema.Schema{Type: schema.TypeString},
+		Optional:    true,
+	},
+	"wiki_access_level": {
+		Description:      fmt.Sprintf("Set the wiki access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+		Type:             schema.TypeString,
+		Optional:         true,
+		Computed:         true,
+		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
+	},
+	"squash_commit_template": {
+		Description: "Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)",
+		Type:        schema.TypeString,
+		Optional:    true,
+	},
+	"merge_commit_template": {
+		Description: "Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)",
+		Type:        schema.TypeString,
+		Optional:    true,
+	},
+}
+
+var validContainerExpirationPolicyAttributesCadenceValues = []string{
+	"1d", "7d", "14d", "1month", "3month",
+}
+
+var containerExpirationPolicyAttributesSchema = &schema.Resource{
+	Schema: map[string]*schema.Schema{
+		"cadence": {
+			Description:      fmt.Sprintf("The cadence of the policy. Valid values are: %s.", renderValueListForDocs(validContainerExpirationPolicyAttributesCadenceValues)),
+			Type:             schema.TypeString,
+			Optional:         true,
+			Computed:         true,
+			ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validContainerExpirationPolicyAttributesCadenceValues, false)),
+		},
+		"keep_n": {
+			Description:      "The number of images to keep.",
+			Type:             schema.TypeInt,
+			Optional:         true,
+			Computed:         true,
+			ValidateDiagFunc: validation.ToDiagFunc(validation.IntAtLeast(0)),
+		},
+		"older_than": {
+			Description: "The number of days to keep images.",
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+		},
+		"name_regex_delete": {
+			Description: "The regular expression to match image names to delete. **Note**: the upstream API has some inconsistencies with the `name_regex` field here. It's basically unusable at the moment.",
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+		},
+		"name_regex_keep": {
+			Description: "The regular expression to match image names to keep.",
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+		},
+		"enabled": {
+			Description: "If true, the policy is enabled.",
+			Type:        schema.TypeBool,
+			Optional:    true,
+			Computed:    true,
+		},
+		"next_run_at": {
+			Description: "The next time the policy will run.",
+			Type:        schema.TypeString,
+			Computed:    true,
+		},
+	},
 }
 
 var _ = registerResource("gitlab_project", func() *schema.Resource {
@@ -465,6 +713,37 @@ func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceDa
 	d.Set("ci_forward_deployment_enabled", project.CIForwardDeploymentEnabled)
 	d.Set("merge_pipelines_enabled", project.MergePipelinesEnabled)
 	d.Set("merge_trains_enabled", project.MergeTrainsEnabled)
+	d.Set("resolve_outdated_diff_discussions", project.ResolveOutdatedDiffDiscussions)
+	d.Set("analytics_access_level", string(project.AnalyticsAccessLevel))
+	d.Set("auto_cancel_pending_pipelines", project.AutoCancelPendingPipelines)
+	d.Set("auto_devops_deploy_strategy", project.AutoDevopsDeployStrategy)
+	d.Set("auto_devops_enabled", project.AutoDevopsEnabled)
+	d.Set("autoclose_referenced_issues", project.AutocloseReferencedIssues)
+	d.Set("build_git_strategy", project.BuildGitStrategy)
+	d.Set("build_timeout", project.BuildTimeout)
+	d.Set("builds_access_level", string(project.BuildsAccessLevel))
+	if err := d.Set("container_expiration_policy", flattenContainerExpirationPolicy(project.ContainerExpirationPolicy)); err != nil {
+		return fmt.Errorf("error setting container_expiration_policy: %v", err)
+	}
+	d.Set("container_registry_access_level", string(project.ContainerRegistryAccessLevel))
+	d.Set("emails_disabled", project.EmailsDisabled)
+	d.Set("external_authorization_classification_label", project.ExternalAuthorizationClassificationLabel)
+	d.Set("forking_access_level", string(project.ForkingAccessLevel))
+	d.Set("issues_access_level", string(project.IssuesAccessLevel))
+	d.Set("merge_requests_access_level", string(project.MergeRequestsAccessLevel))
+	d.Set("operations_access_level", string(project.OperationsAccessLevel))
+	d.Set("public_builds", project.PublicBuilds)
+	d.Set("repository_access_level", string(project.RepositoryAccessLevel))
+	d.Set("repository_storage", project.RepositoryStorage)
+	d.Set("requirements_access_level", string(project.RequirementsAccessLevel))
+	d.Set("security_and_compliance_access_level", string(project.SecurityAndComplianceAccessLevel))
+	d.Set("snippets_access_level", string(project.SnippetsAccessLevel))
+	if err := d.Set("topics", project.Topics); err != nil {
+		return fmt.Errorf("error setting topics: %v", err)
+	}
+	d.Set("wiki_access_level", string(project.WikiAccessLevel))
+	d.Set("squash_commit_template", project.SquashCommitTemplate)
+	d.Set("merge_commit_template", project.MergeCommitTemplate)
 	return nil
 }
 
@@ -548,6 +827,114 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if v, ok := d.GetOk("ci_config_path"); ok {
 		options.CIConfigPath = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("resolve_outdated_diff_discussions"); ok {
+		options.ResolveOutdatedDiffDiscussions = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("analytics_access_level"); ok {
+		options.AnalyticsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("auto_cancel_pending_pipelines"); ok {
+		options.AutoCancelPendingPipelines = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("auto_devops_deploy_strategy"); ok {
+		options.AutoDevopsDeployStrategy = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("auto_devops_enabled"); ok {
+		options.AutoDevopsEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("autoclose_referenced_issues"); ok {
+		options.AutocloseReferencedIssues = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("build_git_strategy"); ok {
+		options.BuildGitStrategy = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("build_timeout"); ok {
+		options.BuildTimeout = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("builds_access_level"); ok {
+		options.BuildsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if _, ok := d.GetOk("container_expiration_policy"); ok {
+		options.ContainerExpirationPolicyAttributes = expandContainerExpirationPolicyAttributes(d)
+	}
+
+	if v, ok := d.GetOk("container_registry_access_level"); ok {
+		options.ContainerRegistryAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("emails_disabled"); ok {
+		options.EmailsDisabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("external_authorization_classification_label"); ok {
+		options.ExternalAuthorizationClassificationLabel = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("forking_access_level"); ok {
+		options.ForkingAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("issues_access_level"); ok {
+		options.IssuesAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("merge_requests_access_level"); ok {
+		options.MergeRequestsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("operations_access_level"); ok {
+		options.OperationsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("public_builds"); ok {
+		options.PublicBuilds = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("repository_access_level"); ok {
+		options.RepositoryAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("repository_storage"); ok {
+		options.RepositoryStorage = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("requirements_access_level"); ok {
+		options.RequirementsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("security_and_compliance_access_level"); ok {
+		options.SecurityAndComplianceAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("snippets_access_level"); ok {
+		options.SnippetsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("topics"); ok {
+		options.Topics = stringSetToStringSlice(v.(*schema.Set))
+	}
+
+	if v, ok := d.GetOk("wiki_access_level"); ok {
+		options.WikiAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("squash_commit_template"); ok {
+		options.SquashCommitTemplate = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("merge_commit_template"); ok {
+		options.MergeCommitTemplate = gitlab.String(v.(string))
 	}
 
 	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
@@ -944,6 +1331,114 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 		options.MergeTrainsEnabled = gitlab.Bool(d.Get("merge_trains_enabled").(bool))
 	}
 
+	if d.HasChange("resolve_outdated_diff_discussions") {
+		options.ResolveOutdatedDiffDiscussions = gitlab.Bool(d.Get("resolve_outdated_diff_discussions").(bool))
+	}
+
+	if d.HasChange("analytics_access_level") {
+		options.AnalyticsAccessLevel = stringToAccessControlValue(d.Get("analytics_access_level").(string))
+	}
+
+	if d.HasChange("auto_cancel_pending_pipelines") {
+		options.AutoCancelPendingPipelines = gitlab.String(d.Get("auto_cancel_pending_pipelines").(string))
+	}
+
+	if d.HasChange("auto_devops_deploy_strategy") {
+		options.AutoDevopsDeployStrategy = gitlab.String(d.Get("auto_devops_deploy_strategy").(string))
+	}
+
+	if d.HasChange("auto_devops_enabled") {
+		options.AutoDevopsEnabled = gitlab.Bool(d.Get("auto_devops_enabled").(bool))
+	}
+
+	if d.HasChange("autoclose_referenced_issues") {
+		options.AutocloseReferencedIssues = gitlab.Bool(d.Get("autoclose_referenced_issues").(bool))
+	}
+
+	if d.HasChange("build_git_strategy") {
+		options.BuildGitStrategy = gitlab.String(d.Get("build_git_strategy").(string))
+	}
+
+	if d.HasChange("build_timeout") {
+		options.BuildTimeout = gitlab.Int(d.Get("build_timeout").(int))
+	}
+
+	if d.HasChange("builds_access_level") {
+		options.BuildsAccessLevel = stringToAccessControlValue(d.Get("builds_access_level").(string))
+	}
+
+	if d.HasChange("container_expiration_policy") {
+		options.ContainerExpirationPolicyAttributes = expandContainerExpirationPolicyAttributes(d)
+	}
+
+	if d.HasChange("container_registry_access_level") {
+		options.ContainerRegistryAccessLevel = stringToAccessControlValue(d.Get("container_registry_access_level").(string))
+	}
+
+	if d.HasChange("emails_disabled") {
+		options.EmailsDisabled = gitlab.Bool(d.Get("emails_disabled").(bool))
+	}
+
+	if d.HasChange("external_authorization_classification_label") {
+		options.ExternalAuthorizationClassificationLabel = gitlab.String(d.Get("external_authorization_classification_label").(string))
+	}
+
+	if d.HasChange("forking_access_level") {
+		options.ForkingAccessLevel = stringToAccessControlValue(d.Get("forking_access_level").(string))
+	}
+
+	if d.HasChange("issues_access_level") {
+		options.IssuesAccessLevel = stringToAccessControlValue(d.Get("issues_access_level").(string))
+	}
+
+	if d.HasChange("merge_requests_access_level") {
+		options.MergeRequestsAccessLevel = stringToAccessControlValue(d.Get("merge_requests_access_level").(string))
+	}
+
+	if d.HasChange("operations_access_level") {
+		options.OperationsAccessLevel = stringToAccessControlValue(d.Get("operations_access_level").(string))
+	}
+
+	if d.HasChange("public_builds") {
+		options.PublicBuilds = gitlab.Bool(d.Get("public_builds").(bool))
+	}
+
+	if d.HasChange("repository_access_level") {
+		options.RepositoryAccessLevel = stringToAccessControlValue(d.Get("repository_access_level").(string))
+	}
+
+	if d.HasChange("repository_storage") {
+		options.RepositoryStorage = gitlab.String(d.Get("repository_storage").(string))
+	}
+
+	if d.HasChange("requirements_access_level") {
+		options.RequirementsAccessLevel = stringToAccessControlValue(d.Get("requirements_access_level").(string))
+	}
+
+	if d.HasChange("security_and_compliance_access_level") {
+		options.SecurityAndComplianceAccessLevel = stringToAccessControlValue(d.Get("security_and_compliance_access_level").(string))
+	}
+
+	if d.HasChange("snippets_access_level") {
+		options.SnippetsAccessLevel = stringToAccessControlValue(d.Get("snippets_access_level").(string))
+	}
+
+	if d.HasChange("topics") {
+		options.Topics = stringSetToStringSlice(d.Get("topics").(*schema.Set))
+	}
+
+	if d.HasChange("wiki_access_level") {
+		options.WikiAccessLevel = stringToAccessControlValue(d.Get("wiki_access_level").(string))
+	}
+
+	if d.HasChange("squash_commit_template") {
+		options.SquashCommitTemplate = gitlab.String(d.Get("squash_commit_template").(string))
+	}
+
+	if d.HasChange("merge_commit_template") {
+		options.MergeCommitTemplate = gitlab.String(d.Get("merge_commit_template").(string))
+	}
+
 	if *options != (gitlab.EditProjectOptions{}) {
 		log.Printf("[DEBUG] update gitlab project %s", d.Id())
 		_, _, err := client.Projects.EditProject(d.Id(), options, gitlab.WithContext(ctx))
@@ -1191,6 +1686,57 @@ func flattenProjectPushRules(pushRules *gitlab.ProjectPushRules) (values []map[s
 			"max_file_size":                 pushRules.MaxFileSize,
 		},
 	}
+}
+
+func flattenContainerExpirationPolicy(policy *gitlab.ContainerExpirationPolicy) (values []map[string]interface{}) {
+	if policy == nil {
+		return
+	}
+
+	values = []map[string]interface{}{
+		{
+			"cadence":           policy.Cadence,
+			"keep_n":            policy.KeepN,
+			"older_than":        policy.OlderThan,
+			"name_regex_delete": policy.NameRegexDelete,
+			"name_regex_keep":   policy.NameRegexKeep,
+			"enabled":           policy.Enabled,
+		},
+	}
+	if policy.NextRunAt != nil {
+		values[0]["next_run_at"] = policy.NextRunAt.Format(time.RFC3339)
+	}
+	return values
+}
+
+func expandContainerExpirationPolicyAttributes(d *schema.ResourceData) *gitlab.ContainerExpirationPolicyAttributes {
+	policy := gitlab.ContainerExpirationPolicyAttributes{}
+
+	if v, ok := d.GetOk("container_expiration_policy.0.cadence"); ok {
+		policy.Cadence = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("container_expiration_policy.0.keep_n"); ok {
+		policy.KeepN = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("container_expiration_policy.0.older_than"); ok {
+		policy.OlderThan = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("container_expiration_policy.0.name_regex_delete"); ok {
+		policy.NameRegexDelete = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("container_expiration_policy.0.name_regex_keep"); ok {
+		policy.NameRegexKeep = gitlab.String(v.(string))
+	}
+
+	if v, ok := d.GetOk("container_expiration_policy.0.enabled"); ok {
+		policy.Enabled = gitlab.Bool(v.(bool))
+	}
+
+	return &policy
 }
 
 func namespaceOrPathChanged(ctx context.Context, d *schema.ResourceDiff, meta interface{}) bool {
