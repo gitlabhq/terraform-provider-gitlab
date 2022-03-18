@@ -1,3 +1,51 @@
+## 3.13.0 (Unreleased)
+
+FEATURES:
+
+* **New Data Source:** `gitlab_instance_deploy_keys` ([#870](https://github.com/gitlabhq/terraform-provider-gitlab/pull/870))
+* **New Data Source:** `gitlab_project_tags` ([#963](https://github.com/gitlabhq/terraform-provider-gitlab/pull/963))
+* **New Data Source:** `gitlab_repository_file` ([#939](https://github.com/gitlabhq/terraform-provider-gitlab/pull/939))
+
+IMPROVEMENTS:
+
+* resource/gitlab_branch_protection: Make `push_access_level` and `merge_access_level` optional ([#934](https://github.com/gitlabhq/terraform-provider-gitlab/pull/934))
+* resource/gitlab_branch_protection: Add `unprotect_access_level` and `allowed_to_unprotect` attributes ([#934](https://github.com/gitlabhq/terraform-provider-gitlab/pull/934))
+* resource/gitlab_pipeline_schedule: Use single GET API to read resource details to increase performance ([#955](https://github.com/gitlabhq/terraform-provider-gitlab/pull/955))
+* resource/gitlab_project_variable: Use single GET API to read resource details to increase performance ([#953](https://github.com/gitlabhq/terraform-provider-gitlab/pull/953))
+* resource/gitlab_deploy_token: Support `terraform import` ([#960](https://github.com/gitlabhq/terraform-provider-gitlab/pull/960))
+* resource/gitlab_project_access_token: Support `terraform import` ([#960](https://github.com/gitlabhq/terraform-provider-gitlab/pull/960))
+* resource/gitlab_project_hook: Support `terraform import` ([#960](https://github.com/gitlabhq/terraform-provider-gitlab/pull/960))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `analytics_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `auto_cancel_pending_pipelines` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `auto_devops_deploy_strategy` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `auto_devops_enabled` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `autoclose_referenced_issues` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `build_git_strategy` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `builds_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `container_expiration_policy` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `container_registry_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `emails_disabled` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `external_authorization_classification_label` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `forking_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `issues_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `merge_commit_template` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `merge_requests_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `operations_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `public_builds` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `repository_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `repository_storage` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `requirements_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `resolve_outdated_diff_discussions` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `security_and_compliance_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `squash_commit_template` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `topics` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `wiki_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+
+BUG FIXES:
+
+* resource/gitlab_deploy_token: Implement pagination when reading tokens to find all existing tokens ([#941](https://github.com/gitlabhq/terraform-provider-gitlab/pull/941))
+* resource/gitlab_project_approval_rule: Implement pagination when reading approval rules to find all existing ones ([#950](https://github.com/gitlabhq/terraform-provider-gitlab/pull/950))
+
 ## 3.12.0 (2022-03-08)
 
 FEATURES:
