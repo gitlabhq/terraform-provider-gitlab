@@ -267,7 +267,7 @@ func dataSourceGitlabProjectIssuesRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if v, ok := d.GetOk("assignee_id"); ok {
-		options.AssigneeID = gitlab.Int(v.(int))
+		options.AssigneeID = gitlab.AssigneeID(v.(int))
 	}
 
 	if v, ok := d.GetOk("not_assignee_id"); ok {

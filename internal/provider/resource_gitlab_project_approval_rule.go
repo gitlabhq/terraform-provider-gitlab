@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -12,9 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
-
-// https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-project-level-rule
-var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource {
 	var validRuleTypeValues = []string{
