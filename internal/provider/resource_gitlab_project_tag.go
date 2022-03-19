@@ -21,73 +21,25 @@ var _ = registerResource("gitlab_project_tag", func() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Description: "The name of a tag.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
+		Schema: constructSchema(
+			gitlabProjectTagGetSchema(),
+			map[string]*schema.Schema{
+				"project": {
+					Description: "The ID or URL-encoded path of the project owned by the authenticated user.",
+					Type:        schema.TypeString,
+					ForceNew:    true,
+					Required:    true,
+				},
+				"ref": {
+					Description: "Create tag using commit SHA, another tag name, or branch name. This attribute is not available for imported resources.",
+					Type:        schema.TypeString,
+					ForceNew:    true,
+					Required:    true,
+				},
 			},
-			"project": {
-				Description: "The ID or URL-encoded path of the project owned by the authenticated user.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-			},
-			"ref": {
-				Description: "Create tag using commit SHA, another tag name, or branch name. This attribute is not available for imported resources.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-			},
-			"message": {
-				Description: "Creates annotated tag.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-			},
-			"protected": {
-				Description: "Bool, true if tag has tag protection.",
-				Type:        schema.TypeBool,
-				Computed:    true,
-			},
-			"target": {
-				Description: "The unique id assigned to the commit by Gitlab.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"release": {
-				Description: "The release associated with the tag.",
-				Type:        schema.TypeSet,
-				Computed:    true,
-				Set:         schema.HashResource(releaseNoteSchema),
-				Elem:        releaseNoteSchema,
-			},
-			"commit": {
-				Description: "The commit associated with the tag.",
-				Type:        schema.TypeSet,
-				Computed:    true,
-				Set:         schema.HashResource(commitSchema),
-				Elem:        commitSchema,
-			},
-		},
+		),
 	}
 })
-
-var releaseNoteSchema = &schema.Resource{
-	Schema: map[string]*schema.Schema{
-		"tag_name": {
-			Description: "The name of the tag.",
-			Type:        schema.TypeString,
-			Computed:    true,
-		},
-		"description": {
-			Description: "The description of release.",
-			Type:        schema.TypeString,
-			Computed:    true,
-		},
-	},
-}
 
 func resourceGitlabProjectTagCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
