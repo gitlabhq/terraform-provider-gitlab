@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"testing"
 
@@ -36,7 +37,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"soft_destroy",
+					"avatar", "_avatar_hash", "soft_destroy",
 				},
 			},
 			// Update the topics values
@@ -48,6 +49,8 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 						Name:        fmt.Sprintf("foo-full-%d", rInt),
 						Description: "Terraform acceptance tests",
 					}),
+					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "_avatar_hash", "8d29d9c393facb9d86314eb347a03fde503f2c0422bf55af7df086deb126107e"),
 				),
 			},
 			// Verify import
@@ -56,7 +59,43 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"soft_destroy",
+					"avatar", "_avatar_hash", "soft_destroy",
+				},
+			},
+			// Update the avatar image, but keep the filename to test the `CustomizeDiff` function
+			{
+				Config: testAccGitlabTopicFullConfig(rInt),
+				PreConfig: func() {
+					// overwrite the avatar image file
+					if err := copyFile("testdata/gitlab_topic/avatar.png", "testdata/gitlab_topic/avatar.png.bak"); err != nil {
+						t.Fatalf("failed to backup the avatar image file: %v", err)
+					}
+					if err := copyFile("testdata/gitlab_topic/avatar-update.png", "testdata/gitlab_topic/avatar.png"); err != nil {
+						t.Fatalf("failed to overwrite the avatar image file: %v", err)
+					}
+					t.Cleanup(func() {
+						if err := os.Rename("testdata/gitlab_topic/avatar.png.bak", "testdata/gitlab_topic/avatar.png"); err != nil {
+							t.Fatalf("failed to restore the avatar image file: %v", err)
+						}
+					})
+				},
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTopicExists("gitlab_topic.foo", &topic),
+					testAccCheckGitlabTopicAttributes(&topic, &testAccGitlabTopicExpectedAttributes{
+						Name:        fmt.Sprintf("foo-full-%d", rInt),
+						Description: "Terraform acceptance tests",
+					}),
+					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "_avatar_hash", "a58bd926fd3baabd41c56e810f62ade8705d18a4e280fb35764edb4b778444db"),
+				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_topic.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"avatar", "_avatar_hash", "soft_destroy",
 				},
 			},
 			// Update the topics values back to their initial state
@@ -67,6 +106,8 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 					testAccCheckGitlabTopicAttributes(&topic, &testAccGitlabTopicExpectedAttributes{
 						Name: fmt.Sprintf("foo-req-%d", rInt),
 					}),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_url", ""),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "_avatar_hash", ""),
 				),
 			},
 			// Verify import
@@ -75,7 +116,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"soft_destroy",
+					"avatar", "_avatar_hash", "soft_destroy",
 				},
 			},
 			// Updating the topic to have a description before it is deleted
@@ -95,7 +136,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"soft_destroy",
+					"avatar", "_avatar_hash", "soft_destroy",
 				},
 			},
 		},
@@ -247,6 +288,7 @@ func testAccGitlabTopicFullConfig(rInt int) string {
 resource "gitlab_topic" "foo" {
   name             = "foo-full-%d"
   description      = "Terraform acceptance tests"
+  avatar 		   = "${path.module}/testdata/gitlab_topic/avatar.png"
 }`, rInt)
 }
 
