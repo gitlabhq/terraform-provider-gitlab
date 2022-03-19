@@ -72,7 +72,6 @@ func resourceGitlabGroupLabelCreate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	d.SetId(label.Name)
-
 	return resourceGitlabGroupLabelRead(ctx, d, meta)
 }
 
@@ -82,27 +81,18 @@ func resourceGitlabGroupLabelRead(ctx context.Context, d *schema.ResourceData, m
 	labelName := d.Id()
 	log.Printf("[DEBUG] read gitlab group label %s/%s", group, labelName)
 
-	page := 1
-	labelsLen := 0
-	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.GroupLabels.ListGroupLabels(group, &gitlab.ListGroupLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}}, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
+	label, _, err := client.GroupLabels.GetGroupLabel(group, labelName, gitlab.WithContext(ctx))
+	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] failed to read gitlab label %s/%s, removing from state", group, labelName)
+			d.SetId("")
+			return nil
 		}
-		for _, label := range labels {
-			if label.Name == labelName {
-				d.Set("description", label.Description)
-				d.Set("color", label.Color)
-				d.Set("name", label.Name)
-				return nil
-			}
-		}
-		labelsLen = len(labels)
-		page = page + 1
+		return diag.FromErr(err)
 	}
-
-	log.Printf("[DEBUG] failed to read gitlab label %s/%s", group, labelName)
-	d.SetId("")
+	d.Set("description", label.Description)
+	d.Set("color", label.Color)
+	d.Set("name", label.Name)
 	return nil
 }
 

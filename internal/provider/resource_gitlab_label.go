@@ -2,7 +2,10 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -10,7 +13,6 @@ import (
 )
 
 var _ = registerResource("gitlab_label", func() *schema.Resource {
-	// lintignore: XR002 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: `The ` + "`" + `gitlab_label` + "`" + ` resource allows to manage the lifecycle of a project label.
 
@@ -20,6 +22,12 @@ var _ = registerResource("gitlab_label", func() *schema.Resource {
 		ReadContext:   resourceGitlabLabelRead,
 		UpdateContext: resourceGitlabLabelUpdate,
 		DeleteContext: resourceGitlabLabelDelete,
+		// FIXME: this importer sucks a little, but we can't use a passthrough importer, because
+		//        the resource id is flawed and we don't want to break backwards-compatibility.
+		//        We cannot have the same label in two different projects as of now, ...
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceGitlabLabelImporter,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"project": {
@@ -77,27 +85,19 @@ func resourceGitlabLabelRead(ctx context.Context, d *schema.ResourceData, meta i
 	labelName := d.Id()
 	log.Printf("[DEBUG] read gitlab label %s/%s", project, labelName)
 
-	page := 1
-	labelsLen := 0
-	for page == 1 || labelsLen != 0 {
-		labels, _, err := client.Labels.ListLabels(project, &gitlab.ListLabelsOptions{ListOptions: gitlab.ListOptions{Page: page}}, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
+	label, _, err := client.Labels.GetLabel(project, labelName, gitlab.WithContext(ctx))
+	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] failed to read gitlab label %s/%s", project, labelName)
+			d.SetId("")
+			return nil
 		}
-		for _, label := range labels {
-			if label.Name == labelName {
-				d.Set("description", label.Description)
-				d.Set("color", label.Color)
-				d.Set("name", label.Name)
-				return nil
-			}
-		}
-		labelsLen = len(labels)
-		page = page + 1
+		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] failed to read gitlab label %s/%s", project, labelName)
-	d.SetId("")
+	d.Set("description", label.Description)
+	d.Set("color", label.Color)
+	d.Set("name", label.Name)
 	return nil
 }
 
@@ -137,4 +137,29 @@ func resourceGitlabLabelDelete(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	return nil
+}
+
+func resourceGitlabLabelImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*gitlab.Client)
+	parts := strings.SplitN(d.Id(), ":", 2)
+	if len(parts) != 2 {
+		return nil, fmt.Errorf("invalid label id (should be <project ID>.<label name>): %s", d.Id())
+	}
+
+	d.SetId(parts[1])
+	project, _, err := client.Projects.GetProject(parts[0], nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := d.Set("project", strconv.Itoa(project.ID)); err != nil {
+		return nil, err
+	}
+
+	diagnostic := resourceGitlabLabelRead(ctx, d, meta)
+	if diagnostic.HasError() {
+		return nil, fmt.Errorf("failed to read project label %s: %s", d.Id(), diagnostic[0].Summary)
+	}
+
+	return []*schema.ResourceData{d}, nil
 }

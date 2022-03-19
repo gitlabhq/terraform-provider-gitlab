@@ -55,38 +55,35 @@ func TestAccGitlabLabel_basic(t *testing.T) {
 					}),
 				),
 			},
-			// Create a project and lots of labels with default options
+			// Verify Import
 			{
-				Config: testAccGitlabLabelLargeConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.20", &label),
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.30", &label),
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.40", &label),
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.10", &label),
-					testAccCheckGitlabLabelAttributes(&label, &testAccGitlabLabelExpectedAttributes{
-						Name:        "FIXME11",
-						Color:       "#ffcc00",
-						Description: "fix this test",
-					}),
-				),
-			},
-			// Update the lots of labels to change the parameters
-			{
-				Config: testAccGitlabLabelUpdateLargeConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.20", &label),
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.30", &label),
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.40", &label),
-					testAccCheckGitlabLabelExists("gitlab_label.fixme.10", &label),
-					testAccCheckGitlabLabelAttributes(&label, &testAccGitlabLabelExpectedAttributes{
-						Name:        "FIXME11",
-						Color:       "#ff0000",
-						Description: "red label",
-					}),
-				),
+				ResourceName:      "gitlab_label.fixme",
+				ImportStateIdFunc: getLabelImportID("gitlab_label.fixme"),
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
+}
+
+func getLabelImportID(n string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[n]
+		if !ok {
+			return "", fmt.Errorf("Not Found: %s", n)
+		}
+
+		labelID := rs.Primary.ID
+		if labelID == "" {
+			return "", fmt.Errorf("No label key ID is set")
+		}
+		projectID := rs.Primary.Attributes["project"]
+		if projectID == "" {
+			return "", fmt.Errorf("No project ID is set")
+		}
+
+		return fmt.Sprintf("%s:%s", projectID, labelID), nil
+	}
 }
 
 func testAccCheckGitlabLabelExists(n string, label *gitlab.Label) resource.TestCheckFunc {
@@ -200,46 +197,4 @@ resource "gitlab_label" "fixme" {
   description = "red label"
 }
 	`, rInt, rInt)
-}
-
-func testAccGitlabLabelLargeConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_label" "fixme" {
-  project = "${gitlab_project.foo.id}"
-  name = format("FIXME%%02d", count.index+1)
-  count = 100
-  color = "#ffcc00"
-  description = "fix this test"
-}
-	`, rInt)
-}
-
-func testAccGitlabLabelUpdateLargeConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_label" "fixme" {
-  project = "${gitlab_project.foo.id}"
-  name = format("FIXME%%02d", count.index+1)
-  count = 99
-  color = "#ff0000"
-  description = "red label"
-}
-	`, rInt)
 }

@@ -53,53 +53,8 @@ func TestAccGitlabGroupLabel_basic(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccGitlabGroupLabelLargeConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.20", &label),
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.30", &label),
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.40", &label),
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.10", &label),
-					testAccCheckGitlabGroupLabelAttributes(&label, &testAccGitlabGroupLabelExpectedAttributes{
-						Name:        "FIXME11",
-						Color:       "#ffcc00",
-						Description: "fix this test",
-					}),
-				),
-			},
-			{
-				Config: testAccGitlabGroupLabelUpdateLargeConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.20", &label),
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.30", &label),
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.40", &label),
-					testAccCheckGitlabGroupLabelExists("gitlab_group_label.fixme.10", &label),
-					testAccCheckGitlabGroupLabelAttributes(&label, &testAccGitlabGroupLabelExpectedAttributes{
-						Name:        "FIXME11",
-						Color:       "#ff0000",
-						Description: "red label",
-					}),
-				),
-			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabGroupLabel_import(t *testing.T) {
-	rInt := acctest.RandInt()
-	resourceName := "gitlab_group_label.fixme"
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabGroupLabelDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabGroupLabelConfig(rInt),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportStateIdFunc: getGroupLabelImportID(resourceName),
+				ResourceName:      "gitlab_group_label.fixme",
+				ImportStateIdFunc: getGroupLabelImportID("gitlab_group_label.fixme"),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -234,42 +189,4 @@ resource "gitlab_group_label" "fixme" {
   description = "red label"
 }
 	`, rInt, rInt, rInt)
-}
-
-func testAccGitlabGroupLabelLargeConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-  name             = "foo-%d"
-  path             = "foo-%d"
-  description      = "Terraform acceptance tests"
-  visibility_level = "public"
-}
-
-resource "gitlab_group_label" "fixme" {
-  group = "${gitlab_group.foo.id}"
-  name = format("FIXME%%02d", count.index+1)
-  count = 100
-  color = "#ffcc00"
-  description = "fix this test"
-}
-	`, rInt, rInt)
-}
-
-func testAccGitlabGroupLabelUpdateLargeConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-  name             = "foo-%d"
-  path             = "foo-%d"
-  description      = "Terraform acceptance tests"
-  visibility_level = "public"
-}
-
-resource "gitlab_group_label" "fixme" {
-  group = "${gitlab_group.foo.id}"
-  name = format("FIXME%%02d", count.index+1)
-  count = 99
-  color = "#ff0000"
-  description = "red label"
-}
-	`, rInt, rInt)
 }
