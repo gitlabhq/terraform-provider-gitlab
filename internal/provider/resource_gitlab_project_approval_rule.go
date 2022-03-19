@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -12,9 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
-
-// https://docs.gitlab.com/ee/api/merge_request_approvals.html#create-project-level-rule
-var errApprovalRuleNotFound = errors.New("approval rule not found")
 
 var _ = registerResource("gitlab_project_approval_rule", func() *schema.Resource {
 	var validRuleTypeValues = []string{
@@ -119,21 +115,28 @@ func resourceGitlabProjectApprovalRuleCreate(ctx context.Context, d *schema.Reso
 func resourceGitlabProjectApprovalRuleRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] read gitlab project-level rule %s", d.Id())
 
-	projectID, _, err := parseTwoPartID(d.Id())
+	projectID, parsedRuleID, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.Set("project", projectID)
-
-	rule, err := getApprovalRuleByID(ctx, meta.(*gitlab.Client), d.Id())
+	ruleID, err := strconv.Atoi(parsedRuleID)
 	if err != nil {
-		if errors.Is(err, errApprovalRuleNotFound) {
+		return diag.FromErr(err)
+	}
+
+	client := meta.(*gitlab.Client)
+
+	rule, _, err := client.Projects.GetProjectApprovalRule(projectID, ruleID, gitlab.WithContext(ctx))
+	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] no project-level rule %s found, removing from state", d.Id())
 			d.SetId("")
 			return nil
 		}
 		return diag.FromErr(err)
 	}
 
+	d.Set("project", projectID)
 	d.Set("name", rule.Name)
 	d.Set("approvals_required", rule.ApprovalsRequired)
 	d.Set("rule_type", rule.RuleType)
@@ -205,35 +208,6 @@ func resourceGitlabProjectApprovalRuleDelete(ctx context.Context, d *schema.Reso
 	}
 
 	return nil
-}
-
-// getApprovalRuleByID checks the list of rules and finds the one that matches our rule ID.
-func getApprovalRuleByID(ctx context.Context, client *gitlab.Client, id string) (*gitlab.ProjectApprovalRule, error) {
-	projectID, ruleID, err := parseTwoPartID(id)
-	if err != nil {
-		return nil, err
-	}
-
-	ruleIDInt, err := strconv.Atoi(ruleID)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Printf("[DEBUG] read approval rules for project %s", projectID)
-
-	rules, _, err := client.Projects.GetProjectApprovalRules(projectID, gitlab.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-
-	for _, r := range rules {
-		if r.ID == ruleIDInt {
-			log.Printf("[DEBUG] found project-level rule %+v", r)
-			return r, nil
-		}
-	}
-
-	return nil, errApprovalRuleNotFound
 }
 
 // flattenApprovalRuleUserIDs flattens a list of approval user ids into a list
