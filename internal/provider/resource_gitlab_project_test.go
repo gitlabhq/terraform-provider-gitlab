@@ -3,6 +3,7 @@
 package provider
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -1192,11 +1193,11 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 				}
 			}
 
-			if err := resourceGitlabProjectSetToState(testGitlabClient, expectedData, expected); err != nil {
+			if err := resourceGitlabProjectSetToState(context.Background(), testGitlabClient, expectedData, expected); err != nil {
 				return err
 			}
 
-			if err := resourceGitlabProjectSetToState(testGitlabClient, receivedData, received); err != nil {
+			if err := resourceGitlabProjectSetToState(context.Background(), testGitlabClient, receivedData, received); err != nil {
 				return err
 			}
 

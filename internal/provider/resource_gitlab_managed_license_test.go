@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"testing"
@@ -60,7 +61,7 @@ func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
 				// Create a managed license with an "approved" state
 				SkipFunc: orSkipFunc(
 					isRunningInCE,
-					isGitLabVersionLessThan(testGitlabClient, "15.0"),
+					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
 				),
 				Config: testManagedLicenseConfig(rInt, "approved"),
 				Check: resource.ComposeTestCheckFunc(
@@ -71,7 +72,7 @@ func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
 				// Update the managed license to have a blacklisted state
 				SkipFunc: orSkipFunc(
 					isRunningInCE,
-					isGitLabVersionLessThan(testGitlabClient, "15.0"),
+					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
 				),
 				Config: testManagedLicenseConfig(rInt, "blacklisted"),
 				Check: resource.ComposeTestCheckFunc(
@@ -81,7 +82,7 @@ func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
 			{
 				SkipFunc: orSkipFunc(
 					isRunningInCE,
-					isGitLabVersionLessThan(testGitlabClient, "15.0"),
+					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
 				),
 				ResourceName:      "gitlab_managed_license.fixme",
 				ImportState:       true,
