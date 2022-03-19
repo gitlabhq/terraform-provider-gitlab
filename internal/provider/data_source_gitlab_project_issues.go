@@ -348,7 +348,7 @@ func dataSourceGitlabProjectIssuesRead(ctx context.Context, d *schema.ResourceDa
 
 	var issues []*gitlab.Issue
 	for options.Page != 0 {
-		paginatedIssues, resp, err := client.Issues.ListProjectIssues(project, &options)
+		paginatedIssues, resp, err := client.Issues.ListProjectIssues(project, &options, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.FromErr(err)
 		}
