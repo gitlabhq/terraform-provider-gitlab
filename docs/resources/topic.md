@@ -4,8 +4,8 @@ page_title: "gitlab_topic Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_topic resource allows to manage the lifecycle of topics that are then assignable to projects.
-  Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
-  ~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.
+  -> Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
+  ~> Deleting a topic was implemented in GitLab 14.9. For older versions of GitLab set soft_destroy = true to empty out a topic instead of deleting it.
   Upstream API: GitLab REST API docs for topics https://docs.gitlab.com/ee/api/topics.html
 ---
 
@@ -13,9 +13,9 @@ description: |-
 
 The `gitlab_topic` resource allows to manage the lifecycle of topics that are then assignable to projects.
 
-Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
+-> Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
 
-~> Deleting a resource doesn't delete the corresponding topic as the GitLab API doesn't support deleting topics yet. You can set soft_destroy to true if you want the topics description to be emptied instead.
+~> Deleting a topic was implemented in GitLab 14.9. For older versions of GitLab set `soft_destroy = true` to empty out a topic instead of deleting it.
 
 **Upstream API**: [GitLab REST API docs for topics](https://docs.gitlab.com/ee/api/topics.html)
 
@@ -34,12 +34,12 @@ resource "gitlab_topic" "functional_programming" {
 ### Required
 
 - `name` (String) The topic's name
-- `soft_destroy` (Boolean) Empty the topics fields instead of deleting it
 
 ### Optional
 
 - `description` (String) A text describing the topic
 - `id` (String) The ID of this resource.
+- `soft_destroy` (Boolean, Deprecated) Empty the topics fields instead of deleting it
 
 ## Import
 
