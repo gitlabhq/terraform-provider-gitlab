@@ -287,7 +287,7 @@ func resourceGitlabRepositoryFileDelete(ctx context.Context, d *schema.ResourceD
 		}
 
 		deleteOptions.LastCommitID = gitlab.String(existingRepositoryFile.LastCommitID)
-		resp, err := client.RepositoryFiles.DeleteFile(project, filePath, deleteOptions)
+		resp, err := client.RepositoryFiles.DeleteFile(project, filePath, deleteOptions, gitlab.WithContext(ctx))
 		if err != nil {
 			if isRefreshError(err) {
 				return resource.RetryableError(err)
