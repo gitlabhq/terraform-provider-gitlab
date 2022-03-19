@@ -147,7 +147,7 @@ func resourceGitlabLabelImporter(ctx context.Context, d *schema.ResourceData, me
 	}
 
 	d.SetId(parts[1])
-	project, _, err := client.Projects.GetProject(parts[0], nil)
+	project, _, err := client.Projects.GetProject(parts[0], nil, gitlab.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
