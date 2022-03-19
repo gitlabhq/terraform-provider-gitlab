@@ -156,13 +156,13 @@ func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta 
 	d.SetId(fmt.Sprintf("%d", user.ID))
 
 	if d.Get("state") == "blocked" {
-		err := client.Users.BlockUser(user.ID)
+		err := client.Users.BlockUser(user.ID, gitlab.WithContext(ctx))
 
 		if err != nil {
 			return diag.FromErr(err)
 		}
 	} else if d.Get("state") == "deactivated" {
-		err := client.Users.DeactivateUser(user.ID)
+		err := client.Users.DeactivateUser(user.ID, gitlab.WithContext(ctx))
 
 		if err != nil {
 			return diag.FromErr(err)
@@ -245,24 +245,24 @@ func resourceGitlabUserUpdate(ctx context.Context, d *schema.ResourceData, meta 
 		// NOTE: yes, this can be written much more consice, however, for the sake of understanding the behavior,
 		//       of the API and the allowed state transitions of GitLab, let's keep it as-is and enjoy the readability.
 		if newState == "active" && oldState == "blocked" {
-			err = client.Users.UnblockUser(id)
+			err = client.Users.UnblockUser(id, gitlab.WithContext(ctx))
 		} else if newState == "active" && oldState == "deactivated" {
-			err = client.Users.ActivateUser(id)
+			err = client.Users.ActivateUser(id, gitlab.WithContext(ctx))
 		} else if newState == "blocked" && oldState == "active" {
-			err = client.Users.BlockUser(id)
+			err = client.Users.BlockUser(id, gitlab.WithContext(ctx))
 		} else if newState == "blocked" && oldState == "deactivated" {
-			err = client.Users.BlockUser(id)
+			err = client.Users.BlockUser(id, gitlab.WithContext(ctx))
 		} else if newState == "deactivated" && oldState == "active" {
-			err = client.Users.DeactivateUser(id)
+			err = client.Users.DeactivateUser(id, gitlab.WithContext(ctx))
 		} else if newState == "deactivated" && oldState == "blocked" {
 			// a blocked user cannot be deactivated, GitLab will return an error, like:
 			// `403 Forbidden - A blocked user cannot be deactivated by the API`
 			// we have to unblock the user first
-			err = client.Users.UnblockUser(id)
+			err = client.Users.UnblockUser(id, gitlab.WithContext(ctx))
 			if err != nil {
 				return diag.FromErr(err)
 			}
-			err = client.Users.DeactivateUser(id)
+			err = client.Users.DeactivateUser(id, gitlab.WithContext(ctx))
 		}
 
 		if err != nil {
