@@ -12,7 +12,10 @@ import (
 
 var _ = registerDataSource("gitlab_repository_file", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "Allows you to receive information about file in repository like name, size, content. File content is Base64 encoded. This endpoint can be accessed without authentication if the repository is publicly accessible.",
+		Description: `The ` + "`gitlab_repository_file`" + ` data source allows details of a file in a repository to be retrieved.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)`,
+
 		ReadContext: dataSourceGitlabRepositoryFileRead,
 		Schema: map[string]*schema.Schema{
 			"project": {

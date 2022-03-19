@@ -37,7 +37,6 @@ func testAccDataSourceGitlabRepositoryFile(src, n string) resource.TestCheckFunc
 		testAttributes := []string{
 			"project",
 			"file_path",
-			"file_path",
 			"size",
 			"encoding",
 			"content",
