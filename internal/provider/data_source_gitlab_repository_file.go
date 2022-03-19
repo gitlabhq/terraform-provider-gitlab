@@ -17,63 +17,7 @@ var _ = registerDataSource("gitlab_repository_file", func() *schema.Resource {
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)`,
 
 		ReadContext: dataSourceGitlabRepositoryFileRead,
-		Schema: map[string]*schema.Schema{
-			"project": {
-				Description: "The ID of the project.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"file_path": {
-				Description: "The full path of the file. It must be relative to the root of the project without a leading slash `/`.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"ref": {
-				Description: "The name of branch, tag or commit.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"file_name": {
-				Description: "String, file name.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"size": {
-				Description: "Integer, file size.",
-				Type:        schema.TypeInt,
-				Computed:    true,
-			},
-			"encoding": {
-				Description: "String, file encoding.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"content": {
-				Description: "String, base64 encoded file content.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"content_sha256": {
-				Description: "String, content sha256 digest.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"blob_id": {
-				Description: "String, blob id.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"commit_id": {
-				Description: "String, commit id.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-			"last_commit_id": {
-				Description: "String, last commit id.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-		},
+		Schema:      datasourceSchemaFromResourceSchema(gitlabRepositoryFileGetSchema(), "project", "file_path", "ref"),
 	}
 })
 
@@ -94,17 +38,9 @@ func dataSourceGitlabRepositoryFileRead(ctx context.Context, d *schema.ResourceD
 
 	d.SetId(fmt.Sprintf("%s:%s:%s", project, repositoryFile.Ref, repositoryFile.FilePath))
 
-	d.Set("project", project)
-	d.Set("file_name", repositoryFile.FileName)
-	d.Set("file_path", repositoryFile.FilePath)
-	d.Set("size", repositoryFile.Size)
-	d.Set("encoding", repositoryFile.Encoding)
-	d.Set("content", repositoryFile.Content)
-	d.Set("content_sha256", repositoryFile.SHA256)
-	d.Set("ref", repositoryFile.Ref)
-	d.Set("blob_id", repositoryFile.BlobID)
-	d.Set("commit_id", repositoryFile.CommitID)
-	d.Set("last_commit_id", repositoryFile.LastCommitID)
-
+	stateMap := gitlabRepositoryFileToStateMap(project, repositoryFile)
+	if err := setStateMapInResourceData(stateMap, d); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }

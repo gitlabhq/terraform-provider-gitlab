@@ -67,9 +67,9 @@ resource "gitlab_repository_file" "foo" {
 }
 
 data "gitlab_repository_file" "foo" {
-  project = %s
-  file_path = "testfile-meow"
+  project = gitlab_repository_file.foo.project
+  file_path = gitlab_repository_file.foo.file_path
   ref = "main"
 }
-`, project, project)
+`, project)
 }

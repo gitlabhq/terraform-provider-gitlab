@@ -29,7 +29,7 @@ data "gitlab_repository_file" "example" {
 ### Required
 
 - **file_path** (String) The full path of the file. It must be relative to the root of the project without a leading slash `/`.
-- **project** (String) The ID of the project.
+- **project** (String) The name or ID of the project.
 - **ref** (String) The name of branch, tag or commit.
 
 ### Optional
@@ -38,13 +38,13 @@ data "gitlab_repository_file" "example" {
 
 ### Read-Only
 
-- **blob_id** (String) String, blob id.
-- **commit_id** (String) String, commit id.
-- **content** (String) String, base64 encoded file content.
-- **content_sha256** (String) String, content sha256 digest.
-- **encoding** (String) String, file encoding.
-- **file_name** (String) String, file name.
-- **last_commit_id** (String) String, last commit id.
-- **size** (Number) Integer, file size.
+- **blob_id** (String) The blob id.
+- **commit_id** (String) The commit id.
+- **content** (String) base64 encoded file content. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
+- **content_sha256** (String) File content sha256 digest.
+- **encoding** (String) The file content encoding.
+- **file_name** (String) The filename.
+- **last_commit_id** (String) The last known commit id.
+- **size** (Number) The file size.
 
 
