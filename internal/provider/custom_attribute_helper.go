@@ -1,11 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -26,26 +28,26 @@ func CreateCustomAttributeResource(idName string, createGetter CreateGetter, cre
 		d.Set("value", customAttribute.Value)
 	}
 
-	readFunc := func(d *schema.ResourceData, meta interface{}) error {
+	readFunc := func(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		client := meta.(*gitlab.Client)
 		getter := createGetter(client)
 		log.Printf("[DEBUG] read Custom Attribute %s", d.Id())
 
 		id, key, err := parseId(d.Id())
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		customAttribute, _, err := getter(id, key)
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		setToState(d, id, customAttribute)
 		return nil
 	}
 
-	setFunc := func(d *schema.ResourceData, meta interface{}) error {
+	setFunc := func(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		client := meta.(*gitlab.Client)
 		setter := createSetter(client)
 
@@ -57,39 +59,39 @@ func CreateCustomAttributeResource(idName string, createGetter CreateGetter, cre
 
 		log.Printf("[DEBUG] set (create or update) Custom Attribute %s with value %s for %s %d", options.Key, options.Value, idName, id)
 
-		customAttribute, _, err := setter(id, *options)
+		customAttribute, _, err := setter(id, *options, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		d.SetId(buildId(id, customAttribute.Key))
-		return readFunc(d, meta)
+		return readFunc(ctx, d, meta)
 	}
 
-	deleteFunc := func(d *schema.ResourceData, meta interface{}) error {
+	deleteFunc := func(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 		client := meta.(*gitlab.Client)
 		deleter := createDeleter(client)
 		log.Printf("[DEBUG] delete Custom Attribute %s", d.Id())
 
 		id, key, err := parseId(d.Id())
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
-		_, err = deleter(id, key)
+		_, err = deleter(id, key, gitlab.WithContext(ctx))
 		if err != nil {
-			return err
+			return diag.FromErr(err)
 		}
 
 		return nil
 	}
 
 	return &schema.Resource{
-		Description: description,
-		Create:      setFunc,
-		Read:        readFunc,
-		Update:      setFunc,
-		Delete:      deleteFunc,
+		Description:   description,
+		CreateContext: setFunc,
+		ReadContext:   readFunc,
+		UpdateContext: setFunc,
+		DeleteContext: deleteFunc,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
