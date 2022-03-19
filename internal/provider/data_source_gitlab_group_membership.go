@@ -118,7 +118,7 @@ func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.Resource
 		}
 	} else if fullPathOk {
 		// Get group by full path
-		group, _, err = client.Groups.GetGroup(fullPathData.(string), nil)
+		group, _, err = client.Groups.GetGroup(fullPathData.(string), nil, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.FromErr(err)
 		}
