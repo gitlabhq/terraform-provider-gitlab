@@ -167,6 +167,18 @@ func resourceGitlabRepositoryFileRead(ctx context.Context, d *schema.ResourceDat
 		return diag.FromErr(err)
 	}
 
+	configContent := d.Get("content").(string)
+	log.Printf("[DEBUG] gitlab_repository_file: comparing content of %s with %s", repositoryFile.Content, configContent)
+	// NOTE: for backwards-compatibility reasons, we also support an already given base64 encoding,
+	//       otherwise we encode the `content` to base64.
+	if _, err := base64.StdEncoding.DecodeString(configContent); err != nil {
+		// if `content` is config is not a base64 encoded string, we decode the one from the API, too
+		// in case it's base64 encoded, else we don't decode it.
+		if decodedContent, err := base64.StdEncoding.DecodeString(repositoryFile.Content); err == nil {
+			repositoryFile.Content = string(decodedContent)
+		}
+	}
+
 	d.SetId(resourceGitLabRepositoryFileBuildId(project, branch, repositoryFile.FilePath))
 	d.Set("branch", repositoryFile.Ref)
 	stateMap := gitlabRepositoryFileToStateMap(project, repositoryFile)

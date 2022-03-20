@@ -28,6 +28,7 @@ func TestAccGitlabRepositoryFile_basic(t *testing.T) {
 						FilePath: "meow.txt",
 						Content:  "bWVvdyBtZW93IG1lb3c=",
 					}),
+					resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "bWVvdyBtZW93IG1lb3c="),
 				),
 			},
 			{
@@ -44,6 +45,7 @@ func TestAccGitlabRepositoryFile_basic(t *testing.T) {
 						FilePath: "meow.txt",
 						Content:  "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg==",
 					}),
+					resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg=="),
 				),
 			},
 			{
@@ -168,6 +170,7 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 						FilePath: "meow.txt",
 						Content:  "SGVsbG8gV29ybGQsIG1lb3c=",
 					}),
+					resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "Hello World, meow"),
 				),
 			},
 			// Update content
@@ -189,9 +192,10 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 						FilePath: "meow.txt",
 						Content:  "SGVsbG8gV29ybGQsIG1lb3cgVVBEQVRFRA==",
 					}),
+					resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "Hello World, meow UPDATED"),
 				),
 			},
-			// Update to already base64 encoded content, but same content, yields in an empty plan
+			// Update to already base64 encoded content, but same content
 			{
 				Config: fmt.Sprintf(`
 					resource "gitlab_repository_file" "this" {
@@ -204,7 +208,7 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 						commit_message = "feature: add launch codes"
 					}
 				`, testProject.ID),
-				PlanOnly: true,
+				Check: resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "SGVsbG8gV29ybGQsIG1lb3cgVVBEQVRFRA=="),
 			},
 			// Update content and already base64 encode it
 			{
@@ -225,9 +229,10 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 						FilePath: "meow.txt",
 						Content:  "bWVvdyBtZW93IG1lb3c=",
 					}),
+					resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "bWVvdyBtZW93IG1lb3c="),
 				),
 			},
-			// Update to not-yet base64 encoded content, but same content, yields in an empty plan
+			// Update to not-yet base64 encoded content, but same content
 			{
 				Config: fmt.Sprintf(`
 					resource "gitlab_repository_file" "this" {
@@ -240,7 +245,7 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 						commit_message = "feature: add launch codes"
 					}
 				`, testProject.ID),
-				PlanOnly: true,
+				Check: resource.TestCheckResourceAttr("gitlab_repository_file.this", "content", "meow meow meow"),
 			},
 		},
 	})

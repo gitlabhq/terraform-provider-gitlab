@@ -1,8 +1,6 @@
 package provider
 
 import (
-	"encoding/base64"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/xanzy/go-gitlab"
 )
@@ -45,12 +43,6 @@ func gitlabRepositoryFileGetSchema() map[string]*schema.Schema {
 			Description: "File content. If the content is not yet base64 encoded, it will be encoded automatically. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).",
 			Type:        schema.TypeString,
 			Required:    true,
-			DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-				if _, err := base64.StdEncoding.DecodeString(new); err != nil {
-					new = base64.StdEncoding.EncodeToString([]byte(new))
-				}
-				return old == new
-			},
 		},
 		"content_sha256": {
 			Description: "File content sha256 digest.",
