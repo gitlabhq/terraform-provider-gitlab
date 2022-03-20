@@ -114,29 +114,6 @@ func TestAccGitlabRepositoryFile_concurrentResources(t *testing.T) {
 	})
 }
 
-func TestAccGitlabRepositoryFile_validationOfBase64Content(t *testing.T) {
-	cases := []struct {
-		givenContent           string
-		expectedIsValidContent bool
-	}{
-		{
-			givenContent:           "not valid base64",
-			expectedIsValidContent: false,
-		},
-		{
-			givenContent:           "bWVvdyBtZW93IG1lb3c=",
-			expectedIsValidContent: true,
-		},
-	}
-
-	for _, c := range cases {
-		_, errs := validateBase64Content(c.givenContent, "dummy")
-		if len(errs) > 0 == c.expectedIsValidContent {
-			t.Fatalf("content '%s' was either expected to be valid base64 but isn't or to be invalid base64 but actually is", c.givenContent)
-		}
-	}
-}
-
 func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 	testAccCheck(t)
 
@@ -157,6 +134,113 @@ func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 						Content:  "bWVvdyBtZW93IG1lb3c=",
 					}),
 				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
+	testAccCheck(t)
+
+	var file gitlab.File
+	testProject := testAccCreateProject(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "Hello World, meow"
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: add launch codes"
+					}
+				`, testProject.ID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
+					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
+						FilePath: "meow.txt",
+						Content:  "SGVsbG8gV29ybGQsIG1lb3c=",
+					}),
+				),
+			},
+			// Update content
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "Hello World, meow UPDATED"
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: add launch codes"
+					}
+				`, testProject.ID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
+					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
+						FilePath: "meow.txt",
+						Content:  "SGVsbG8gV29ybGQsIG1lb3cgVVBEQVRFRA==",
+					}),
+				),
+			},
+			// Update to already base64 encoded content, but same content, yields in an empty plan
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "SGVsbG8gV29ybGQsIG1lb3cgVVBEQVRFRA=="
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: add launch codes"
+					}
+				`, testProject.ID),
+				PlanOnly: true,
+			},
+			// Update content and already base64 encode it
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "bWVvdyBtZW93IG1lb3c="
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: add launch codes"
+					}
+				`, testProject.ID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
+					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
+						FilePath: "meow.txt",
+						Content:  "bWVvdyBtZW93IG1lb3c=",
+					}),
+				),
+			},
+			// Update to not-yet base64 encoded content, but same content, yields in an empty plan
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "meow meow meow"
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: add launch codes"
+					}
+				`, testProject.ID),
+				PlanOnly: true,
 			},
 		},
 	})

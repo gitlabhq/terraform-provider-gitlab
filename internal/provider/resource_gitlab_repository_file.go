@@ -107,13 +107,20 @@ func resourceGitlabRepositoryFileCreate(ctx context.Context, d *schema.ResourceD
 	log.Printf("[DEBUG] gitlab_repository_file: got lock to create %s/%s", project, filePath)
 
 	client := meta.(*gitlab.Client)
+	// NOTE: for backwards-compatibility reasons, we also support an already given base64 encoding,
+	//       otherwise we encode the `content` to base64.
+	content := d.Get("content").(string)
+	if _, err := base64.StdEncoding.DecodeString(content); err != nil {
+		log.Printf("[DEBUG] gitlab_repository_file: given content '%s' is not a valid base64 encoded string, encoding it ...", content)
+		content = base64.StdEncoding.EncodeToString([]byte(content))
+	}
 
 	options := &gitlab.CreateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
 		Encoding:      gitlab.String(encoding),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
 		AuthorName:    gitlab.String(d.Get("author_name").(string)),
-		Content:       gitlab.String(d.Get("content").(string)),
+		Content:       gitlab.String(content),
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
 	}
 	if startBranch, ok := d.GetOk("start_branch"); ok {
@@ -189,12 +196,20 @@ func resourceGitlabRepositoryFileUpdate(ctx context.Context, d *schema.ResourceD
 		Ref: gitlab.String(branch),
 	}
 
+	// NOTE: for backwards-compatibility reasons, we also support an already given base64 encoding,
+	//       otherwise we encode the `content` to base64.
+	content := d.Get("content").(string)
+	if _, err := base64.StdEncoding.DecodeString(content); err != nil {
+		log.Printf("[DEBUG] gitlab_repository_file: given content '%s' is not a valid base64 encoded string, encoding it ...", content)
+		content = base64.StdEncoding.EncodeToString([]byte(content))
+	}
+
 	updateOptions := &gitlab.UpdateFileOptions{
 		Branch:        gitlab.String(branch),
 		Encoding:      gitlab.String(encoding),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
 		AuthorName:    gitlab.String(d.Get("author_name").(string)),
-		Content:       gitlab.String(d.Get("content").(string)),
+		Content:       gitlab.String(content),
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
 	}
 	if startBranch, ok := d.GetOk("start_branch"); ok {
@@ -274,14 +289,6 @@ func resourceGitlabRepositoryFileDelete(ctx context.Context, d *schema.ResourceD
 	}
 
 	return nil
-}
-
-func validateBase64Content(v interface{}, k string) (we []string, errors []error) {
-	content := v.(string)
-	if _, err := base64.StdEncoding.DecodeString(content); err != nil {
-		errors = append(errors, fmt.Errorf("given repository file content '%s' is not base64 encoded, but must be", content))
-	}
-	return
 }
 
 func resourceGitLabRepositoryFileParseId(id string) (string, string, string, error) {
