@@ -34,57 +34,37 @@ var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 		// However, we don't support the `encoding` parameter as it seems to be broken.
 		// Only a value of `base64` is supported, all others, including the documented default `text`, lead to
 		// a `400 {error: encoding does not have a valid value}` error.
-		Schema: map[string]*schema.Schema{
-			"project": {
-				Description: "The ID of the project.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
+		Schema: constructSchema(
+			map[string]*schema.Schema{
+				"branch": {
+					Description: "Name of the branch to which to commit to.",
+					Type:        schema.TypeString,
+					Required:    true,
+					ForceNew:    true,
+				},
+				"start_branch": {
+					Description: "Name of the branch to start the new commit from.",
+					Type:        schema.TypeString,
+					Optional:    true,
+				},
+				"author_email": {
+					Description: "Email of the commit author.",
+					Type:        schema.TypeString,
+					Optional:    true,
+				},
+				"author_name": {
+					Description: "Name of the commit author.",
+					Type:        schema.TypeString,
+					Optional:    true,
+				},
+				"commit_message": {
+					Description: "Commit message.",
+					Type:        schema.TypeString,
+					Required:    true,
+				},
 			},
-			"file_path": {
-				Description: "The full path of the file. It must be relative to the root of the project without a leading slash `/`.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-			},
-			"branch": {
-				Description: "Name of the branch to which to commit to.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-			},
-			"start_branch": {
-				Description: "Name of the branch to start the new commit from.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
-			"author_email": {
-				Description: "Email of the commit author.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
-			"author_name": {
-				Description: "Name of the commit author.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
-			"content": {
-				Description:  "base64 encoded file content. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).",
-				Type:         schema.TypeString,
-				Required:     true,
-				ValidateFunc: validateBase64Content,
-			},
-			"commit_message": {
-				Description: "Commit message.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"encoding": {
-				Description: "Content encoding.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-		},
+			gitlabRepositoryFileGetSchema(),
+		),
 	}
 })
 
@@ -136,11 +116,11 @@ func resourceGitlabRepositoryFileRead(ctx context.Context, d *schema.ResourceDat
 	}
 
 	d.SetId(resourceGitLabRepositoryFileBuildId(project, branch, repositoryFile.FilePath))
-	d.Set("project", project)
-	d.Set("file_path", repositoryFile.FilePath)
 	d.Set("branch", repositoryFile.Ref)
-	d.Set("encoding", repositoryFile.Encoding)
-	d.Set("content", repositoryFile.Content)
+	stateMap := gitlabRepositoryFileToStateMap(project, repositoryFile)
+	if err = setStateMapInResourceData(stateMap, d); err != nil {
+		return diag.FromErr(err)
+	}
 
 	return nil
 }
