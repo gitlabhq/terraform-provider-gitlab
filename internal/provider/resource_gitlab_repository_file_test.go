@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
-func TestAccGitlabRepositoryFile_create(t *testing.T) {
+func TestAccGitlabRepositoryFile_basic(t *testing.T) {
+	testAccCheck(t)
+
 	var file gitlab.File
-	rInt := acctest.RandInt()
+	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -20,7 +21,7 @@ func TestAccGitlabRepositoryFile_create(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabRepositoryFileConfig(rInt),
+				Config: testAccGitlabRepositoryFileConfig(testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
 					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
@@ -29,14 +30,39 @@ func TestAccGitlabRepositoryFile_create(t *testing.T) {
 					}),
 				),
 			},
+			{
+				ResourceName:            "gitlab_repository_file.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"author_email", "author_name", "commit_message"},
+			},
+			{
+				Config: testAccGitlabRepositoryFileUpdateConfig(testProject.ID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
+					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
+						FilePath: "meow.txt",
+						Content:  "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg==",
+					}),
+				),
+			},
+			{
+				ResourceName:            "gitlab_repository_file.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"author_email", "author_name", "commit_message"},
+			},
 		},
 	})
 }
 
 func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T) {
+	testAccCheck(t)
+
 	var fooFile gitlab.File
 	var barFile gitlab.File
-	rInt := acctest.RandInt()
+	firstTestProject := testAccCreateProject(t)
+	secondTestProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -44,7 +70,7 @@ func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T)
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabRepositoryFileSameFileDifferentRepositoryConfig(rInt),
+				Config: testAccGitlabRepositoryFileSameFileDifferentRepositoryConfig(firstTestProject.ID, secondTestProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.foo_file", &fooFile),
 					testAccCheckGitlabRepositoryFileAttributes(&fooFile, &testAccGitlabRepositoryFileAttributes{
@@ -112,8 +138,10 @@ func TestAccGitlabRepositoryFile_validationOfBase64Content(t *testing.T) {
 }
 
 func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
+	testAccCheck(t)
+
 	var file gitlab.File
-	rInt := acctest.RandInt()
+	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -121,7 +149,7 @@ func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccGitlabRepositoryFileStartBranchConfig(rInt),
+				Config: testAccGitlabRepositoryFileStartBranchConfig(testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
 					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
@@ -129,62 +157,6 @@ func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 						Content:  "bWVvdyBtZW93IG1lb3c=",
 					}),
 				),
-			},
-		},
-	})
-}
-
-func TestAccGitlabRepositoryFile_update(t *testing.T) {
-	var file gitlab.File
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabRepositoryFileConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
-					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
-						FilePath: "meow.txt",
-						Content:  "bWVvdyBtZW93IG1lb3c=",
-					}),
-				),
-			},
-			{
-				Config: testAccGitlabRepositoryFileUpdateConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabRepositoryFileExists("gitlab_repository_file.this", &file),
-					testAccCheckGitlabRepositoryFileAttributes(&file, &testAccGitlabRepositoryFileAttributes{
-						FilePath: "meow.txt",
-						Content:  "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg==",
-					}),
-				),
-			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabRepositoryFile_import(t *testing.T) {
-	rInt := acctest.RandInt()
-	resourceName := "gitlab_repository_file.this"
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabPipelineTriggerDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabRepositoryFileConfig(rInt),
-			},
-			{
-				ResourceName:            resourceName,
-				ImportState:             true,
-				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"author_email", "author_name", "commit_message"},
 			},
 		},
 	})
@@ -266,22 +238,10 @@ func testAccCheckGitlabRepositoryFileDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccGitlabRepositoryFileConfig(rInt int) string {
+func testAccGitlabRepositoryFileConfig(projectID int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  default_branch = "main"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-  initialize_with_readme = true
-}
-
 resource "gitlab_repository_file" "this" {
-  project = "${gitlab_project.foo.id}"
+  project = %d
   file_path = "meow.txt"
   branch = "main"
   content = "bWVvdyBtZW93IG1lb3c="
@@ -289,25 +249,13 @@ resource "gitlab_repository_file" "this" {
   author_name = "Meow Meowington"
   commit_message = "feature: add launch codes"
 }
-	`, rInt)
+	`, projectID)
 }
 
-func testAccGitlabRepositoryFileStartBranchConfig(rInt int) string {
+func testAccGitlabRepositoryFileStartBranchConfig(projectID int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  default_branch = "main"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-  initialize_with_readme = true
-}
-
 resource "gitlab_repository_file" "this" {
-  project = "${gitlab_project.foo.id}"
+  project = %d
   file_path = "meow.txt"
   branch = "meow-branch"
   start_branch = "main"
@@ -316,25 +264,13 @@ resource "gitlab_repository_file" "this" {
   author_name = "Meow Meowington"
   commit_message = "feature: add launch codes"
 }
-	`, rInt)
+	`, projectID)
 }
 
-func testAccGitlabRepositoryFileUpdateConfig(rInt int) string {
+func testAccGitlabRepositoryFileUpdateConfig(projectID int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  default_branch = "main"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-  initialize_with_readme = true
-}
-
 resource "gitlab_repository_file" "this" {
-  project = "${gitlab_project.foo.id}"
+  project = %d
   file_path = "meow.txt"
   branch = "main"
   content = "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg=="
@@ -342,37 +278,13 @@ resource "gitlab_repository_file" "this" {
   author_name = "Meow Meowington"
   commit_message = "feature: change launch codes"
 }
-	`, rInt)
+	`, projectID)
 }
 
-func testAccGitlabRepositoryFileSameFileDifferentRepositoryConfig(rInt int) string {
+func testAccGitlabRepositoryFileSameFileDifferentRepositoryConfig(firstProjectID, secondProjectID int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  default_branch = "main"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-  initialize_with_readme = true
-}
-
-resource "gitlab_project" "bar" {
-  name = "bar-%d"
-  description = "Terraform acceptance tests"
-
-  default_branch = "main"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-  initialize_with_readme = true
-}
-
 resource "gitlab_repository_file" "foo_file" {
-  project = "${gitlab_project.foo.id}"
+  project = %d
   file_path = "meow.txt"
   branch = "main"
   content = "bWVvdyBtZW93IG1lb3c="
@@ -382,7 +294,7 @@ resource "gitlab_repository_file" "foo_file" {
 }
 
 resource "gitlab_repository_file" "bar_file" {
-  project = "${gitlab_project.bar.id}"
+  project = %d
   file_path = "meow.txt"
   branch = "main"
   content = "bWVvdyBtZW93IG1lb3c="
@@ -390,7 +302,7 @@ resource "gitlab_repository_file" "bar_file" {
   author_name = "Meow Meowington"
   commit_message = "feature: add launch codes"
 }
-	`, rInt, rInt)
+	`, firstProjectID, secondProjectID)
 }
 
 func testAccGitlabRepositoryFileConcurrentResourcesConfig(projectID int) string {
