@@ -59,6 +59,7 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 							Type:         schema.TypeString,
 							ForceNew:     true,
 							Optional:     true,
+							Computed:     true,
 							ValidateFunc: validation.StringInSlice(validProtectedEnvironmentDeploymentLevelNames, false),
 						},
 						"access_level_description": {
@@ -67,14 +68,14 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 							Computed:    true,
 						},
 						"user_id": {
-							Description:  "The ID of the user allowed to deploy to this protected environment.",
+							Description:  "The ID of the user allowed to deploy to this protected environment. The user must be a member of the project.",
 							Type:         schema.TypeInt,
 							ForceNew:     true,
 							Optional:     true,
 							ValidateFunc: validation.IntAtLeast(1),
 						},
 						"group_id": {
-							Description:  "The ID of the group allowed to deploy to this protected environment.",
+							Description:  "The ID of the group allowed to deploy to this protected environment. The project must be shared with the group.",
 							Type:         schema.TypeInt,
 							ForceNew:     true,
 							Optional:     true,
@@ -88,13 +89,9 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 })
 
 func resourceGitlabProjectProtectedEnvironmentCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	deployAccessLevels, err := expandDeployAccessLevels(d.Get("deploy_access_levels").([]interface{}))
-	if err != nil {
-		return diag.Errorf("error expanding deploy_access_levels: %v", err)
-	}
-
+	deployAccessLevels := expandDeployAccessLevels(d.Get("deploy_access_levels").([]interface{}))
 	options := &gitlab.ProtectRepositoryEnvironmentsOptions{
-		Name: gitlab.String(d.Get("environment").(string)),
+		Name:               gitlab.String(d.Get("environment").(string)),
 		DeployAccessLevels: &deployAccessLevels,
 	}
 
@@ -113,7 +110,6 @@ func resourceGitlabProjectProtectedEnvironmentCreate(ctx context.Context, d *sch
 	}
 
 	d.SetId(buildTwoPartID(&project, &protectedEnvironment.Name))
-
 	return resourceGitlabProjectProtectedEnvironmentRead(ctx, d, meta)
 }
 
@@ -166,32 +162,34 @@ func resourceGitlabProjectProtectedEnvironmentDelete(ctx context.Context, d *sch
 	return nil
 }
 
-func expandDeployAccessLevels(vs []interface{}) ([]*gitlab.EnvironmentAccessOptions, error) {
+func expandDeployAccessLevels(vs []interface{}) []*gitlab.EnvironmentAccessOptions {
 	result := make([]*gitlab.EnvironmentAccessOptions, 0)
 
 	for _, v := range vs {
 		opts := v.(map[string]interface{})
 		option := &gitlab.EnvironmentAccessOptions{}
-		if accessLevel, exists := opts["access_level"]; exists {
+		if accessLevel, ok := opts["access_level"]; ok && accessLevel != "" {
 			option.AccessLevel = gitlab.AccessLevel(accessLevelNameToValue[accessLevel.(string)])
-		} else if userID, exists := opts["user_id"]; exists {
+		} else if userID, ok := opts["user_id"]; ok && userID != 0 {
 			option.UserID = gitlab.Int(userID.(int))
-		} else if groupID, exists := opts["group_id"]; exists {
+		} else if groupID, ok := opts["group_id"]; ok && groupID != 0 {
 			option.GroupID = gitlab.Int(groupID.(int))
 		}
 		result = append(result, option)
 	}
 
-	return result, nil
+	return result
 }
 
-func flattenDeployAccessLevels(vs []*gitlab.EnvironmentAccessDescription) []map[string]interface{} {
+func flattenDeployAccessLevels(accessDescriptions []*gitlab.EnvironmentAccessDescription) []map[string]interface{} {
 	result := make([]map[string]interface{}, 0)
 
-	for _, accessDescription := range vs {
+	for _, accessDescription := range accessDescriptions {
 		v := make(map[string]interface{})
-		v["access_level"] = accessLevelValueToName[accessDescription.AccessLevel]
-		v["access_level_description"] = accessDescription.AccessLevelDescription
+		if accessDescription.AccessLevel != 0 {
+			v["access_level"] = accessLevelValueToName[accessDescription.AccessLevel]
+			v["access_level_description"] = accessDescription.AccessLevelDescription
+		}
 		if accessDescription.UserID != 0 {
 			v["user_id"] = accessDescription.UserID
 		}

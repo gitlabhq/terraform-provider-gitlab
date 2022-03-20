@@ -11,6 +11,8 @@ import (
 )
 
 func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
+	testAccCheck(t)
+	testAccCheckEE(t)
 
 	var pt gitlab.ProtectedEnvironment
 	rInt := acctest.RandInt()
@@ -83,6 +85,8 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 }
 
 func TestAccGitlabProjectProtectedEnvironment_user(t *testing.T) {
+	testAccCheck(t)
+	testAccCheckEE(t)
 
 	var pt gitlab.ProtectedEnvironment
 	rInt := acctest.RandInt()
@@ -123,8 +127,9 @@ func TestAccGitlabProjectProtectedEnvironment_user(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
 					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:   fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						UserID: testUser.ID,
+						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
+						CreateAccessLevel: accessLevelValueToName[gitlab.MaintainerPermissions],
+						UserID:            testUser.ID,
 					}),
 				),
 			},
@@ -157,11 +162,21 @@ func TestAccGitlabProjectProtectedEnvironment_user(t *testing.T) {
 }
 
 func TestAccGitlabProjectProtectedEnvironment_group(t *testing.T) {
+	testAccCheck(t)
+	testAccCheckEE(t)
 
 	var pt gitlab.ProtectedEnvironment
 	rInt := acctest.RandInt()
 	testProject := testAccCreateProject(t)
 	group := testAccCreateGroups(t, 1)[0]
+
+	options := &gitlab.ShareWithGroupOptions{
+		GroupID:     &group.ID,
+		GroupAccess: gitlab.AccessLevel(gitlab.MaintainerPermissions),
+	}
+	if _, err := testGitlabClient.Projects.ShareProjectWithGroup(testProject.ID, options); err != nil {
+		t.Fatalf("unable to share project %d with group %d", testProject.ID, group.ID)
+	}
 	testEnvironment := testAccCreateProjectEnvironment(t, testProject.ID, &gitlab.CreateEnvironmentOptions{
 		Name: gitlab.String(fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt)),
 	})
@@ -196,8 +211,9 @@ func TestAccGitlabProjectProtectedEnvironment_group(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
 					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:    fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						GroupID: group.ID,
+						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
+						CreateAccessLevel: accessLevelValueToName[gitlab.MaintainerPermissions],
+						GroupID:           group.ID,
 					}),
 				),
 			},
@@ -267,19 +283,19 @@ type testAccGitlabProjectProtectedEnvironmentExpectedAttributes struct {
 func testAccCheckGitlabProjectProtectedEnvironmentAttributes(pt *gitlab.ProtectedEnvironment, want *testAccGitlabProjectProtectedEnvironmentExpectedAttributes) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		if pt.Name != want.Name {
-			return fmt.Errorf("got name %q; want %q", pt.Name, want.Name)
+			return fmt.Errorf("got name %s; want %s", pt.Name, want.Name)
 		}
 
 		if pt.DeployAccessLevels[0].AccessLevel != accessLevelNameToValue[want.CreateAccessLevel] {
-			return fmt.Errorf("got create access levels %q; want %q", pt.DeployAccessLevels[0].AccessLevel, accessLevelNameToValue[want.CreateAccessLevel])
+			return fmt.Errorf("got create access levels %d; want %d", pt.DeployAccessLevels[0].AccessLevel, accessLevelNameToValue[want.CreateAccessLevel])
 		}
 
 		if pt.DeployAccessLevels[0].GroupID != want.GroupID {
-			return fmt.Errorf("got group ID %q; want %q", pt.DeployAccessLevels[0].GroupID, want.GroupID)
+			return fmt.Errorf("got group ID %d; want %d", pt.DeployAccessLevels[0].GroupID, want.GroupID)
 		}
 
 		if pt.DeployAccessLevels[0].UserID != want.UserID {
-			return fmt.Errorf("got user ID %q; want %q", pt.DeployAccessLevels[0].UserID, want.UserID)
+			return fmt.Errorf("got user ID %d; want %d", pt.DeployAccessLevels[0].UserID, want.UserID)
 		}
 
 		return nil
@@ -306,10 +322,10 @@ func testAccCheckGitlabProjectProtectedEnvironmentDestroy(s *terraform.State) er
 		if pt != nil {
 			return fmt.Errorf("project Protected Environment %s still exists", protectedEnvironment)
 		}
-	}
-
-	if is404(err) {
-		return err
+	} else {
+		if !is404(err) {
+			return err
+		}
 	}
 
 	return nil

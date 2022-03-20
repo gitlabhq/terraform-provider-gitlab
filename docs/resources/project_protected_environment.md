@@ -3,14 +3,15 @@
 page_title: "gitlab_project_protected_environment Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_protected_environment resource you to create and manage a protected environment in your GitLab project
-          Upstream API: GitLab API docs https://docs.gitlab.com/ee/ci/environments/protected_environments.html
+  The gitlab_project_protected_environment resource allows to manage the lifecycle of a protected environment in a project.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_environments.html
 ---
 
 # gitlab_project_protected_environment (Resource)
 
-The `gitlab_project_protected_environment` resource you to create and manage a protected environment in your GitLab project
-		**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+The `gitlab_project_protected_environment` resource allows to manage the lifecycle of a protected environment in a project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_environments.html)
 
 ## Example Usage
 
@@ -67,26 +68,26 @@ resource "gitlab_project_protected_environment" "this" {
 
 ### Required
 
-- **deploy_access_levels** (Block List, Min: 1) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
-- **environment** (String) The name of the environment.
-- **project** (String) The ID or full path of the project which the protected environment is created against.
+- `deploy_access_levels` (Block List, Min: 1, Max: 1) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
+- `environment` (String) The name of the environment.
+- `project` (String) The ID or full path of the project which the protected environment is created against.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 <a id="nestedblock--deploy_access_levels"></a>
 ### Nested Schema for `deploy_access_levels`
 
 Optional:
 
-- **access_level** (String) Levels of access required to deploy to this protected environment. Valid values are `developer`, `maintainer`.
-- **group_id** (Number) The ID of the group allowed to deploy to this protected environment.
-- **user_id** (Number) The ID of the user allowed to deploy to this protected environment.
+- `access_level` (String) Levels of access required to deploy to this protected environment. Valid values are `developer`, `maintainer`.
+- `group_id` (Number) The ID of the group allowed to deploy to this protected environment. The project must be shared with the group.
+- `user_id` (Number) The ID of the user allowed to deploy to this protected environment. The user must be a member of the project.
 
 Read-Only:
 
-- **access_level_description** (String) Readable description of level of access.
+- `access_level_description` (String) Readable description of level of access.
 
 ## Import
 

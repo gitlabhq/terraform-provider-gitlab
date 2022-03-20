@@ -14,8 +14,9 @@ import (
 )
 
 func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
-	rInt := acctest.RandInt()
+	testAccCheck(t)
 
+	rInt := acctest.RandInt()
 	testProject := testAccCreateProject(t)
 
 	var env1 gitlab.Environment = gitlab.Environment{
@@ -38,16 +39,18 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.this", &env1),
 					testAccCheckGitlabProjectEnvironmentAttributes(&env1, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
+						Name:  fmt.Sprintf("ProjectEnvironment-%d", rInt),
+						State: "available",
 					}),
 					testCheckResourceAttrLazy("gitlab_project_environment.this", "created_at", func() string { return env1.CreatedAt.Format(time.RFC3339) }),
 				),
 			},
 			// Verify import
 			{
-				ResourceName:      "gitlab_project_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "gitlab_project_environment.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"stop_before_destroy"},
 			},
 			// Update the Environment
 			{
@@ -56,6 +59,7 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.this", &env2),
 					testAccCheckGitlabProjectEnvironmentAttributes(&env2, &testAccGitlabProjectEnvironmentExpectedAttributes{
 						Name:        fmt.Sprintf("ProjectEnvironment-%d", rInt),
+						State:       "available",
 						ExternalURL: "https://example.com",
 					}),
 					testCheckResourceAttrLazy("gitlab_project_environment.this", "created_at", func() string { return env2.CreatedAt.Format(time.RFC3339) }),
@@ -64,9 +68,10 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 			},
 			// Verify import
 			{
-				ResourceName:      "gitlab_project_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "gitlab_project_environment.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"stop_before_destroy"},
 			},
 			// Update the Environment to get back to initial settings
 			{
@@ -74,23 +79,26 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectEnvironmentExists("gitlab_project_environment.this", &env1),
 					testAccCheckGitlabProjectEnvironmentAttributes(&env1, &testAccGitlabProjectEnvironmentExpectedAttributes{
-						Name: fmt.Sprintf("ProjectEnvironment-%d", rInt),
+						Name:  fmt.Sprintf("ProjectEnvironment-%d", rInt),
+						State: "available",
 					}),
 				),
 			},
 			// Verify import
 			{
-				ResourceName:      "gitlab_project_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "gitlab_project_environment.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"stop_before_destroy"},
 			},
 		},
 	})
 }
 
-func TestAccGitlabProjectEnvironment_stop_before_destroy(t *testing.T) {
-	rInt := acctest.RandInt()
+func TestAccGitlabProjectEnvironment_stopBeforeDestroyDisabled(t *testing.T) {
+	testAccCheck(t)
 
+	rInt := acctest.RandInt()
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
@@ -98,10 +106,18 @@ func TestAccGitlabProjectEnvironment_stop_before_destroy(t *testing.T) {
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{
-			// Create environment with required values only
+			// Create environment with `stop_before_destroy = false`
 			{
-				Config:      testAccGitlabProjectEnvironmentConfig(testProject.ID, rInt),
+				Config: testAccGitlabProjectEnvironmentStopBeforeDestroyFalse(testProject.ID, rInt),
+			},
+			{
+				Config:      testAccGitlabProjectEnvironmentStopBeforeDestroyFalse(testProject.ID, rInt),
 				ExpectError: regexp.MustCompile("Environment must be in a stopped state before deletion"),
+				Destroy:     true,
+			},
+			// Update stop flag
+			{
+				Config: testAccGitlabProjectEnvironmentConfig(testProject.ID, rInt),
 			},
 		},
 	})
@@ -124,8 +140,10 @@ func testAccCheckGitlabProjectEnvironmentExists(n string, env *gitlab.Environmen
 			return fmt.Errorf("error converting environment ID to int: %v", err)
 		}
 
-		if _, _, err := testGitlabClient.Environments.GetEnvironment(project, environmentID); err != nil {
+		if e, _, err := testGitlabClient.Environments.GetEnvironment(project, environmentID); err != nil {
 			return err
+		} else {
+			*env = *e
 		}
 		return nil
 	}
@@ -181,10 +199,10 @@ func testAccCheckGitlabProjectEnvironmentDestroy(s *terraform.State) error {
 		if env != nil {
 			return fmt.Errorf("[ERROR] project Environment %v still exists", environmentIDInt)
 		}
-	}
-
-	if is404(err) {
-		return err
+	} else {
+		if !is404(err) {
+			return err
+		}
 	}
 
 	return nil

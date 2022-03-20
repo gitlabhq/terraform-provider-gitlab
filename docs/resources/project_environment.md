@@ -3,14 +3,22 @@
 page_title: "gitlab_project_environment Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_environment resource you to create and manage an environment in your GitLab project
-          Upstream API: GitLab API docs https://docs.gitlab.com/ee/ci/environments/index.html
+  The gitlab_project_environment resource allows to manage the lifecycle of an environment in a project.
+  -> During a terraform destroy this resource by default will not attempt to stop the environment first.
+  An environment is required to be in a stopped state before a deletetion of the environment can occur.
+  Set the stop_before_destroy flag to attempt to automatically stop the environment before deletion.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/environments.html
 ---
 
 # gitlab_project_environment (Resource)
 
-The `gitlab_project_environment` resource you to create and manage an environment in your GitLab project
-		**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/ci/environments/index.html)
+The `gitlab_project_environment` resource allows to manage the lifecycle of an environment in a project.
+
+-> During a terraform destroy this resource by default will not attempt to stop the environment first.
+An environment is required to be in a stopped state before a deletetion of the environment can occur.
+Set the `stop_before_destroy` flag to attempt to automatically stop the environment before deletion.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/environments.html)
 
 ## Example Usage
 
@@ -39,17 +47,21 @@ resource "gitlab_project_environment" "this" {
 
 ### Required
 
-- **name** (String) The name of the environment
-- **project** (String) The ID or full path of the project to environment is created for.
+- `name` (String) The name of the environment.
+- `project` (String) The ID or full path of the project to environment is created for.
 
 ### Optional
 
-- **external_url** (String) Place to link to for this environment
-- **id** (String) The ID of this resource.
+- `external_url` (String) Place to link to for this environment.
+- `id` (String) The ID of this resource.
+- `stop_before_destroy` (Boolean) Determines whether the environment is attempted to be stopped before the environment is deleted.
 
 ### Read-Only
 
-- **state** (String) State the environment is in. Valid values are `available`, `stopped`.
+- `created_at` (String) The ISO8601 date/time that this environment was created at in UTC.
+- `slug` (String) The name of the environment in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
+- `state` (String) State the environment is in. Valid values are `available`, `stopped`.
+- `updated_at` (String) The ISO8601 date/time that this environment was last updated at in UTC.
 
 ## Import
 

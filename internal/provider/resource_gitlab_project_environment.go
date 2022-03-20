@@ -17,11 +17,11 @@ var _ = registerResource("gitlab_project_environment", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_project_environment`" + ` resource allows to manage the lifecycle of an environment in a project.
 
--> During a terraform destroy this resource by default will not attempt to stop the environment first. 
-An environment is required to be in a stopped state before a deletetion of the environment can occur. 
+-> During a terraform destroy this resource by default will not attempt to stop the environment first.
+An environment is required to be in a stopped state before a deletetion of the environment can occur.
 Set the ` + "`stop_before_destroy`" + ` flag to attempt to automatically stop the environment before deletion.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/environments.html`,
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/environments.html)`,
 
 		CreateContext: resourceGitlabProjectEnvironmentCreate,
 		ReadContext:   resourceGitlabProjectEnvironmentRead,
@@ -39,14 +39,14 @@ Set the ` + "`stop_before_destroy`" + ` flag to attempt to automatically stop th
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"name": {
-				Description:  "The name of the environment",
+				Description:  "The name of the environment.",
 				Type:         schema.TypeString,
 				ForceNew:     true,
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
 			"external_url": {
-				Description:  "Place to link to for this environment",
+				Description:  "Place to link to for this environment.",
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.IsURLWithHTTPorHTTPS,
@@ -56,19 +56,13 @@ Set the ` + "`stop_before_destroy`" + ` flag to attempt to automatically stop th
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
-			"stop_before_destroy": {
-				Description: "Determines whether the environment is attempted to be stopped before the environment is deleted.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
 			"created_at": {
-				Description: "The ISO8601 date/time that this environment was created at in UTC",
+				Description: "The ISO8601 date/time that this environment was created at in UTC.",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
 			"updated_at": {
-				Description: "The ISO8601 date/time that this environment was last updated at in UTC",
+				Description: "The ISO8601 date/time that this environment was last updated at in UTC.",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
@@ -76,6 +70,12 @@ Set the ` + "`stop_before_destroy`" + ` flag to attempt to automatically stop th
 				Description: fmt.Sprintf("State the environment is in. Valid values are %s.", renderValueListForDocs(validProjectEnvironmentStates)),
 				Type:        schema.TypeString,
 				Computed:    true,
+			},
+			"stop_before_destroy": {
+				Description: "Determines whether the environment is attempted to be stopped before the environment is deleted.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
 			},
 		},
 	}
@@ -106,30 +106,29 @@ func resourceGitlabProjectEnvironmentCreate(ctx context.Context, d *schema.Resou
 
 	environmentID := fmt.Sprintf("%d", environment.ID)
 	d.SetId(buildTwoPartID(&project, &environmentID))
-
 	return resourceGitlabProjectEnvironmentRead(ctx, d, meta)
 }
 
 func resourceGitlabProjectEnvironmentRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] read gitlab environment %s", d.Id())
 
-	project, environmentIDInt, err := environmentAndProjectFromResource(d)
+	project, environmentID, err := resourceGitlabProjectEnvironmentParseID(d)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] Project %s read gitlab environment %d", project, environmentIDInt)
+	log.Printf("[DEBUG] Project %s read gitlab environment %d", project, environmentID)
 
 	client := meta.(*gitlab.Client)
 
-	environment, _, err := client.Environments.GetEnvironment(project, environmentIDInt, gitlab.WithContext(ctx))
+	environment, _, err := client.Environments.GetEnvironment(project, environmentID, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
-			log.Printf("[DEBUG] Project %s gitlab environment %q not found, removing from state", project, environmentIDInt)
+			log.Printf("[DEBUG] Project %s gitlab environment %d not found, removing from state", project, environmentID)
 			d.SetId("")
 			return nil
 		}
-		return diag.Errorf("error getting gitlab project %q environment %q: %v", project, environmentIDInt, err)
+		return diag.Errorf("error getting gitlab project %s environment %d: %v", project, environmentID, err)
 	}
 
 	d.Set("project", project)
@@ -137,7 +136,6 @@ func resourceGitlabProjectEnvironmentRead(ctx context.Context, d *schema.Resourc
 	d.Set("state", environment.State)
 	d.Set("external_url", environment.ExternalURL)
 	d.Set("created_at", environment.CreatedAt.Format(time.RFC3339))
-
 	if environment.UpdatedAt != nil {
 		d.Set("updated_at", environment.UpdatedAt.Format(time.RFC3339))
 	}
@@ -148,7 +146,7 @@ func resourceGitlabProjectEnvironmentRead(ctx context.Context, d *schema.Resourc
 func resourceGitlabProjectEnvironmentUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[DEBUG] update gitlab environment %s", d.Id())
 
-	project, environmentIDInt, err := environmentAndProjectFromResource(d)
+	project, environmentID, err := resourceGitlabProjectEnvironmentParseID(d)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -161,12 +159,12 @@ func resourceGitlabProjectEnvironmentUpdate(ctx context.Context, d *schema.Resou
 		options.ExternalURL = gitlab.String(d.Get("external_url").(string))
 	}
 
-	log.Printf("[DEBUG] Project %s update gitlab environment %d", project, environmentIDInt)
+	log.Printf("[DEBUG] Project %s update gitlab environment %d", project, environmentID)
 
 	client := meta.(*gitlab.Client)
 
-	if _, _, err := client.Environments.EditEnvironment(project, environmentIDInt, options, gitlab.WithContext(ctx)); err != nil {
-		return diag.Errorf("error editing gitlab project %q environment %q: %v", project, environmentIDInt, err)
+	if _, _, err := client.Environments.EditEnvironment(project, environmentID, options, gitlab.WithContext(ctx)); err != nil {
+		return diag.Errorf("error editing gitlab project %s environment %d: %v", project, environmentID, err)
 	}
 
 	return resourceGitlabProjectEnvironmentRead(ctx, d, meta)
@@ -174,7 +172,7 @@ func resourceGitlabProjectEnvironmentUpdate(ctx context.Context, d *schema.Resou
 
 func resourceGitlabProjectEnvironmentDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, environmentIDInt, err := environmentAndProjectFromResource(d)
+	project, environmentID, err := resourceGitlabProjectEnvironmentParseID(d)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -182,49 +180,48 @@ func resourceGitlabProjectEnvironmentDelete(ctx context.Context, d *schema.Resou
 	stopBeforeDestroy := d.Get("stop_before_destroy").(bool)
 
 	if stopBeforeDestroy {
-		log.Printf("[DEBUG] Stopping environment %v for Project %s before destruction", environmentIDInt, project)
-		_, err = client.Environments.StopEnvironment(project, environmentIDInt, gitlab.WithContext(ctx))
+		log.Printf("[DEBUG] Stopping environment %d for Project %s before destruction", environmentID, project)
+		_, err = client.Environments.StopEnvironment(project, environmentID, gitlab.WithContext(ctx))
 		if err != nil {
-			return diag.Errorf("error stopping gitlab project %q environment %q: %v", project, environmentIDInt, err)
+			return diag.Errorf("error stopping gitlab project %s environment %q: %v", project, environmentID, err)
 		}
 	} else {
-		environment, _, err := client.Environments.GetEnvironment(project, environmentIDInt, gitlab.WithContext(ctx))
+		environment, _, err := client.Environments.GetEnvironment(project, environmentID, gitlab.WithContext(ctx))
 		if err != nil {
 			if is404(err) {
-				log.Printf("[DEBUG] Project %s gitlab environment %q not found, removing from state", project, environmentIDInt)
+				log.Printf("[DEBUG] Project %s gitlab environment %d not found, removing from state", project, environmentID)
 				d.SetId("")
 				return nil
 			}
-			return diag.Errorf("error getting gitlab project %q environment %q: %v", project, environmentIDInt, err)
+			return diag.Errorf("error getting gitlab project %s environment %d: %v", project, environmentID, err)
 		}
 
 		if environment.State != "stopped" {
-			return diag.Errorf("[ERROR] cannot destroy gitlab project %q environment %q: Environment must be in a stopped state before deletion. Set stop_before_destroy flag to attempt to auto stop the environment on destruction", project, environmentIDInt)
+			return diag.Errorf("[ERROR] cannot destroy gitlab project %s environment %d: Environment must be in a stopped state before deletion. Set stop_before_destroy flag to attempt to auto stop the environment on destruction", project, environmentID)
 		}
 	}
 
-	_, err = client.Environments.DeleteEnvironment(project, environmentIDInt, gitlab.WithContext(ctx))
+	_, err = client.Environments.DeleteEnvironment(project, environmentID, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.Errorf("error deleting gitlab project %q environment %q: %v", project, environmentIDInt, err)
+		return diag.Errorf("error deleting gitlab project %s environment %d: %v", project, environmentID, err)
 	}
 
 	return nil
 }
 
-func environmentAndProjectFromResource(d *schema.ResourceData) (string, int, error) {
-	project, environmentID, err := parseTwoPartID(d.Id())
+func resourceGitlabProjectEnvironmentParseID(d *schema.ResourceData) (string, int, error) {
+	project, rawEnvironmentID, err := parseTwoPartID(d.Id())
 
 	if err != nil {
-		log.Printf("[ERROR] cannot get project and environmentID from input: %v", d.Id())
+		log.Printf("[ERROR] cannot get project and environment ID from input: %v", d.Id())
 		return "", 0, err
 	}
 
-	environmentIDInt, e := strconv.Atoi(environmentID)
+	environmentID, err := strconv.Atoi(rawEnvironmentID)
 
-	if e != nil {
-		log.Printf("[ERROR] cannot convert environment ID to int: %v", e)
-		return "", 0, e
+	if err != nil {
+		log.Printf("[ERROR] cannot convert environment ID to int: %v", err)
+		return "", 0, err
 	}
-
-	return project, environmentIDInt, nil
+	return project, environmentID, nil
 }
