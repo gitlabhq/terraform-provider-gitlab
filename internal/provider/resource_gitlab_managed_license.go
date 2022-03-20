@@ -12,6 +12,10 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+var managedLicenseAllowedValues = []string{
+	"approved", "blacklisted", "allowed", "denied",
+}
+
 var _ = registerResource("gitlab_managed_license", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`" + `gitlab_managed_license` + "`" + ` resource allows to manage the lifecycle of a managed license.
@@ -44,11 +48,14 @@ var _ = registerResource("gitlab_managed_license", func() *schema.Resource {
 				Description: "The name of the managed license (I.e., 'Apache License 2.0' or 'MIT license')",
 			},
 			"approval_status": {
-				Type:         schema.TypeString,
-				Required:     true,
-				ForceNew:     false,
-				ValidateFunc: validation.StringInSlice([]string{"approved", "blacklisted"}, true),
-				Description:  "Whether the license is approved or not. Only 'approved' or 'blacklisted' allowed.",
+				Type:             schema.TypeString,
+				Required:         true,
+				ForceNew:         false,
+				ValidateFunc:     validation.StringInSlice(managedLicenseAllowedValues, true),
+				DiffSuppressFunc: checkDeprecatedValuesForDiff,
+				Description: fmt.Sprintf(`The approval status of the license. Valid values are: %s. "approved" and "blacklisted" 
+				have been deprecated in favor of "allowed" and "denied"; use "allowed" and "denied" for GitLab versions 15.0 and higher. 
+				Prior to version 15.0 and after 14.6, the values are equivalent.`, renderValueListForDocs(managedLicenseAllowedValues)),
 			},
 		},
 	}
@@ -149,6 +156,11 @@ func stringToApprovalStatus(s string) *gitlab.LicenseApprovalStatusValue {
 	lookup := map[string]gitlab.LicenseApprovalStatusValue{
 		"approved":    gitlab.LicenseApproved,
 		"blacklisted": gitlab.LicenseBlacklisted,
+
+		// This is counter-intuitive, but currently the API response from the non-deprecated
+		// values is the deprecated values. So we have to map them here.
+		"allowed": gitlab.LicenseApproved,
+		"denied":  gitlab.LicenseBlacklisted,
 	}
 
 	value, ok := lookup[s]
@@ -170,4 +182,21 @@ func projectIdAndLicenseIdFromId(id string) (string, int, error) {
 	}
 
 	return projectId, licenseId, nil
+}
+
+func checkDeprecatedValuesForDiff(k, oldValue, newValue string, d *schema.ResourceData) bool {
+	approvedValues := []string{"approved", "allowed"}
+	deniedValues := []string{"blacklisted", "denied"}
+
+	// While we could technically combine these two "if" blocks, this seems more readable
+	// and should have the same execution pattern.
+	if contains(approvedValues, oldValue) && contains(approvedValues, newValue) {
+		return true
+	}
+
+	if contains(deniedValues, oldValue) && contains(deniedValues, newValue) {
+		return true
+	}
+
+	return false
 }

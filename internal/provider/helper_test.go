@@ -15,6 +15,8 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+type SkipFunc = func() (bool, error)
+
 func init() {
 	// We are using the gomega package for its matchers only, but it requires us to register a handler anyway.
 	gomega.RegisterFailHandler(func(_ string, _ ...int) {
@@ -68,6 +70,22 @@ func testAccCheck(t *testing.T) {
 
 	if os.Getenv(resource.EnvTfAcc) == "" {
 		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
+	}
+}
+
+// orSkipFunc accepts many skipFunc and returns "true" if any returns true.
+func orSkipFunc(input ...SkipFunc) SkipFunc {
+	return func() (bool, error) {
+		for _, item := range input {
+			result, err := item()
+			if err != nil {
+				return false, err
+			}
+			if result {
+				return result, nil
+			}
+		}
+		return false, nil
 	}
 }
 

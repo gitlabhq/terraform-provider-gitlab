@@ -21,19 +21,20 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
 			{
-				// Create a managed license with an "approved" state
+				// Create a managed license with an "allowed" state
 				SkipFunc: isRunningInCE,
-				Config:   testManagedLicenseConfig(rInt, "approved"),
+				Config:   testManagedLicenseConfig(rInt, "allowed"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
 				),
 			},
 			{
-				// Update the managed license to have a blacklisted state
+				// Update the managed license to have a denied state
 				SkipFunc: isRunningInCE,
-				Config:   testManagedLicenseConfig(rInt, "blacklisted"),
+				Config:   testManagedLicenseConfig(rInt, "denied"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", &managedLicense),
+					//Even though the API accepts "denied", it still returns "blacklisted" until 15.0
+					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "blacklisted", &managedLicense),
 				),
 			},
 			{
@@ -46,14 +47,79 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLicense) resource.TestCheckFunc {
+func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
+	var managedLicense gitlab.ManagedLicense
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() {},
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckManagedLicenseDestroy,
+		Steps: []resource.TestStep{
+			{
+				// Create a managed license with an "approved" state
+				SkipFunc: orSkipFunc(
+					isRunningInCE,
+					isGitLabVersionLessThan(testGitlabClient, "15.0"),
+				),
+				Config: testManagedLicenseConfig(rInt, "approved"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
+				),
+			},
+			{
+				// Update the managed license to have a blacklisted state
+				SkipFunc: orSkipFunc(
+					isRunningInCE,
+					isGitLabVersionLessThan(testGitlabClient, "15.0"),
+				),
+				Config: testManagedLicenseConfig(rInt, "blacklisted"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "blacklisted", &managedLicense),
+				),
+			},
+			{
+				SkipFunc: orSkipFunc(
+					isRunningInCE,
+					isGitLabVersionLessThan(testGitlabClient, "15.0"),
+				),
+				ResourceName:      "gitlab_managed_license.fixme",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestCheckManagedLicenseStatusDiffFunc(t *testing.T) {
+	if !checkDeprecatedValuesForDiff("", "approved", "allowed", nil) {
+		t.Log("approved and allowed should be suppressed")
+		t.Fail()
+	}
+
+	if !checkDeprecatedValuesForDiff("", "denied", "blacklisted", nil) {
+		t.Log("denied and blacklisted should be suppressed")
+		t.Fail()
+	}
+
+	if checkDeprecatedValuesForDiff("", "denied", "approved", nil) {
+		t.Log("denied and approved should not be suppressed")
+		t.Fail()
+	}
+
+	if checkDeprecatedValuesForDiff("", "allowed", "blacklisted", nil) {
+		t.Log("allowed and blacklisted should not be suppressed")
+		t.Fail()
+	}
+}
+
+func testAccCheckGitlabManagedLicenseStatus(resource string, status string, license *gitlab.ManagedLicense) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
+		rs, ok := s.RootModule().Resources[resource]
 		if !ok {
-			return fmt.Errorf("not Found: %s", n)
+			return fmt.Errorf("not Found: %s", resource)
 		}
 
-		licenseStatus := rs.Primary.Attributes["approval_status"]
 		project := rs.Primary.Attributes["project"]
 		if project == "" {
 			return fmt.Errorf("no project ID is set")
@@ -65,7 +131,7 @@ func testAccCheckGitlabManagedLicenseStatus(n string, license *gitlab.ManagedLic
 		}
 
 		for _, gotLicense := range licenses {
-			if gotLicense.ApprovalStatus == *stringToApprovalStatus(licenseStatus) {
+			if gotLicense.ApprovalStatus == *stringToApprovalStatus(status) {
 				*license = *gotLicense
 				return nil
 			}
