@@ -35,14 +35,14 @@ resource "gitlab_service_pipelines_email" "email" {
 
 ### Required
 
-- **project** (String) ID of the project you want to activate integration on.
-- **recipients** (Set of String) ) email addresses where notifications are sent.
+- `project` (String) ID of the project you want to activate integration on.
+- `recipients` (Set of String) ) email addresses where notifications are sent.
 
 ### Optional
 
-- **branches_to_be_notified** (String) Branches to send notifications for. Valid options are `all`, `default`, `protected`, and `default_and_protected`. Default is `default`
-- **id** (String) The ID of this resource.
-- **notify_only_broken_pipelines** (Boolean) Notify only broken pipelines. Default is true.
+- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are `all`, `default`, `protected`, and `default_and_protected`. Default is `default`
+- `id` (String) The ID of this resource.
+- `notify_only_broken_pipelines` (Boolean) Notify only broken pipelines. Default is true.
 
 ## Import
 

@@ -36,22 +36,22 @@ resource "gitlab_project_variable" "example" {
 
 ### Required
 
-- **name** (String) A name to describe the project access token.
-- **project** (String) The id of the project to add the project access token to.
-- **scopes** (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`.
+- `name` (String) A name to describe the project access token.
+- `project` (String) The id of the project to add the project access token to.
+- `scopes` (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`.
 
 ### Optional
 
-- **expires_at** (String) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
-- **id** (String) The ID of this resource.
+- `expires_at` (String) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **active** (Boolean) True if the token is active.
-- **created_at** (String) Time the token has been created, RFC3339 format.
-- **revoked** (Boolean) True if the token is revoked.
-- **token** (String, Sensitive) The secret token. **Note**: the token is not available for imported resources.
-- **user_id** (Number) The user_id associated to the token.
+- `active` (Boolean) True if the token is active.
+- `created_at` (String) Time the token has been created, RFC3339 format.
+- `revoked` (Boolean) True if the token is revoked.
+- `token` (String, Sensitive) The secret token. **Note**: the token is not available for imported resources.
+- `user_id` (Number) The user_id associated to the token.
 
 ## Import
 

@@ -31,14 +31,14 @@ resource "gitlab_deploy_key" "example" {
 
 ### Required
 
-- **key** (String) The public ssh key body.
-- **project** (String) The name or id of the project to add the deploy key to.
-- **title** (String) A title to describe the deploy key with.
+- `key` (String) The public ssh key body.
+- `project` (String) The name or id of the project to add the deploy key to.
+- `title` (String) A title to describe the deploy key with.
 
 ### Optional
 
-- **can_push** (Boolean) Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.
-- **id** (String) The ID of this resource.
+- `can_push` (Boolean) Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.
+- `id` (String) The ID of this resource.
 
 ## Import
 

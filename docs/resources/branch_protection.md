@@ -69,37 +69,37 @@ resource "gitlab_branch_protection" "main" {
 
 ### Required
 
-- **branch** (String) Name of the branch.
-- **project** (String) The id of the project.
+- `branch` (String) Name of the branch.
+- `project` (String) The id of the project.
 
 ### Optional
 
-- **allow_force_push** (Boolean) Can be set to true to allow users with push access to force push.
-- **allowed_to_merge** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_merge))
-- **allowed_to_push** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_push))
-- **allowed_to_unprotect** (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_unprotect))
-- **code_owner_approval_required** (Boolean) Can be set to true to require code owner approval before merging.
-- **id** (String) The ID of this resource.
-- **merge_access_level** (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`.
-- **push_access_level** (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`.
-- **unprotect_access_level** (String) Access levels allowed to unprotect. Valid values are: `developer`, `maintainer`.
+- `allow_force_push` (Boolean) Can be set to true to allow users with push access to force push.
+- `allowed_to_merge` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_merge))
+- `allowed_to_push` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_push))
+- `allowed_to_unprotect` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_unprotect))
+- `code_owner_approval_required` (Boolean) Can be set to true to require code owner approval before merging.
+- `id` (String) The ID of this resource.
+- `merge_access_level` (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`.
+- `push_access_level` (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`.
+- `unprotect_access_level` (String) Access levels allowed to unprotect. Valid values are: `developer`, `maintainer`.
 
 ### Read-Only
 
-- **branch_protection_id** (Number) The ID of the branch protection (not the branch name).
+- `branch_protection_id` (Number) The ID of the branch protection (not the branch name).
 
 <a id="nestedblock--allowed_to_merge"></a>
 ### Nested Schema for `allowed_to_merge`
 
 Optional:
 
-- **group_id** (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
-- **user_id** (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
 
 Read-Only:
 
-- **access_level** (String) Level of access.
-- **access_level_description** (String) Readable description of level of access.
+- `access_level` (String) Level of access.
+- `access_level_description` (String) Readable description of level of access.
 
 
 <a id="nestedblock--allowed_to_push"></a>
@@ -107,13 +107,13 @@ Read-Only:
 
 Optional:
 
-- **group_id** (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
-- **user_id** (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
 
 Read-Only:
 
-- **access_level** (String) Level of access.
-- **access_level_description** (String) Readable description of level of access.
+- `access_level` (String) Level of access.
+- `access_level_description` (String) Readable description of level of access.
 
 
 <a id="nestedblock--allowed_to_unprotect"></a>
@@ -121,13 +121,13 @@ Read-Only:
 
 Optional:
 
-- **group_id** (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
-- **user_id** (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
 
 Read-Only:
 
-- **access_level** (String) Level of access.
-- **access_level_description** (String) Readable description of level of access.
+- `access_level` (String) Level of access.
+- `access_level_description` (String) Readable description of level of access.
 
 ## Import
 

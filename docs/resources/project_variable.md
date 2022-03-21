@@ -32,17 +32,17 @@ resource "gitlab_project_variable" "example" {
 
 ### Required
 
-- **key** (String) The name of the variable.
-- **project** (String) The name or id of the project.
-- **value** (String, Sensitive) The value of the variable.
+- `key` (String) The name of the variable.
+- `project` (String) The name or id of the project.
+- `value` (String, Sensitive) The value of the variable.
 
 ### Optional
 
-- **environment_scope** (String) The environment_scope of the variable. Defaults to `*`.
-- **id** (String) The ID of this resource.
-- **masked** (Boolean) If set to `true`, the variable will be masked if it would have been written to the logs. Defaults to `false`.
-- **protected** (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-- **variable_type** (String) The type of a variable. Available types are: env_var (default) and file.
+- `environment_scope` (String) The environment_scope of the variable. Defaults to `*`.
+- `id` (String) The ID of this resource.
+- `masked` (Boolean) If set to `true`, the variable will be masked if it would have been written to the logs. Defaults to `false`.
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+- `variable_type` (String) The type of a variable. Available types are: env_var (default) and file.
 
 ## Import
 

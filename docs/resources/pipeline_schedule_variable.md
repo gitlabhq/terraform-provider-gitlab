@@ -36,14 +36,14 @@ resource "gitlab_pipeline_schedule_variable" "example" {
 
 ### Required
 
-- **key** (String) Name of the variable.
-- **pipeline_schedule_id** (Number) The id of the pipeline schedule.
-- **project** (String) The id of the project to add the schedule to.
-- **value** (String) Value of the variable.
+- `key` (String) Name of the variable.
+- `pipeline_schedule_id` (Number) The id of the pipeline schedule.
+- `project` (String) The id of the project to add the schedule to.
+- `value` (String) Value of the variable.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

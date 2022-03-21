@@ -32,26 +32,26 @@ data "gitlab_project_protected_branch" "example" {
 
 ### Required
 
-- **name** (String) The name of the protected branch.
-- **project_id** (String) The integer or path with namespace that uniquely identifies the project.
+- `name` (String) The name of the protected branch.
+- `project_id` (String) The integer or path with namespace that uniquely identifies the project.
 
 ### Read-Only
 
-- **allow_force_push** (Boolean) Whether force push is allowed.
-- **code_owner_approval_required** (Boolean) Reject code pushes that change files listed in the CODEOWNERS file.
-- **id** (Number) The ID of this resource.
-- **merge_access_levels** (List of Object) Describes which access levels, users, or groups are allowed to perform the action. (see [below for nested schema](#nestedatt--merge_access_levels))
-- **push_access_levels** (List of Object) Describes which access levels, users, or groups are allowed to perform the action. (see [below for nested schema](#nestedatt--push_access_levels))
+- `allow_force_push` (Boolean) Whether force push is allowed.
+- `code_owner_approval_required` (Boolean) Reject code pushes that change files listed in the CODEOWNERS file.
+- `id` (Number) The ID of this resource.
+- `merge_access_levels` (List of Object) Describes which access levels, users, or groups are allowed to perform the action. (see [below for nested schema](#nestedatt--merge_access_levels))
+- `push_access_levels` (List of Object) Describes which access levels, users, or groups are allowed to perform the action. (see [below for nested schema](#nestedatt--push_access_levels))
 
 <a id="nestedatt--merge_access_levels"></a>
 ### Nested Schema for `merge_access_levels`
 
 Read-Only:
 
-- **access_level** (String)
-- **access_level_description** (String)
-- **group_id** (Number)
-- **user_id** (Number)
+- `access_level` (String)
+- `access_level_description` (String)
+- `group_id` (Number)
+- `user_id` (Number)
 
 
 <a id="nestedatt--push_access_levels"></a>
@@ -59,9 +59,9 @@ Read-Only:
 
 Read-Only:
 
-- **access_level** (String)
-- **access_level_description** (String)
-- **group_id** (Number)
-- **user_id** (Number)
+- `access_level` (String)
+- `access_level_description` (String)
+- `group_id` (Number)
+- `user_id` (Number)
 
 

@@ -32,47 +32,47 @@ data "gitlab_project_tags" "example" {
 
 ### Required
 
-- **project** (String) The ID or URL-encoded path of the project owned by the authenticated user.
+- `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **order_by** (String) Return tags ordered by `name` or `updated` fields. Default is `updated`.
-- **search** (String) Return list of tags matching the search criteria. You can use `^term` and `term$` to find tags that begin and end with `term` respectively. No other regular expressions are supported.
-- **sort** (String) Return tags sorted in `asc` or `desc` order. Default is `desc`.
+- `id` (String) The ID of this resource.
+- `order_by` (String) Return tags ordered by `name` or `updated` fields. Default is `updated`.
+- `search` (String) Return list of tags matching the search criteria. You can use `^term` and `term$` to find tags that begin and end with `term` respectively. No other regular expressions are supported.
+- `sort` (String) Return tags sorted in `asc` or `desc` order. Default is `desc`.
 
 ### Read-Only
 
-- **tags** (List of Object) List of repository tags from a project. (see [below for nested schema](#nestedatt--tags))
+- `tags` (List of Object) List of repository tags from a project. (see [below for nested schema](#nestedatt--tags))
 
 <a id="nestedatt--tags"></a>
 ### Nested Schema for `tags`
 
 Read-Only:
 
-- **commit** (Set of Object) (see [below for nested schema](#nestedobjatt--tags--commit))
-- **message** (String)
-- **name** (String)
-- **protected** (Boolean)
-- **release** (Set of Object) (see [below for nested schema](#nestedobjatt--tags--release))
-- **target** (String)
+- `commit` (Set of Object) (see [below for nested schema](#nestedobjatt--tags--commit))
+- `message` (String)
+- `name` (String)
+- `protected` (Boolean)
+- `release` (Set of Object) (see [below for nested schema](#nestedobjatt--tags--release))
+- `target` (String)
 
 <a id="nestedobjatt--tags--commit"></a>
 ### Nested Schema for `tags.commit`
 
 Read-Only:
 
-- **author_email** (String)
-- **author_name** (String)
-- **authored_date** (String)
-- **committed_date** (String)
-- **committer_email** (String)
-- **committer_name** (String)
-- **id** (String)
-- **message** (String)
-- **parent_ids** (Set of String)
-- **short_id** (String)
-- **title** (String)
+- `author_email` (String)
+- `author_name` (String)
+- `authored_date` (String)
+- `committed_date` (String)
+- `committer_email` (String)
+- `committer_name` (String)
+- `id` (String)
+- `message` (String)
+- `parent_ids` (Set of String)
+- `short_id` (String)
+- `title` (String)
 
 
 <a id="nestedobjatt--tags--release"></a>
@@ -80,7 +80,7 @@ Read-Only:
 
 Read-Only:
 
-- **description** (String)
-- **tag_name** (String)
+- `description` (String)
+- `tag_name` (String)
 
 

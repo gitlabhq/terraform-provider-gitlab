@@ -40,22 +40,22 @@ resource "gitlab_user" "example" {
 
 ### Required
 
-- **email** (String) The e-mail address of the user.
-- **name** (String) The name of the user.
-- **username** (String) The username of the user.
+- `email` (String) The e-mail address of the user.
+- `name` (String) The name of the user.
+- `username` (String) The username of the user.
 
 ### Optional
 
-- **can_create_group** (Boolean) Boolean, defaults to false. Whether to allow the user to create groups.
-- **id** (String) The ID of this resource.
-- **is_admin** (Boolean) Boolean, defaults to false.  Whether to enable administrative privileges
-- **is_external** (Boolean) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
-- **note** (String) The note associated to the user.
-- **password** (String, Sensitive) The password of the user.
-- **projects_limit** (Number) Integer, defaults to 0.  Number of projects user can create.
-- **reset_password** (Boolean) Boolean, defaults to false. Send user password reset link.
-- **skip_confirmation** (Boolean) Boolean, defaults to true. Whether to skip confirmation.
-- **state** (String) String, defaults to 'active'. The state of the user account. Valid values are `active`, `deactivated`, `blocked`.
+- `can_create_group` (Boolean) Boolean, defaults to false. Whether to allow the user to create groups.
+- `id` (String) The ID of this resource.
+- `is_admin` (Boolean) Boolean, defaults to false.  Whether to enable administrative privileges
+- `is_external` (Boolean) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
+- `note` (String) The note associated to the user.
+- `password` (String, Sensitive) The password of the user.
+- `projects_limit` (Number) Integer, defaults to 0.  Number of projects user can create.
+- `reset_password` (Boolean) Boolean, defaults to false. Send user password reset link.
+- `skip_confirmation` (Boolean) Boolean, defaults to true. Whether to skip confirmation.
+- `state` (String) String, defaults to 'active'. The state of the user account. Valid values are `active`, `deactivated`, `blocked`.
 
 ## Import
 

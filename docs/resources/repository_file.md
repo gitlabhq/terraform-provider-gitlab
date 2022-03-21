@@ -45,29 +45,29 @@ resource "gitlab_repository_file" "this" {
 
 ### Required
 
-- **branch** (String) Name of the branch to which to commit to.
-- **commit_message** (String) Commit message.
-- **content** (String) base64 encoded file content. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
-- **file_path** (String) The full path of the file. It must be relative to the root of the project without a leading slash `/`.
-- **project** (String) The name or ID of the project.
+- `branch` (String) Name of the branch to which to commit to.
+- `commit_message` (String) Commit message.
+- `content` (String) base64 encoded file content. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
+- `file_path` (String) The full path of the file. It must be relative to the root of the project without a leading slash `/`.
+- `project` (String) The name or ID of the project.
 
 ### Optional
 
-- **author_email** (String) Email of the commit author.
-- **author_name** (String) Name of the commit author.
-- **id** (String) The ID of this resource.
-- **start_branch** (String) Name of the branch to start the new commit from.
+- `author_email` (String) Email of the commit author.
+- `author_name` (String) Name of the commit author.
+- `id` (String) The ID of this resource.
+- `start_branch` (String) Name of the branch to start the new commit from.
 
 ### Read-Only
 
-- **blob_id** (String) The blob id.
-- **commit_id** (String) The commit id.
-- **content_sha256** (String) File content sha256 digest.
-- **encoding** (String) The file content encoding.
-- **file_name** (String) The filename.
-- **last_commit_id** (String) The last known commit id.
-- **ref** (String) The name of branch, tag or commit.
-- **size** (Number) The file size.
+- `blob_id` (String) The blob id.
+- `commit_id` (String) The commit id.
+- `content_sha256` (String) File content sha256 digest.
+- `encoding` (String) The file content encoding.
+- `file_name` (String) The filename.
+- `last_commit_id` (String) The last known commit id.
+- `ref` (String) The name of branch, tag or commit.
+- `size` (Number) The file size.
 
 ## Import
 

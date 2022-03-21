@@ -32,27 +32,27 @@ data "gitlab_group_membership" "example" {
 
 ### Optional
 
-- **access_level** (String) Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
-- **full_path** (String) The full path of the group.
-- **group_id** (Number) The ID of the group.
-- **id** (String) The ID of this resource.
+- `access_level` (String) Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
+- `full_path` (String) The full path of the group.
+- `group_id` (Number) The ID of the group.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **members** (List of Object) The list of group members. (see [below for nested schema](#nestedatt--members))
+- `members` (List of Object) The list of group members. (see [below for nested schema](#nestedatt--members))
 
 <a id="nestedatt--members"></a>
 ### Nested Schema for `members`
 
 Read-Only:
 
-- **access_level** (String)
-- **avatar_url** (String)
-- **expires_at** (String)
-- **id** (Number)
-- **name** (String)
-- **state** (String)
-- **username** (String)
-- **web_url** (String)
+- `access_level` (String)
+- `avatar_url` (String)
+- `expires_at` (String)
+- `id` (Number)
+- `name` (String)
+- `state` (String)
+- `username` (String)
+- `web_url` (String)
 
 

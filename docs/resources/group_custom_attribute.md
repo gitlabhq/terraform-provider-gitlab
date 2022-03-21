@@ -28,13 +28,13 @@ resource "gitlab_group_custom_attribute" "attr" {
 
 ### Required
 
-- **group** (Number) The id of the group.
-- **key** (String) Key for the Custom Attribute.
-- **value** (String) Value for the Custom Attribute.
+- `group` (Number) The id of the group.
+- `key` (String) Key for the Custom Attribute.
+- `value` (String) Value for the Custom Attribute.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

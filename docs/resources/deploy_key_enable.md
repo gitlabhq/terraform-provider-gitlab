@@ -45,15 +45,15 @@ resource "gitlab_deploy_key_enable" "foo" {
 
 ### Required
 
-- **key_id** (String) The Gitlab key id for the pre-existing deploy key
-- **project** (String) The name or id of the project to add the deploy key to.
+- `key_id` (String) The Gitlab key id for the pre-existing deploy key
+- `project` (String) The name or id of the project to add the deploy key to.
 
 ### Optional
 
-- **can_push** (Boolean) Can deploy key push to the project’s repository.
-- **id** (String) The ID of this resource.
-- **key** (String) Deploy key.
-- **title** (String) Deploy key's title.
+- `can_push` (Boolean) Can deploy key push to the project’s repository.
+- `id` (String) The ID of this resource.
+- `key` (String) Deploy key.
+- `title` (String) Deploy key's title.
 
 ## Import
 

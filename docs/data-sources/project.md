@@ -30,74 +30,74 @@ data "gitlab_project" "example" {
 
 ### Optional
 
-- **id** (String) The integer or path with namespace that uniquely identifies the project within the gitlab install.
-- **path_with_namespace** (String) The path of the repository with namespace.
-- **public_builds** (Boolean) If true, jobs can be viewed by non-project members.
+- `id` (String) The integer or path with namespace that uniquely identifies the project within the gitlab install.
+- `path_with_namespace` (String) The path of the repository with namespace.
+- `public_builds` (Boolean) If true, jobs can be viewed by non-project members.
 
 ### Read-Only
 
-- **analytics_access_level** (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
-- **archived** (Boolean) Whether the project is in read-only mode (archived).
-- **auto_cancel_pending_pipelines** (String) Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
-- **auto_devops_deploy_strategy** (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
-- **auto_devops_enabled** (Boolean) Enable Auto DevOps for this project.
-- **autoclose_referenced_issues** (Boolean) Set whether auto-closing referenced issues on default branch.
-- **build_git_strategy** (String) The Git strategy. Defaults to fetch.
-- **build_timeout** (Number) The maximum amount of time, in seconds, that a job can run.
-- **builds_access_level** (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
-- **container_expiration_policy** (List of Object) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))
-- **container_registry_access_level** (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
-- **default_branch** (String) The default branch for the project.
-- **description** (String) A description of the project.
-- **emails_disabled** (Boolean) Disable email notifications.
-- **external_authorization_classification_label** (String) The classification label for the project.
-- **forking_access_level** (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
-- **http_url_to_repo** (String) URL that can be provided to `git clone` to clone the
-- **issues_access_level** (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
-- **issues_enabled** (Boolean) Enable issue tracking for the project.
-- **lfs_enabled** (Boolean) Enable LFS for the project.
-- **merge_commit_template** (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
-- **merge_pipelines_enabled** (Boolean) Enable or disable merge pipelines.
-- **merge_requests_access_level** (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
-- **merge_requests_enabled** (Boolean) Enable merge requests for the project.
-- **merge_trains_enabled** (Boolean) Enable or disable merge trains.
-- **name** (String) The name of the project.
-- **namespace_id** (Number) The namespace (group or user) of the project. Defaults to your user.
-- **operations_access_level** (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
-- **path** (String) The path of the repository.
-- **pipelines_enabled** (Boolean) Enable pipelines for the project.
-- **printing_merge_request_link_enabled** (Boolean) Show link to create/view merge request when pushing from the command line
-- **push_rules** (List of Object) Push rules for the project. (see [below for nested schema](#nestedatt--push_rules))
-- **remove_source_branch_after_merge** (Boolean) Enable `Delete source branch` option by default for all new merge requests
-- **repository_access_level** (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
-- **repository_storage** (String) Which storage shard the repository is on. (administrator only)
-- **request_access_enabled** (Boolean) Allow users to request member access.
-- **requirements_access_level** (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
-- **resolve_outdated_diff_discussions** (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
-- **runners_token** (String) Registration token to use during runner setup.
-- **security_and_compliance_access_level** (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
-- **snippets_access_level** (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
-- **snippets_enabled** (Boolean) Enable snippets for the project.
-- **squash_commit_template** (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
-- **ssh_url_to_repo** (String) URL that can be provided to `git clone` to clone the
-- **topics** (Set of String) The list of topics for the project.
-- **visibility_level** (String) Repositories are created as private by default.
-- **web_url** (String) URL that can be used to find the project in a browser.
-- **wiki_access_level** (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
-- **wiki_enabled** (Boolean) Enable wiki for the project.
+- `analytics_access_level` (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
+- `archived` (Boolean) Whether the project is in read-only mode (archived).
+- `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+- `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
+- `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
+- `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
+- `build_git_strategy` (String) The Git strategy. Defaults to fetch.
+- `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
+- `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
+- `container_expiration_policy` (List of Object) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))
+- `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
+- `default_branch` (String) The default branch for the project.
+- `description` (String) A description of the project.
+- `emails_disabled` (Boolean) Disable email notifications.
+- `external_authorization_classification_label` (String) The classification label for the project.
+- `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
+- `http_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
+- `issues_enabled` (Boolean) Enable issue tracking for the project.
+- `lfs_enabled` (Boolean) Enable LFS for the project.
+- `merge_commit_template` (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
+- `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
+- `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
+- `merge_requests_enabled` (Boolean) Enable merge requests for the project.
+- `merge_trains_enabled` (Boolean) Enable or disable merge trains.
+- `name` (String) The name of the project.
+- `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
+- `operations_access_level` (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
+- `path` (String) The path of the repository.
+- `pipelines_enabled` (Boolean) Enable pipelines for the project.
+- `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
+- `push_rules` (List of Object) Push rules for the project. (see [below for nested schema](#nestedatt--push_rules))
+- `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests
+- `repository_access_level` (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
+- `repository_storage` (String) Which storage shard the repository is on. (administrator only)
+- `request_access_enabled` (Boolean) Allow users to request member access.
+- `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
+- `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+- `runners_token` (String) Registration token to use during runner setup.
+- `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+- `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
+- `snippets_enabled` (Boolean) Enable snippets for the project.
+- `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
+- `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `topics` (Set of String) The list of topics for the project.
+- `visibility_level` (String) Repositories are created as private by default.
+- `web_url` (String) URL that can be used to find the project in a browser.
+- `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
+- `wiki_enabled` (Boolean) Enable wiki for the project.
 
 <a id="nestedatt--container_expiration_policy"></a>
 ### Nested Schema for `container_expiration_policy`
 
 Read-Only:
 
-- **cadence** (String)
-- **enabled** (Boolean)
-- **keep_n** (Number)
-- **name_regex_delete** (String)
-- **name_regex_keep** (String)
-- **next_run_at** (String)
-- **older_than** (String)
+- `cadence` (String)
+- `enabled` (Boolean)
+- `keep_n` (Number)
+- `name_regex_delete` (String)
+- `name_regex_keep` (String)
+- `next_run_at` (String)
+- `older_than` (String)
 
 
 <a id="nestedatt--push_rules"></a>
@@ -105,16 +105,16 @@ Read-Only:
 
 Read-Only:
 
-- **author_email_regex** (String)
-- **branch_name_regex** (String)
-- **commit_committer_check** (Boolean)
-- **commit_message_negative_regex** (String)
-- **commit_message_regex** (String)
-- **deny_delete_tag** (Boolean)
-- **file_name_regex** (String)
-- **max_file_size** (Number)
-- **member_check** (Boolean)
-- **prevent_secrets** (Boolean)
-- **reject_unsigned_commits** (Boolean)
+- `author_email_regex` (String)
+- `branch_name_regex` (String)
+- `commit_committer_check` (Boolean)
+- `commit_message_negative_regex` (String)
+- `commit_message_regex` (String)
+- `deny_delete_tag` (Boolean)
+- `file_name_regex` (String)
+- `max_file_size` (Number)
+- `member_check` (Boolean)
+- `prevent_secrets` (Boolean)
+- `reject_unsigned_commits` (Boolean)
 
 

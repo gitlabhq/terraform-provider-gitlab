@@ -32,19 +32,19 @@ resource "gitlab_project_mirror" "foo" {
 
 ### Required
 
-- **project** (String) The id of the project.
-- **url** (String, Sensitive) The URL of the remote repository to be mirrored.
+- `project` (String) The id of the project.
+- `url` (String, Sensitive) The URL of the remote repository to be mirrored.
 
 ### Optional
 
-- **enabled** (Boolean) Determines if the mirror is enabled.
-- **id** (String) The ID of this resource.
-- **keep_divergent_refs** (Boolean) Determines if divergent refs are skipped.
-- **only_protected_branches** (Boolean) Determines if only protected branches are mirrored.
+- `enabled` (Boolean) Determines if the mirror is enabled.
+- `id` (String) The ID of this resource.
+- `keep_divergent_refs` (Boolean) Determines if divergent refs are skipped.
+- `only_protected_branches` (Boolean) Determines if only protected branches are mirrored.
 
 ### Read-Only
 
-- **mirror_id** (Number) Mirror ID.
+- `mirror_id` (Number) Mirror ID.
 
 ## Import
 

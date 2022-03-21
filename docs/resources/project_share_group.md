@@ -28,14 +28,14 @@ resource "gitlab_project_share_group" "test" {
 
 ### Required
 
-- **group_id** (Number) The id of the group.
-- **project_id** (String) The id of the project.
+- `group_id` (Number) The id of the group.
+- `project_id` (String) The id of the project.
 
 ### Optional
 
-- **access_level** (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
-- **group_access** (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
-- **id** (String) The ID of this resource.
+- `access_level` (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- `id` (String) The ID of this resource.
 
 ## Import
 

@@ -32,18 +32,18 @@ resource "gitlab_group_badge" "example" {
 
 ### Required
 
-- **group** (String) The id of the group to add the badge to.
-- **image_url** (String) The image url which will be presented on group overview.
-- **link_url** (String) The url linked with the badge.
+- `group` (String) The id of the group to add the badge to.
+- `image_url` (String) The image url which will be presented on group overview.
+- `link_url` (String) The url linked with the badge.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **rendered_image_url** (String) The image_url argument rendered (in case of use of placeholders).
-- **rendered_link_url** (String) The link_url argument rendered (in case of use of placeholders).
+- `rendered_image_url` (String) The image_url argument rendered (in case of use of placeholders).
+- `rendered_link_url` (String) The link_url argument rendered (in case of use of placeholders).
 
 ## Import
 

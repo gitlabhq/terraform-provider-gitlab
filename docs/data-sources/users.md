@@ -38,51 +38,51 @@ data "gitlab_users" "example-two" {
 
 ### Optional
 
-- **active** (Boolean) Filter users that are active.
-- **blocked** (Boolean) Filter users that are blocked.
-- **created_after** (String) Search for users created after a specific date. (Requires administrator privileges)
-- **created_before** (String) Search for users created before a specific date. (Requires administrator privileges)
-- **extern_provider** (String) Lookup users by external provider. (Requires administrator privileges)
-- **extern_uid** (String) Lookup users by external UID. (Requires administrator privileges)
-- **id** (String) The ID of this resource.
-- **order_by** (String) Order the users' list by `id`, `name`, `username`, `created_at` or `updated_at`. (Requires administrator privileges)
-- **search** (String) Search users by username, name or email.
-- **sort** (String) Sort users' list in asc or desc order. (Requires administrator privileges)
+- `active` (Boolean) Filter users that are active.
+- `blocked` (Boolean) Filter users that are blocked.
+- `created_after` (String) Search for users created after a specific date. (Requires administrator privileges)
+- `created_before` (String) Search for users created before a specific date. (Requires administrator privileges)
+- `extern_provider` (String) Lookup users by external provider. (Requires administrator privileges)
+- `extern_uid` (String) Lookup users by external UID. (Requires administrator privileges)
+- `id` (String) The ID of this resource.
+- `order_by` (String) Order the users' list by `id`, `name`, `username`, `created_at` or `updated_at`. (Requires administrator privileges)
+- `search` (String) Search users by username, name or email.
+- `sort` (String) Sort users' list in asc or desc order. (Requires administrator privileges)
 
 ### Read-Only
 
-- **users** (List of Object) The list of users. (see [below for nested schema](#nestedatt--users))
+- `users` (List of Object) The list of users. (see [below for nested schema](#nestedatt--users))
 
 <a id="nestedatt--users"></a>
 ### Nested Schema for `users`
 
 Read-Only:
 
-- **avatar_url** (String)
-- **bio** (String)
-- **can_create_group** (Boolean)
-- **can_create_project** (Boolean)
-- **color_scheme_id** (Number)
-- **created_at** (String)
-- **current_sign_in_at** (String)
-- **email** (String)
-- **extern_uid** (String)
-- **external** (Boolean)
-- **id** (Number)
-- **is_admin** (Boolean)
-- **last_sign_in_at** (String)
-- **linkedin** (String)
-- **location** (String)
-- **name** (String)
-- **organization** (String)
-- **projects_limit** (Number)
-- **provider** (String)
-- **skype** (String)
-- **state** (String)
-- **theme_id** (Number)
-- **twitter** (String)
-- **two_factor_enabled** (Boolean)
-- **username** (String)
-- **website_url** (String)
+- `avatar_url` (String)
+- `bio` (String)
+- `can_create_group` (Boolean)
+- `can_create_project` (Boolean)
+- `color_scheme_id` (Number)
+- `created_at` (String)
+- `current_sign_in_at` (String)
+- `email` (String)
+- `extern_uid` (String)
+- `external` (Boolean)
+- `id` (Number)
+- `is_admin` (Boolean)
+- `last_sign_in_at` (String)
+- `linkedin` (String)
+- `location` (String)
+- `name` (String)
+- `organization` (String)
+- `projects_limit` (Number)
+- `provider` (String)
+- `skype` (String)
+- `state` (String)
+- `theme_id` (Number)
+- `twitter` (String)
+- `two_factor_enabled` (Boolean)
+- `username` (String)
+- `website_url` (String)
 
 
