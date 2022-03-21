@@ -37,7 +37,7 @@ jobs:
           go-version: ${{ needs.go-version.outputs.go-version }}
       - uses: actions/checkout@v3
       # Cache the Go modules.
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
           key: ${{ github.job }}-${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum', 'GNUMakefile') }}
