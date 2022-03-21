@@ -29,14 +29,14 @@ resource "gitlab_project_freeze_period" "schedule" {
 
 ### Required
 
-- **freeze_end** (String) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
-- **freeze_start** (String) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
-- **project_id** (String) The id of the project to add the schedule to.
+- `freeze_end` (String) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
+- `freeze_start` (String) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
+- `project_id` (String) The id of the project to add the schedule to.
 
 ### Optional
 
-- **cron_timezone** (String) The timezone.
-- **id** (String) The ID of this resource.
+- `cron_timezone` (String) The timezone.
+- `id` (String) The ID of this resource.
 
 ## Import
 

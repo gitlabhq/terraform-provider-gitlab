@@ -46,20 +46,20 @@ resource "gitlab_deploy_token" "example" {
 
 ### Required
 
-- **name** (String) A name to describe the deploy token with.
-- **scopes** (Set of String) Valid values: `read_repository`, `read_registry`, `read_package_registry`, `write_registry`, `write_package_registry`.
+- `name` (String) A name to describe the deploy token with.
+- `scopes` (Set of String) Valid values: `read_repository`, `read_registry`, `read_package_registry`, `write_registry`, `write_package_registry`.
 
 ### Optional
 
-- **expires_at** (String) Time the token will expire it, RFC3339 format. Will not expire per default.
-- **group** (String) The name or id of the group to add the deploy token to.
-- **id** (String) The ID of this resource.
-- **project** (String) The name or id of the project to add the deploy token to.
-- **username** (String) A username for the deploy token. Default is `gitlab+deploy-token-{n}`.
+- `expires_at` (String) Time the token will expire it, RFC3339 format. Will not expire per default.
+- `group` (String) The name or id of the group to add the deploy token to.
+- `id` (String) The ID of this resource.
+- `project` (String) The name or id of the project to add the deploy token to.
+- `username` (String) A username for the deploy token. Default is `gitlab+deploy-token-{n}`.
 
 ### Read-Only
 
-- **token** (String, Sensitive) The secret token. This is only populated when creating a new deploy token. **Note**: The token is not available for imported resources.
+- `token` (String, Sensitive) The secret token. This is only populated when creating a new deploy token. **Note**: The token is not available for imported resources.
 
 ## Import
 

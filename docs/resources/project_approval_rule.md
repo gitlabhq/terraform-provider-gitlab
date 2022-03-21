@@ -72,17 +72,17 @@ resource "gitlab_branch_protection" "any-approver" {
 
 ### Required
 
-- **approvals_required** (Number) The number of approvals required for this rule.
-- **name** (String) The name of the approval rule.
-- **project** (String) The name or id of the project to add the approval rules.
+- `approvals_required` (Number) The number of approvals required for this rule.
+- `name` (String) The name of the approval rule.
+- `project` (String) The name or id of the project to add the approval rules.
 
 ### Optional
 
-- **group_ids** (Set of Number) A list of group IDs whose members can approve of the merge request.
-- **id** (String) The ID of this resource.
-- **protected_branch_ids** (Set of Number) A list of protected branch IDs (not branch names) for which the rule applies.
-- **rule_type** (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`.
-- **user_ids** (Set of Number) A list of specific User IDs to add to the list of approvers.
+- `group_ids` (Set of Number) A list of group IDs whose members can approve of the merge request.
+- `id` (String) The ID of this resource.
+- `protected_branch_ids` (Set of Number) A list of protected branch IDs (not branch names) for which the rule applies.
+- `rule_type` (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`.
+- `user_ids` (Set of Number) A list of specific User IDs to add to the list of approvers.
 
 ## Import
 

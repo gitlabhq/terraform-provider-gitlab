@@ -37,13 +37,13 @@ resource "gitlab_project_membership" "example" {
 
 ### Required
 
-- **access_level** (String) The access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
-- **project_id** (String) The id of the project.
-- **user_id** (Number) The id of the user.
+- `access_level` (String) The access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- `project_id` (String) The id of the project.
+- `user_id` (Number) The id of the user.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

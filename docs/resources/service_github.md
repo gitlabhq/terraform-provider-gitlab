@@ -37,21 +37,21 @@ resource "gitlab_service_github" "github" {
 
 ### Required
 
-- **project** (String) ID of the project you want to activate integration on.
-- **repository_url** (String) The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.
-- **token** (String, Sensitive) A GitHub personal access token with at least `repo:status` scope.
+- `project` (String) ID of the project you want to activate integration on.
+- `repository_url` (String) The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.
+- `token` (String, Sensitive) A GitHub personal access token with at least `repo:status` scope.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **static_context** (Boolean) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
+- `id` (String) The ID of this resource.
+- `static_context` (Boolean) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
 
 ### Read-Only
 
-- **active** (Boolean) Whether the integration is active.
-- **created_at** (String) Create time.
-- **title** (String) Title.
-- **updated_at** (String) Update time.
+- `active` (Boolean) Whether the integration is active.
+- `created_at` (String) Create time.
+- `title` (String) Title.
+- `updated_at` (String) Update time.
 
 ## Import
 

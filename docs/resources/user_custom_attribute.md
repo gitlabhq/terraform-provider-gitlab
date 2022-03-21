@@ -28,13 +28,13 @@ resource "gitlab_user_custom_attribute" "attr" {
 
 ### Required
 
-- **key** (String) Key for the Custom Attribute.
-- **user** (Number) The id of the user.
-- **value** (String) Value for the Custom Attribute.
+- `key` (String) Key for the Custom Attribute.
+- `user` (Number) The id of the user.
+- `value` (String) Value for the Custom Attribute.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

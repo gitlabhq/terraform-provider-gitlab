@@ -44,107 +44,107 @@ resource "gitlab_project" "example-two" {
 
 ### Required
 
-- **name** (String) The name of the project.
+- `name` (String) The name of the project.
 
 ### Optional
 
-- **allow_merge_on_skipped_pipeline** (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
-- **analytics_access_level** (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
-- **approvals_before_merge** (Number) Number of merge request approvals required for merging. Default is 0.
-- **archive_on_destroy** (Boolean) Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
-- **archived** (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
-- **auto_cancel_pending_pipelines** (String) Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
-- **auto_devops_deploy_strategy** (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
-- **auto_devops_enabled** (Boolean) Enable Auto DevOps for this project.
-- **autoclose_referenced_issues** (Boolean) Set whether auto-closing referenced issues on default branch.
-- **build_coverage_regex** (String) Test coverage parsing for the project.
-- **build_git_strategy** (String) The Git strategy. Defaults to fetch.
-- **build_timeout** (Number) The maximum amount of time, in seconds, that a job can run.
-- **builds_access_level** (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
-- **ci_config_path** (String) Custom Path to CI config file.
-- **ci_forward_deployment_enabled** (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
-- **container_expiration_policy** (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
-- **container_registry_access_level** (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
-- **container_registry_enabled** (Boolean) Enable container registry for the project.
-- **default_branch** (String) The default branch for the project.
-- **description** (String) A description of the project.
-- **emails_disabled** (Boolean) Disable email notifications.
-- **external_authorization_classification_label** (String) The classification label for the project.
-- **forking_access_level** (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
-- **group_with_project_templates_id** (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
-- **id** (String) The ID of this resource.
-- **import_url** (String) Git URL to a repository to be imported.
-- **initialize_with_readme** (Boolean) Create main branch with first commit containing a README.md file.
-- **issues_access_level** (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
-- **issues_enabled** (Boolean) Enable issue tracking for the project.
-- **issues_template** (String) Sets the template for new issues in the project.
-- **lfs_enabled** (Boolean) Enable LFS for the project.
-- **merge_commit_template** (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
-- **merge_method** (String) Set to `ff` to create fast-forward merges
-- **merge_pipelines_enabled** (Boolean) Enable or disable merge pipelines.
-- **merge_requests_access_level** (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
-- **merge_requests_enabled** (Boolean) Enable merge requests for the project.
-- **merge_requests_template** (String) Sets the template for new merge requests in the project.
-- **merge_trains_enabled** (Boolean) Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
-- **mirror** (Boolean) Enable project pull mirror.
-- **mirror_overwrites_diverged_branches** (Boolean) Enable overwrite diverged branches for a mirrored project.
-- **mirror_trigger_builds** (Boolean) Enable trigger builds on pushes for a mirrored project.
-- **namespace_id** (Number) The namespace (group or user) of the project. Defaults to your user.
-- **only_allow_merge_if_all_discussions_are_resolved** (Boolean) Set to true if you want allow merges only if all discussions are resolved.
-- **only_allow_merge_if_pipeline_succeeds** (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
-- **only_mirror_protected_branches** (Boolean) Enable only mirror protected branches for a mirrored project.
-- **operations_access_level** (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
-- **packages_enabled** (Boolean) Enable packages repository for the project.
-- **pages_access_level** (String) Enable pages access control
-- **path** (String) The path of the repository.
-- **pipelines_enabled** (Boolean) Enable pipelines for the project.
-- **printing_merge_request_link_enabled** (Boolean) Show link to create/view merge request when pushing from the command line
-- **public_builds** (Boolean) If true, jobs can be viewed by non-project members.
-- **push_rules** (Block List, Max: 1) Push rules for the project. (see [below for nested schema](#nestedblock--push_rules))
-- **remove_source_branch_after_merge** (Boolean) Enable `Delete source branch` option by default for all new merge requests.
-- **repository_access_level** (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
-- **repository_storage** (String) Which storage shard the repository is on. (administrator only)
-- **request_access_enabled** (Boolean) Allow users to request member access.
-- **requirements_access_level** (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
-- **resolve_outdated_diff_discussions** (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
-- **security_and_compliance_access_level** (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
-- **shared_runners_enabled** (Boolean) Enable shared runners for this project.
-- **snippets_access_level** (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
-- **snippets_enabled** (Boolean) Enable snippets for the project.
-- **squash_commit_template** (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
-- **squash_option** (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]
-- **tags** (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
-- **template_name** (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
-- **template_project_id** (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`.
-- **topics** (Set of String) The list of topics for the project.
-- **use_custom_template** (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
-- **visibility_level** (String) Set to `public` to create a public project.
-- **wiki_access_level** (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
-- **wiki_enabled** (Boolean) Enable wiki for the project.
+- `allow_merge_on_skipped_pipeline` (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
+- `analytics_access_level` (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
+- `approvals_before_merge` (Number) Number of merge request approvals required for merging. Default is 0.
+- `archive_on_destroy` (Boolean) Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
+- `archived` (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
+- `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+- `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
+- `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
+- `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
+- `build_coverage_regex` (String) Test coverage parsing for the project.
+- `build_git_strategy` (String) The Git strategy. Defaults to fetch.
+- `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
+- `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
+- `ci_config_path` (String) Custom Path to CI config file.
+- `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+- `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
+- `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
+- `container_registry_enabled` (Boolean) Enable container registry for the project.
+- `default_branch` (String) The default branch for the project.
+- `description` (String) A description of the project.
+- `emails_disabled` (Boolean) Disable email notifications.
+- `external_authorization_classification_label` (String) The classification label for the project.
+- `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
+- `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
+- `id` (String) The ID of this resource.
+- `import_url` (String) Git URL to a repository to be imported.
+- `initialize_with_readme` (Boolean) Create main branch with first commit containing a README.md file.
+- `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
+- `issues_enabled` (Boolean) Enable issue tracking for the project.
+- `issues_template` (String) Sets the template for new issues in the project.
+- `lfs_enabled` (Boolean) Enable LFS for the project.
+- `merge_commit_template` (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
+- `merge_method` (String) Set to `ff` to create fast-forward merges
+- `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
+- `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
+- `merge_requests_enabled` (Boolean) Enable merge requests for the project.
+- `merge_requests_template` (String) Sets the template for new merge requests in the project.
+- `merge_trains_enabled` (Boolean) Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
+- `mirror` (Boolean) Enable project pull mirror.
+- `mirror_overwrites_diverged_branches` (Boolean) Enable overwrite diverged branches for a mirrored project.
+- `mirror_trigger_builds` (Boolean) Enable trigger builds on pushes for a mirrored project.
+- `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
+- `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Set to true if you want allow merges only if all discussions are resolved.
+- `only_allow_merge_if_pipeline_succeeds` (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
+- `only_mirror_protected_branches` (Boolean) Enable only mirror protected branches for a mirrored project.
+- `operations_access_level` (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
+- `packages_enabled` (Boolean) Enable packages repository for the project.
+- `pages_access_level` (String) Enable pages access control
+- `path` (String) The path of the repository.
+- `pipelines_enabled` (Boolean) Enable pipelines for the project.
+- `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
+- `public_builds` (Boolean) If true, jobs can be viewed by non-project members.
+- `push_rules` (Block List, Max: 1) Push rules for the project. (see [below for nested schema](#nestedblock--push_rules))
+- `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests.
+- `repository_access_level` (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
+- `repository_storage` (String) Which storage shard the repository is on. (administrator only)
+- `request_access_enabled` (Boolean) Allow users to request member access.
+- `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
+- `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+- `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+- `shared_runners_enabled` (Boolean) Enable shared runners for this project.
+- `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
+- `snippets_enabled` (Boolean) Enable snippets for the project.
+- `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
+- `squash_option` (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]
+- `tags` (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
+- `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
+- `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`.
+- `topics` (Set of String) The list of topics for the project.
+- `use_custom_template` (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+- `visibility_level` (String) Set to `public` to create a public project.
+- `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
+- `wiki_enabled` (Boolean) Enable wiki for the project.
 
 ### Read-Only
 
-- **http_url_to_repo** (String) URL that can be provided to `git clone` to clone the
-- **path_with_namespace** (String) The path of the repository with namespace.
-- **runners_token** (String, Sensitive) Registration token to use during runner setup.
-- **ssh_url_to_repo** (String) URL that can be provided to `git clone` to clone the
-- **web_url** (String) URL that can be used to find the project in a browser.
+- `http_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `path_with_namespace` (String) The path of the repository with namespace.
+- `runners_token` (String, Sensitive) Registration token to use during runner setup.
+- `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `web_url` (String) URL that can be used to find the project in a browser.
 
 <a id="nestedblock--container_expiration_policy"></a>
 ### Nested Schema for `container_expiration_policy`
 
 Optional:
 
-- **cadence** (String) The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
-- **enabled** (Boolean) If true, the policy is enabled.
-- **keep_n** (Number) The number of images to keep.
-- **name_regex_delete** (String) The regular expression to match image names to delete. **Note**: the upstream API has some inconsistencies with the `name_regex` field here. It's basically unusable at the moment.
-- **name_regex_keep** (String) The regular expression to match image names to keep.
-- **older_than** (String) The number of days to keep images.
+- `cadence` (String) The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
+- `enabled` (Boolean) If true, the policy is enabled.
+- `keep_n` (Number) The number of images to keep.
+- `name_regex_delete` (String) The regular expression to match image names to delete. **Note**: the upstream API has some inconsistencies with the `name_regex` field here. It's basically unusable at the moment.
+- `name_regex_keep` (String) The regular expression to match image names to keep.
+- `older_than` (String) The number of days to keep images.
 
 Read-Only:
 
-- **next_run_at** (String) The next time the policy will run.
+- `next_run_at` (String) The next time the policy will run.
 
 
 <a id="nestedblock--push_rules"></a>
@@ -152,17 +152,17 @@ Read-Only:
 
 Optional:
 
-- **author_email_regex** (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
-- **branch_name_regex** (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
-- **commit_committer_check** (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
-- **commit_message_negative_regex** (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
-- **commit_message_regex** (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
-- **deny_delete_tag** (Boolean) Deny deleting a tag.
-- **file_name_regex** (String) All commited filenames must not match this regex, e.g. `(jar|exe)$`.
-- **max_file_size** (Number) Maximum file size (MB).
-- **member_check** (Boolean) Restrict commits by author (email) to existing GitLab users.
-- **prevent_secrets** (Boolean) GitLab will reject any files that are likely to contain secrets.
-- **reject_unsigned_commits** (Boolean) Reject commit when it’s not signed through GPG.
+- `author_email_regex` (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
+- `branch_name_regex` (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+- `commit_committer_check` (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
+- `commit_message_negative_regex` (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+- `commit_message_regex` (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+- `deny_delete_tag` (Boolean) Deny deleting a tag.
+- `file_name_regex` (String) All commited filenames must not match this regex, e.g. `(jar|exe)$`.
+- `max_file_size` (Number) Maximum file size (MB).
+- `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
+- `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
+- `reject_unsigned_commits` (Boolean) Reject commit when it’s not signed through GPG.
 
 ## Import
 

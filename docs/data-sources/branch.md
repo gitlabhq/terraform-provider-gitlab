@@ -34,39 +34,39 @@ data "gitlab_branch" "foo" {
 
 ### Required
 
-- **name** (String) The name of the branch.
-- **project** (String) The full path or id of the project.
+- `name` (String) The name of the branch.
+- `project` (String) The full path or id of the project.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **can_push** (Boolean) Bool, true if you can push to the branch.
-- **commit** (Set of Object) The commit associated with the branch ref. (see [below for nested schema](#nestedatt--commit))
-- **default** (Boolean) Bool, true if branch is the default branch for the project.
-- **developer_can_merge** (Boolean) Bool, true if developer level access allows to merge branch.
-- **developer_can_push** (Boolean) Bool, true if developer level access allows git push.
-- **merged** (Boolean) Bool, true if the branch has been merged into it's parent.
-- **protected** (Boolean) Bool, true if branch has branch protection.
-- **web_url** (String) The url of the created branch (https.)
+- `can_push` (Boolean) Bool, true if you can push to the branch.
+- `commit` (Set of Object) The commit associated with the branch ref. (see [below for nested schema](#nestedatt--commit))
+- `default` (Boolean) Bool, true if branch is the default branch for the project.
+- `developer_can_merge` (Boolean) Bool, true if developer level access allows to merge branch.
+- `developer_can_push` (Boolean) Bool, true if developer level access allows git push.
+- `merged` (Boolean) Bool, true if the branch has been merged into it's parent.
+- `protected` (Boolean) Bool, true if branch has branch protection.
+- `web_url` (String) The url of the created branch (https.)
 
 <a id="nestedatt--commit"></a>
 ### Nested Schema for `commit`
 
 Read-Only:
 
-- **author_email** (String)
-- **author_name** (String)
-- **authored_date** (String)
-- **committed_date** (String)
-- **committer_email** (String)
-- **committer_name** (String)
-- **id** (String)
-- **message** (String)
-- **parent_ids** (Set of String)
-- **short_id** (String)
-- **title** (String)
+- `author_email` (String)
+- `author_name` (String)
+- `authored_date` (String)
+- `committed_date` (String)
+- `committer_email` (String)
+- `committer_name` (String)
+- `id` (String)
+- `message` (String)
+- `parent_ids` (Set of String)
+- `short_id` (String)
+- `title` (String)
 
 

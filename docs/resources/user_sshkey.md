@@ -33,19 +33,19 @@ resource "gitlab_user_sshkey" "example" {
 
 ### Required
 
-- **key** (String) The ssh key. The SSH key `comment` (trailing part) is optional and ignored for diffing, because GitLab overrides it with the username and GitLab hostname.
-- **title** (String) The title of the ssh key.
-- **user_id** (Number) The ID of the user to add the ssh key to.
+- `key` (String) The ssh key. The SSH key `comment` (trailing part) is optional and ignored for diffing, because GitLab overrides it with the username and GitLab hostname.
+- `title` (String) The title of the ssh key.
+- `user_id` (Number) The ID of the user to add the ssh key to.
 
 ### Optional
 
-- **expires_at** (String) The expiration date of the SSH key in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)
-- **id** (String) The ID of this resource.
+- `expires_at` (String) The expiration date of the SSH key in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **created_at** (String) The time when this key was created in GitLab.
-- **key_id** (Number) The ID of the ssh key.
+- `created_at` (String) The time when this key was created in GitLab.
+- `key_id` (Number) The ID of the ssh key.
 
 ## Import
 

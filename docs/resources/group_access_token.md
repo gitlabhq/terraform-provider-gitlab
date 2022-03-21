@@ -40,23 +40,23 @@ resource "gitlab_group_variable" "example" {
 
 ### Required
 
-- **group** (String) The ID or path of the group to add the group access token to.
-- **name** (String) The name of the group access token.
-- **scopes** (Set of String) The scope for the group access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_api`, `read_registry`, `write_registry`, `read_repository`, `write_repository`.
+- `group` (String) The ID or path of the group to add the group access token to.
+- `name` (String) The name of the group access token.
+- `scopes` (Set of String) The scope for the group access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_api`, `read_registry`, `write_registry`, `read_repository`, `write_repository`.
 
 ### Optional
 
-- **access_level** (String) The access level for the group access token. Valid values are: `guest`, `reporter`, `developer`, `maintainer`.
-- **expires_at** (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.
-- **id** (String) The ID of this resource.
+- `access_level` (String) The access level for the group access token. Valid values are: `guest`, `reporter`, `developer`, `maintainer`.
+- `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **active** (Boolean) True if the token is active.
-- **created_at** (String) Time the token has been created, RFC3339 format.
-- **revoked** (Boolean) True if the token is revoked.
-- **token** (String, Sensitive) The group access token. This is only populated when creating a new group access token. This attribute is not available for imported resources.
-- **user_id** (Number) The user id associated to the token.
+- `active` (Boolean) True if the token is active.
+- `created_at` (String) Time the token has been created, RFC3339 format.
+- `revoked` (Boolean) True if the token is revoked.
+- `token` (String, Sensitive) The group access token. This is only populated when creating a new group access token. This attribute is not available for imported resources.
+- `user_id` (Number) The user id associated to the token.
 
 ## Import
 

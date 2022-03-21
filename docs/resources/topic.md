@@ -33,13 +33,13 @@ resource "gitlab_topic" "functional_programming" {
 
 ### Required
 
-- **name** (String) The topic's name
-- **soft_destroy** (Boolean) Empty the topics fields instead of deleting it
+- `name` (String) The topic's name
+- `soft_destroy` (Boolean) Empty the topics fields instead of deleting it
 
 ### Optional
 
-- **description** (String) A text describing the topic
-- **id** (String) The ID of this resource.
+- `description` (String) A text describing the topic
+- `id` (String) The ID of this resource.
 
 ## Import
 

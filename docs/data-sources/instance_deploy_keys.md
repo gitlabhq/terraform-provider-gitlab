@@ -32,36 +32,36 @@ data "gitlab_instance_deploy_keys" "example" {
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **public** (Boolean) Only return deploy keys that are public.
+- `id` (String) The ID of this resource.
+- `public` (Boolean) Only return deploy keys that are public.
 
 ### Read-Only
 
-- **deploy_keys** (List of Object) The list of all deploy keys across all projects of the GitLab instance. (see [below for nested schema](#nestedatt--deploy_keys))
+- `deploy_keys` (List of Object) The list of all deploy keys across all projects of the GitLab instance. (see [below for nested schema](#nestedatt--deploy_keys))
 
 <a id="nestedatt--deploy_keys"></a>
 ### Nested Schema for `deploy_keys`
 
 Read-Only:
 
-- **created_at** (String)
-- **fingerprint** (String)
-- **id** (Number)
-- **key** (String)
-- **projects_with_write_access** (List of Object) (see [below for nested schema](#nestedobjatt--deploy_keys--projects_with_write_access))
-- **title** (String)
+- `created_at` (String)
+- `fingerprint` (String)
+- `id` (Number)
+- `key` (String)
+- `projects_with_write_access` (List of Object) (see [below for nested schema](#nestedobjatt--deploy_keys--projects_with_write_access))
+- `title` (String)
 
 <a id="nestedobjatt--deploy_keys--projects_with_write_access"></a>
 ### Nested Schema for `deploy_keys.projects_with_write_access`
 
 Read-Only:
 
-- **created_at** (String)
-- **description** (String)
-- **id** (Number)
-- **name** (String)
-- **name_with_namespace** (String)
-- **path** (String)
-- **path_with_namespace** (String)
+- `created_at` (String)
+- `description` (String)
+- `id` (Number)
+- `name` (String)
+- `name_with_namespace` (String)
+- `path` (String)
+- `path_with_namespace` (String)
 
 
