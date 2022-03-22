@@ -4,7 +4,11 @@ page_title: "gitlab_repository_file Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_repository_file resource allows to manage the lifecycle of a file within a repository.
-  ~> Limitations: The GitLab Repository Files API https://docs.gitlab.com/ee/api/repository_files.html can only create, update or delete a single file at the time.  The API will also fail with a 400 https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with -parallelism=1 https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
+  -> Timeouts Default timeout for Create, Update and Delete is one minute and can be configured in the timeouts block.
+  -> Implementation Detail GitLab is unable to handle concurrent calls to the GitLab repository files API for the same project.
+     Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
+     execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
+     changed the repository at the same time.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/repository_files.html
 ---
 
@@ -12,7 +16,12 @@ description: |-
 
 The `gitlab_repository_file` resource allows to manage the lifecycle of a file within a repository.
 
-~> **Limitations**: The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html) can only create, update or delete a single file at the time.  The API will also [fail with a 400](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository) response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with [-parallelism=1](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n) and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
+-> **Timeouts** Default timeout for *Create*, *Update* and *Delete* is one minute and can be configured in the `timeouts` block.
+
+-> **Implementation Detail** GitLab is unable to handle concurrent calls to the GitLab repository files API for the same project.
+   Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
+   execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
+   changed the repository at the same time.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)
 
@@ -57,6 +66,7 @@ resource "gitlab_repository_file" "this" {
 - `author_name` (String) Name of the commit author.
 - `id` (String) The ID of this resource.
 - `start_branch` (String) Name of the branch to start the new commit from.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
@@ -68,6 +78,15 @@ resource "gitlab_repository_file" "this" {
 - `last_commit_id` (String) The last known commit id.
 - `ref` (String) The name of branch, tag or commit.
 - `size` (Number) The file size.
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
+- `update` (String)
 
 ## Import
 

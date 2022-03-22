@@ -3,22 +3,44 @@ package provider
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 const encoding = "base64"
 
+// NOTE: this lock is a bit of a hack to prevent parallel calls to the GitLab Repository Files API.
+//       If it is called concurrently, the API will return a 400 error along the lines of:
+//       ```
+//       (400 Bad Request) DELETE https://gitlab.com/api/v4/projects/30716/repository/files/somefile.yaml: 400
+//       {message: 9:Could not update refs/heads/master. Please refresh and try again..}
+//       ```
+//
+//       This lock only solves half of the problem, where the provider is responsible for
+//       the concurrency. The other half is if the API is called outside of terraform at the same time
+//       this resource makes calls to the API.
+//       To mitigate this, simple retries are used.
+var resourceGitlabRepositoryFileApiLock = newLock()
+
 var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_repository_file`" + ` resource allows to manage the lifecycle of a file within a repository.
 
-~> **Limitations**: The [GitLab Repository Files API](https://docs.gitlab.com/ee/api/repository_files.html) can only create, update or delete a single file at the time.  The API will also [fail with a 400](https://docs.gitlab.com/ee/api/repository_files.html#update-existing-file-in-repository) response status code if the underlying repository is changed while the API tries to make changes.  Therefore, it's recommended to make sure that you execute it with [-parallelism=1](https://www.terraform.io/docs/cli/commands/apply.html#parallelism-n) and that no other entity than the terraform at hand makes changes to the underlying repository while it's executing.
+-> **Timeouts** Default timeout for *Create*, *Update* and *Delete* is one minute and can be configured in the ` + "`timeouts`" + ` block.
+
+-> **Implementation Detail** GitLab is unable to handle concurrent calls to the GitLab repository files API for the same project.
+   Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
+   execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
+   changed the repository at the same time.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)`,
 
@@ -28,6 +50,11 @@ var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 		DeleteContext: resourceGitlabRepositoryFileDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
+		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(1 * time.Minute),
+			Update: schema.DefaultTimeout(1 * time.Minute),
+			Delete: schema.DefaultTimeout(1 * time.Minute),
 		},
 
 		// the schema matches https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
@@ -69,9 +96,17 @@ var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 })
 
 func resourceGitlabRepositoryFileCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
 	filePath := d.Get("file_path").(string)
+
+	log.Printf("[DEBUG] gitlab_repository_file: waiting for lock to create %s/%s", project, filePath)
+	if err := resourceGitlabRepositoryFileApiLock.lock(ctx); err != nil {
+		return diag.FromErr(err)
+	}
+	defer resourceGitlabRepositoryFileApiLock.unlock()
+	log.Printf("[DEBUG] gitlab_repository_file: got lock to create %s/%s", project, filePath)
+
+	client := meta.(*gitlab.Client)
 
 	options := &gitlab.CreateFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
@@ -85,12 +120,22 @@ func resourceGitlabRepositoryFileCreate(ctx context.Context, d *schema.ResourceD
 		options.StartBranch = gitlab.String(startBranch.(string))
 	}
 
-	repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, filePath, options, gitlab.WithContext(ctx))
+	err := resource.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, filePath, options, gitlab.WithContext(ctx))
+		if err != nil {
+			if isRefreshError(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+
+		d.SetId(resourceGitLabRepositoryFileBuildId(project, repositoryFile.Branch, repositoryFile.FilePath))
+		return nil
+	})
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.SetId(resourceGitLabRepositoryFileBuildId(project, repositoryFile.Branch, repositoryFile.FilePath))
 	return resourceGitlabRepositoryFileRead(ctx, d, meta)
 }
 
@@ -126,35 +171,54 @@ func resourceGitlabRepositoryFileRead(ctx context.Context, d *schema.ResourceDat
 }
 
 func resourceGitlabRepositoryFileUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
 	project, branch, filePath, err := resourceGitLabRepositoryFileParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
+	log.Printf("[DEBUG] gitlab_repository_file: waiting for lock to update %s/%s", project, filePath)
+	if err := resourceGitlabRepositoryFileApiLock.lock(ctx); err != nil {
+		return diag.FromErr(err)
+	}
+	defer resourceGitlabRepositoryFileApiLock.unlock()
+	log.Printf("[DEBUG] gitlab_repository_file: got lock to update %s/%s", project, filePath)
+
+	client := meta.(*gitlab.Client)
+
 	readOptions := &gitlab.GetFileOptions{
 		Ref: gitlab.String(branch),
 	}
 
-	existingRepositoryFile, _, err := client.RepositoryFiles.GetFile(project, filePath, readOptions, gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	options := &gitlab.UpdateFileOptions{
+	updateOptions := &gitlab.UpdateFileOptions{
 		Branch:        gitlab.String(branch),
 		Encoding:      gitlab.String(encoding),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
 		AuthorName:    gitlab.String(d.Get("author_name").(string)),
 		Content:       gitlab.String(d.Get("content").(string)),
 		CommitMessage: gitlab.String(d.Get("commit_message").(string)),
-		LastCommitID:  gitlab.String(existingRepositoryFile.LastCommitID),
 	}
 	if startBranch, ok := d.GetOk("start_branch"); ok {
-		options.StartBranch = gitlab.String(startBranch.(string))
+		updateOptions.StartBranch = gitlab.String(startBranch.(string))
 	}
 
-	_, _, err = client.RepositoryFiles.UpdateFile(project, filePath, options, gitlab.WithContext(ctx))
+	err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
+		// NOTE: we also re-read the file to obtain an eventually changed `LastCommitID` for which we needed the refresh
+		existingRepositoryFile, _, err := client.RepositoryFiles.GetFile(project, filePath, readOptions, gitlab.WithContext(ctx))
+		if err != nil {
+			return resource.NonRetryableError(err)
+		}
+
+		updateOptions.LastCommitID = gitlab.String(existingRepositoryFile.LastCommitID)
+		_, _, err = client.RepositoryFiles.UpdateFile(project, filePath, updateOptions, gitlab.WithContext(ctx))
+		if err != nil {
+			if isRefreshError(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+
+		return nil
+	})
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -163,32 +227,50 @@ func resourceGitlabRepositoryFileUpdate(ctx context.Context, d *schema.ResourceD
 }
 
 func resourceGitlabRepositoryFileDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
 	project, branch, filePath, err := resourceGitLabRepositoryFileParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
+	log.Printf("[DEBUG] gitlab_repository_file: waiting for lock to delete %s/%s", project, filePath)
+	if err := resourceGitlabRepositoryFileApiLock.lock(ctx); err != nil {
+		return diag.FromErr(err)
+	}
+	defer resourceGitlabRepositoryFileApiLock.unlock()
+	log.Printf("[DEBUG] gitlab_repository_file: got lock to delete %s/%s", project, filePath)
+
+	client := meta.(*gitlab.Client)
+
 	readOptions := &gitlab.GetFileOptions{
 		Ref: gitlab.String(branch),
 	}
-
-	existingRepositoryFile, _, err := client.RepositoryFiles.GetFile(project, filePath, readOptions, gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	options := &gitlab.DeleteFileOptions{
+	deleteOptions := &gitlab.DeleteFileOptions{
 		Branch:        gitlab.String(d.Get("branch").(string)),
 		AuthorEmail:   gitlab.String(d.Get("author_email").(string)),
 		AuthorName:    gitlab.String(d.Get("author_name").(string)),
 		CommitMessage: gitlab.String(fmt.Sprintf("[DELETE]: %s", d.Get("commit_message").(string))),
-		LastCommitID:  gitlab.String(existingRepositoryFile.LastCommitID),
 	}
 
-	resp, err := client.RepositoryFiles.DeleteFile(project, filePath, options)
+	err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
+		// NOTE: we also re-read the file to obtain an eventually changed `LastCommitID` for which we needed the refresh
+
+		existingRepositoryFile, _, err := client.RepositoryFiles.GetFile(project, filePath, readOptions, gitlab.WithContext(ctx))
+		if err != nil {
+			return resource.NonRetryableError(err)
+		}
+
+		deleteOptions.LastCommitID = gitlab.String(existingRepositoryFile.LastCommitID)
+		resp, err := client.RepositoryFiles.DeleteFile(project, filePath, deleteOptions)
+		if err != nil {
+			if isRefreshError(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(fmt.Errorf("%s failed to delete repository file: (%s) %v", d.Id(), resp.Status, err))
+		}
+		return nil
+	})
 	if err != nil {
-		return diag.Errorf("%s failed to delete repository file: (%s) %v", d.Id(), resp.Status, err)
+		return diag.FromErr(err)
 	}
 
 	return nil
@@ -213,4 +295,11 @@ func resourceGitLabRepositoryFileParseId(id string) (string, string, string, err
 
 func resourceGitLabRepositoryFileBuildId(project string, branch string, filePath string) string {
 	return fmt.Sprintf("%s:%s:%s", project, branch, filePath)
+}
+
+func isRefreshError(err error) bool {
+	var httpErr *gitlab.ErrorResponse
+	return errors.As(err, &httpErr) &&
+		httpErr.Response.StatusCode == http.StatusBadRequest &&
+		strings.Contains(httpErr.Message, "Please refresh and try again")
 }
