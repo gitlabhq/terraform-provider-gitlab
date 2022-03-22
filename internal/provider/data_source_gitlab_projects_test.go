@@ -35,7 +35,7 @@ func TestAccDataGitlabProjectsSearch(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"data.gitlab_projects.search",
 						"projects.0.permissions.0.project_access.access_level",
-						"40",
+						"50",
 					),
 					resource.TestCheckNoResourceAttr(
 						"data.gitlab_projects.search",
