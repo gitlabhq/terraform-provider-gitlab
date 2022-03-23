@@ -3,18 +3,18 @@
 page_title: "gitlab_group Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage GitLab groups.
-  Note your provider will need to be configured with admin-level access for this resource to work.
-  Upstream API: GitLab Groups API https://docs.gitlab.com/ee/api/groups.html
+  The gitlab_group resource allows to manage the lifecycle of a group.
+  -> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html
 ---
 
 # gitlab_group (Resource)
 
-This resource allows you to create and manage GitLab groups.
+The `gitlab_group` resource allows to manage the lifecycle of a group.
 
-Note your provider will need to be configured with admin-level access for this resource to work.
+-> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
 
-**Upstream API**: [GitLab Groups API](https://docs.gitlab.com/ee/api/groups.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html)
 
 ## Example Usage
 

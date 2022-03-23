@@ -17,9 +17,11 @@ import (
 
 var _ = registerResource("gitlab_group", func() *schema.Resource {
 	return &schema.Resource{
-		Description: "This resource allows you to create and manage GitLab groups.\n\n" +
-			"Note your provider will need to be configured with admin-level access for this resource to work.\n\n" +
-			"**Upstream API**: [GitLab Groups API](https://docs.gitlab.com/ee/api/groups.html)",
+		Description: `The ` + "`gitlab_group`" + ` resource allows to manage the lifecycle of a group.
+
+-> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html)`,
 
 		CreateContext: resourceGitlabGroupCreate,
 		ReadContext:   resourceGitlabGroupRead,
