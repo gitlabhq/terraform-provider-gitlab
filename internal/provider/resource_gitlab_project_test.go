@@ -867,6 +867,43 @@ resource "gitlab_project" "foo" {
 	})
 }
 
+func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
+	testAccCheck(t)
+
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	user := testAccCreateUsers(t, 1)[0]
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name              = "foo-%d"
+						description       = "Terraform acceptance tests"
+						visibility_level  = "public"
+
+						namespace_id = %d
+					}
+				`, rInt, user.NamespaceID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						if project.Namespace.ID != user.NamespaceID {
+							return fmt.Errorf("project was created in namespace %d but expected %d", project.Namespace.ID, user.NamespaceID)
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 type testAccGitlabProjectMirroredExpectedAttributes struct {
 	Mirror                           bool
 	MirrorTriggerBuilds              bool
