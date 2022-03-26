@@ -145,12 +145,13 @@ func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.Resourc
 
 	log.Printf("[DEBUG] read gitlab ProjectAccessToken %d, project ID %s", projectAccessTokenID, project)
 
-	projectAccessToken, err := resourceGitlabProjectAccessTokenFind(ctx, client, project, projectAccessTokenID)
-	if errors.Is(err, errResourceGitlabProjectAccessTokenNotFound) {
-		log.Printf("[DEBUG] failed to read gitlab ProjectAccessToken %d, project ID %s", projectAccessTokenID, project)
-		d.SetId("")
-	}
+	projectAccessToken, _, err := client.ProjectAccessTokens.GetProjectAccessToken(project, projectAccessTokenID, gitlab.WithContext(ctx))
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] GitLab ProjectAccessToken %d, project ID %s not found, removing from state", projectAccessTokenID, project)
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
@@ -164,8 +165,7 @@ func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.Resourc
 	d.Set("revoked", projectAccessToken.Revoked)
 	d.Set("user_id", projectAccessToken.UserID)
 	d.Set("access_level", accessLevelValueToName[projectAccessToken.AccessLevel])
-	err = d.Set("scopes", projectAccessToken.Scopes)
-	if err != nil {
+	if err = d.Set("scopes", projectAccessToken.Scopes); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -194,47 +194,15 @@ func resourceGitlabProjectAccessTokenDelete(ctx context.Context, d *schema.Resou
 	log.Printf("[DEBUG] Waiting for ProjectAccessToken %s to finish deleting", d.Id())
 
 	err = resource.RetryContext(ctx, 5*time.Minute, func() *resource.RetryError {
-		_, err := resourceGitlabProjectAccessTokenFind(ctx, client, project, projectAccessTokenID)
-		if errors.Is(err, errResourceGitlabProjectAccessTokenNotFound) {
-			return nil
-		}
+		_, _, err := client.ProjectAccessTokens.GetProjectAccessToken(project, projectAccessTokenID, gitlab.WithContext(ctx))
 		if err != nil {
+			if is404(err) {
+				return nil
+			}
 			return resource.NonRetryableError(err)
 		}
 		return resource.RetryableError(errors.New("project access token was not deleted"))
 	})
 
 	return diag.FromErr(err)
-}
-
-var errResourceGitlabProjectAccessTokenNotFound = errors.New("project access token not found")
-
-// resourceGitlabProjectAccessTokenFind finds the project access token with the specified tokenID.
-// It returns a errResourceGitlabProjectAccessTokenNotFound error if the token is not found.
-func resourceGitlabProjectAccessTokenFind(ctx context.Context, client *gitlab.Client, project interface{}, projectAccessTokenID int) (*gitlab.ProjectAccessToken, error) {
-	//there is a slight possibility to not find an existing item, for example
-	// 1. item is #101 (ie, in the 2nd page)
-	// 2. I load first page (ie. I don't find my target item)
-	// 3. A concurrent operation remove item 99 (ie, my target item shift to 1st page)
-	// 4. a concurrent operation add an item
-	// 5: I load 2nd page  (ie. I don't find my target item)
-	// 6. Total pages and total items properties are unchanged (from the perspective of the reader)
-
-	page := 1
-	for page != 0 {
-		projectAccessTokens, response, err := client.ProjectAccessTokens.ListProjectAccessTokens(project, &gitlab.ListProjectAccessTokensOptions{Page: page, PerPage: 100}, gitlab.WithContext(ctx))
-		if err != nil {
-			return nil, err
-		}
-
-		for _, projectAccessToken := range projectAccessTokens {
-			if projectAccessToken.ID == projectAccessTokenID {
-				return projectAccessToken, nil
-			}
-		}
-
-		page = response.NextPage
-	}
-
-	return nil, errResourceGitlabProjectAccessTokenNotFound
 }

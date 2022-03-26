@@ -166,50 +166,31 @@ func resourceGitlabGroupAccessTokenRead(ctx context.Context, d *schema.ResourceD
 	}
 
 	log.Printf("[DEBUG] read gitlab GroupAccessToken %d, group ID %s", groupAccessTokenId, group)
-
-	//there is a slight possibility to not find an existing item, for example
-	// 1. item is #101 (ie, in the 2nd page)
-	// 2. I load first page (ie. I don't find my target item)
-	// 3. A concurrent operation remove item 99 (ie, my target item shift to 1st page)
-	// 4. a concurrent operation add an item
-	// 5: I load 2nd page  (ie. I don't find my target item)
-	// 6. Total pages and total items properties are unchanged (from the perspective of the reader)
-
-	page := 1
-	for page != 0 {
-		groupAccessTokens, response, err := client.GroupAccessTokens.ListGroupAccessTokens(group, &gitlab.ListGroupAccessTokensOptions{Page: page, PerPage: 100}, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
+	groupAccessToken, _, err := client.GroupAccessTokens.GetGroupAccessToken(group, groupAccessTokenId, gitlab.WithContext(ctx))
+	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] GitLab GroupAccessToken %d, group ID %s not found, removing from state", groupAccessTokenId, group)
+			d.SetId("")
+			return nil
 		}
-
-		for _, groupAccessToken := range groupAccessTokens {
-			if groupAccessToken.ID == groupAccessTokenId {
-
-				d.Set("group", group)
-				d.Set("name", groupAccessToken.Name)
-				if groupAccessToken.ExpiresAt != nil {
-					d.Set("expires_at", groupAccessToken.ExpiresAt.String())
-				}
-				d.Set("active", groupAccessToken.Active)
-				d.Set("created_at", groupAccessToken.CreatedAt.Format(time.RFC3339))
-				d.Set("access_level", accessLevelValueToName[groupAccessToken.AccessLevel])
-				d.Set("revoked", groupAccessToken.Revoked)
-				d.Set("user_id", groupAccessToken.UserID)
-
-				err = d.Set("scopes", groupAccessToken.Scopes)
-				if err != nil {
-					return diag.FromErr(err)
-				}
-
-				return nil
-			}
-		}
-
-		page = response.NextPage
+		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] failed to read gitlab GroupAccessToken %d, group ID %s", groupAccessTokenId, group)
-	d.SetId("")
+	d.Set("group", group)
+	d.Set("name", groupAccessToken.Name)
+	if groupAccessToken.ExpiresAt != nil {
+		d.Set("expires_at", groupAccessToken.ExpiresAt.String())
+	}
+	d.Set("active", groupAccessToken.Active)
+	d.Set("created_at", groupAccessToken.CreatedAt.Format(time.RFC3339))
+	d.Set("access_level", accessLevelValueToName[groupAccessToken.AccessLevel])
+	d.Set("revoked", groupAccessToken.Revoked)
+	d.Set("user_id", groupAccessToken.UserID)
+
+	if err = d.Set("scopes", groupAccessToken.Scopes); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return nil
 }
 
