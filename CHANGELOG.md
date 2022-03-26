@@ -46,6 +46,7 @@ BUG FIXES:
 
 * resource/gitlab_deploy_token: Implement pagination when reading tokens to find all existing tokens ([#941](https://github.com/gitlabhq/terraform-provider-gitlab/pull/941))
 * resource/gitlab_project_approval_rule: Implement pagination when reading approval rules to find all existing ones ([#950](https://github.com/gitlabhq/terraform-provider-gitlab/pull/950))
+* resource/gitlab_repository_file: Implement locking and retry within the provider to mitigate parallelism limits ([#964](https://github.com/gitlabhq/terraform-provider-gitlab/pull/964))
 
 ## 3.12.0 (2022-03-08)
 
