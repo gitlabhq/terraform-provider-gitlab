@@ -6,6 +6,9 @@ description: |-
   The gitlab_project_mirror resource allows to manage the lifecycle of a project mirror.
   This is for pushing changes to a remote repository. Pull Mirroring can be configured using a combination of the
   importurl, mirror, and mirrortriggerbuilds properties on the gitlabproject resource.
+  -> Destroy Behavior GitLab 14.10 introduced an API endpoint to delete a project mirror.
+     Therefore, for GitLab 14.10 and newer the project mirror will be destroyed when the resource is destroyed.
+     For older versions, the mirror will be disabled and the resource will be destroyed.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/remote_mirrors.html
 ---
 
@@ -15,6 +18,10 @@ The `gitlab_project_mirror` resource allows to manage the lifecycle of a project
 
 This is for *pushing* changes to a remote repository. *Pull Mirroring* can be configured using a combination of the
 import_url, mirror, and mirror_trigger_builds properties on the gitlab_project resource.
+
+-> **Destroy Behavior** GitLab 14.10 introduced an API endpoint to delete a project mirror.
+   Therefore, for GitLab 14.10 and newer the project mirror will be destroyed when the resource is destroyed.
+   For older versions, the mirror will be disabled and the resource will be destroyed.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/remote_mirrors.html)
 
