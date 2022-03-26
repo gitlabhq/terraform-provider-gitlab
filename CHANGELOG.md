@@ -40,6 +40,7 @@ IMPROVEMENTS:
 * resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `squash_commit_template` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
 * resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `topics` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
 * resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `wiki_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_managed_license: Add support for "allowed" and "denied" to align with upcoming GitLab 15.0 deprecations ([#952](https://github.com/gitlabhq/terraform-provider-gitlab/pull/952))
 
 BUG FIXES:
 
