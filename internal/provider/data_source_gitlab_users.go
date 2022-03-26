@@ -212,6 +212,12 @@ var _ = registerDataSource("gitlab_users", func() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 						},
+						"namespace_id": {
+							Description: "The ID of the user's namespace. Requires admin token to access this field. Available since GitLab 14.10.",
+							Type:        schema.TypeInt,
+							Optional:    true,
+							Computed:    true,
+						},
 					},
 				},
 			},
@@ -274,6 +280,7 @@ func flattenGitlabUsers(users []*gitlab.User) []interface{} {
 			"organization":       user.Organization,
 			"theme_id":           user.ThemeID,
 			"color_scheme_id":    user.ColorSchemeID,
+			"namespace_id":       user.NamespaceID,
 		}
 
 		if user.CreatedAt != nil {
