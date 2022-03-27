@@ -48,6 +48,19 @@ func TestAccGitlabGroupAccessToken_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Update the Group Access Token Access Level to Owner
+			{
+				Config: testAccGitlabGroupAccessTokenUpdateAccessLevel(testGroup.ID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupAccessTokenExists("gitlab_group_access_token.this", &gat),
+					testAccCheckGitlabGroupAccessTokenAttributes(&gat, &testAccGitlabGroupAccessTokenExpectedAttributes{
+						name:        "my new group token",
+						scopes:      map[string]bool{"read_repository": false, "api": true, "write_repository": false, "read_api": false},
+						expiresAt:   "2099-05-01",
+						accessLevel: gitlab.AccessLevelValue(gitlab.OwnerPermissions),
+					}),
+				),
+			},
 			// Add a CICD variable with Group Access Token value
 			{
 				Config: testAccGitlabGroupAccessTokenUpdateConfigWithCICDvar(testGroup.ID),
@@ -224,6 +237,18 @@ resource "gitlab_group_access_token" "this" {
   group = %d
   expires_at = "2099-05-01"
   access_level = "maintainer"
+  scopes = ["api"]
+}
+	`, groupId)
+}
+
+func testAccGitlabGroupAccessTokenUpdateAccessLevel(groupId int) string {
+	return fmt.Sprintf(`
+resource "gitlab_group_access_token" "this" {
+  name = "my new group token"
+  group = %d
+  expires_at = "2099-05-01"
+  access_level = "owner"
   scopes = ["api"]
 }
 	`, groupId)

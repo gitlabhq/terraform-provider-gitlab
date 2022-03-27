@@ -17,7 +17,7 @@ var _ = registerDataSource("gitlab_project_tag", func() *schema.Resource {
 
 		ReadContext: dataSourceGitlabProjectTagRead,
 		Schema: constructSchema(
-			datasourceSchemaFromResourceSchema(gitlabProjectTagGetSchema(), "name"),
+			datasourceSchemaFromResourceSchema(gitlabProjectTagGetSchema(), []string{"name"}, nil),
 			map[string]*schema.Schema{
 				"project": {
 					Description: "The ID or URL-encoded path of the project owned by the authenticated user.",

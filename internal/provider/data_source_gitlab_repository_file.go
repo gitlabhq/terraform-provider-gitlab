@@ -17,7 +17,7 @@ var _ = registerDataSource("gitlab_repository_file", func() *schema.Resource {
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)`,
 
 		ReadContext: dataSourceGitlabRepositoryFileRead,
-		Schema:      datasourceSchemaFromResourceSchema(gitlabRepositoryFileGetSchema(), "project", "file_path", "ref"),
+		Schema:      datasourceSchemaFromResourceSchema(gitlabRepositoryFileGetSchema(), []string{"project", "file_path", "ref"}, nil),
 	}
 })
 

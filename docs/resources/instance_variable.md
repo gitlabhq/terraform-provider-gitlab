@@ -3,13 +3,13 @@
 page_title: "gitlab_instance_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_instance_variable resource allows to manage the lifecycle of a CI/CD variable for an instance.
+  The gitlab_instance_variable resource allows to manage the lifecycle of an instance-level CI/CD variable.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/instance_level_variables.html
 ---
 
 # gitlab_instance_variable (Resource)
 
-The `gitlab_instance_variable` resource allows to manage the lifecycle of a CI/CD variable for an instance.
+The `gitlab_instance_variable` resource allows to manage the lifecycle of an instance-level CI/CD variable.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_variables.html)
 
@@ -35,9 +35,9 @@ resource "gitlab_instance_variable" "example" {
 ### Optional
 
 - `id` (String) The ID of this resource.
-- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements). Defaults to `false`.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-- `variable_type` (String) The type of a variable. Available types are: env_var (default) and file.
+- `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
 
 ## Import
 
