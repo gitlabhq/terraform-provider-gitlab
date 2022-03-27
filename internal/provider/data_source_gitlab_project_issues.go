@@ -206,7 +206,7 @@ var _ = registerDataSource("gitlab_project_issues", func() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem: &schema.Resource{
-					Schema: datasourceSchemaFromResourceSchema(gitlabProjectIssueGetSchema(), nil),
+					Schema: datasourceSchemaFromResourceSchema(gitlabProjectIssueGetSchema(), nil, nil),
 				},
 			},
 		},

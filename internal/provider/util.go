@@ -346,7 +346,7 @@ func attributeNamesFromSchema(schema map[string]*schema.Schema) []string {
 // - all attributes have ForceNew, Required = false
 // - Validation funcs and attributes (e.g. MaxItems) are not copied
 // Adapted from https://github.com/hashicorp/terraform-provider-google/blob/1a72f93a8dcf6f1e59d5f25aefcb6d794a116bf5/google/datasource_helpers.go#L13
-func datasourceSchemaFromResourceSchema(rs map[string]*schema.Schema, arguments []string) map[string]*schema.Schema {
+func datasourceSchemaFromResourceSchema(rs map[string]*schema.Schema, arguments []string, optionalArguments []string) map[string]*schema.Schema {
 	ds := make(map[string]*schema.Schema, len(rs))
 	for k, v := range rs {
 		dv := &schema.Schema{
@@ -362,6 +362,10 @@ func datasourceSchemaFromResourceSchema(rs map[string]*schema.Schema, arguments 
 			dv.Required = false
 		}
 
+		if contains(optionalArguments, k) {
+			dv.Optional = true
+		}
+
 		switch v.Type {
 		case schema.TypeSet:
 			dv.Set = v.Set
@@ -373,7 +377,7 @@ func datasourceSchemaFromResourceSchema(rs map[string]*schema.Schema, arguments 
 			if elem, ok := v.Elem.(*schema.Resource); ok {
 				// handle the case where the Element is a sub-resource
 				dv.Elem = &schema.Resource{
-					Schema: datasourceSchemaFromResourceSchema(elem.Schema, nil),
+					Schema: datasourceSchemaFromResourceSchema(elem.Schema, nil, nil),
 				}
 			} else {
 				// handle simple primitive case
