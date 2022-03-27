@@ -12,7 +12,7 @@ import (
 
 var _ = registerResource("gitlab_instance_variable", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`" + `gitlab_instance_variable` + "`" + ` resource allows to manage the lifecycle of a CI/CD variable for an instance.
+		Description: `The ` + "`" + `gitlab_instance_variable` + "`" + ` resource allows to manage the lifecycle of an instance-level CI/CD variable.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_variables.html)`,
 
@@ -24,40 +24,7 @@ var _ = registerResource("gitlab_instance_variable", func() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: map[string]*schema.Schema{
-			"key": {
-				Description:  "The name of the variable.",
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: StringIsGitlabVariableName,
-			},
-			"value": {
-				Description: "The value of the variable.",
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-			},
-			"variable_type": {
-				Description:  "The type of a variable. Available types are: env_var (default) and file.",
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "env_var",
-				ValidateFunc: StringIsGitlabVariableType,
-			},
-			"protected": {
-				Description: "If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"masked": {
-				Description: "If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements). Defaults to `false`.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-		},
+		Schema: gitlabInstanceVariableGetSchema(),
 	}
 })
 
@@ -85,7 +52,6 @@ func resourceGitlabInstanceVariableCreate(ctx context.Context, d *schema.Resourc
 	}
 
 	d.SetId(key)
-
 	return resourceGitlabInstanceVariableRead(ctx, d, meta)
 }
 
@@ -111,6 +77,11 @@ func resourceGitlabInstanceVariableRead(ctx context.Context, d *schema.ResourceD
 	d.Set("variable_type", v.VariableType)
 	d.Set("protected", v.Protected)
 	d.Set("masked", v.Masked)
+
+	stateMap := gitlabInstanceVariableToStateMap(v)
+	if err = setStateMapInResourceData(stateMap, d); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 
