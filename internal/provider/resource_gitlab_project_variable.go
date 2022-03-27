@@ -26,54 +26,7 @@ var _ = registerResource("gitlab_project_variable", func() *schema.Resource {
 			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: map[string]*schema.Schema{
-			"project": {
-				Description: "The name or id of the project.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-			},
-			"key": {
-				Description:  "The name of the variable.",
-				Type:         schema.TypeString,
-				ForceNew:     true,
-				Required:     true,
-				ValidateFunc: StringIsGitlabVariableName,
-			},
-			"value": {
-				Description: "The value of the variable.",
-				Type:        schema.TypeString,
-				Required:    true,
-				Sensitive:   true,
-			},
-			"variable_type": {
-				Description:  "The type of a variable. Available types are: env_var (default) and file.",
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      "env_var",
-				ValidateFunc: StringIsGitlabVariableType,
-			},
-			"protected": {
-				Description: "If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"masked": {
-				Description: "If set to `true`, the variable will be masked if it would have been written to the logs. Defaults to `false`.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"environment_scope": {
-				Description: "The environment_scope of the variable. Defaults to `*`.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "*",
-				// Versions of GitLab prior to 13.4 cannot update environment_scope.
-				ForceNew: true,
-			},
-		},
+		Schema: gitlabProjectVariableGetSchema(),
 	}
 })
 
@@ -148,13 +101,10 @@ func resourceGitlabProjectVariableRead(ctx context.Context, d *schema.ResourceDa
 		return augmentVariableClientError(d, err)
 	}
 
-	d.Set("key", variable.Key)
-	d.Set("value", variable.Value)
-	d.Set("variable_type", variable.VariableType)
-	d.Set("project", project)
-	d.Set("protected", variable.Protected)
-	d.Set("masked", variable.Masked)
-	d.Set("environment_scope", variable.EnvironmentScope)
+	stateMap := gitlabProjectVariableToStateMap(project, variable)
+	if err = setStateMapInResourceData(stateMap, d); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 
