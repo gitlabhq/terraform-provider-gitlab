@@ -369,6 +369,24 @@ func testAccCreateProjectVariable(t *testing.T, projectID int) *gitlab.ProjectVa
 	return variable
 }
 
+func testAccCreateGroupVariable(t *testing.T, groupID int) *gitlab.GroupVariable {
+	variable, _, err := testGitlabClient.GroupVariables.CreateVariable(groupID, &gitlab.CreateGroupVariableOptions{
+		Key:   gitlab.String(fmt.Sprintf("test_key_%d", acctest.RandInt())),
+		Value: gitlab.String("test_value"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		if _, err := testGitlabClient.GroupVariables.RemoveVariable(groupID, variable.Key, nil); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	return variable
+}
+
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
 // acceptance test.
 type testAccGitlabProjectContext struct {
