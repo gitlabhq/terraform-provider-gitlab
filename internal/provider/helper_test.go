@@ -351,6 +351,24 @@ func testAccCreateProjectEnvironment(t *testing.T, projectID int, options *gitla
 	return projectEnvironment
 }
 
+func testAccCreateProjectVariable(t *testing.T, projectID int) *gitlab.ProjectVariable {
+	variable, _, err := testGitlabClient.ProjectVariables.CreateVariable(projectID, &gitlab.CreateProjectVariableOptions{
+		Key:   gitlab.String(fmt.Sprintf("test_key_%d", acctest.RandInt())),
+		Value: gitlab.String("test_value"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		if _, err := testGitlabClient.ProjectVariables.RemoveVariable(projectID, variable.Key, nil); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	return variable
+}
+
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
 // acceptance test.
 type testAccGitlabProjectContext struct {
