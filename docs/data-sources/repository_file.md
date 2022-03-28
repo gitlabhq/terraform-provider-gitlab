@@ -40,7 +40,7 @@ data "gitlab_repository_file" "example" {
 
 - `blob_id` (String) The blob id.
 - `commit_id` (String) The commit id.
-- `content` (String) base64 encoded file content. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
+- `content` (String) File content. If the content is not yet base64 encoded, it will be encoded automatically. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
 - `content_sha256` (String) File content sha256 digest.
 - `encoding` (String) The file content encoding.
 - `file_name` (String) The filename.
