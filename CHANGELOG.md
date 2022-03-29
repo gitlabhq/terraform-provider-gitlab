@@ -1,10 +1,19 @@
-## 3.13.0 (Unreleased)
+## 3.13.0 (2022-03-29)
 
 FEATURES:
 
 * **New Data Source:** `gitlab_instance_deploy_keys` ([#870](https://github.com/gitlabhq/terraform-provider-gitlab/pull/870))
 * **New Data Source:** `gitlab_project_tags` ([#963](https://github.com/gitlabhq/terraform-provider-gitlab/pull/963))
 * **New Data Source:** `gitlab_repository_file` ([#939](https://github.com/gitlabhq/terraform-provider-gitlab/pull/939))
+* **New Resource**: `gitlab_project_environment` ([#938](https://github.com/gitlabhq/terraform-provider-gitlab/pull/938))
+* **New Resource**: `gitlab_project_protected_environment` ([#938](https://github.com/gitlabhq/terraform-provider-gitlab/pull/938))
+* **New Resource**: `gitlab_system_hook` ([#929](https://github.com/gitlabhq/terraform-provider-gitlab/pull/929))
+
+FEATURES:
+
+* resource/gitlab_topic: Support deletion ([#967](https://github.com/gitlabhq/terraform-provider-gitlab/pull/967))
+* resource/gitlab_topic: Support avatar images ([#968](https://github.com/gitlabhq/terraform-provider-gitlab/pull/968))
+* resource/gitlab_repository_file: Support using plain text `content` to beautify plans ([#972](https://github.com/gitlabhq/terraform-provider-gitlab/pull/972))
 
 IMPROVEMENTS:
 
