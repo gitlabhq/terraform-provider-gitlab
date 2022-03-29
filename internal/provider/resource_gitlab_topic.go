@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -32,21 +33,48 @@ var _ = registerResource("gitlab_topic", func() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Description: "The topic's name",
+				Description: "The topic's name.",
 				Type:        schema.TypeString,
 				Required:    true,
 			},
 			"soft_destroy": {
-				Description: "Empty the topics fields instead of deleting it",
+				Description: "Empty the topics fields instead of deleting it.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Deprecated:  "GitLab 14.9 introduced the proper deletion of topics. This field is no longer needed.",
 			},
 			"description": {
-				Description: "A text describing the topic",
+				Description: "A text describing the topic.",
 				Type:        schema.TypeString,
 				Optional:    true,
 			},
+			"avatar": {
+				Description: "A local path to the avatar image to upload. **Note**: not available for imported resources.",
+				Type:        schema.TypeString,
+				Optional:    true,
+			},
+			"avatar_hash": {
+				Description:  "The hash of the avatar image. Use `filesha256(\"path/to/avatar.png\")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				RequiredWith: []string{"avatar"},
+			},
+			"avatar_url": {
+				Description: "The URL of the avatar image.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+		},
+		CustomizeDiff: func(ctx context.Context, rd *schema.ResourceDiff, i interface{}) error {
+			if _, ok := rd.GetOk("avatar"); ok {
+				if v, ok := rd.GetOk("avatar_hash"); !ok || v.(string) == "" {
+					if err := rd.SetNewComputed("avatar_hash"); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
 		},
 	}
 })
@@ -61,6 +89,14 @@ func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.Description = gitlab.String(v.(string))
 	}
 
+	if v, ok := d.GetOk("avatar"); ok {
+		avatar, err := resourceGitlabTopicGetAvatar(v.(string))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		options.Avatar = avatar
+	}
+
 	log.Printf("[DEBUG] create gitlab topic %s", *options.Name)
 
 	topic, _, err := client.Topics.CreateTopic(options, gitlab.WithContext(ctx))
@@ -69,7 +105,6 @@ func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	d.SetId(fmt.Sprintf("%d", topic.ID))
-
 	return resourceGitlabTopicRead(ctx, d, meta)
 }
 
@@ -95,7 +130,7 @@ func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta i
 	d.SetId(fmt.Sprintf("%d", topic.ID))
 	d.Set("name", topic.Name)
 	d.Set("description", topic.Description)
-
+	d.Set("avatar_url", topic.AvatarURL)
 	return nil
 }
 
@@ -111,6 +146,24 @@ func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta
 		options.Description = gitlab.String(d.Get("description").(string))
 	}
 
+	if d.HasChanges("avatar", "avatar_hash") || d.Get("avatar_hash").(string) == "" {
+		avatarPath := d.Get("avatar").(string)
+		var avatar *gitlab.TopicAvatar
+		// NOTE: the avatar should be removed
+		if avatarPath == "" {
+			avatar = &gitlab.TopicAvatar{}
+			// terraform doesn't care to remove this from state, thus, we do.
+			d.Set("avatar_hash", "")
+		} else {
+			changedAvatar, err := resourceGitlabTopicGetAvatar(avatarPath)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			avatar = changedAvatar
+		}
+		options.Avatar = avatar
+	}
+
 	log.Printf("[DEBUG] update gitlab topic %s", d.Id())
 
 	topicID, err := strconv.Atoi(d.Id())
@@ -121,7 +174,6 @@ func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta
 	if err != nil {
 		return diag.Errorf("Failed to update topic %d: %s", topicID, err)
 	}
-
 	return resourceGitlabTopicRead(ctx, d, meta)
 }
 
@@ -165,4 +217,16 @@ func resourceGitlabTopicDelete(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	return nil
+}
+
+func resourceGitlabTopicGetAvatar(avatarPath string) (*gitlab.TopicAvatar, error) {
+	avatarFile, err := os.Open(avatarPath)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to open avatar file %s: %s", avatarPath, err)
+	}
+
+	return &gitlab.TopicAvatar{
+		Filename: avatarPath,
+		Image:    avatarFile,
+	}, nil
 }

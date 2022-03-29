@@ -25,6 +25,8 @@ The `gitlab_topic` resource allows to manage the lifecycle of topics that are th
 resource "gitlab_topic" "functional_programming" {
   name        = "Functional Programming"
   description = "In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions."
+  avatar      = "${path.module}/avatar.png"
+  avatar_hash = filesha256("${path.module}/avatar.png")
 }
 ```
 
@@ -33,13 +35,19 @@ resource "gitlab_topic" "functional_programming" {
 
 ### Required
 
-- `name` (String) The topic's name
+- `name` (String) The topic's name.
 
 ### Optional
 
-- `description` (String) A text describing the topic
+- `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
+- `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+- `description` (String) A text describing the topic.
 - `id` (String) The ID of this resource.
-- `soft_destroy` (Boolean, Deprecated) Empty the topics fields instead of deleting it
+- `soft_destroy` (Boolean, Deprecated) Empty the topics fields instead of deleting it.
+
+### Read-Only
+
+- `avatar_url` (String) The URL of the avatar image.
 
 ## Import
 
