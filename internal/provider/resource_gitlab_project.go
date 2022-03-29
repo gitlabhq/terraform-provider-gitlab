@@ -565,6 +565,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Set:         schema.HashString,
 		Elem:        &schema.Schema{Type: schema.TypeString},
 		Optional:    true,
+		Computed:    true,
 	},
 	"wiki_access_level": {
 		Description:      fmt.Sprintf("Set the wiki access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
