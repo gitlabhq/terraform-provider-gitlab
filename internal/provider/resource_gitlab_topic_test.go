@@ -37,7 +37,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"avatar", "_avatar_hash", "soft_destroy",
+					"avatar", "avatar_hash", "soft_destroy",
 				},
 			},
 			// Update the topics values
@@ -50,7 +50,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 						Description: "Terraform acceptance tests",
 					}),
 					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
-					resource.TestCheckResourceAttr("gitlab_topic.foo", "_avatar_hash", "8d29d9c393facb9d86314eb347a03fde503f2c0422bf55af7df086deb126107e"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_hash", "8d29d9c393facb9d86314eb347a03fde503f2c0422bf55af7df086deb126107e"),
 				),
 			},
 			// Verify import
@@ -59,7 +59,73 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"avatar", "_avatar_hash", "soft_destroy",
+					"avatar", "avatar_hash", "soft_destroy",
+				},
+			},
+			// Update back to the default topics avatar
+			{
+				Config: testAccGitlabTopicFullConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTopicExists("gitlab_topic.foo", &topic),
+					testAccCheckGitlabTopicAttributes(&topic, &testAccGitlabTopicExpectedAttributes{
+						Name:        fmt.Sprintf("foo-full-%d", rInt),
+						Description: "Terraform acceptance tests",
+					}),
+					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_hash", "8d29d9c393facb9d86314eb347a03fde503f2c0422bf55af7df086deb126107e"),
+				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_topic.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"avatar", "avatar_hash", "soft_destroy",
+				},
+			},
+			// Update the topics avatar
+			{
+				Config: testAccGitlabTopicFullUpdatedAvatarConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTopicExists("gitlab_topic.foo", &topic),
+					testAccCheckGitlabTopicAttributes(&topic, &testAccGitlabTopicExpectedAttributes{
+						Name:        fmt.Sprintf("foo-full-%d", rInt),
+						Description: "Terraform acceptance tests",
+					}),
+					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_hash", "a58bd926fd3baabd41c56e810f62ade8705d18a4e280fb35764edb4b778444db"),
+				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_topic.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"avatar", "avatar_hash", "soft_destroy",
+				},
+			},
+			// Update back to the default topics avatar
+			{
+				Config: testAccGitlabTopicFullConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTopicExists("gitlab_topic.foo", &topic),
+					testAccCheckGitlabTopicAttributes(&topic, &testAccGitlabTopicExpectedAttributes{
+						Name:        fmt.Sprintf("foo-full-%d", rInt),
+						Description: "Terraform acceptance tests",
+					}),
+					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_hash", "8d29d9c393facb9d86314eb347a03fde503f2c0422bf55af7df086deb126107e"),
+				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_topic.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"avatar", "avatar_hash", "soft_destroy",
 				},
 			},
 			// Update the avatar image, but keep the filename to test the `CustomizeDiff` function
@@ -86,7 +152,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 						Description: "Terraform acceptance tests",
 					}),
 					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
-					resource.TestCheckResourceAttr("gitlab_topic.foo", "_avatar_hash", "a58bd926fd3baabd41c56e810f62ade8705d18a4e280fb35764edb4b778444db"),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_hash", "a58bd926fd3baabd41c56e810f62ade8705d18a4e280fb35764edb4b778444db"),
 				),
 			},
 			// Verify import
@@ -95,7 +161,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"avatar", "_avatar_hash", "soft_destroy",
+					"avatar", "avatar_hash", "soft_destroy",
 				},
 			},
 			// Update the topics values back to their initial state
@@ -107,7 +173,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 						Name: fmt.Sprintf("foo-req-%d", rInt),
 					}),
 					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_url", ""),
-					resource.TestCheckResourceAttr("gitlab_topic.foo", "_avatar_hash", ""),
+					resource.TestCheckResourceAttr("gitlab_topic.foo", "avatar_hash", ""),
 				),
 			},
 			// Verify import
@@ -116,7 +182,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"avatar", "_avatar_hash", "soft_destroy",
+					"avatar", "avatar_hash", "soft_destroy",
 				},
 			},
 			// Updating the topic to have a description before it is deleted
@@ -136,8 +202,35 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
-					"avatar", "_avatar_hash", "soft_destroy",
+					"avatar", "avatar_hash", "soft_destroy",
 				},
+			},
+		},
+	})
+}
+
+func TestAccGitlabTopic_withoutAvatarHash(t *testing.T) {
+	var topic gitlab.Topic
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabTopicDestroy,
+		Steps: []resource.TestStep{
+			// Create a topic with avatar, but without giving a hash
+			{
+				Config: testAccGitlabTopicAvatarWithoutHashConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabTopicExists("gitlab_topic.foo", &topic),
+					resource.TestCheckResourceAttrSet("gitlab_topic.foo", "avatar_url"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			// Update the avatar image, but keep the filename to test the `CustomizeDiff` function
+			{
+				Config:             testAccGitlabTopicAvatarWithoutHashConfig(rInt),
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -279,25 +372,44 @@ func testAccCheckGitlabTopicSoftDestroy(s *terraform.State) (err error) {
 func testAccGitlabTopicRequiredConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
-  name             = "foo-req-%d"
+  name = "foo-req-%d"
 }`, rInt)
 }
 
 func testAccGitlabTopicFullConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
-  name             = "foo-full-%d"
-  description      = "Terraform acceptance tests"
-  avatar 		   = "${path.module}/testdata/gitlab_topic/avatar.png"
+  name        = "foo-full-%d"
+  description = "Terraform acceptance tests"
+  avatar      = "${path.module}/testdata/gitlab_topic/avatar.png"
+  avatar_hash = filesha256("${path.module}/testdata/gitlab_topic/avatar.png")
+}`, rInt)
+}
+
+func testAccGitlabTopicFullUpdatedAvatarConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_topic" "foo" {
+  name        = "foo-full-%d"
+  description = "Terraform acceptance tests"
+  avatar 	  = "${path.module}/testdata/gitlab_topic/avatar-update.png"
+  avatar_hash = filesha256("${path.module}/testdata/gitlab_topic/avatar-update.png")
+}`, rInt)
+}
+
+func testAccGitlabTopicAvatarWithoutHashConfig(rInt int) string {
+	return fmt.Sprintf(`
+resource "gitlab_topic" "foo" {
+  name   = "foo-%d"
+  avatar = "${path.module}/testdata/gitlab_topic/avatar.png"
 }`, rInt)
 }
 
 func testAccGitlabTopicSoftDestroyConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
-  name             = "foo-soft-destroy-%d"
-  description      = "Terraform acceptance tests"
+  name        = "foo-soft-destroy-%d"
+  description = "Terraform acceptance tests"
 
-  soft_destroy     = true
+  soft_destroy = true
 }`, rInt)
 }

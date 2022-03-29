@@ -1,11 +1,8 @@
 package provider
 
 import (
-	"bytes"
 	"context"
-	"crypto/sha256"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
@@ -52,14 +49,16 @@ var _ = registerResource("gitlab_topic", func() *schema.Resource {
 				Optional:    true,
 			},
 			"avatar": {
-				Description: "A local path to the avatar image to upload. **Note**: not available for imported resources",
+				Description: "A local path to the avatar image to upload. **Note**: not available for imported resources.",
 				Type:        schema.TypeString,
 				Optional:    true,
 			},
-			"_avatar_hash": {
-				Description: "The hash of the avatar image. **Note**: this is an internally used attribute to track the avatar image.",
-				Type:        schema.TypeString,
-				Computed:    true,
+			"avatar_hash": {
+				Description:  "The hash of the avatar image. Use `filesha256(\"path/to/avatar.png\")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				RequiredWith: []string{"avatar"},
 			},
 			"avatar_url": {
 				Description: "The URL of the avatar image.",
@@ -68,21 +67,10 @@ var _ = registerResource("gitlab_topic", func() *schema.Resource {
 			},
 		},
 		CustomizeDiff: func(ctx context.Context, rd *schema.ResourceDiff, i interface{}) error {
-			if v, ok := rd.GetOk("avatar"); ok {
-				avatarPath := v.(string)
-				avatarFile, err := os.Open(avatarPath)
-				if err != nil {
-					return fmt.Errorf("Unable to open avatar file %s: %s", avatarPath, err)
-				}
-
-				avatarHash, err := getSha256(avatarFile)
-				if err != nil {
-					return fmt.Errorf("Unable to get hash from avatar file %s: %s", avatarPath, err)
-				}
-
-				if rd.Get("_avatar_hash").(string) != avatarHash {
-					if err := rd.SetNew("_avatar_hash", avatarHash); err != nil {
-						return fmt.Errorf("Unable to set _avatar_hash: %s", err)
+			if _, ok := rd.GetOk("avatar"); ok {
+				if v, ok := rd.GetOk("avatar_hash"); !ok || v.(string) == "" {
+					if err := rd.SetNewComputed("avatar_hash"); err != nil {
+						return err
 					}
 				}
 			}
@@ -101,14 +89,12 @@ func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.Description = gitlab.String(v.(string))
 	}
 
-	avatarHash := ""
 	if v, ok := d.GetOk("avatar"); ok {
-		avatar, hash, err := resourceGitlabTopicGetAvatar(v.(string))
+		avatar, err := resourceGitlabTopicGetAvatar(v.(string))
 		if err != nil {
 			return diag.FromErr(err)
 		}
 		options.Avatar = avatar
-		avatarHash = hash
 	}
 
 	log.Printf("[DEBUG] create gitlab topic %s", *options.Name)
@@ -119,9 +105,6 @@ func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	d.SetId(fmt.Sprintf("%d", topic.ID))
-	if options.Avatar != nil {
-		d.Set("_avatar_hash", avatarHash)
-	}
 	return resourceGitlabTopicRead(ctx, d, meta)
 }
 
@@ -148,7 +131,6 @@ func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta i
 	d.Set("name", topic.Name)
 	d.Set("description", topic.Description)
 	d.Set("avatar_url", topic.AvatarURL)
-
 	return nil
 }
 
@@ -164,24 +146,22 @@ func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta
 		options.Description = gitlab.String(d.Get("description").(string))
 	}
 
-	if d.HasChanges("avatar", "_avatar_hash") {
+	if d.HasChanges("avatar", "avatar_hash") || d.Get("avatar_hash").(string) == "" {
 		avatarPath := d.Get("avatar").(string)
 		var avatar *gitlab.TopicAvatar
-		var avatarHash string
 		// NOTE: the avatar should be removed
 		if avatarPath == "" {
 			avatar = &gitlab.TopicAvatar{}
-			avatarHash = ""
+			// terraform doesn't care to remove this from state, thus, we do.
+			d.Set("avatar_hash", "")
 		} else {
-			changedAvatar, changedAvatarHash, err := resourceGitlabTopicGetAvatar(avatarPath)
+			changedAvatar, err := resourceGitlabTopicGetAvatar(avatarPath)
 			if err != nil {
 				return diag.FromErr(err)
 			}
 			avatar = changedAvatar
-			avatarHash = changedAvatarHash
 		}
 		options.Avatar = avatar
-		d.Set("_avatar_hash", avatarHash)
 	}
 
 	log.Printf("[DEBUG] update gitlab topic %s", d.Id())
@@ -239,30 +219,14 @@ func resourceGitlabTopicDelete(ctx context.Context, d *schema.ResourceData, meta
 	return nil
 }
 
-func resourceGitlabTopicGetAvatar(avatarPath string) (*gitlab.TopicAvatar, string, error) {
+func resourceGitlabTopicGetAvatar(avatarPath string) (*gitlab.TopicAvatar, error) {
 	avatarFile, err := os.Open(avatarPath)
 	if err != nil {
-		return nil, "", fmt.Errorf("Unable to open avatar file %s: %s", avatarPath, err)
+		return nil, fmt.Errorf("Unable to open avatar file %s: %s", avatarPath, err)
 	}
 
-	avatarImageBuf := &bytes.Buffer{}
-	teeReader := io.TeeReader(avatarFile, avatarImageBuf)
-	avatarHash, err := getSha256(teeReader)
-	if err != nil {
-		return nil, "", fmt.Errorf("Unable to get hash from avatar file %s: %s", avatarPath, err)
-	}
-
-	avatarImageReader := bytes.NewReader(avatarImageBuf.Bytes())
 	return &gitlab.TopicAvatar{
 		Filename: avatarPath,
-		Image:    avatarImageReader,
-	}, avatarHash, nil
-}
-
-func getSha256(r io.Reader) (string, error) {
-	h := sha256.New()
-	if _, err := io.Copy(h, r); err != nil {
-		return "", fmt.Errorf("Unable to get hash %s", err)
-	}
-	return fmt.Sprintf("%x", h.Sum(nil)), nil
+		Image:    avatarFile,
+	}, nil
 }
