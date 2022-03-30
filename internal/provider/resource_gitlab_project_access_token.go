@@ -91,7 +91,7 @@ var _ = registerResource("gitlab_project_access_token", func() *schema.Resource 
 				Computed:    true,
 			},
 			"access_level": {
-				Description:      fmt.Sprintf("The access level of the associated user_id membership (cf resource_gitlab_project_membership). Valid values are: %s", renderValueListForDocs(validProjectAccessLevelNames)),
+				Description:      fmt.Sprintf("The access level of the associated user_id project membership (cf resource_gitlab_project_membership). Valid values are: %s. Default is `%s`", renderValueListForDocs(validProjectAccessLevelNames), accessLevelValueToName[gitlab.MaintainerPermissions]),
 				Type:             schema.TypeString,
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				Optional:         true,
