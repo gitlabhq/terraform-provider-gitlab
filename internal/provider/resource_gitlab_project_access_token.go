@@ -90,17 +90,27 @@ var _ = registerResource("gitlab_project_access_token", func() *schema.Resource 
 				Type:        schema.TypeInt,
 				Computed:    true,
 			},
+			"access_level": {
+				Description:      fmt.Sprintf("The access level for the project access token. Valid values are: %s. Default is `%s`.", renderValueListForDocs(validProjectAccessLevelNames), accessLevelValueToName[gitlab.MaintainerPermissions]),
+				Type:             schema.TypeString,
+				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
+				Optional:         true,
+				Default:          accessLevelValueToName[gitlab.MaintainerPermissions],
+				ForceNew:         true,
+			},
 		},
 	}
 })
 
 func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-
+	accessLevelId := accessLevelNameToValue[d.Get("access_level").(string)]
 	project := d.Get("project").(string)
+
 	options := &gitlab.CreateProjectAccessTokenOptions{
-		Name:   gitlab.String(d.Get("name").(string)),
-		Scopes: stringSetToStringSlice(d.Get("scopes").(*schema.Set)),
+		Name:        gitlab.String(d.Get("name").(string)),
+		Scopes:      stringSetToStringSlice(d.Get("scopes").(*schema.Set)),
+		AccessLevel: &accessLevelId,
 	}
 
 	log.Printf("[DEBUG] create gitlab ProjectAccessToken %s %s for project ID %s", *options.Name, options.Scopes, project)
@@ -172,6 +182,7 @@ func resourceGitlabProjectAccessTokenRead(ctx context.Context, d *schema.Resourc
 				d.Set("created_at", projectAccessToken.CreatedAt.String())
 				d.Set("revoked", projectAccessToken.Revoked)
 				d.Set("user_id", projectAccessToken.UserID)
+				d.Set("access_level", accessLevelValueToName[projectAccessToken.AccessLevel])
 
 				err = d.Set("scopes", projectAccessToken.Scopes)
 				if err != nil {

@@ -3,7 +3,6 @@ package provider
 import (
 	"errors"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 	"testing"

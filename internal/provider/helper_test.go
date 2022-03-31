@@ -119,16 +119,29 @@ func testAccCurrentUser(t *testing.T) *gitlab.User {
 
 // testAccCreateProject is a test helper for creating a project.
 func testAccCreateProject(t *testing.T) *gitlab.Project {
+	return testAccCreateProjectWithNamespace(t, 0)
+}
+
+// testAccCreateProjectWithNamespace is a test helper for creating a project. This method accepts a namespace to great a project
+// within a group
+func testAccCreateProjectWithNamespace(t *testing.T, namespaceID int) *gitlab.Project {
 	t.Helper()
 
-	project, _, err := testGitlabClient.Projects.CreateProject(&gitlab.CreateProjectOptions{
+	options := &gitlab.CreateProjectOptions{
 		Name:        gitlab.String(acctest.RandomWithPrefix("acctest")),
 		Description: gitlab.String("Terraform acceptance tests"),
 		// So that acceptance tests can be run in a gitlab organization with no billing.
 		Visibility: gitlab.Visibility(gitlab.PublicVisibility),
 		// So that a branch is created.
 		InitializeWithReadme: gitlab.Bool(true),
-	})
+	}
+
+	//Apply a namespace if one is passed in.
+	if namespaceID != 0 {
+		options.NamespaceID = gitlab.Int(namespaceID)
+	}
+
+	project, _, err := testGitlabClient.Projects.CreateProject(options)
 	if err != nil {
 		t.Fatalf("could not create test project: %v", err)
 	}
