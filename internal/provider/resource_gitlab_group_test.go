@@ -2,7 +2,6 @@ package provider
 
 import (
 	"fmt"
-	"net/http"
 	"testing"
 	"time"
 
@@ -284,8 +283,8 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 		// Fixes groups API async deletion issue
 		// https://github.com/gitlabhq/terraform-provider-gitlab/issues/319
 		for start := time.Now(); time.Since(start) < 15*time.Second; {
-			g, resp, err := testGitlabClient.Groups.GetGroup(group.ID, nil)
-			if resp != nil && resp.StatusCode == http.StatusNotFound {
+			g, _, err := testGitlabClient.Groups.GetGroup(group.ID, nil)
+			if is404(err) {
 				return nil
 			}
 			if g != nil && g.MarkedForDeletionOn != nil {

@@ -1,5 +1,3 @@
-// lintignore: AT012 // TODO: Resolve this tfproviderlint issue
-
 package provider
 
 import (
@@ -665,8 +663,7 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	})
 }
 
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabProject_import(t *testing.T) {
+func TestAccGitlabProject_imprt(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -690,7 +687,7 @@ func TestAccGitlabProject_import(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProject_nestedImport(t *testing.T) {
+func TestAccGitlabProject_nestedImprt(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -770,12 +767,8 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	})
 }
 
-// lintignore: AT002 // not a Terraform import test
-func TestAccGitlabProject_importURL(t *testing.T) {
-	// Since we do some manual setup in this test, we need to handle the test skip first.
-	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
-	}
+func TestAccGitlabProject_imprtURL(t *testing.T) {
+	testAccCheck(t)
 
 	rInt := acctest.RandInt()
 
@@ -898,12 +891,8 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 	}
 }
 
-// lintignore: AT002 // not a Terraform import test
-func TestAccGitlabProject_importURLMirrored(t *testing.T) {
-	// Since we do some manual setup in this test, we need to handle the test skip first.
-	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
-	}
+func TestAccGitlabProject_ImprtURLMirrored(t *testing.T) {
+	testAccCheck(t)
 
 	var mirror gitlab.Project
 	rInt := acctest.RandInt()
@@ -1021,10 +1010,10 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccCheckMutualExclusiveNameAndID(rInt),

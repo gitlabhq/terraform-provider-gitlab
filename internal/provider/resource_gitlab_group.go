@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strings"
 	"time"
 
@@ -251,9 +250,9 @@ func resourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta i
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab group %s", d.Id())
 
-	group, resp, err := client.Groups.GetGroup(d.Id(), nil, gitlab.WithContext(ctx))
+	group, _, err := client.Groups.GetGroup(d.Id(), nil, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
