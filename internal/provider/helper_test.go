@@ -121,7 +121,7 @@ func testAccCreateProject(t *testing.T) *gitlab.Project {
 	return testAccCreateProjectWithNamespace(t, 0)
 }
 
-// testAccCreateProject is a test helper for creating a project. This method accepts a namespace to great a project
+// testAccCreateProjectWithNamespace is a test helper for creating a project. This method accepts a namespace to great a project
 // within a group
 func testAccCreateProjectWithNamespace(t *testing.T, namespaceID int) *gitlab.Project {
 	t.Helper()
