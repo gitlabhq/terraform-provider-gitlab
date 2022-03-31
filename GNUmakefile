@@ -20,7 +20,7 @@ endif
 test: ## Run unit tests.
 	go test $(TESTARGS) $(PROVIDER_SRC_DIR)
 
-TFPROVIDERLINTX_CHECKS = -XR003=false -XS002=false
+TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
 
 fmt: tool-golangci-lint tool-tfproviderlintx tool-terraform tool-shfmt ## Format files and fix issues.
 	gofmt -w -s .
