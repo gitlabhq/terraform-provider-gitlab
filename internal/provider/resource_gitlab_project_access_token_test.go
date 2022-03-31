@@ -30,9 +30,10 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectAccessTokenExists("gitlab_project_access_token.bar", &pat),
 					testAccCheckGitlabProjectAccessTokenAttributes(&pat, &testAccGitlabProjectAccessTokenExpectedAttributes{
-						name:      "my project token",
-						scopes:    map[string]bool{"read_repository": true, "api": true, "write_repository": true, "read_api": true},
-						expiresAt: "2022-04-01",
+						name:        "my project token",
+						scopes:      map[string]bool{"read_repository": true, "api": true, "write_repository": true, "read_api": true},
+						expiresAt:   "2022-04-01",
+						accessLevel: accessLevelValueToName[gitlab.MaintainerPermissions], // default permission on gitlab side when unspecified
 					}),
 				),
 			},
@@ -90,6 +91,56 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 			},
 		},
 	})
+}
+
+func TestAccGitlabProjectAccessToken_accessLevel(t *testing.T) {
+	var pat testAccGitlabProjectAccessTokenWrapper
+	rInt := acctest.RandInt()
+
+	testAccGitlabProjectStart(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectAccessTokenDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and a Project Access Token
+			{
+				Config: testAccGitlabProjectAccessTokenConfigWithAccessLevel(rInt, accessLevelValueToName[gitlab.MaintainerPermissions]),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectAccessTokenExists("gitlab_project_access_token.bar", &pat),
+					testAccCheckGitlabProjectAccessTokenAttributes(&pat, &testAccGitlabProjectAccessTokenExpectedAttributes{
+						name:        "my project token",
+						scopes:      map[string]bool{"read_repository": true, "api": true, "write_repository": true, "read_api": true},
+						expiresAt:   "2022-04-01",
+						accessLevel: accessLevelValueToName[gitlab.MaintainerPermissions],
+					}),
+				),
+			},
+			// Update the Project Access Token to change the parameters
+			{
+				Config: testAccGitlabProjectAccessTokenConfigWithAccessLevel(rInt, accessLevelValueToName[gitlab.DeveloperPermissions]),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectAccessTokenExists("gitlab_project_access_token.bar", &pat),
+					testAccCheckGitlabProjectAccessTokenAttributes(&pat, &testAccGitlabProjectAccessTokenExpectedAttributes{
+						name:        "my project token",
+						scopes:      map[string]bool{"read_repository": true, "api": true, "write_repository": true, "read_api": true},
+						expiresAt:   "2022-04-01",
+						accessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
+					}),
+				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_project_access_token.bar",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					// the token is only known during creating. We explicitly mention this limitation in the docs.
+					"token",
+				},
+			},
+		}})
 }
 
 func testAccCheckGitlabProjectAccessTokenDoesNotExist(pat *testAccGitlabProjectAccessTokenWrapper) resource.TestCheckFunc {
@@ -155,9 +206,10 @@ func testAccCheckGitlabProjectAccessTokenExists(n string, pat *testAccGitlabProj
 }
 
 type testAccGitlabProjectAccessTokenExpectedAttributes struct {
-	name      string
-	scopes    map[string]bool
-	expiresAt string
+	name        string
+	scopes      map[string]bool
+	expiresAt   string
+	accessLevel string
 }
 
 type testAccGitlabProjectAccessTokenWrapper struct {
@@ -303,4 +355,25 @@ resource "gitlab_project_variable" "var" {
  }
 
 	`, rInt)
+}
+
+func testAccGitlabProjectAccessTokenConfigWithAccessLevel(rInt int, level string) string {
+	return fmt.Sprintf(`
+resource "gitlab_project" "foo" {
+  name = "foo-%d"
+  description = "Terraform acceptance tests"
+
+  # So that acceptance tests can be run in a gitlab organization
+  # with no billing
+  visibility_level = "public"
+}
+
+resource "gitlab_project_access_token" "bar" {
+  name = "my project token"
+  project = gitlab_project.foo.id
+  expires_at = "2022-04-01"
+  scopes = ["read_repository" , "api", "write_repository", "read_api"]
+  access_level = "%s"
+}
+	`, rInt, level)
 }

@@ -17,9 +17,10 @@ The `gitlab_project_access_token` resource allows to manage the lifecycle of a p
 
 ```terraform
 resource "gitlab_project_access_token" "example" {
-  project    = "25"
-  name       = "Example project access token"
-  expires_at = "2020-03-14"
+  project      = "25"
+  name         = "Example project access token"
+  expires_at   = "2020-03-14"
+  access_level = "reporter"
 
   scopes = ["api"]
 }
@@ -42,6 +43,7 @@ resource "gitlab_project_variable" "example" {
 
 ### Optional
 
+- `access_level` (String) The access level for the project access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`. Default is `maintainer`.
 - `expires_at` (String) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
 - `id` (String) The ID of this resource.
 
