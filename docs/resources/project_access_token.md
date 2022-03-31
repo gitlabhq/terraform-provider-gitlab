@@ -43,7 +43,7 @@ resource "gitlab_project_variable" "example" {
 
 ### Optional
 
-- `access_level` (String) The access level of the associated user_id project membership (cf resource_gitlab_project_membership). Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`. Default is `maintainer`
+- `access_level` (String) The access level for the project access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`. Default is `maintainer`.
 - `expires_at` (String) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
 - `id` (String) The ID of this resource.
 
