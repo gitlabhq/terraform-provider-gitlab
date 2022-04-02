@@ -11,7 +11,8 @@ build: ## Build the provider binary.
 
 generate: tool-tfplugindocs ## Generate files to be checked in.
 	@# Setting empty environment variables to work around issue: https://github.com/hashicorp/terraform-plugin-docs/issues/12
-	GITLAB_TOKEN="" $(GOBIN)/tfplugindocs generate
+	@# Setting the PATH so that tfplugindocs uses the same terraform binary as other targets here, and to resolve a "Error: Incompatible provider version" error on M1 macs.
+	GITLAB_TOKEN="" PATH="$(GOBIN):$(PATH)" $(GOBIN)/tfplugindocs generate
 
 ifdef RUN
 TESTARGS += -test.run $(RUN)
