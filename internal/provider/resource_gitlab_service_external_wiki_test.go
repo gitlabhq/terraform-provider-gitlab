@@ -50,7 +50,7 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 					testAccCheckGitlabServiceExternalWikiExists(externalWikiResourceName, &externalWikiService),
 					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL2),
 					testCheckResourceAttrLazy(externalWikiResourceName, "created_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
-					testCheckResourceAttrLazy(externalWikiResourceName, "updated_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
+					testCheckResourceAttrLazy(externalWikiResourceName, "updated_at", func() string { return externalWikiService.UpdatedAt.Format(time.RFC3339) }),
 				),
 			},
 			// Verify import
