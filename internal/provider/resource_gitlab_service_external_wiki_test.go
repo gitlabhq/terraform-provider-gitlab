@@ -97,7 +97,7 @@ func testAccCheckGitlabServiceExternalWikiDestroy(s *terraform.State) error {
 	var project string
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type == "gitlab_project_environment" {
+		if rs.Type == "gitlab_service_external_wiki" {
 			project = rs.Primary.ID
 
 			externalWikiService, _, err := testGitlabClient.Services.GetExternalWikiService(project)
