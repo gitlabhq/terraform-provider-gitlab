@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -37,6 +38,31 @@ var _ = registerResource("gitlab_service_external_wiki", func() *schema.Resource
 				Type:         schema.TypeString,
 				Required:     true,
 				ValidateFunc: validation.IsURLWithHTTPorHTTPS,
+			},
+			"title": {
+				Description: "Title of the integration.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"created_at": {
+				Description: "The ISO8601 date/time that this integration was activated at in UTC.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"updated_at": {
+				Description: "The ISO8601 date/time that this integration was last updated at in UTC.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"slug": {
+				Description: "The name of the integration in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"active": {
+				Description: "Whether the integration is active.",
+				Type:        schema.TypeBool,
+				Computed:    true,
 			},
 		},
 	}
@@ -79,6 +105,14 @@ func resourceGitlabServiceExternalWikiRead(ctx context.Context, d *schema.Resour
 
 	d.Set("project", project)
 	d.Set("external_wiki_url", service.Properties.ExternalWikiURL)
+	d.Set("active", service.Active)
+	d.Set("slug", service.Slug)
+	d.Set("title", service.Title)
+	d.Set("created_at", service.CreatedAt.Format(time.RFC3339))
+	if service.UpdatedAt != nil {
+		d.Set("updated_at", service.UpdatedAt.Format(time.RFC3339))
+	}
+
 	return nil
 }
 

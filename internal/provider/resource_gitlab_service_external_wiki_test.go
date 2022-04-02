@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
@@ -31,6 +32,9 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceExternalWikiExists(externalWikiResourceName, &externalWikiService),
 					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL1),
+					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL1),
+					resource.TestCheckResourceAttr(externalWikiResourceName, "active", "true"),
+					testCheckResourceAttrLazy(externalWikiResourceName, "created_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
 				),
 			},
 			// Verify import
@@ -45,6 +49,8 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceExternalWikiExists(externalWikiResourceName, &externalWikiService),
 					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL2),
+					testCheckResourceAttrLazy(externalWikiResourceName, "created_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
+					testCheckResourceAttrLazy(externalWikiResourceName, "updated_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
 				),
 			},
 			// Verify import
@@ -102,13 +108,11 @@ func testAccCheckGitlabServiceExternalWikiDestroy(s *terraform.State) error {
 
 			externalWikiService, _, err := testGitlabClient.Services.GetExternalWikiService(project)
 			if err == nil {
-				if externalWikiService != nil {
+				if externalWikiService != nil && externalWikiService.Active != false {
 					return fmt.Errorf("[ERROR] External Wiki Service %v still exists", project)
 				}
 			} else {
-				if !is404(err) {
-					return err
-				}
+				return err
 			}
 		}
 	}
