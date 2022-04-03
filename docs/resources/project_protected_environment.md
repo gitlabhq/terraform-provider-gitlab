@@ -16,26 +16,15 @@ The `gitlab_project_protected_environment` resource allows to manage the lifecyc
 ## Example Usage
 
 ```terraform
-resource "gitlab_group" "this" {
-  name        = "example"
-  path        = "example"
-  description = "An example group"
-}
-
-resource "gitlab_project" "this" {
-  name                   = "example"
-  namespace_id           = gitlab_group.this.id
-  initialize_with_readme = true
-}
-
 resource "gitlab_project_environment" "this" {
-  project      = gitlab_project.this.id
+  project      = 123
   name         = "example"
   external_url = "www.example.com"
 }
 
-resource "gitlab_project_protected_environment" "this" {
-  project     = gitlab_project.this.id
+# Example with access level
+resource "gitlab_project_protected_environment" "example_with_access_level" {
+  project     = gitlab_project_environment.this.project
   environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
@@ -43,23 +32,42 @@ resource "gitlab_project_protected_environment" "this" {
   }
 }
 
-resource "gitlab_project_protected_environment" "this" {
-  project     = gitlab_project.this.id
+# Example with group
+resource "gitlab_project_protected_environment" "example_with_group" {
+  project     = gitlab_project_environment.this.project
   environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
-    group_id = gitlab_group.test.id
+    group_id = 456
   }
 }
 
-resource "gitlab_project_protected_environment" "this" {
-  project     = gitlab_project.this.id
+# Example with user
+resource "gitlab_project_protected_environment" "example_with_user" {
+  project     = gitlab_project_environment.this.project
   environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
-    user_id = gitlab_user.test.id
+    user_id = 789
+  }
+}
+
+# Example with multiple access levels
+resource "gitlab_project_protected_environment" "example_with_multiple" {
+  project     = gitlab_project_environment.this.project
+  environment = gitlab_project_environment.this.name
+
+  deploy_access_levels {
+    access_level = "developer"
   }
 
+  deploy_access_levels {
+    group_id = 456
+  }
+
+  deploy_access_levels {
+    user_id = 789
+  }
 }
 ```
 
@@ -68,7 +76,7 @@ resource "gitlab_project_protected_environment" "this" {
 
 ### Required
 
-- `deploy_access_levels` (Block List, Min: 1, Max: 1) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
+- `deploy_access_levels` (Block List, Min: 1) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
 - `environment` (String) The name of the environment.
 - `project` (String) The ID or full path of the project which the protected environment is created against.
 
