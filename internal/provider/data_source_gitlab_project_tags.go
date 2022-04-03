@@ -44,7 +44,7 @@ var _ = registerDataSource("gitlab_project_tags", func() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Elem: &schema.Resource{
-					Schema: datasourceSchemaFromResourceSchema(gitlabProjectTagGetSchema()),
+					Schema: datasourceSchemaFromResourceSchema(gitlabProjectTagGetSchema(), nil, nil),
 				},
 			},
 		},
