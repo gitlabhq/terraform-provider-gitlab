@@ -40,16 +40,13 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 			},
 			// Uncomment and validate after 14.9 is released, update acceptance tests
 			// 	"required_approval_count": {
-			// 		Description:  "The number of approvals required to deploy to this environment. This is part of Deployment Approvals, which isn't yet available for use.",
-			// 		Type:         schema.TypeString,
+			// 		Description:  "The number of approvals required to deploy to this environment.",
+			// 		Type:         schema.TypeInt,
 			// 		ForceNew:     true,
-			// 		Required:     false,
-			// 		ValidateFunc: validation.StringIsNotEmpty,
 			// },
 			"deploy_access_levels": {
 				Description: "Array of access levels allowed to deploy, with each described by a hash.",
 				Type:        schema.TypeList,
-				MaxItems:    1,
 				ForceNew:    true,
 				Required:    true,
 				Elem: &schema.Resource{
@@ -59,7 +56,7 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 							Type:         schema.TypeString,
 							ForceNew:     true,
 							Optional:     true,
-							Computed:     true,
+							Computed:     true, // When user_id or group_id is specified, the GitLab API still returns an access_level in the response.
 							ValidateFunc: validation.StringInSlice(validProtectedEnvironmentDeploymentLevelNames, false),
 						},
 						"access_level_description": {
@@ -89,7 +86,11 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 })
 
 func resourceGitlabProjectProtectedEnvironmentCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	deployAccessLevels := expandDeployAccessLevels(d.Get("deploy_access_levels").([]interface{}))
+	deployAccessLevels, err := expandDeployAccessLevels(d.Get("deploy_access_levels").([]interface{}))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	options := &gitlab.ProtectRepositoryEnvironmentsOptions{
 		Name:               gitlab.String(d.Get("environment").(string)),
 		DeployAccessLevels: &deployAccessLevels,
@@ -162,33 +163,50 @@ func resourceGitlabProjectProtectedEnvironmentDelete(ctx context.Context, d *sch
 	return nil
 }
 
-func expandDeployAccessLevels(vs []interface{}) []*gitlab.EnvironmentAccessOptions {
-	result := make([]*gitlab.EnvironmentAccessOptions, 0)
+func expandDeployAccessLevels(vs []interface{}) ([]*gitlab.EnvironmentAccessOptions, error) {
+	result := make([]*gitlab.EnvironmentAccessOptions, len(vs))
 
-	for _, v := range vs {
+	for i, v := range vs {
 		opts := v.(map[string]interface{})
 		option := &gitlab.EnvironmentAccessOptions{}
+		count := 0
+
 		if accessLevel, ok := opts["access_level"]; ok && accessLevel != "" {
 			option.AccessLevel = gitlab.AccessLevel(accessLevelNameToValue[accessLevel.(string)])
-		} else if userID, ok := opts["user_id"]; ok && userID != 0 {
-			option.UserID = gitlab.Int(userID.(int))
-		} else if groupID, ok := opts["group_id"]; ok && groupID != 0 {
-			option.GroupID = gitlab.Int(groupID.(int))
+			count++
 		}
-		result = append(result, option)
+
+		if userID, ok := opts["user_id"]; ok && userID != 0 {
+			option.UserID = gitlab.Int(userID.(int))
+			count++
+		}
+
+		if groupID, ok := opts["group_id"]; ok && groupID != 0 {
+			option.GroupID = gitlab.Int(groupID.(int))
+			count++
+		}
+
+		// This is a manual "ExactlyOneOf" schema check, since this cannot be validated at the
+		// schema-level inside of a list.
+		// See: https://github.com/hashicorp/terraform-plugin-sdk/blob/0f834ffb1619ce1ef8d3f5255911108ede086ef9/helper/schema/schema.go#L278
+		if count != 1 {
+			return nil, fmt.Errorf(`illegal deploy_access_levels.%d: exactly one of "access_level", "user_id", or "group_id" must be specified (got %d)`, i, count)
+		}
+
+		result[i] = option
 	}
 
-	return result
+	return result, nil
 }
 
 func flattenDeployAccessLevels(accessDescriptions []*gitlab.EnvironmentAccessDescription) []map[string]interface{} {
-	result := make([]map[string]interface{}, 0)
+	result := make([]map[string]interface{}, len(accessDescriptions))
 
-	for _, accessDescription := range accessDescriptions {
+	for i, accessDescription := range accessDescriptions {
 		v := make(map[string]interface{})
+		v["access_level_description"] = accessDescription.AccessLevelDescription
 		if accessDescription.AccessLevel != 0 {
 			v["access_level"] = accessLevelValueToName[accessDescription.AccessLevel]
-			v["access_level_description"] = accessDescription.AccessLevelDescription
 		}
 		if accessDescription.UserID != 0 {
 			v["user_id"] = accessDescription.UserID
@@ -196,7 +214,7 @@ func flattenDeployAccessLevels(accessDescriptions []*gitlab.EnvironmentAccessDes
 		if accessDescription.GroupID != 0 {
 			v["group_id"] = accessDescription.GroupID
 		}
-		result = append(result, v)
+		result[i] = v
 	}
 
 	return result

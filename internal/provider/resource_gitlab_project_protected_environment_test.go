@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -14,228 +15,76 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 	testAccCheck(t)
 	testAccCheckEE(t)
 
-	var pt gitlab.ProtectedEnvironment
-	rInt := acctest.RandInt()
-	testProject := testAccCreateProject(t)
-	testEnvironment := testAccCreateProjectEnvironment(t, testProject.ID, &gitlab.CreateEnvironmentOptions{
-		Name: gitlab.String(fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt)),
+	// Set up project environment.
+	project := testAccCreateProject(t)
+	environment := testAccCreateProjectEnvironment(t, project.ID, &gitlab.CreateEnvironmentOptions{
+		Name: gitlab.String(acctest.RandomWithPrefix("test-protected-environment")),
 	})
 
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy,
-		Steps: []resource.TestStep{
-			// Create a Protected Environment with default options
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "developer"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
-					}),
-				),
-			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			// Update the Protected Environment
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "maintainer"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.MaintainerPermissions],
-					}),
-				),
-			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			// Update the Protected Environment to get back to initial settings
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "developer"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
-					}),
-				),
-			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
-}
+	// Set up project user.
+	user := testAccCreateUsers(t, 1)[0]
+	testAccAddProjectMembers(t, project.ID, []*gitlab.User{user})
 
-func TestAccGitlabProjectProtectedEnvironment_user(t *testing.T) {
-	testAccCheck(t)
-	testAccCheckEE(t)
-
-	var pt gitlab.ProtectedEnvironment
-	rInt := acctest.RandInt()
-	testProject := testAccCreateProject(t)
-	testUser := testAccCreateUsers(t, 1)[0]
-	testAccAddProjectMembers(t, testProject.ID, []*gitlab.User{testUser})
-	testEnvironment := testAccCreateProjectEnvironment(t, testProject.ID, &gitlab.CreateEnvironmentOptions{
-		Name: gitlab.String(fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt)),
-	})
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy,
-		Steps: []resource.TestStep{
-			// Create a Protected Environment with default options
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "developer"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
-					}),
-				),
-			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			// Update the Protected Environment with user level access
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentUpdateUserConfig(testEnvironment.Name, testProject.ID, testUser.ID),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.MaintainerPermissions],
-						UserID:            testUser.ID,
-					}),
-				),
-			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			// Update the Protected Environment to get back to initial settings
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "developer"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
-					}),
-				),
-			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
-}
-
-func TestAccGitlabProjectProtectedEnvironment_group(t *testing.T) {
-	testAccCheck(t)
-	testAccCheckEE(t)
-
-	var pt gitlab.ProtectedEnvironment
-	rInt := acctest.RandInt()
-	testProject := testAccCreateProject(t)
+	// Set up group access.
 	group := testAccCreateGroups(t, 1)[0]
-
-	options := &gitlab.ShareWithGroupOptions{
+	if _, err := testGitlabClient.Projects.ShareProjectWithGroup(project.ID, &gitlab.ShareWithGroupOptions{
 		GroupID:     &group.ID,
 		GroupAccess: gitlab.AccessLevel(gitlab.MaintainerPermissions),
+	}); err != nil {
+		t.Fatalf("unable to share project %d with group %d", project.ID, group.ID)
 	}
-	if _, err := testGitlabClient.Projects.ShareProjectWithGroup(testProject.ID, options); err != nil {
-		t.Fatalf("unable to share project %d with group %d", testProject.ID, group.ID)
-	}
-	testEnvironment := testAccCreateProjectEnvironment(t, testProject.ID, &gitlab.CreateEnvironmentOptions{
-		Name: gitlab.String(fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt)),
-	})
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy,
+		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy(project.ID, environment.Name),
 		Steps: []resource.TestStep{
-			// Create a Protected Environment with default options
+			// Create a basic protected environment.
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "developer"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
-					}),
-				),
+				Config: fmt.Sprintf(`
+				resource "gitlab_project_protected_environment" "this" {
+					project     = %d
+					environment = %q
+					deploy_access_levels {
+						access_level = "developer"
+					}
+				}`, project.ID, environment.Name),
+				// Check computed attributes.
+				Check: resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.0.access_level_description"),
 			},
-			// Verify import
-			{
-				ResourceName:      "gitlab_project_protected_environment.this",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-			// Update the Protected Environment with group level access
-			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentUpdateGroupConfig(testEnvironment.Name, testProject.ID, group.ID),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.MaintainerPermissions],
-						GroupID:           group.ID,
-					}),
-				),
-			},
-			// Verify import
+			// Verify upstream attributes with an import.
 			{
 				ResourceName:      "gitlab_project_protected_environment.this",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
-			// Update the Protected Environment to get back to initial settings
+			// Update the protected environment.
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectProtectedEnvironmentBasicConfig(testEnvironment.Name, testProject.ID, "developer"),
+				Config: fmt.Sprintf(`
+				resource "gitlab_project_protected_environment" "this" {
+					project     = %d
+					environment = %q
+					deploy_access_levels {
+						access_level = "maintainer"
+					}
+					deploy_access_levels {
+						user_id = %d
+					}
+					deploy_access_levels {
+						group_id = %d
+					}
+				}`, project.ID, environment.Name, user.ID, group.ID),
+				// Check computed attributes.
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectProtectedEnvironmentExists("gitlab_project_protected_environment.this", &pt),
-					testAccCheckGitlabProjectProtectedEnvironmentAttributes(&pt, &testAccGitlabProjectProtectedEnvironmentExpectedAttributes{
-						Name:              fmt.Sprintf("ProjectProtectedEnvironment-%d", rInt),
-						CreateAccessLevel: accessLevelValueToName[gitlab.DeveloperPermissions],
-					}),
+					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.0.access_level_description"),
+					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.1.access_level_description"),
+					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.2.access_level_description"),
+					// access_level is computed when not specified.
+					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.1.access_level"),
+					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.2.access_level"),
 				),
 			},
-			// Verify import
+			// Verify upstream attributes with an import.
 			{
 				ResourceName:      "gitlab_project_protected_environment.this",
 				ImportState:       true,
@@ -245,127 +94,15 @@ func TestAccGitlabProjectProtectedEnvironment_group(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabProjectProtectedEnvironmentExists(n string, pt *gitlab.ProtectedEnvironment) resource.TestCheckFunc {
+func testAccCheckGitlabProjectProtectedEnvironmentDestroy(projectID int, environmentName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
+		_, _, err := testGitlabClient.ProtectedEnvironments.GetProtectedEnvironment(projectID, environmentName)
+		if err == nil {
+			return errors.New("environment is still protected")
 		}
-
-		project, environment, err := parseTwoPartID(rs.Primary.ID)
-		if err != nil {
-			return fmt.Errorf("Error in Splitting Project ID and Environment Name")
+		if !is404(err) {
+			return fmt.Errorf("unable to get protected environment: %w", err)
 		}
-
-		pes, _, err := testGitlabClient.ProtectedEnvironments.ListProtectedEnvironments(project, nil)
-		if err != nil {
-			return err
-		}
-
-		for _, gotpe := range pes {
-			if gotpe.Name == environment {
-				*pt = *gotpe
-				return nil
-			}
-		}
-
-		return fmt.Errorf("Protected Environment does not exist")
-	}
-}
-
-type testAccGitlabProjectProtectedEnvironmentExpectedAttributes struct {
-	Name              string
-	CreateAccessLevel string
-	GroupID           int
-	UserID            int
-}
-
-func testAccCheckGitlabProjectProtectedEnvironmentAttributes(pt *gitlab.ProtectedEnvironment, want *testAccGitlabProjectProtectedEnvironmentExpectedAttributes) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		if pt.Name != want.Name {
-			return fmt.Errorf("got name %s; want %s", pt.Name, want.Name)
-		}
-
-		if pt.DeployAccessLevels[0].AccessLevel != accessLevelNameToValue[want.CreateAccessLevel] {
-			return fmt.Errorf("got create access levels %d; want %d", pt.DeployAccessLevels[0].AccessLevel, accessLevelNameToValue[want.CreateAccessLevel])
-		}
-
-		if pt.DeployAccessLevels[0].GroupID != want.GroupID {
-			return fmt.Errorf("got group ID %d; want %d", pt.DeployAccessLevels[0].GroupID, want.GroupID)
-		}
-
-		if pt.DeployAccessLevels[0].UserID != want.UserID {
-			return fmt.Errorf("got user ID %d; want %d", pt.DeployAccessLevels[0].UserID, want.UserID)
-		}
-
 		return nil
 	}
-}
-
-func testAccCheckGitlabProjectProtectedEnvironmentDestroy(s *terraform.State) error {
-	var project string
-	var protectedEnvironment string
-	var err error
-	for _, rs := range s.RootModule().Resources {
-		if rs.Type == "gitlab_project" {
-			project = rs.Primary.ID
-		} else if rs.Type == "gitlab_project_protected_environment" {
-			project, protectedEnvironment, err = parseTwoPartID(rs.Primary.ID)
-			if err != nil {
-				return fmt.Errorf("[ERROR] cannot get project and Protected Environment from input: %v", rs.Primary.ID)
-			}
-		}
-	}
-
-	pt, _, err := testGitlabClient.ProtectedEnvironments.GetProtectedEnvironment(project, protectedEnvironment)
-	if err == nil {
-		if pt != nil {
-			return fmt.Errorf("project Protected Environment %s still exists", protectedEnvironment)
-		}
-	} else {
-		if !is404(err) {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func testAccGitlabProjectProtectedEnvironmentBasicConfig(environmentName string, projectID int, access_level string) string {
-	return fmt.Sprintf(`
-resource "gitlab_project_protected_environment" "this" {
-  project     = %[2]d
-  environment = "%[1]s"
-
-  deploy_access_levels {
-		access_level = "%[3]s"
-  }
-}
-	`, environmentName, projectID, access_level)
-}
-
-func testAccGitlabProjectProtectedEnvironmentUpdateGroupConfig(environmentName string, projectID int, groupID int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project_protected_environment" "this" {
-  project     = %[2]d
-  environment = "%[1]s"
-
-  deploy_access_levels {
-    group_id = %[3]d
-  }
-}
-	`, environmentName, projectID, groupID)
-}
-
-func testAccGitlabProjectProtectedEnvironmentUpdateUserConfig(environmentName string, projectID int, userID int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project_protected_environment" "this" {
-  project     = %[2]d
-  environment = "%[1]s"
-
-  deploy_access_levels {
-    user_id = %[3]d
-  }
-}
-	`, environmentName, projectID, userID)
 }
