@@ -47,10 +47,21 @@ func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
-			// Delete the gitlab_group_share_group resource
+			// Update share group back to initial settings
 			{
-				Config: testAccGitlabGroupShareGroupConfigDelete(),
-				Check:  testAccCheckGitlabGroupIsNotShared(mainGroup.Name),
+				Config: testAccGitlabGroupShareGroupConfig(mainGroup.ID, sharedGroup.ID,
+					`
+					group_access 	 = "guest"
+					expires_at     = "2099-01-01"
+					`,
+				),
+				Check: testAccCheckGitlabGroupSharedWithGroup(mainGroup.Name, sharedGroup.Name, "2099-01-01", gitlab.GuestPermissions),
+			},
+			{
+				// Verify Import
+				ResourceName:      "gitlab_group_share_group.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -82,22 +93,6 @@ func testAccCheckGitlabGroupSharedWithGroup(mainGroupName string, sharedGroupNam
 			return fmt.Errorf("expire time was nil (wanted %s)", expireTime)
 		} else if sharedGroup.ExpiresAt != nil && sharedGroup.ExpiresAt.String() != expireTime {
 			return fmt.Errorf("expire time was %s (wanted %s)", sharedGroup.ExpiresAt.String(), expireTime)
-		}
-
-		return nil
-	}
-}
-
-func testAccCheckGitlabGroupIsNotShared(mainGroupName string) resource.TestCheckFunc {
-	return func(_ *terraform.State) error {
-		mainGroup, _, err := testGitlabClient.Groups.GetGroup(mainGroupName, nil)
-		if err != nil {
-			return err
-		}
-
-		sharedGroupsCount := len(mainGroup.SharedWithGroups)
-		if sharedGroupsCount != 0 {
-			return fmt.Errorf("Number of shared groups was %d (wanted %d)", sharedGroupsCount, 0)
 		}
 
 		return nil
@@ -147,8 +142,4 @@ func testAccGitlabGroupShareGroupConfig(mainGroupId int, shareGroupId int, share
 		shareGroupId,
 		shareGroupSettings,
 	)
-}
-
-func testAccGitlabGroupShareGroupConfigDelete() string {
-	return ``
 }

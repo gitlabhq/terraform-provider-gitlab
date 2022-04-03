@@ -662,7 +662,8 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProject_imprt(t *testing.T) {
+// lintignore: AT002 // specialized import test
+func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -686,7 +687,8 @@ func TestAccGitlabProject_imprt(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProject_nestedImprt(t *testing.T) {
+// lintignore: AT002 // specialized import test
+func TestAccGitlabProject_nestedImport(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -766,7 +768,8 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	})
 }
 
-func TestAccGitlabProject_imprtURL(t *testing.T) {
+// lintignore: AT002 // not a Terraform import test
+func TestAccGitlabProject_importURL(t *testing.T) {
 	testAccCheck(t)
 
 	rInt := acctest.RandInt()
@@ -890,7 +893,8 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 	}
 }
 
-func TestAccGitlabProject_ImprtURLMirrored(t *testing.T) {
+// lintignore: AT002 // not a Terraform import test
+func TestAccGitlabProject_ImportURLMirrored(t *testing.T) {
 	testAccCheck(t)
 
 	var mirror gitlab.Project
