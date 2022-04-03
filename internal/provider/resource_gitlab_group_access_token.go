@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hashicorp/go-cty/cty"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -76,19 +75,11 @@ var _ = registerResource("gitlab_group_access_token", func() *schema.Resource {
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validAccessLevels, false)),
 			},
 			"expires_at": {
-				Description: "The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				ForceNew:    true,
-				ValidateDiagFunc: func(i interface{}, p cty.Path) diag.Diagnostics {
-					v := i.(string)
-
-					if _, err := time.Parse("2006-01-02", v); err != nil {
-						return diag.Errorf("expected %q to be a valid YYYY-MM-DD date, got %q: %+v", p, i, err)
-					}
-
-					return nil
-				},
+				Description:      "The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ForceNew:         true,
+				ValidateDiagFunc: isISO6801Date,
 			},
 			"token": {
 				Description: "The group access token. This is only populated when creating a new group access token. This attribute is not available for imported resources.",
@@ -236,6 +227,6 @@ func resourceGitlabGroupAccessTokenDelete(ctx context.Context, d *schema.Resourc
 	}
 
 	log.Printf("[DEBUG] Delete gitlab GroupAccessToken %s", d.Id())
-	_, err = client.GroupAccessTokens.DeleteGroupAccessToken(group, groupAccessTokenId, gitlab.WithContext(ctx))
+	_, err = client.GroupAccessTokens.RevokeGroupAccessToken(group, groupAccessTokenId, gitlab.WithContext(ctx))
 	return diag.FromErr(err)
 }

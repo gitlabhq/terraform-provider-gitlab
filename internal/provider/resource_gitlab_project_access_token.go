@@ -52,19 +52,11 @@ var _ = registerResource("gitlab_project_access_token", func() *schema.Resource 
 				},
 			},
 			"expires_at": {
-				Description: "Time the token will expire it, YYYY-MM-DD format. Will not expire per default.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				ValidateFunc: func(i interface{}, k string) (warnings []string, errors []error) {
-					v := i.(string)
-
-					if _, err := time.Parse("2006-01-02", v); err != nil {
-						errors = append(errors, fmt.Errorf("expected %q to be a valid YYYY-MM-DD date, got %q: %+v", k, i, err))
-					}
-
-					return warnings, errors
-				},
-				ForceNew: true,
+				Description:      "Time the token will expire it, YYYY-MM-DD format. Will not expire per default.",
+				Type:             schema.TypeString,
+				Optional:         true,
+				ValidateDiagFunc: isISO6801Date,
+				ForceNew:         true,
 			},
 			"token": {
 				Description: "The secret token. **Note**: the token is not available for imported resources.",
@@ -124,15 +116,12 @@ func resourceGitlabProjectAccessTokenCreate(ctx context.Context, d *schema.Resou
 		}
 		parsedExpiresAtISOTime := gitlab.ISOTime(parsedExpiresAt)
 		options.ExpiresAt = &parsedExpiresAtISOTime
-		log.Printf("[DEBUG] create gitlab ProjectAccessToken %s with expires_at %s for project ID %s", *options.Name, *options.ExpiresAt, project)
 	}
 
 	projectAccessToken, _, err := client.ProjectAccessTokens.CreateProjectAccessToken(project, options, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-
-	log.Printf("[DEBUG] created gitlab ProjectAccessToken %d - %s for project ID %s", projectAccessToken.ID, *options.Name, project)
 
 	PATstring := strconv.Itoa(projectAccessToken.ID)
 	d.SetId(buildTwoPartID(&project, &PATstring))
@@ -197,7 +186,7 @@ func resourceGitlabProjectAccessTokenDelete(ctx context.Context, d *schema.Resou
 	}
 
 	log.Printf("[DEBUG] Delete gitlab ProjectAccessToken %s", d.Id())
-	_, err = client.ProjectAccessTokens.DeleteProjectAccessToken(project, projectAccessTokenID, gitlab.WithContext(ctx))
+	_, err = client.ProjectAccessTokens.RevokeProjectAccessToken(project, projectAccessTokenID, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
