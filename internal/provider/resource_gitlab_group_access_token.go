@@ -27,6 +27,7 @@ var validAccessLevels = []string{
 	"reporter",
 	"developer",
 	"maintainer",
+	"owner",
 }
 
 var _ = registerResource("gitlab_group_access_token", func() *schema.Resource {
