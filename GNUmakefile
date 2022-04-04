@@ -3,6 +3,7 @@ default: reviewable
 reviewable: build fmt generate test ## Run before committing.
 
 GOBIN = $(shell pwd)/bin
+PROVIDER_SRC_DIR := ./internal/provider
 
 build: ## Build the provider binary.
 	go mod tidy
@@ -10,14 +11,15 @@ build: ## Build the provider binary.
 
 generate: tool-tfplugindocs ## Generate files to be checked in.
 	@# Setting empty environment variables to work around issue: https://github.com/hashicorp/terraform-plugin-docs/issues/12
-	GITLAB_TOKEN="" $(GOBIN)/tfplugindocs generate
+	@# Setting the PATH so that tfplugindocs uses the same terraform binary as other targets here, and to resolve a "Error: Incompatible provider version" error on M1 macs.
+	GITLAB_TOKEN="" PATH="$(GOBIN):$(PATH)" $(GOBIN)/tfplugindocs generate
 
 ifdef RUN
 TESTARGS += -test.run $(RUN)
 endif
 
 test: ## Run unit tests.
-	go test $(TESTARGS) ./gitlab
+	go test $(TESTARGS) $(PROVIDER_SRC_DIR)
 
 TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
 
@@ -50,6 +52,9 @@ lint-generated: generate ## Check that "make generate" was called. Note this onl
 		exit 1; \
 	}
 
+lint-custom: ## Run custom checks and validations that do not fit into an existing lint framework.
+	@./scripts/lint-custom.sh
+
 apicovered: tool-apicovered ## Run an analysis tool to estimate the GitLab API coverage.
 	@$(GOBIN)/apicovered ./gitlab
 
@@ -68,7 +73,7 @@ testacc-down: ## Teardown a GitLab instance.
 	docker-compose down
 
 testacc: ## Run acceptance tests against a GitLab instance.
-	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v ./gitlab $(TESTARGS) -timeout 40m
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
 
 # TOOLS
 # Tool dependencies are installed into a project-local /bin folder.

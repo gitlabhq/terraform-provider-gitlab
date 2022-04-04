@@ -7,5 +7,5 @@ resource "gitlab_project" "foo" {
 resource "gitlab_managed_license" "mit" {
   project         = gitlab_project.foo.id
   name            = "MIT license"
-  approval_status = "approved"
+  approval_status = "allowed"
 }

@@ -3,20 +3,24 @@
 page_title: "gitlab_project_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage Project Access Token for your GitLab projects.
+  The gitlab_project_access_token resource allows to manage the lifecycle of a project access token.
+  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/project_access_tokens.html
 ---
 
 # gitlab_project_access_token (Resource)
 
-This resource allows you to create and manage Project Access Token for your GitLab projects.
+The `gitlab_project_access_token` resource allows to manage the lifecycle of a project access token.
+
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/project_access_tokens.html)
 
 ## Example Usage
 
 ```terraform
 resource "gitlab_project_access_token" "example" {
-  project    = "25"
-  name       = "Example project access token"
-  expires_at = "2020-03-14"
+  project      = "25"
+  name         = "Example project access token"
+  expires_at   = "2020-03-14"
+  access_level = "reporter"
 
   scopes = ["api"]
 }
@@ -33,21 +37,31 @@ resource "gitlab_project_variable" "example" {
 
 ### Required
 
-- **name** (String) A name to describe the project access token.
-- **project** (String) The id of the project to add the project access token to.
-- **scopes** (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`.
+- `name` (String) A name to describe the project access token.
+- `project` (String) The id of the project to add the project access token to.
+- `scopes` (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`.
 
 ### Optional
 
-- **expires_at** (String) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
-- **id** (String) The ID of this resource.
+- `access_level` (String) The access level for the project access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`. Default is `maintainer`.
+- `expires_at` (String) Time the token will expire it, YYYY-MM-DD format. Will not expire per default.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **active** (Boolean) True if the token is active.
-- **created_at** (String) Time the token has been created, RFC3339 format.
-- **revoked** (Boolean) True if the token is revoked.
-- **token** (String, Sensitive) The secret token. This is only populated when creating a new project access token.
-- **user_id** (Number) The user_id associated to the token.
+- `active` (Boolean) True if the token is active.
+- `created_at` (String) Time the token has been created, RFC3339 format.
+- `revoked` (Boolean) True if the token is revoked.
+- `token` (String, Sensitive) The secret token. **Note**: the token is not available for imported resources.
+- `user_id` (Number) The user_id associated to the token.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# A GitLab Project Access Token can be imported using a key composed of `<project-id>:<token-id>`, e.g.
+terraform import gitlab_project_access_token.example "12345:1"
+
+# NOTE: the `token` resource attribute is not available for imported resources as this information cannot be read from the GitLab API.
+```

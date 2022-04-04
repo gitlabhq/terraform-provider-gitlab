@@ -41,6 +41,7 @@ resource "gitlab_project" "api" {
   only_allow_merge_if_all_discussions_are_resolved = true
   only_allow_merge_if_pipeline_succeeds            = true
   remove_source_branch_after_merge                 = true
+  printing_merge_request_link_enabled              = true
 
   container_registry_enabled = false
   lfs_enabled                = false

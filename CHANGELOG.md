@@ -1,3 +1,186 @@
+## 3.13.0 (2022-03-30)
+
+FEATURES:
+
+* **New Data Source:** `gitlab_instance_deploy_keys` ([#870](https://github.com/gitlabhq/terraform-provider-gitlab/pull/870))
+* **New Data Source:** `gitlab_project_tags` ([#963](https://github.com/gitlabhq/terraform-provider-gitlab/pull/963))
+* **New Data Source:** `gitlab_repository_file` ([#939](https://github.com/gitlabhq/terraform-provider-gitlab/pull/939))
+* **New Resource**: `gitlab_project_environment` ([#938](https://github.com/gitlabhq/terraform-provider-gitlab/pull/938))
+* **New Resource**: `gitlab_project_protected_environment` ([#938](https://github.com/gitlabhq/terraform-provider-gitlab/pull/938))
+* **New Resource**: `gitlab_system_hook` ([#929](https://github.com/gitlabhq/terraform-provider-gitlab/pull/929))
+* resource/gitlab_topic: Support deletion ([#967](https://github.com/gitlabhq/terraform-provider-gitlab/pull/967))
+* resource/gitlab_topic: Support avatar images ([#968](https://github.com/gitlabhq/terraform-provider-gitlab/pull/968))
+* resource/gitlab_repository_file: Support using plain text `content` to beautify plans ([#972](https://github.com/gitlabhq/terraform-provider-gitlab/pull/972))
+
+IMPROVEMENTS:
+
+* resource/gitlab_branch_protection: Make `push_access_level` and `merge_access_level` optional ([#934](https://github.com/gitlabhq/terraform-provider-gitlab/pull/934))
+* resource/gitlab_branch_protection: Add `unprotect_access_level` and `allowed_to_unprotect` attributes ([#934](https://github.com/gitlabhq/terraform-provider-gitlab/pull/934))
+* resource/gitlab_pipeline_schedule: Use single GET API to read resource details to increase performance ([#955](https://github.com/gitlabhq/terraform-provider-gitlab/pull/955))
+* resource/gitlab_project_variable: Use single GET API to read resource details to increase performance ([#953](https://github.com/gitlabhq/terraform-provider-gitlab/pull/953))
+* resource/gitlab_deploy_token: Support `terraform import` ([#960](https://github.com/gitlabhq/terraform-provider-gitlab/pull/960))
+* resource/gitlab_project_access_token: Support `terraform import` ([#960](https://github.com/gitlabhq/terraform-provider-gitlab/pull/960))
+* resource/gitlab_project_hook: Support `terraform import` ([#960](https://github.com/gitlabhq/terraform-provider-gitlab/pull/960))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `analytics_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `auto_cancel_pending_pipelines` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `auto_devops_deploy_strategy` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `auto_devops_enabled` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `autoclose_referenced_issues` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `build_git_strategy` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `builds_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `container_expiration_policy` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `container_registry_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `emails_disabled` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `external_authorization_classification_label` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `forking_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `issues_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `merge_commit_template` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `merge_requests_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `operations_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `public_builds` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `repository_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `repository_storage` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `requirements_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `resolve_outdated_diff_discussions` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `security_and_compliance_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `squash_commit_template` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `topics` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_project, datasource/gitlab_project, datasource/gitlab_projects: Add `wiki_access_level` attribute ([#917](https://github.com/gitlabhq/terraform-provider-gitlab/pull/917))
+* resource/gitlab_managed_license: Add support for "allowed" and "denied" to align with upcoming GitLab 15.0 deprecations ([#952](https://github.com/gitlabhq/terraform-provider-gitlab/pull/952))
+
+BUG FIXES:
+
+* resource/gitlab_deploy_token: Implement pagination when reading tokens to find all existing tokens ([#941](https://github.com/gitlabhq/terraform-provider-gitlab/pull/941))
+* resource/gitlab_project_approval_rule: Implement pagination when reading approval rules to find all existing ones ([#950](https://github.com/gitlabhq/terraform-provider-gitlab/pull/950))
+* resource/gitlab_repository_file: Implement locking and retry within the provider to mitigate parallelism limits ([#964](https://github.com/gitlabhq/terraform-provider-gitlab/pull/964))
+
+## 3.12.0 (2022-03-08)
+
+FEATURES:
+
+* **New Resource:** `gitlab_project_tag` ([#910](https://github.com/gitlabhq/terraform-provider-gitlab/pull/910))
+* **New Resource:** `gitlab_project_issue` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+* **New Data Source:** `gitlab_project_tag` ([#910](https://github.com/gitlabhq/terraform-provider-gitlab/pull/910))
+* **New Data Source:** `gitlab_project_issue` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+* **New Data Source:** `gitlab_project_issues` ([#891](https://github.com/gitlabhq/terraform-provider-gitlab/pull/891))
+
+IMPROVEMENTS:
+
+* datasource/gitlab_group: Add `prevent_forking_outside_group` attribute ([#914](https://github.com/gitlabhq/terraform-provider-gitlab/pull/914))
+* resource/gitlab_group: Add `prevent_forking_outside_group` attribute ([#914](https://github.com/gitlabhq/terraform-provider-gitlab/pull/914))
+* resource/gitlab_project_approval_rule: Add `rule_type` attribute ([#916](https://github.com/gitlabhq/terraform-provider-gitlab/pull/916))
+
+BUG FIXES:
+
+* resource/gitlab_project: Fix deletion drift handling ([#924](https://github.com/gitlabhq/terraform-provider-gitlab/pull/924))
+* resource/gitlab_project_badge: Fix deletion drift handling ([#924](https://github.com/gitlabhq/terraform-provider-gitlab/pull/924))
+* resource/gitlab_group_badge: Fix deletion drift handling ([#924](https://github.com/gitlabhq/terraform-provider-gitlab/pull/924))
+
+## 3.11.1 (2022-03-02)
+
+BUG FIXES:
+
+* resource/gitlab_project: fix waiting for default branch protection during creation ([#908](https://github.com/gitlabhq/terraform-provider-gitlab/pull/908))
+
+## 3.11.0 (2022-03-01)
+
+FEATURES:
+
+* **New Resource:** `resource/gitlab_user_sshkey` ([#903](https://github.com/gitlabhq/terraform-provider-gitlab/pull/903))
+
+IMPROVEMENTS:
+
+* resource/gitlab_instance_variable: better error message for invalid masked variable values ([#895](https://github.com/gitlabhq/terraform-provider-gitlab/pull/895))
+* resource/gitlab_group_variable: better error message for invalid masked variable values ([#895](https://github.com/gitlabhq/terraform-provider-gitlab/pull/895))
+* resource/gitlab_project: Add `merge_pipelines_enabled` and `merge_trains_enabled` attributes ([#900](https://github.com/gitlabhq/terraform-provider-gitlab/pull/900))
+* resource/gitlab_project_level_mr_approvals: Add `required_password_to_approve` attribute ([#808](https://github.com/gitlabhq/terraform-provider-gitlab/pull/808))
+* resource/gitlab_user: Add support for `deactivated` user state ([#899](https://github.com/gitlabhq/terraform-provider-gitlab/pull/899))
+
+BUG FIXES:
+
+* resource/gitlab_branch_protection: fix issue claiming that no valid access level([#892](https://github.com/gitlabhq/terraform-provider-gitlab/pull/892))
+
+## 3.10.1 (2022-02-24)
+
+**ATTENTION:** this bug fix release was never released due to [#896](https://github.com/gitlabhq/terraform-provider-gitlab/issues/896).
+Please use `v3.11.0` instead.
+
+BUG FIXES:
+
+* resource/gitlab_branch_protection: Fix issue which claimed that `no valid access level` can be found ([#892](https://github.com/gitlabhq/terraform-provider-gitlab/pull/892))
+
+## 3.10.0 (2022-02-23)
+
+FEATURES:
+
+* **New Resource:** `gitlab_group_access_token` ([#860](https://github.com/gitlabhq/terraform-provider-gitlab/pull/860))
+* **New Resource:** `gitlab_topic` ([#871](https://github.com/gitlabhq/terraform-provider-gitlab/pull/871))
+
+IMPROVEMENTS:
+
+* datasource/gitlab_project: Add `printing_merge_request_link_enabled` attribute ([#783](https://github.com/gitlabhq/terraform-provider-gitlab/pull/783))
+* datasource/gitlab_project: Add `ci_forward_deployment_enabled` attribute ([#732](https://github.com/gitlabhq/terraform-provider-gitlab/pull/732))
+* datasource/gitlab_projects: Add `ci_forward_deployment_enabled` attribute ([#732](https://github.com/gitlabhq/terraform-provider-gitlab/pull/732))
+* datasource/gitlab_group_membership: Support pagination ([#858](https://github.com/gitlabhq/terraform-provider-gitlab/pull/858))
+* resource/gitlab_group_ldap_link: Add import support ([#771](https://github.com/gitlabhq/terraform-provider-gitlab/pull/771))
+* resource/gitlab_project: Add `ci_forward_deployment_enabled` attribute ([#732](https://github.com/gitlabhq/terraform-provider-gitlab/pull/732))
+* resource/gitlab_project: Add `printing_merge_request_link_enabled` attribute ([#783](https://github.com/gitlabhq/terraform-provider-gitlab/pull/783))
+* resource/gitlab_project_hook: Add `releases_events` attribute ([#773](https://github.com/gitlabhq/terraform-provider-gitlab/pull/773))
+* resource/gitlab_branch_protection: Add `allow_force_push` attribute ([#877](https://github.com/gitlabhq/terraform-provider-gitlab/pull/877))
+* resource/gitlab_service_jira: Add `api_url` attribute ([#597](https://github.com/gitlabhq/terraform-provider-gitlab/pull/597))
+* resource/gitlab_user: Add `state` attribute to allow blocking users ([#762](https://github.com/gitlabhq/terraform-provider-gitlab/pull/762))
+
+BUG FIXES:
+
+* datasource/gitlab_projects: Allow to get archived and unarchived repositories ([#855](https://github.com/gitlabhq/terraform-provider-gitlab/pull/855))
+* resource/gitlab_group: Support setting `default_branch_protection` to `0` ([#856](https://github.com/gitlabhq/terraform-provider-gitlab/pull/856))
+* resource/gitlab_group_ldap_link: Fix panic when setting group access level ([#873](https://github.com/gitlabhq/terraform-provider-gitlab/pull/873))
+* resource/gitlab_project: Correctly handle push rules add and edit ([#838](https://github.com/gitlabhq/terraform-provider-gitlab/pull/838))
+* resource/gitlab_project: Support creating project in group without default branch protection ([#856](https://github.com/gitlabhq/terraform-provider-gitlab/pull/856))
+* resource/gitlab_project: Fix backwards-compatibility with 14.1 regarding the `squash_option` ([#867](https://github.com/gitlabhq/terraform-provider-gitlab/pull/867))
+* resource/gitlab_project: Re-compute `path_with_namespace`, `ssh_url_to_repo`, `http_url_to_repo` and `web_url` attributes if `path` changes ([#875](https://github.com/gitlabhq/terraform-provider-gitlab/pull/875))
+
+## 3.9.1 (2022-02-06)
+
+BUGFIXES:
+
+* Fix crash in `gitlab_user` data source
+
+## 3.9.0 (2022-02-04)
+
+FEATURES:
+
+* 0519c96 - Add `gitlab_repository_file` resource (#724)
+* a915ccb - Add the `gitlab_project_access_token` resource (#588)
+* 8564a07 - Add `gitlab_group_custom_attribute`, `gitlab_project_custom_attribute`, and `gitlab_user_custom_attribute` (#731)
+* 39b0b6d - Add support for `gitlab_group_badge` resource (#673)
+* dd0da2b - Implement configuration of the integration "Microsoft Teams" (#308) (#784)
+* febe745 - Add `gitlab_project_protected_branch` and `gitlab_project_protected_branches` data sources (#551)
+* b4d4f8d - Support `early_auth_check` flag in provider config (#787)
+* 1455db0 - Add `gitlab_managed_license` resource (#700)
+* be59cd1 - New `archive_on_destroy` attribute for `gitlab_project` (#816)
+
+ENHANCEMENTS:
+
+* 9863a61 - Add missing attributes to documentation (#802)
+* 84d729e - Improve documentation around authentication with GitLab (#803)
+* a9edc4a - Add environment scope to `gitlab_group_variable` (#717)
+* c5a2f34 - Support `issues_template` and `merge_requests_template` attributes in project resource (#796)
+* 65b8e9c - Add minimal access level permissions (#747)
+* 12ae791 - Added missing scopes to deploy token (#769)
+* 1455db0 - Update allowed access levels in `gitlab_branch_protection`, `gitlab_group_ldap_link`, `gitlab_group_membership`, `gitlab_group_share_group`, `gitlab_project_membership`, `gitlab_project_share_group`, and `gitlab_tag_protection` (#819)
+* 1455db0 - New attribute `group_access` in `gitlab_project_share_group` and `gitlab_group_ldap_link` (attribute `access_level` is now considered deprecated on those resources) (#819)
+
+BUGFIXES:
+
+* f3b0f31 - Handle manually removed resources (#318)
+* fc84cc3 - Properly allow arguments `id`or `path_with_namespace` for project data source (#806)
+* d7059cf - Do not recreate project mirror on every run (#632)
+* e57bf1d - Fix branch_protection documentation (#780)
+* 912b647 - Fix docs for `gitlab_project_level_mr_approvals` import (#766)
+* e89922e - instance_cluster/group_cluster: Suppress whitespace diff for kubernetes_ca_cert (#728)
+* edda219 - gitlab_user: Do not set skip_confirmation on read (#491)
+
 ## 3.8.0 (Nov 19, 2021)
 
 ENHANCEMENTS:
@@ -61,34 +244,34 @@ BUG FIXES:
 
 FEATURES:
 
-* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/516 ))  
+* Add resource for project freeze periods ([#516](https://github.com/gitlabhq/terraform-provider-gitlab/pull/516 ))
 
 ENHANCEMENTS:
 
-* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/523)) 
-* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/525)) 
-* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/527)) 
+* Update go version and go-gitlab version ([#523](https://github.com/gitlabhq/terraform-provider-gitlab/pull/523))
+* Support additional attributes in `gitlab_project_hook` ([#525](https://github.com/gitlabhq/terraform-provider-gitlab/pull/525))
+* Link badges in README to proper workflows ([#527](https://github.com/gitlabhq/terraform-provider-gitlab/pull/527))
 * gitlab_project: Check each push rule individually ([#531](https://github.com/gitlabhq/terraform-provider-gitlab/pull/531))
-* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/532)) 
-* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/535)) 
-* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/539)) 
+* Allow `full_path` in addition to `id` in gitlab_project data source ([#532](https://github.com/gitlabhq/terraform-provider-gitlab/pull/532))
+* Update test fixtures for better usability ([#535](https://github.com/gitlabhq/terraform-provider-gitlab/pull/535))
+* Check for state change on user delete ([#539](https://github.com/gitlabhq/terraform-provider-gitlab/pull/539))
 * Increase gitlab_project import timeout ([#536](https://github.com/gitlabhq/terraform-provider-gitlab/pull/536))
-* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/554)) 
-* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/546)) 
-* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/558)) 
-* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/564)) 
-* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/568)) 
+* Add optional mirror options ([#554](https://github.com/gitlabhq/terraform-provider-gitlab/pull/554))
+* Remove vendor folder ([#546](https://github.com/gitlabhq/terraform-provider-gitlab/pull/546))
+* Add dependabot config ([#558](https://github.com/gitlabhq/terraform-provider-gitlab/pull/558))
+* Fix EE tests actually running against CE ([#564](https://github.com/gitlabhq/terraform-provider-gitlab/pull/564))
+* Fix EE test mounting license as a directory ([#568](https://github.com/gitlabhq/terraform-provider-gitlab/pull/568))
 
 BUG FIXES:
 
-* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/510)) 
-* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/555)) 
+* fix deploy_token expiration ([#510](https://github.com/gitlabhq/terraform-provider-gitlab/pull/510))
+* Fix group_share_group nil pointer reference ([#555](https://github.com/gitlabhq/terraform-provider-gitlab/pull/555))
 
 ## 3.4.0 (Jan 14, 2021)
 
 FEATURES:
 
-* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/511)) 
+* Support sharing a group with another group ([#511](https://github.com/gitlabhq/terraform-provider-gitlab/pull/511))
 * Support Project Mirroring ([#512](https://github.com/gitlabhq/terraform-provider-gitlab/pull/512))
 
 ## 3.3.0 (Nov 30, 2020)
@@ -244,14 +427,14 @@ ENHANCEMENTS:
 
 BUGFIXES:
 
-* Support for soft-delete of groups and projects in Gitlab Enterprise Edition 
+* Support for soft-delete of groups and projects in Gitlab Enterprise Edition
   ([#282](https://github.com/gitlabhq/terraform-provider-gitlab/issues/282),
    [#283](https://github.com/gitlabhq/terraform-provider-gitlab/issues/283),
    [#285](https://github.com/gitlabhq/terraform-provider-gitlab/issues/285),
    [#291](https://github.com/gitlabhq/terraform-provider-gitlab/issues/291))
 
 ENHANCEMENTS:
-* Switched from Travis CI to Github Actions 
+* Switched from Travis CI to Github Actions
   ([#216](https://github.com/gitlabhq/terraform-provider-gitlab/issues/216))
 
 ## 2.5.0 (December 05, 2019)

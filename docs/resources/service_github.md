@@ -3,15 +3,18 @@
 page_title: "gitlab_service_github Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  NOTE: requires either EE (self-hosted) or Silver and above (GitLab.com).
-  This resource manages a GitHub integration https://docs.gitlab.com/ee/user/project/integrations/github.html that updates pipeline statuses on a GitHub repo's pull requests.
+  The gitlab_service_github resource allows to manage the lifecycle of a project integration with GitHub.
+  -> This resource requires a GitLab Enterprise instance.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#github
 ---
 
 # gitlab_service_github (Resource)
 
-**NOTE**: requires either EE (self-hosted) or Silver and above (GitLab.com).
+The `gitlab_service_github` resource allows to manage the lifecycle of a project integration with GitHub.
 
-This resource manages a [GitHub integration](https://docs.gitlab.com/ee/user/project/integrations/github.html) that updates pipeline statuses on a GitHub repo's pull requests.
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#github)
 
 ## Example Usage
 
@@ -34,21 +37,21 @@ resource "gitlab_service_github" "github" {
 
 ### Required
 
-- **project** (String) ID of the project you want to activate integration on.
-- **repository_url** (String) The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.
-- **token** (String, Sensitive) A GitHub personal access token with at least `repo:status` scope.
+- `project` (String) ID of the project you want to activate integration on.
+- `repository_url` (String) The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.
+- `token` (String, Sensitive) A GitHub personal access token with at least `repo:status` scope.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **static_context** (Boolean) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
+- `id` (String) The ID of this resource.
+- `static_context` (Boolean) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
 
 ### Read-Only
 
-- **active** (Boolean) Whether the integration is active.
-- **created_at** (String) Create time.
-- **title** (String) Title.
-- **updated_at** (String) Update time.
+- `active` (Boolean) Whether the integration is active.
+- `created_at` (String) Create time.
+- `title` (String) Title.
+- `updated_at` (String) Update time.
 
 ## Import
 

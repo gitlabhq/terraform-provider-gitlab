@@ -3,12 +3,15 @@
 page_title: "gitlab_service_microsoft_teams Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to manage Microsoft Teams integration.
+  The gitlab_service_microsoft_teams resource allows to manage the lifecycle of a project integration with Microsoft Teams.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#microsoft-teams
 ---
 
 # gitlab_service_microsoft_teams (Resource)
 
-This resource allows you to manage Microsoft Teams integration.
+The `gitlab_service_microsoft_teams` resource allows to manage the lifecycle of a project integration with Microsoft Teams.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#microsoft-teams)
 
 ## Example Usage
 
@@ -31,29 +34,29 @@ resource "gitlab_service_microsoft_teams" "teams" {
 
 ### Required
 
-- **project** (String) ID of the project you want to activate integration on.
-- **webhook** (String) The Microsoft Teams webhook. For example, https://outlook.office.com/webhook/...
+- `project` (String) ID of the project you want to activate integration on.
+- `webhook` (String) The Microsoft Teams webhook. For example, https://outlook.office.com/webhook/...
 
 ### Optional
 
-- **branches_to_be_notified** (String) Branches to send notifications for. Valid options are “all”, “default”, “protected”, and “default_and_protected”. The default value is “default”
-- **confidential_issues_events** (Boolean) Enable notifications for confidential issue events
-- **confidential_note_events** (Boolean) Enable notifications for confidential note events
-- **id** (String) The ID of this resource.
-- **issues_events** (Boolean) Enable notifications for issue events
-- **merge_requests_events** (Boolean) Enable notifications for merge request events
-- **note_events** (Boolean) Enable notifications for note events
-- **notify_only_broken_pipelines** (Boolean) Send notifications for broken pipelines
-- **pipeline_events** (Boolean) Enable notifications for pipeline events
-- **push_events** (Boolean) Enable notifications for push events
-- **tag_push_events** (Boolean) Enable notifications for tag push events
-- **wiki_page_events** (Boolean) Enable notifications for wiki page events
+- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are “all”, “default”, “protected”, and “default_and_protected”. The default value is “default”
+- `confidential_issues_events` (Boolean) Enable notifications for confidential issue events
+- `confidential_note_events` (Boolean) Enable notifications for confidential note events
+- `id` (String) The ID of this resource.
+- `issues_events` (Boolean) Enable notifications for issue events
+- `merge_requests_events` (Boolean) Enable notifications for merge request events
+- `note_events` (Boolean) Enable notifications for note events
+- `notify_only_broken_pipelines` (Boolean) Send notifications for broken pipelines
+- `pipeline_events` (Boolean) Enable notifications for pipeline events
+- `push_events` (Boolean) Enable notifications for push events
+- `tag_push_events` (Boolean) Enable notifications for tag push events
+- `wiki_page_events` (Boolean) Enable notifications for wiki page events
 
 ### Read-Only
 
-- **active** (Boolean) Whether the integration is active.
-- **created_at** (String) Create time.
-- **updated_at** (String) Update time.
+- `active` (Boolean) Whether the integration is active.
+- `created_at` (String) Create time.
+- `updated_at` (String) Update time.
 
 ## Import
 

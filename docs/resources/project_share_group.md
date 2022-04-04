@@ -3,12 +3,15 @@
 page_title: "gitlab_project_share_group Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to share a project with a group
+  The gitlab_project_share_group resource allows to manage the lifecycle of project shared with a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#share-project-with-group
 ---
 
 # gitlab_project_share_group (Resource)
 
-This resource allows you to share a project with a group
+The `gitlab_project_share_group` resource allows to manage the lifecycle of project shared with a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#share-project-with-group)
 
 ## Example Usage
 
@@ -25,14 +28,14 @@ resource "gitlab_project_share_group" "test" {
 
 ### Required
 
-- **group_id** (Number) The id of the group.
-- **project_id** (String) The id of the project.
+- `group_id` (Number) The id of the group.
+- `project_id` (String) The id of the project.
 
 ### Optional
 
-- **access_level** (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
-- **group_access** (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
-- **id** (String) The ID of this resource.
+- `access_level` (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- `id` (String) The ID of this resource.
 
 ## Import
 

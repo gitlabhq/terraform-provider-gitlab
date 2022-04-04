@@ -3,16 +3,15 @@
 page_title: "gitlab_instance_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage CI/CD variables for your GitLab instance.
-  For further information on variables, consult the gitlab
-  documentation https://docs.gitlab.com/ee/api/instance_level_ci_variables.html.
+  The gitlab_instance_variable resource allows to manage the lifecycle of an instance-level CI/CD variable.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/instance_level_variables.html
 ---
 
 # gitlab_instance_variable (Resource)
 
-This resource allows you to create and manage CI/CD variables for your GitLab instance.
-For further information on variables, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/api/instance_level_ci_variables.html).
+The `gitlab_instance_variable` resource allows to manage the lifecycle of an instance-level CI/CD variable.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_variables.html)
 
 ## Example Usage
 
@@ -30,15 +29,15 @@ resource "gitlab_instance_variable" "example" {
 
 ### Required
 
-- **key** (String) The name of the variable.
-- **value** (String, Sensitive) The value of the variable.
+- `key` (String) The name of the variable.
+- `value` (String, Sensitive) The value of the variable.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
-- **masked** (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variable-requirements). Defaults to `false`.
-- **protected** (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-- **variable_type** (String) The type of a variable. Available types are: env_var (default) and file.
+- `id` (String) The ID of this resource.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+- `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
 
 ## Import
 

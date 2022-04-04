@@ -3,12 +3,15 @@
 page_title: "gitlab_tag_protection Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to protect a specific tag or wildcard by an access level so that the user with less access level cannot Create the tags.
+  The gitlab_tag_protection resource allows to manage the lifecycle of a tag protection.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_tags.html
 ---
 
 # gitlab_tag_protection (Resource)
 
-This resource allows you to protect a specific tag or wildcard by an access level so that the user with less access level cannot Create the tags.
+The `gitlab_tag_protection` resource allows to manage the lifecycle of a tag protection.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_tags.html)
 
 ## Example Usage
 
@@ -25,13 +28,13 @@ resource "gitlab_tag_protection" "TagProtect" {
 
 ### Required
 
-- **create_access_level** (String) Access levels which are allowed to create. Valid values are: `no one`, `developer`, `maintainer`.
-- **project** (String) The id of the project.
-- **tag** (String) Name of the tag or wildcard.
+- `create_access_level` (String) Access levels which are allowed to create. Valid values are: `no one`, `developer`, `maintainer`.
+- `project` (String) The id of the project.
+- `tag` (String) Name of the tag or wildcard.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

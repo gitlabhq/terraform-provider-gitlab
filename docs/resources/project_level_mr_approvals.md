@@ -3,14 +3,18 @@
 page_title: "gitlab_project_level_mr_approvals Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to configure project-level MR approvals. for your GitLab projects.
-  For further information on merge request approvals, consult the GitLab API documentation https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals.
+  The gitlab_project_level_mr_approval_rule resource allows to manage the lifecycle of a Merge Request-level approval rule.
+  -> This resource requires a GitLab Enterprise instance.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/merge_request_approvals.html#merge-request-level-mr-approvals
 ---
 
 # gitlab_project_level_mr_approvals (Resource)
 
-This resource allows you to configure project-level MR approvals. for your GitLab projects.
-For further information on merge request approvals, consult the [GitLab API documentation](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals).
+The `gitlab_project_level_mr_approval_rule` resource allows to manage the lifecycle of a Merge Request-level approval rule.
+
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/merge_request_approvals.html#merge-request-level-mr-approvals)
 
 ## Example Usage
 
@@ -34,15 +38,16 @@ resource "gitlab_project_level_mr_approvals" "foo" {
 
 ### Required
 
-- **project_id** (Number) The ID of the project to change MR approval configuration.
+- `project_id` (Number) The ID of the project to change MR approval configuration.
 
 ### Optional
 
-- **disable_overriding_approvers_per_merge_request** (Boolean) By default, users are able to edit the approval rules in merge requests. If set to true,
-- **id** (String) The ID of this resource.
-- **merge_requests_author_approval** (Boolean) Set to `true` if you want to allow merge request authors to self-approve merge requests. Authors
-- **merge_requests_disable_committers_approval** (Boolean) Set to `true` if you want to prevent approval of merge requests by merge request committers. Default is `false`.
-- **reset_approvals_on_push** (Boolean) Set to `true` if you want to remove all approvals in a merge request when new commits are pushed to its source branch. Default is `true`.
+- `disable_overriding_approvers_per_merge_request` (Boolean) By default, users are able to edit the approval rules in merge requests. If set to true,
+- `id` (String) The ID of this resource.
+- `merge_requests_author_approval` (Boolean) Set to `true` if you want to allow merge request authors to self-approve merge requests. Authors
+- `merge_requests_disable_committers_approval` (Boolean) Set to `true` if you want to prevent approval of merge requests by merge request committers.
+- `require_password_to_approve` (Boolean) Set to `true` if you want to require authentication when approving a merge request.
+- `reset_approvals_on_push` (Boolean) Set to `true` if you want to remove all approvals in a merge request when new commits are pushed to its source branch. Default is `true`.
 
 ## Import
 

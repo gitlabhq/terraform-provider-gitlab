@@ -3,12 +3,15 @@
 page_title: "gitlab_service_pipelines_email Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource manages a Pipelines email integration https://docs.gitlab.com/ee/user/project/integrations/overview.html#integrations-listing that emails the pipeline status to a list of recipients.
+  The gitlab_service_pipelines_email resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails
 ---
 
 # gitlab_service_pipelines_email (Resource)
 
-This resource manages a [Pipelines email integration](https://docs.gitlab.com/ee/user/project/integrations/overview.html#integrations-listing) that emails the pipeline status to a list of recipients.
+The `gitlab_service_pipelines_email` resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails)
 
 ## Example Usage
 
@@ -32,14 +35,14 @@ resource "gitlab_service_pipelines_email" "email" {
 
 ### Required
 
-- **project** (String) ID of the project you want to activate integration on.
-- **recipients** (Set of String) ) email addresses where notifications are sent.
+- `project` (String) ID of the project you want to activate integration on.
+- `recipients` (Set of String) ) email addresses where notifications are sent.
 
 ### Optional
 
-- **branches_to_be_notified** (String) Branches to send notifications for. Valid options are `all`, `default`, `protected`, and `default_and_protected`. Default is `default`
-- **id** (String) The ID of this resource.
-- **notify_only_broken_pipelines** (Boolean) Notify only broken pipelines. Default is true.
+- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are `all`, `default`, `protected`, and `default_and_protected`. Default is `default`
+- `id` (String) The ID of this resource.
+- `notify_only_broken_pipelines` (Boolean) Notify only broken pipelines. Default is true.
 
 ## Import
 

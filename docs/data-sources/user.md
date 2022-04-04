@@ -3,15 +3,18 @@
 page_title: "gitlab_user Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.
-  -> Some attributes might not be returned depending on if you're an admin or not. Please refer to Gitlab documentation https://docs.gitlab.com/ce/api/users.html#single-user for more details.
+  The gitlab_user data source allows details of a user to be retrieved by either the user ID, username or email address.
+  -> Some attributes might not be returned depending on if you're an admin or not.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html#single-user
 ---
 
 # gitlab_user (Data Source)
 
-Provide details about a specific user in the gitlab provider. Especially the ability to lookup the id for linking to other resources.
+The `gitlab_user` data source allows details of a user to be retrieved by either the user ID, username or email address.
 
--> Some attributes might not be returned depending on if you're an admin or not. Please refer to [Gitlab documentation](https://docs.gitlab.com/ce/api/users.html#single-user) for more details.
+-> Some attributes might not be returned depending on if you're an admin or not.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#single-user)
 
 ## Example Usage
 
@@ -33,36 +36,36 @@ data "gitlab_user" "example-two" {
 
 ### Optional
 
-- **email** (String) The email address of the user.
-- **id** (String) The ID of this resource.
-- **user_id** (Number) The ID of the user.
-- **username** (String) The username of the user.
+- `email` (String) The public email address of the user. **Note**: before GitLab 14.8 the lookup was based on the users primary email address.
+- `id` (String) The ID of this resource.
+- `user_id` (Number) The ID of the user.
+- `username` (String) The username of the user.
 
 ### Read-Only
 
-- **avatar_url** (String) The avatar URL of the user.
-- **bio** (String) The bio of the user.
-- **can_create_group** (Boolean) Whether the user can create groups.
-- **can_create_project** (Boolean) Whether the user can create projects.
-- **color_scheme_id** (Number) User's color scheme ID.
-- **created_at** (String) Date the user was created at.
-- **current_sign_in_at** (String) Current user's sign-in date.
-- **extern_uid** (String) The external UID of the user.
-- **external** (Boolean) Whether the user is external.
-- **is_admin** (Boolean) Whether the user is an admin.
-- **last_sign_in_at** (String) Last user's sign-in date.
-- **linkedin** (String) LinkedIn profile of the user.
-- **location** (String) The location of the user.
-- **name** (String) The name of the user.
-- **note** (String) Admin notes for this user.
-- **organization** (String) The organization of the user.
-- **projects_limit** (Number) Number of projects the user can create.
-- **skype** (String) Skype username of the user.
-- **state** (String) Whether the user is active or blocked.
-- **theme_id** (Number) User's theme ID.
-- **twitter** (String) Twitter username of the user.
-- **two_factor_enabled** (Boolean) Whether user's two-factor auth is enabled.
-- **user_provider** (String) The UID provider of the user.
-- **website_url** (String) User's website URL.
+- `avatar_url` (String) The avatar URL of the user.
+- `bio` (String) The bio of the user.
+- `can_create_group` (Boolean) Whether the user can create groups.
+- `can_create_project` (Boolean) Whether the user can create projects.
+- `color_scheme_id` (Number) User's color scheme ID.
+- `created_at` (String) Date the user was created at.
+- `current_sign_in_at` (String) Current user's sign-in date.
+- `extern_uid` (String) The external UID of the user.
+- `external` (Boolean) Whether the user is external.
+- `is_admin` (Boolean) Whether the user is an admin.
+- `last_sign_in_at` (String) Last user's sign-in date.
+- `linkedin` (String) LinkedIn profile of the user.
+- `location` (String) The location of the user.
+- `name` (String) The name of the user.
+- `note` (String) Admin notes for this user.
+- `organization` (String) The organization of the user.
+- `projects_limit` (Number) Number of projects the user can create.
+- `skype` (String) Skype username of the user.
+- `state` (String) Whether the user is active or blocked.
+- `theme_id` (Number) User's theme ID.
+- `twitter` (String) Twitter username of the user.
+- `two_factor_enabled` (Boolean) Whether user's two-factor auth is enabled.
+- `user_provider` (String) The UID provider of the user.
+- `website_url` (String) User's website URL.
 
 

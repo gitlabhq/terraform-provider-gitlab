@@ -16,14 +16,14 @@ linter:
 
 provider:
   - '.go-version'
-  - 'gitlab/**/*'
+  - 'internal/provider/**/*'
   - 'main.go'
 
 resource:
-  - 'gitlab/resource_*.go'
+  - 'internal/provider/resource_*.go'
 
 data-source:
-  - 'gitlab/data_source_*.go'
+  - 'internal/provider/data_source_*.go'
 
 tests:
   - '**/*_test.go'

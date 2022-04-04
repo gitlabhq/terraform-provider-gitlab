@@ -3,15 +3,15 @@
 page_title: "gitlab_deploy_key_enable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to enable pre-existing deploy keys for your GitLab projects.
-  NOTE: the GITLAB KEY_ID for the deploy key must be known
+  The gitlab_deploy_key_enable resource allows to enable an already existing deploy key (see gitlab_deploy_key resource) for a specific project.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/deploy_keys.html#enable-a-deploy-key
 ---
 
 # gitlab_deploy_key_enable (Resource)
 
-This resource allows you to enable pre-existing deploy keys for your GitLab projects.
+The `gitlab_deploy_key_enable` resource allows to enable an already existing deploy key (see `gitlab_deploy_key resource`) for a specific project.
 
-> **NOTE**: the GITLAB KEY_ID for the deploy key must be known
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/deploy_keys.html#enable-a-deploy-key)
 
 ## Example Usage
 
@@ -45,15 +45,15 @@ resource "gitlab_deploy_key_enable" "foo" {
 
 ### Required
 
-- **key_id** (String) The Gitlab key id for the pre-existing deploy key
-- **project** (String) The name or id of the project to add the deploy key to.
+- `key_id` (String) The Gitlab key id for the pre-existing deploy key
+- `project` (String) The name or id of the project to add the deploy key to.
 
 ### Optional
 
-- **can_push** (Boolean) Can deploy key push to the project’s repository.
-- **id** (String) The ID of this resource.
-- **key** (String) Deploy key.
-- **title** (String) Deploy key's title.
+- `can_push` (Boolean) Can deploy key push to the project’s repository.
+- `id` (String) The ID of this resource.
+- `key` (String) Deploy key.
+- `title` (String) Deploy key's title.
 
 ## Import
 

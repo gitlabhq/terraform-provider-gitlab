@@ -3,16 +3,15 @@
 page_title: "gitlab_project_badge Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage badges for your GitLab projects.
-  For further information consult the gitlab
-  documentation https://docs.gitlab.com/ce/user/project/badges.html.
+  The gitlab_project_badge resource allows to mange the lifecycle of project badges.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/user/project/badges.html#project-badges
 ---
 
 # gitlab_project_badge (Resource)
 
-This resource allows you to create and manage badges for your GitLab projects.
-For further information consult the [gitlab
-documentation](https://docs.gitlab.com/ce/user/project/badges.html).
+The `gitlab_project_badge` resource allows to mange the lifecycle of project badges.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/badges.html#project-badges)
 
 ## Example Usage
 
@@ -33,18 +32,18 @@ resource "gitlab_project_badge" "example" {
 
 ### Required
 
-- **image_url** (String) The image url which will be presented on project overview.
-- **link_url** (String) The url linked with the badge.
-- **project** (String) The id of the project to add the badge to.
+- `image_url` (String) The image url which will be presented on project overview.
+- `link_url` (String) The url linked with the badge.
+- `project` (String) The id of the project to add the badge to.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **rendered_image_url** (String) The image_url argument rendered (in case of use of placeholders).
-- **rendered_link_url** (String) The link_url argument rendered (in case of use of placeholders).
+- `rendered_image_url` (String) The image_url argument rendered (in case of use of placeholders).
+- `rendered_link_url` (String) The link_url argument rendered (in case of use of placeholders).
 
 ## Import
 

@@ -37,7 +37,7 @@ jobs:
             Marking this pull request as stale due to 30 days of inactivity. If this pull request receives no comments in the next 14 days it will be closed. Maintainers can also remove the `stale` label.
             
             To help this pull request get reviewed, please check that it is rebased onto the latest ${{ github.event.repository.default_branch }} and is passing automated checks. It also helps if you could reference an issue that the pull request resolves, and create one if it doesn't exist.
-          close-issue-message: 'This issue was closed because it has been stale for 14 days with no activity.'
+          close-issue-message: 'This issue was closed because it has been stale for 30 days with no activity.'
           close-pr-message: 'This PR was closed because it has been stale for 14 days with no activity.'
           days-before-issue-stale: 120
           days-before-pr-stale: 30

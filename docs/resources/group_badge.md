@@ -3,16 +3,15 @@
 page_title: "gitlab_group_badge Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage badges for your GitLab groups.
-  For further information, consult the gitlab
-  documentation https://docs.gitlab.com/ee/user/project/badges.html#group-badges.
+  The gitlab_group_badge resource allows to mange the lifecycle of group badges.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/user/project/badges.html#group-badges
 ---
 
 # gitlab_group_badge (Resource)
 
-This resource allows you to create and manage badges for your GitLab groups.
-For further information, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/user/project/badges.html#group-badges).
+The `gitlab_group_badge` resource allows to mange the lifecycle of group badges.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/badges.html#group-badges)
 
 ## Example Usage
 
@@ -33,18 +32,18 @@ resource "gitlab_group_badge" "example" {
 
 ### Required
 
-- **group** (String) The id of the group to add the badge to.
-- **image_url** (String) The image url which will be presented on group overview.
-- **link_url** (String) The url linked with the badge.
+- `group` (String) The id of the group to add the badge to.
+- `image_url` (String) The image url which will be presented on group overview.
+- `link_url` (String) The url linked with the badge.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ### Read-Only
 
-- **rendered_image_url** (String) The image_url argument rendered (in case of use of placeholders).
-- **rendered_link_url** (String) The link_url argument rendered (in case of use of placeholders).
+- `rendered_image_url` (String) The image_url argument rendered (in case of use of placeholders).
+- `rendered_link_url` (String) The link_url argument rendered (in case of use of placeholders).
 
 ## Import
 

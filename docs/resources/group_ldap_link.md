@@ -3,12 +3,15 @@
 page_title: "gitlab_group_ldap_link Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add an LDAP link to an existing GitLab group.
+  The gitlab_group_ldap_link resource allows to manage the lifecycle of an LDAP integration with a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#ldap-group-links
 ---
 
 # gitlab_group_ldap_link (Resource)
 
-This resource allows you to add an LDAP link to an existing GitLab group.
+The `gitlab_group_ldap_link` resource allows to manage the lifecycle of an LDAP integration with a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#ldap-group-links)
 
 ## Example Usage
 
@@ -26,22 +29,22 @@ resource "gitlab_group_ldap_link" "test" {
 
 ### Required
 
-- **cn** (String) The CN of the LDAP group to link with.
-- **group_id** (String) The id of the GitLab group.
-- **ldap_provider** (String) The name of the LDAP provider as stored in the GitLab database.
+- `cn` (String) The CN of the LDAP group to link with.
+- `group_id` (String) The id of the GitLab group.
+- `ldap_provider` (String) The name of the LDAP provider as stored in the GitLab database.
 
 ### Optional
 
-- **access_level** (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
-- **force** (Boolean) If true, then delete and replace an existing LDAP link if one exists.
-- **group_access** (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
-- **id** (String) The ID of this resource.
+- `access_level` (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
+- `force` (Boolean) If true, then delete and replace an existing LDAP link if one exists.
+- `group_access` (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
+- `id` (String) The ID of this resource.
 
 ## Import
 
 Import is supported using the following syntax:
 
 ```shell
-# GitLab group ldap links can be imported using an id made up of `ldap_provider:cn`, e.g.
-terraform import gitlab_group_ldap_link.test "ldapmain:testuser"
+# GitLab group ldap links can be imported using an id made up of `group_id:ldap_provider:cn`, e.g.
+terraform import gitlab_group_ldap_link.test "12345:ldapmain:testuser"
 ```

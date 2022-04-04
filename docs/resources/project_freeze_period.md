@@ -3,12 +3,15 @@
 page_title: "gitlab_project_freeze_period Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the gitlab documentation https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period.
+  The gitlab_project_freeze_period resource allows to manage the lifecycle of a freeze period for a project.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/freeze_periods.html
 ---
 
 # gitlab_project_freeze_period (Resource)
 
-This resource allows you to create and manage freeze periods. For further information on freeze periods, consult the [gitlab documentation](https://docs.gitlab.com/ee/api/freeze_periods.html#create-a-freeze-period).
+The `gitlab_project_freeze_period` resource allows to manage the lifecycle of a freeze period for a project.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/freeze_periods.html)
 
 ## Example Usage
 
@@ -26,14 +29,14 @@ resource "gitlab_project_freeze_period" "schedule" {
 
 ### Required
 
-- **freeze_end** (String) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
-- **freeze_start** (String) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
-- **project_id** (String) The id of the project to add the schedule to.
+- `freeze_end` (String) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
+- `freeze_start` (String) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
+- `project_id` (String) The id of the project to add the schedule to.
 
 ### Optional
 
-- **cron_timezone** (String) The timezone.
-- **id** (String) The ID of this resource.
+- `cron_timezone` (String) The timezone.
+- `id` (String) The ID of this resource.
 
 ## Import
 

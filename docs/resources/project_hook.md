@@ -3,16 +3,15 @@
 page_title: "gitlab_project_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage hooks for your GitLab projects.
-  For further information on hooks, consult the gitlab
-  documentation https://docs.gitlab.com/ce/user/project/integrations/webhooks.html.
+  The gitlab_project_hook resource allows to manage the lifecycle of a project hook.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#hooks
 ---
 
 # gitlab_project_hook (Resource)
 
-This resource allows you to create and manage hooks for your GitLab projects.
-For further information on hooks, consult the [gitlab
-documentation](https://docs.gitlab.com/ce/user/project/integrations/webhooks.html).
+The `gitlab_project_hook` resource allows to manage the lifecycle of a project hook.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#hooks)
 
 ## Example Usage
 
@@ -29,25 +28,35 @@ resource "gitlab_project_hook" "example" {
 
 ### Required
 
-- **project** (String) The name or id of the project to add the hook to.
-- **url** (String) The url of the hook to invoke.
+- `project` (String) The name or id of the project to add the hook to.
+- `url` (String) The url of the hook to invoke.
 
 ### Optional
 
-- **confidential_issues_events** (Boolean) Invoke the hook for confidential issues events.
-- **confidential_note_events** (Boolean) Invoke the hook for confidential notes events.
-- **deployment_events** (Boolean) Invoke the hook for deployment events.
-- **enable_ssl_verification** (Boolean) Enable ssl verification when invoking the hook.
-- **id** (String) The ID of this resource.
-- **issues_events** (Boolean) Invoke the hook for issues events.
-- **job_events** (Boolean) Invoke the hook for job events.
-- **merge_requests_events** (Boolean) Invoke the hook for merge requests.
-- **note_events** (Boolean) Invoke the hook for notes events.
-- **pipeline_events** (Boolean) Invoke the hook for pipeline events.
-- **push_events** (Boolean) Invoke the hook for push events.
-- **push_events_branch_filter** (String) Invoke the hook for push events on matching branches only.
-- **tag_push_events** (Boolean) Invoke the hook for tag push events.
-- **token** (String, Sensitive) A token to present when invoking the hook.
-- **wiki_page_events** (Boolean) Invoke the hook for wiki page events.
+- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
+- `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
+- `id` (String) The ID of this resource.
+- `issues_events` (Boolean) Invoke the hook for issues events.
+- `job_events` (Boolean) Invoke the hook for job events.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests.
+- `note_events` (Boolean) Invoke the hook for notes events.
+- `pipeline_events` (Boolean) Invoke the hook for pipeline events.
+- `push_events` (Boolean) Invoke the hook for push events.
+- `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
+- `releases_events` (Boolean) Invoke the hook for releases events.
+- `tag_push_events` (Boolean) Invoke the hook for tag push events.
+- `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
+- `wiki_page_events` (Boolean) Invoke the hook for wiki page events.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# A GitLab Project Hook can be imported using a key composed of `<project-id>:<hook-id>`, e.g.
+terraform import gitlab_project_hook.example "12345:1"
+
+# NOTE: the `token` resource attribute is not available for imported resources as this information cannot be read from the GitLab API.
+```

@@ -3,12 +3,18 @@
 page_title: "gitlab_group_membership Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add a user to an existing group.
+  The gitlab_group_membership resource allows to manage the lifecycle of a users group membersip.
+  -> If a group should grant membership to another group use the gitlab_group_share_group resource instead.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
 ---
 
 # gitlab_group_membership (Resource)
 
-This resource allows you to add a user to an existing group.
+The `gitlab_group_membership` resource allows to manage the lifecycle of a users group membersip.
+
+-> If a group should grant membership to another group use the `gitlab_group_share_group` resource instead.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html)
 
 ## Example Usage
 
@@ -26,14 +32,14 @@ resource "gitlab_group_membership" "test" {
 
 ### Required
 
-- **access_level** (String) Access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`.
-- **group_id** (String) The id of the group.
-- **user_id** (Number) The id of the user.
+- `access_level` (String) Access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`.
+- `group_id` (String) The id of the group.
+- `user_id` (Number) The id of the user.
 
 ### Optional
 
-- **expires_at** (String) Expiration date for the group membership. Format: `YYYY-MM-DD`
-- **id** (String) The ID of this resource.
+- `expires_at` (String) Expiration date for the group membership. Format: `YYYY-MM-DD`
+- `id` (String) The ID of this resource.
 
 ## Import
 

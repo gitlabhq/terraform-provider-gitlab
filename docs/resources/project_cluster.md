@@ -3,16 +3,18 @@
 page_title: "gitlab_project_cluster Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage project clusters for your GitLab projects.
-  For further information on clusters, consult the gitlab
-  documentation https://docs.gitlab.com/ce/user/project/clusters/index.html.
+  The gitlab_project_cluster resource allows to manage the lifecycle of a project cluster.
+  ~> This is deprecated GitLab feature since 14.5
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_clusters.html
 ---
 
 # gitlab_project_cluster (Resource)
 
-This resource allows you to create and manage project clusters for your GitLab projects.
-For further information on clusters, consult the [gitlab
-documentation](https://docs.gitlab.com/ce/user/project/clusters/index.html).
+The `gitlab_project_cluster` resource allows to manage the lifecycle of a project cluster.
+
+~> This is deprecated GitLab feature since 14.5
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_clusters.html)
 
 ## Example Usage
 
@@ -41,29 +43,29 @@ resource "gitlab_project_cluster" "bar" {
 
 ### Required
 
-- **kubernetes_api_url** (String) The URL to access the Kubernetes API.
-- **kubernetes_token** (String, Sensitive) The token to authenticate against Kubernetes.
-- **name** (String) The name of cluster.
-- **project** (String) The id of the project to add the cluster to.
+- `kubernetes_api_url` (String) The URL to access the Kubernetes API.
+- `kubernetes_token` (String, Sensitive) The token to authenticate against Kubernetes.
+- `name` (String) The name of cluster.
+- `project` (String) The id of the project to add the cluster to.
 
 ### Optional
 
-- **domain** (String) The base domain of the cluster.
-- **enabled** (Boolean) Determines if cluster is active or not. Defaults to `true`. This attribute cannot be read.
-- **environment_scope** (String) The associated environment to the cluster. Defaults to `*`.
-- **id** (String) The ID of this resource.
-- **kubernetes_authorization_type** (String) The cluster authorization type. Valid values are `rbac`, `abac`, `unknown_authorization`. Defaults to `rbac`.
-- **kubernetes_ca_cert** (String) TLS certificate (needed if API is using a self-signed TLS certificate).
-- **kubernetes_namespace** (String) The unique namespace related to the project.
-- **managed** (Boolean) Determines if cluster is managed by gitlab or not. Defaults to `true`. This attribute cannot be read.
-- **management_project_id** (String) The ID of the management project for the cluster.
+- `domain` (String) The base domain of the cluster.
+- `enabled` (Boolean) Determines if cluster is active or not. Defaults to `true`. This attribute cannot be read.
+- `environment_scope` (String) The associated environment to the cluster. Defaults to `*`.
+- `id` (String) The ID of this resource.
+- `kubernetes_authorization_type` (String) The cluster authorization type. Valid values are `rbac`, `abac`, `unknown_authorization`. Defaults to `rbac`.
+- `kubernetes_ca_cert` (String) TLS certificate (needed if API is using a self-signed TLS certificate).
+- `kubernetes_namespace` (String) The unique namespace related to the project.
+- `managed` (Boolean) Determines if cluster is managed by gitlab or not. Defaults to `true`. This attribute cannot be read.
+- `management_project_id` (String) The ID of the management project for the cluster.
 
 ### Read-Only
 
-- **cluster_type** (String) Cluster type.
-- **created_at** (String) Create time.
-- **platform_type** (String) Platform type.
-- **provider_type** (String) Provider type.
+- `cluster_type` (String) Cluster type.
+- `created_at` (String) Create time.
+- `platform_type` (String) Platform type.
+- `provider_type` (String) Provider type.
 
 ## Import
 

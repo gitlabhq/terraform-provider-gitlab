@@ -3,12 +3,18 @@
 page_title: "gitlab_project_membership Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add a current user to an existing project with a set access level.
+  The gitlab_project_membership resource allows to manage the lifecycle of a users project membersip.
+  -> If a project should grant membership to an entire group use the gitlab_project_share_group resource instead.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
 ---
 
 # gitlab_project_membership (Resource)
 
-This resource allows you to add a current user to an existing project with a set access level.
+The `gitlab_project_membership` resource allows to manage the lifecycle of a users project membersip.
+
+-> If a project should grant membership to an entire group use the `gitlab_project_share_group` resource instead.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html)
 
 ## Example Usage
 
@@ -31,13 +37,13 @@ resource "gitlab_project_membership" "example" {
 
 ### Required
 
-- **access_level** (String) The access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
-- **project_id** (String) The id of the project.
-- **user_id** (Number) The id of the user.
+- `access_level` (String) The access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+- `project_id` (String) The id of the project.
+- `user_id` (Number) The id of the user.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

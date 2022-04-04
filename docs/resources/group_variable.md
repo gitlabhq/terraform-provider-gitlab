@@ -3,16 +3,15 @@
 page_title: "gitlab_group_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage CI/CD variables for your GitLab groups.
-  For further information on variables, consult the gitlab
-  documentation https://docs.gitlab.com/ce/ci/variables/README.html#variables.
+  The gitlab_group_variable resource allows to manage the lifecycle of a CI/CD variable for a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/group_level_variables.html
 ---
 
 # gitlab_group_variable (Resource)
 
-This resource allows you to create and manage CI/CD variables for your GitLab groups.
-For further information on variables, consult the [gitlab
-documentation](https://docs.gitlab.com/ce/ci/variables/README.html#variables).
+The `gitlab_group_variable` resource allows to manage the lifecycle of a CI/CD variable for a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_level_variables.html)
 
 ## Example Usage
 
@@ -32,17 +31,17 @@ resource "gitlab_group_variable" "example" {
 
 ### Required
 
-- **group** (String) The name or id of the group.
-- **key** (String) The name of the variable.
-- **value** (String, Sensitive) The value of the variable.
+- `group` (String) The name or id of the group.
+- `key` (String) The name of the variable.
+- `value` (String, Sensitive) The value of the variable.
 
 ### Optional
 
-- **environment_scope** (String) The environment scope of the variable. Defaults to all environment (`*`). Note that in Community Editions of Gitlab, values other than `*` will cause inconsistent plans. See https://docs.gitlab.com/ee/ci/variables/#add-a-cicd-variable-to-a-group
-- **id** (String) The ID of this resource.
-- **masked** (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
-- **protected** (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-- **variable_type** (String) The type of a variable. Available types are: env_var (default) and file.
+- `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`). Note that in Community Editions of Gitlab, values other than `*` will cause inconsistent plans.
+- `id` (String) The ID of this resource.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+- `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
 
 ## Import
 

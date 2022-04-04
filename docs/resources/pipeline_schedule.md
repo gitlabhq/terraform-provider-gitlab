@@ -3,16 +3,15 @@
 page_title: "gitlab_pipeline_schedule Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage pipeline schedules.
-  For further information on clusters, consult the gitlab
-  documentation https://docs.gitlab.com/ce/user/project/pipelines/schedules.html.
+  The gitlab_pipeline_schedule resource allows to manage the lifecycle of a scheduled pipeline.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/pipeline_schedules.html
 ---
 
 # gitlab_pipeline_schedule (Resource)
 
-This resource allows you to create and manage pipeline schedules.
-For further information on clusters, consult the [gitlab
-documentation](https://docs.gitlab.com/ce/user/project/pipelines/schedules.html).
+The `gitlab_pipeline_schedule` resource allows to manage the lifecycle of a scheduled pipeline.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pipeline_schedules.html)
 
 ## Example Usage
 
@@ -30,16 +29,16 @@ resource "gitlab_pipeline_schedule" "example" {
 
 ### Required
 
-- **cron** (String) The cron (e.g. `0 1 * * *`).
-- **description** (String) The description of the pipeline schedule.
-- **project** (String) The name or id of the project to add the schedule to.
-- **ref** (String) The branch/tag name to be triggered.
+- `cron` (String) The cron (e.g. `0 1 * * *`).
+- `description` (String) The description of the pipeline schedule.
+- `project` (String) The name or id of the project to add the schedule to.
+- `ref` (String) The branch/tag name to be triggered.
 
 ### Optional
 
-- **active** (Boolean) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
-- **cron_timezone** (String) The timezone.
-- **id** (String) The ID of this resource.
+- `active` (Boolean) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
+- `cron_timezone` (String) The timezone.
+- `id` (String) The ID of this resource.
 
 ## Import
 

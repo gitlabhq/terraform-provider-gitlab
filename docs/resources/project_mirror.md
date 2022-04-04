@@ -3,22 +3,20 @@
 page_title: "gitlab_project_mirror Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add a mirror target for the repository, all changes will be synced to the remote target.
-  -> This is for pushing changes to a remote repository. Pull Mirroring can be configured using a combination of the
-  import_url, mirror, and mirror_trigger_builds properties on the gitlab_project resource.
-  For further information on mirroring, consult the
-  gitlab documentation https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring.
+  The gitlab_project_mirror resource allows to manage the lifecycle of a project mirror.
+  This is for pushing changes to a remote repository. Pull Mirroring can be configured using a combination of the
+  importurl, mirror, and mirrortriggerbuilds properties on the gitlabproject resource.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/remote_mirrors.html
 ---
 
 # gitlab_project_mirror (Resource)
 
-This resource allows you to add a mirror target for the repository, all changes will be synced to the remote target.
+The `gitlab_project_mirror` resource allows to manage the lifecycle of a project mirror.
 
--> This is for *pushing* changes to a remote repository. *Pull Mirroring* can be configured using a combination of the
-`import_url`, `mirror`, and `mirror_trigger_builds` properties on the `gitlab_project` resource.
+This is for *pushing* changes to a remote repository. *Pull Mirroring* can be configured using a combination of the
+import_url, mirror, and mirror_trigger_builds properties on the gitlab_project resource.
 
-For further information on mirroring, consult the
-[gitlab documentation](https://docs.gitlab.com/ee/user/project/repository/repository_mirroring.html#repository-mirroring).
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/remote_mirrors.html)
 
 ## Example Usage
 
@@ -34,19 +32,19 @@ resource "gitlab_project_mirror" "foo" {
 
 ### Required
 
-- **project** (String) The id of the project.
-- **url** (String, Sensitive) The URL of the remote repository to be mirrored.
+- `project` (String) The id of the project.
+- `url` (String, Sensitive) The URL of the remote repository to be mirrored.
 
 ### Optional
 
-- **enabled** (Boolean) Determines if the mirror is enabled.
-- **id** (String) The ID of this resource.
-- **keep_divergent_refs** (Boolean) Determines if divergent refs are skipped.
-- **only_protected_branches** (Boolean) Determines if only protected branches are mirrored.
+- `enabled` (Boolean) Determines if the mirror is enabled.
+- `id` (String) The ID of this resource.
+- `keep_divergent_refs` (Boolean) Determines if divergent refs are skipped.
+- `only_protected_branches` (Boolean) Determines if only protected branches are mirrored.
 
 ### Read-Only
 
-- **mirror_id** (Number) Mirror ID.
+- `mirror_id` (Number) Mirror ID.
 
 ## Import
 

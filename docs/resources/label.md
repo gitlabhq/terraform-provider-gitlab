@@ -3,16 +3,15 @@
 page_title: "gitlab_label Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage labels for your GitLab projects.
-  For further information on labels, consult the gitlab
-  documentation https://docs.gitlab.com/ee/user/project/labels.html#project-labels.
+  The gitlab_label resource allows to manage the lifecycle of a project label.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/labels.html#project-labels
 ---
 
 # gitlab_label (Resource)
 
-This resource allows you to create and manage labels for your GitLab projects.
-For further information on labels, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/user/project/labels.html#project-labels).
+The `gitlab_label` resource allows to manage the lifecycle of a project label.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/labels.html#project-labels)
 
 ## Example Usage
 
@@ -38,13 +37,20 @@ resource "gitlab_label" "devops_create" {
 
 ### Required
 
-- **color** (String) The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords).
-- **name** (String) The name of the label.
-- **project** (String) The name or id of the project to add the label to.
+- `color` (String) The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords).
+- `name` (String) The name of the label.
+- `project` (String) The name or id of the project to add the label to.
 
 ### Optional
 
-- **description** (String) The description of the label.
-- **id** (String) The ID of this resource.
+- `description` (String) The description of the label.
+- `id` (String) The ID of this resource.
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# Gitlab labels can be imported using an id made up of `{project_id}:{group_label_id}`, e.g.
+terraform import gitlab_label.example 12345:fixme
+```

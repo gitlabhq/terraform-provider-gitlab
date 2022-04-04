@@ -3,12 +3,15 @@
 page_title: "gitlab_group_custom_attribute Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to set custom attributes for a group.
+  The gitlab_group_custom_attribute resource allows to manage custom attributes for a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/custom_attributes.html
 ---
 
 # gitlab_group_custom_attribute (Resource)
 
-This resource allows you to set custom attributes for a group.
+The `gitlab_group_custom_attribute` resource allows to manage custom attributes for a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/custom_attributes.html)
 
 ## Example Usage
 
@@ -25,13 +28,13 @@ resource "gitlab_group_custom_attribute" "attr" {
 
 ### Required
 
-- **group** (Number) The id of the group.
-- **key** (String) Key for the Custom Attribute.
-- **value** (String) Value for the Custom Attribute.
+- `group` (Number) The id of the group.
+- `key` (String) Key for the Custom Attribute.
+- `value` (String) Value for the Custom Attribute.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

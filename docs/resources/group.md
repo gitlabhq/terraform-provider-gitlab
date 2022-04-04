@@ -3,14 +3,18 @@
 page_title: "gitlab_group Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage GitLab groups.
-  Note your provider will need to be configured with admin-level access for this resource to work.
+  The gitlab_group resource allows to manage the lifecycle of a group.
+  -> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html
 ---
 
 # gitlab_group (Resource)
 
-This resource allows you to create and manage GitLab groups.
-Note your provider will need to be configured with admin-level access for this resource to work.
+The `gitlab_group` resource allows to manage the lifecycle of a group.
+
+-> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html)
 
 ## Example Usage
 
@@ -34,33 +38,34 @@ resource "gitlab_project" "example" {
 
 ### Required
 
-- **name** (String) The name of this group.
-- **path** (String) The path of the group.
+- `name` (String) The name of this group.
+- `path` (String) The path of the group.
 
 ### Optional
 
-- **auto_devops_enabled** (Boolean) Boolean, defaults to false.  Default to Auto
-- **default_branch_protection** (Number) Int, defaults to 2.
-- **description** (String) The description of the group.
-- **emails_disabled** (Boolean) Boolean, defaults to false.  Disable email notifications
-- **id** (String) The ID of this resource.
-- **lfs_enabled** (Boolean) Boolean, defaults to true.  Whether to enable LFS
-- **mentions_disabled** (Boolean) Boolean, defaults to false.  Disable the capability
-- **parent_id** (Number) Integer, id of the parent group (creates a nested group).
-- **project_creation_level** (String) , defaults to Maintainer.
-- **request_access_enabled** (Boolean) Boolean, defaults to false.  Whether to
-- **require_two_factor_authentication** (Boolean) Boolean, defaults to false.
-- **share_with_group_lock** (Boolean) Boolean, defaults to false.  Prevent sharing
-- **subgroup_creation_level** (String) , defaults to Owner.
-- **two_factor_grace_period** (Number) Int, defaults to 48.
-- **visibility_level** (String) The group's visibility. Can be `private`, `internal`, or `public`.
+- `auto_devops_enabled` (Boolean) Defaults to false. Default to Auto DevOps pipeline for all projects within this group.
+- `default_branch_protection` (Number) Defaults to 2. See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection
+- `description` (String) The description of the group.
+- `emails_disabled` (Boolean) Defaults to false. Disable email notifications.
+- `id` (String) The ID of this resource.
+- `lfs_enabled` (Boolean) Defaults to true. Enable/disable Large File Storage (LFS) for the projects in this group.
+- `mentions_disabled` (Boolean) Defaults to false. Disable the capability of a group from getting mentioned.
+- `parent_id` (Number) Id of the parent group (creates a nested group).
+- `prevent_forking_outside_group` (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+- `project_creation_level` (String) Defaults to maintainer. Determine if developers can create projects in the group.
+- `request_access_enabled` (Boolean) Defaults to false. Allow users to request member access.
+- `require_two_factor_authentication` (Boolean) Defaults to false. Require all users in this group to setup Two-factor authentication.
+- `share_with_group_lock` (Boolean) Defaults to false. Prevent sharing a project with another group within this group.
+- `subgroup_creation_level` (String) Defaults to owner. Allowed to create subgroups.
+- `two_factor_grace_period` (Number) Defaults to 48. Time before Two-factor authentication is enforced (in hours).
+- `visibility_level` (String) The group's visibility. Can be `private`, `internal`, or `public`.
 
 ### Read-Only
 
-- **full_name** (String) The full name of the group.
-- **full_path** (String) The full path of the group.
-- **runners_token** (String, Sensitive) The group level registration token to use during runner setup.
-- **web_url** (String) Web URL of the group.
+- `full_name` (String) The full name of the group.
+- `full_path` (String) The full path of the group.
+- `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
+- `web_url` (String) Web URL of the group.
 
 ## Import
 

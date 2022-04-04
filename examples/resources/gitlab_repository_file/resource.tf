@@ -17,3 +17,14 @@ resource "gitlab_repository_file" "this" {
   author_name    = "Terraform"
   commit_message = "feature: add meow file"
 }
+
+resource "gitlab_repository_file" "readme" {
+  project   = gitlab_project.this.id
+  file_path = "readme.txt"
+  branch    = "main"
+  // content will be auto base64 encoded
+  content        = "Meow goes the cat"
+  author_email   = "terraform@example.com"
+  author_name    = "Terraform"
+  commit_message = "feature: add readme file"
+}

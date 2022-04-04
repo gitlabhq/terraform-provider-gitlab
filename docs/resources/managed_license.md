@@ -3,17 +3,18 @@
 page_title: "gitlab_managed_license Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to add rules for managing licenses on a project.
-  For additional information, please see the gitlab documentation https://docs.gitlab.com/ee/user/compliance/license_compliance/.
-  ~> Using this resource requires an active gitlab ultimate https://about.gitlab.com/pricing/subscription.
+  The gitlab_managed_license resource allows to manage the lifecycle of a managed license.
+  -> This resource requires a GitLab Enterprise instance.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/managed_licenses.html
 ---
 
 # gitlab_managed_license (Resource)
 
-This resource allows you to add rules for managing licenses on a project.
-For additional information, please see the [gitlab documentation](https://docs.gitlab.com/ee/user/compliance/license_compliance/).
+The `gitlab_managed_license` resource allows to manage the lifecycle of a managed license.
 
-~> Using this resource requires an active [gitlab ultimate](https://about.gitlab.com/pricing/)subscription.
+-> This resource requires a GitLab Enterprise instance.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/managed_licenses.html)
 
 ## Example Usage
 
@@ -27,7 +28,7 @@ resource "gitlab_project" "foo" {
 resource "gitlab_managed_license" "mit" {
   project         = gitlab_project.foo.id
   name            = "MIT license"
-  approval_status = "approved"
+  approval_status = "allowed"
 }
 ```
 
@@ -36,13 +37,15 @@ resource "gitlab_managed_license" "mit" {
 
 ### Required
 
-- **approval_status** (String) Whether the license is approved or not. Only 'approved' or 'blacklisted' allowed.
-- **name** (String) The name of the managed license (I.e., 'Apache License 2.0' or 'MIT license')
-- **project** (String) The ID of the project under which the managed license will be created.
+- `approval_status` (String) The approval status of the license. Valid values are: `approved`, `blacklisted`, `allowed`, `denied`. "approved" and "blacklisted" 
+				have been deprecated in favor of "allowed" and "denied"; use "allowed" and "denied" for GitLab versions 15.0 and higher. 
+				Prior to version 15.0 and after 14.6, the values are equivalent.
+- `name` (String) The name of the managed license (I.e., 'Apache License 2.0' or 'MIT license')
+- `project` (String) The ID of the project under which the managed license will be created.
 
 ### Optional
 
-- **id** (String) The ID of this resource.
+- `id` (String) The ID of this resource.
 
 ## Import
 

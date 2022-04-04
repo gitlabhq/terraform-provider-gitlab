@@ -3,16 +3,15 @@
 page_title: "gitlab_group_label Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  This resource allows you to create and manage labels for your GitLab groups.
-  For further information on labels, consult the gitlab
-  documentation https://docs.gitlab.com/ee/user/project/labels.html#group-labels.
+  The gitlab_group_label resource allows to manage the lifecycle of labels within a group.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/user/project/labels.html#group-labels
 ---
 
 # gitlab_group_label (Resource)
 
-This resource allows you to create and manage labels for your GitLab groups.
-For further information on labels, consult the [gitlab
-documentation](https://docs.gitlab.com/ee/user/project/labels.html#group-labels).
+The `gitlab_group_label` resource allows to manage the lifecycle of labels within a group.
+
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/labels.html#group-labels)
 
 ## Example Usage
 
@@ -30,14 +29,14 @@ resource "gitlab_group_label" "fixme" {
 
 ### Required
 
-- **color** (String) The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords).
-- **group** (String) The name or id of the group to add the label to.
-- **name** (String) The name of the label.
+- `color` (String) The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords).
+- `group` (String) The name or id of the group to add the label to.
+- `name` (String) The name of the label.
 
 ### Optional
 
-- **description** (String) The description of the label.
-- **id** (String) The ID of this resource.
+- `description` (String) The description of the label.
+- `id` (String) The ID of this resource.
 
 ## Import
 
