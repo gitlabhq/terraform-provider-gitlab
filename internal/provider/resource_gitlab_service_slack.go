@@ -257,6 +257,8 @@ func resourceGitlabServiceSlackRead(ctx context.Context, d *schema.ResourceData,
 	if id != project && project != "" {
 		d.SetId(project)
 		log.Printf("[WARN] changed gitlab slack service ID from %s to its project ID %s", id, project)
+	} else {
+		project = id
 	}
 
 	log.Printf("[DEBUG] read gitlab slack service for project %s", project)
