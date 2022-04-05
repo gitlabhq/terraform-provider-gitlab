@@ -1,4 +1,14 @@
+## 3.14.0 (Unreleased)
+
+BUG FIXES:
+
+* resource/gitlab_service_slack: Fix a resource ID bug that causes `gitlab_service_slack` resources that were created before provider version 3.9.0 to return an error. ([#1013](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1013))
+
 ## 3.13.0 (2022-03-30)
+
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
 
 FEATURES:
 
@@ -56,6 +66,10 @@ BUG FIXES:
 
 ## 3.12.0 (2022-03-08)
 
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
+
 FEATURES:
 
 * **New Resource:** `gitlab_project_tag` ([#910](https://github.com/gitlabhq/terraform-provider-gitlab/pull/910))
@@ -78,11 +92,19 @@ BUG FIXES:
 
 ## 3.11.1 (2022-03-02)
 
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
+
 BUG FIXES:
 
 * resource/gitlab_project: fix waiting for default branch protection during creation ([#908](https://github.com/gitlabhq/terraform-provider-gitlab/pull/908))
 
 ## 3.11.0 (2022-03-01)
+
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
 
 FEATURES:
 
@@ -102,14 +124,19 @@ BUG FIXES:
 
 ## 3.10.1 (2022-02-24)
 
-**ATTENTION:** this bug fix release was never released due to [#896](https://github.com/gitlabhq/terraform-provider-gitlab/issues/896).
-Please use `v3.11.0` instead.
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
 
 BUG FIXES:
 
 * resource/gitlab_branch_protection: Fix issue which claimed that `no valid access level` can be found ([#892](https://github.com/gitlabhq/terraform-provider-gitlab/pull/892))
 
 ## 3.10.0 (2022-02-23)
+
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
 
 FEATURES:
 
@@ -142,11 +169,19 @@ BUG FIXES:
 
 ## 3.9.1 (2022-02-06)
 
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
+
 BUGFIXES:
 
 * Fix crash in `gitlab_user` data source
 
 ## 3.9.0 (2022-02-04)
+
+NOTES:
+
+* resource/gitlab_service_slack: There was a breaking change to this resource in version 3.9.0 which was fixed in 3.14.0. Thus, if you have `gitlab_service_slack` resources that were created before 3.9.0, you should skip this version.
 
 FEATURES:
 
