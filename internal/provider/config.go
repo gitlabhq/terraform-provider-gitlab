@@ -13,6 +13,7 @@ import (
 // Config is per-provider, specifies where to connect to gitlab
 type Config struct {
 	Token         string
+	ForcePAToken  bool
 	BaseURL       string
 	Insecure      bool
 	CACertFile    string
@@ -68,10 +69,20 @@ func (c *Config) Client() (*gitlab.Client, error) {
 		opts = append(opts, gitlab.WithBaseURL(c.BaseURL))
 	}
 
-	// The OAuth method is also compatible with project/group/personal access and job tokens because they are all usable as Bearer tokens.
-	// Although the job token API access is very limited.
-	// see https://docs.gitlab.com/ee/api#authentication
-	client, err := gitlab.NewOAuthClient(c.Token, opts...)
+	var client *gitlab.Client
+	var err error
+
+	// If a personal access token has been generated programmatically, as described at
+	// https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token-programmatically,
+	// it will not be OAuth-compatible. Thus, personal accesstoken authentication may be enforced.
+	if c.ForcePAToken {
+		client, err = gitlab.NewClient(c.Token, opts...)
+	} else {
+		// The OAuth method is also compatible with project/group/personal access and job tokens (if generated via the GitLab web UI) because they are all usable as Bearer tokens.
+		// Although the job token API access is very limited.
+		// see https://docs.gitlab.com/ee/api#authentication
+		client, err = gitlab.NewOAuthClient(c.Token, opts...)
+	}
 	if err != nil {
 		return nil, err
 	}

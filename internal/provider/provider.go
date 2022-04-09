@@ -38,6 +38,12 @@ func New(version string) func() *schema.Provider {
 					DefaultFunc: schema.EnvDefaultFunc("GITLAB_TOKEN", nil),
 					Description: "The OAuth2 Token, Project, Group, Personal Access Token or CI Job Token used to connect to GitLab. The OAuth method is used in this provider for authentication (using Bearer authorization token). See https://docs.gitlab.com/ee/api/#authentication for details. It may be sourced from the `GITLAB_TOKEN` environment variable.",
 				},
+				"force_pa_token": {
+					Type:        schema.TypeBool,
+					Optional:    true,
+					Default:     false,
+					Description: "Force the usage of personal access token instead of bearer authentication. E.g. useful when personal access token has been generated programmatically.",
+				},
 				"base_url": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -97,6 +103,7 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 	return func(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 		config := Config{
 			Token:         d.Get("token").(string),
+			ForcePAToken:  d.Get("force_pa_token").(bool),
 			BaseURL:       d.Get("base_url").(string),
 			CACertFile:    d.Get("cacert_file").(string),
 			Insecure:      d.Get("insecure").(bool),
