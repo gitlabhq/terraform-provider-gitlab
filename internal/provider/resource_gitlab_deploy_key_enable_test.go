@@ -2,22 +2,28 @@ package provider
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
-	var deployKey gitlab.ProjectDeployKey
-	rInt := acctest.RandInt()
+	testAccCheck(t)
 
-	keyTitle := "main"
+	testProjectParent := testAccCreateProject(t)
+	testProjectKeyShared := testAccCreateProject(t)
+
 	key := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDblguSWgpqiXIjHPSas4+N3Dten7MTLJMlGQXxGpaqN9nGPdNmuRB2YXyjT/nrryoY/qrtuVkPnis5WVo8N/s3hAnJbeJPUS2WKEGjpBlL34AQ+ANnlmGY8L6zr82Hp2Ommb7XGGtlq5D3yLCgTfcXLjC51tgcdwHsdH1U+RisgLwaTSrP/HF4G7IAr5ATsyYjtCwQRQ8ijdf5A34+XN6h8J6TLXKab5eZDuH38s9LxJuS7MRxx/P2UTOsqfjtrZWoQgE5adEGvnDxKyruex9PzNbCNVahzsma7tdikDbzxlHLIZ1aht6rKuai3iyLgcZfGIYtkq4xvg/bnNXxSsGf worker@kg.getwifi.com"
+
+	canPushDeployKeyOptions := gitlab.AddDeployKeyOptions{
+		Title:   gitlab.String("main"),
+		Key:     gitlab.String(key),
+		CanPush: gitlab.Bool(true),
+	}
+
+	parentProjectDeployKey := testAccCreateDeployKey(t, testProjectParent.ID, &canPushDeployKeyOptions)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
@@ -26,192 +32,99 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Enable a deployKey on project with default options
 			{
-				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyTitle, key),
+				Config: testAccGitlabDeployKeyEnableConfig(testProjectKeyShared.ID, parentProjectDeployKey.ID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
-					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
-						Title:   keyTitle,
-						Key:     key,
-						CanPush: false,
-					}),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "key"),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "title"),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key_enable.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Define canPush to true
 			{
-				Config: testAccGitlabDeployKeyEnableConfigCanPush(rInt, keyTitle, key, true),
+				Config: testAccGitlabDeployKeyEnableConfigCanPush(testProjectKeyShared.ID, parentProjectDeployKey.ID, true),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
-					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
-						Title:   keyTitle,
-						Key:     key,
-						CanPush: true,
-					}),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "key"),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "title"),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key_enable.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Define canPush to false
 			{
-				Config: testAccGitlabDeployKeyEnableConfigCanPush(rInt, keyTitle, key, false),
+				Config: testAccGitlabDeployKeyEnableConfigCanPush(testProjectKeyShared.ID, parentProjectDeployKey.ID, false),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
-					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
-						Title:   keyTitle,
-						Key:     key,
-						CanPush: false,
-					}),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "key"),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "title"),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key_enable.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Get back to default options
 			{
-				Config: testAccGitlabDeployKeyEnableConfig(rInt, keyTitle, key),
+				Config: testAccGitlabDeployKeyEnableConfig(testProjectKeyShared.ID, parentProjectDeployKey.ID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyEnableExists("gitlab_deploy_key_enable.foo", &deployKey),
-					testAccCheckGitlabDeployKeyEnableAttributes(&deployKey, &testAccGitlabDeployKeyEnableExpectedAttributes{
-						Title:   keyTitle,
-						Key:     key,
-						CanPush: false,
-					}),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "key"),
+					resource.TestCheckResourceAttrSet("gitlab_deploy_key_enable.foo", "title"),
 				),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key_enable.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
 }
 
-func testAccCheckGitlabDeployKeyEnableExists(n string, deployKey *gitlab.ProjectDeployKey) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
-		}
-
-		deployKeyID, err := strconv.Atoi(strings.Split(rs.Primary.ID, ":")[1])
-		if err != nil {
-			return err
-		}
-		repoName := rs.Primary.Attributes["project"]
-		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
-		}
-
-		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(repoName, deployKeyID)
-		if err != nil {
-			return err
-		}
-		*deployKey = *gotDeployKey
-		return nil
-	}
-}
-
-type testAccGitlabDeployKeyEnableExpectedAttributes struct {
-	Title   string
-	Key     string
-	CanPush bool
-}
-
-func testAccCheckGitlabDeployKeyEnableAttributes(deployKey *gitlab.ProjectDeployKey, want *testAccGitlabDeployKeyEnableExpectedAttributes) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		if deployKey.Title != want.Title {
-			return fmt.Errorf("got title %q; want %q", deployKey.Title, want.Title)
-		}
-
-		if deployKey.Key != want.Key {
-			return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
-		}
-
-		if deployKey.CanPush != want.CanPush {
-			return fmt.Errorf("got can_push %t; want %t", deployKey.CanPush, want.CanPush)
-		}
-
-		return nil
-	}
-}
-
 func testAccCheckGitlabDeployKeyEnableDestroy(s *terraform.State) error {
-	var project string
-	var deployKeyID int
-
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type == "gitlab_project" {
-			project = rs.Primary.Attributes["project"]
-		} else if rs.Type == "gitlab_deploy_key_enable" {
-			deployKeyID, _ = strconv.Atoi(strings.Split(rs.Primary.ID, ":")[1])
+		project, deployKeyID, err := resourceGitLabDeployKeyEnableParseId(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("unable to parse resource ID into project and deployKeyID: %w", err)
 		}
-	}
 
-	gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
-	if err == nil {
-		if gotDeployKey != nil {
-			return fmt.Errorf("Deploy key still exists: %d", deployKeyID)
+		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
+		if err == nil {
+			if gotDeployKey != nil {
+				return fmt.Errorf("Deploy key still exists: %d", deployKeyID)
+			}
 		}
-	}
-	if !is404(err) {
-		return err
+		if !is404(err) {
+			return err
+		}
 	}
 	return nil
 }
 
-func testAccGitlabDeployKeyEnableConfig(rInt int, keyTitle string, key string) string {
+func testAccGitlabDeployKeyEnableConfig(shareProjectId int, keyId int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "parent" {
-  name = "parent-%d"
-  description = "Terraform acceptance tests - Parent project"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests - Test Project"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_deploy_key" "parent" {
-  project = "${gitlab_project.parent.id}"
-  title = "%s"
-  key = "%s"
-}
-
 resource "gitlab_deploy_key_enable" "foo" {
-  project = "${gitlab_project.foo.id}"
-  key_id = "${gitlab_deploy_key.parent.id}"
+  project = %[1]d
+  key_id  = %[2]d
 }
-  `, rInt, rInt, keyTitle, key)
+  `, shareProjectId, keyId)
 }
 
-func testAccGitlabDeployKeyEnableConfigCanPush(rInt int, keyTitle string, key string, canPush bool) string {
+func testAccGitlabDeployKeyEnableConfigCanPush(shareProjectId int, keyId int, canPush bool) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "parent" {
-  name = "parent-%d"
-  description = "Terraform acceptance tests - Parent project"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests - Test Project"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
-resource "gitlab_deploy_key" "parent" {
-  project = "${gitlab_project.parent.id}"
-  title = "%s"
-  key = "%s"
-}
-
 resource "gitlab_deploy_key_enable" "foo" {
-  project = "${gitlab_project.foo.id}"
-  key_id = "${gitlab_deploy_key.parent.id}"
-  can_push = %t
+  project  = %[1]d
+  key_id   = %[2]d
+  can_push = %[3]t
 }
-  `, rInt, rInt, keyTitle, key, canPush)
+  `, shareProjectId, keyId, canPush)
 }
