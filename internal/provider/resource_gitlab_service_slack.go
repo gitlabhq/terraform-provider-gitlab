@@ -252,7 +252,14 @@ func resourceGitlabServiceSlackCreate(ctx context.Context, d *schema.ResourceDat
 
 func resourceGitlabServiceSlackRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Id()
+	id := d.Id()
+	project := d.Get("project").(string)
+	if id != project && project != "" {
+		d.SetId(project)
+		log.Printf("[WARN] changed gitlab slack service ID from %s to its project ID %s", id, project)
+	} else {
+		project = id
+	}
 
 	log.Printf("[DEBUG] read gitlab slack service for project %s", project)
 
