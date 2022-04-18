@@ -14,7 +14,7 @@ var _ = registerResource("gitlab_instance_variable", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`" + `gitlab_instance_variable` + "`" + ` resource allows to manage the lifecycle of an instance-level CI/CD variable.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_variables.html)`,
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_ci_variables.html)`,
 
 		CreateContext: resourceGitlabInstanceVariableCreate,
 		ReadContext:   resourceGitlabInstanceVariableRead,
