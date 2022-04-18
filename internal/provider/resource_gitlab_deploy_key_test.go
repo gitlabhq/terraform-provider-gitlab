@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"reflect"
 	"strconv"
 	"testing"
 
@@ -10,6 +12,33 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 )
+
+func testGitlabDeployKeyStateDataV0() map[string]interface{} {
+	return map[string]interface{}{
+		"id":      "5",
+		"project": "1",
+	}
+}
+
+func testGitlabDeployKeyStateDataV1() map[string]interface{} {
+	v0 := testGitlabDeployKeyStateDataV0()
+	return map[string]interface{}{
+		"id":      fmt.Sprintf("%s:%s", v0["project"], v0["id"]),
+		"project": "1",
+	}
+}
+
+func TestGitlabDeployKeyStateUpgradeV0(t *testing.T) {
+	expected := testGitlabDeployKeyStateDataV1()
+	actual, err := resourceGitlabDeployKeyStateUpgradeV0(context.Background(), testGitlabDeployKeyStateDataV0(), nil)
+	if err != nil {
+		t.Fatalf("error migrating state: %s", err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
+	}
+}
 
 func TestAccGitlabDeployKey_basic(t *testing.T) {
 	var deployKey gitlab.ProjectDeployKey
@@ -53,6 +82,12 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -73,29 +108,6 @@ func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
 	})
 }
 
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabDeployKey_import(t *testing.T) {
-	rInt := acctest.RandInt()
-	resourceName := "gitlab_deploy_key.foo"
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabDeployKeyConfig(rInt, ""),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportStateIdFunc: getDeployKeyImportID(resourceName),
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
-		},
-	})
-}
-
 func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.ProjectDeployKey) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -103,15 +115,17 @@ func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.ProjectDeploy
 			return fmt.Errorf("Not Found: %s", n)
 		}
 
-		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
+		project, rawDeployKeyID, err := parseTwoPartID(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
-		repoName := rs.Primary.Attributes["project"]
-		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
+
+		deployKeyID, err := strconv.Atoi(rawDeployKeyID)
+		if err != nil {
+			return err
 		}
-		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(repoName, deployKeyID)
+
+		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
 		if err != nil {
 			return err
 		}
@@ -146,15 +160,23 @@ func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.ProjectDeployKey, w
 
 func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
+		if rs.Type != "gitlab_deploy_key" {
 			continue
 		}
-		deployKeyID, err := strconv.Atoi(rs.Primary.ID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
-		project := rs.Primary.Attributes["project"]
+
+		project, rawDeployKeyID, err := parseTwoPartID(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+
+		deployKeyID, err := strconv.Atoi(rawDeployKeyID)
+		if err != nil {
+			return err
+		}
 
 		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
 		if err == nil {
-			if gotDeployKey != nil && fmt.Sprintf("%d", gotDeployKey.ID) == rs.Primary.ID {
+			if gotDeployKey != nil {
 				return fmt.Errorf("Deploy key still exists")
 			}
 		}
@@ -164,26 +186,6 @@ func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 		return nil
 	}
 	return nil
-}
-
-func getDeployKeyImportID(n string) resource.ImportStateIdFunc {
-	return func(s *terraform.State) (string, error) {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return "", fmt.Errorf("Not Found: %s", n)
-		}
-
-		deployKeyID := rs.Primary.ID
-		if deployKeyID == "" {
-			return "", fmt.Errorf("No deploy key ID is set")
-		}
-		projectID := rs.Primary.Attributes["project"]
-		if projectID == "" {
-			return "", fmt.Errorf("No project ID is set")
-		}
-
-		return fmt.Sprintf("%s:%s", projectID, deployKeyID), nil
-	}
 }
 
 func testAccGitlabDeployKeyConfig(rInt int, suffix string) string {

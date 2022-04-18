@@ -24,41 +24,61 @@ var _ = registerResource("gitlab_deploy_key", func() *schema.Resource {
 		ReadContext:   resourceGitlabDeployKeyRead,
 		DeleteContext: resourceGitlabDeployKeyDelete,
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceGitlabDeployKeyStateImporter,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
-		Schema: map[string]*schema.Schema{
-			"project": {
-				Description: "The name or id of the project to add the deploy key to.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-			},
-			"title": {
-				Description: "A title to describe the deploy key with.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-			},
-			"key": {
-				Description: "The public ssh key body.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					return old == strings.TrimSpace(new)
-				},
-			},
-			"can_push": {
-				Description: "Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-				ForceNew:    true,
+		Schema:        resourceGitlabDeployKeySchema(),
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    (&schema.Resource{Schema: resourceGitlabDeployKeySchema()}).CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceGitlabDeployKeyStateUpgradeV0,
+				Version: 0,
 			},
 		},
 	}
 })
+
+func resourceGitlabDeployKeySchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"project": {
+			Description: "The name or id of the project to add the deploy key to.",
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+		},
+		"title": {
+			Description: "A title to describe the deploy key with.",
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+		},
+		"key": {
+			Description: "The public ssh key body.",
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+			DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+				return old == strings.TrimSpace(new)
+			},
+		},
+		"can_push": {
+			Description: "Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.",
+			Type:        schema.TypeBool,
+			Optional:    true,
+			Default:     false,
+			ForceNew:    true,
+		},
+	}
+}
+
+func resourceGitlabDeployKeyStateUpgradeV0(ctx context.Context, rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	oldResourceID := rawState["id"].(string)
+	project := rawState["project"].(string)
+	newResourceID := buildTwoPartID(&project, &oldResourceID)
+	rawState["id"] = newResourceID
+	return rawState, nil
+}
 
 func resourceGitlabDeployKeyCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
@@ -76,18 +96,23 @@ func resourceGitlabDeployKeyCreate(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	d.SetId(fmt.Sprintf("%d", deployKey.ID))
-
+	d.SetId(fmt.Sprintf("%s:%d", project, deployKey.ID))
 	return resourceGitlabDeployKeyRead(ctx, d, meta)
 }
 
 func resourceGitlabDeployKeyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	deployKeyID, err := strconv.Atoi(d.Id())
+
+	project, rawDeployKeyID, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	deployKeyID, err := strconv.Atoi(rawDeployKeyID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	log.Printf("[DEBUG] read gitlab deploy key %s/%d", project, deployKeyID)
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
@@ -100,6 +125,7 @@ func resourceGitlabDeployKeyRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.FromErr(err)
 	}
 
+	d.Set("project", project)
 	d.Set("title", deployKey.Title)
 	d.Set("key", deployKey.Key)
 	d.Set("can_push", deployKey.CanPush)
@@ -108,11 +134,16 @@ func resourceGitlabDeployKeyRead(ctx context.Context, d *schema.ResourceData, me
 
 func resourceGitlabDeployKeyDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	deployKeyID, err := strconv.Atoi(d.Id())
+	project, rawDeployKeyID, err := parseTwoPartID(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	deployKeyID, err := strconv.Atoi(rawDeployKeyID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
 	log.Printf("[DEBUG] Delete gitlab deploy key %s", d.Id())
 
 	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
@@ -122,18 +153,4 @@ func resourceGitlabDeployKeyDelete(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	return nil
-}
-
-func resourceGitlabDeployKeyStateImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	s := strings.Split(d.Id(), ":")
-	if len(s) != 2 {
-		d.SetId("")
-		return nil, fmt.Errorf("Invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
-	}
-	project, id := s[0], s[1]
-
-	d.SetId(id)
-	d.Set("project", project)
-
-	return []*schema.ResourceData{d}, nil
 }
