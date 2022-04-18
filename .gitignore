@@ -30,3 +30,5 @@ website/build
 website/node_modules
 website/vendor
 /tmp
+certs/gitlab-registry.crt
+certs/gitlab-registry.key

@@ -65,15 +65,19 @@ SERVICE ?= gitlab-ce
 GITLAB_TOKEN ?= ACCTEST1234567890123
 GITLAB_BASE_URL ?= http://127.0.0.1:8080/api/v4
 
-testacc-up: ## Launch a GitLab instance.
+testacc-up: | certs ## Launch a GitLab instance.
 	docker-compose up -d $(SERVICE)
 	./scripts/await-healthy.sh
 
 testacc-down: ## Teardown a GitLab instance.
-	docker-compose down
+	docker-compose down --volumes
 
 testacc: ## Run acceptance tests against a GitLab instance.
 	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
+
+certs: ## Generate certs for the GitLab container registry
+	mkdir -p certs
+	openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout certs/gitlab-registry.key -out certs/gitlab-registry.crt -subj "/CN=gitlab-registry.com" -addext "subjectAltName=DNS:IP:127.0.0.1"
 
 # TOOLS
 # Tool dependencies are installed into a project-local /bin folder.
@@ -104,3 +108,6 @@ TERRAFORM_VERSION = v1.1.4
 tool-terraform:
 	@# See https://github.com/hashicorp/terraform/issues/30356
 	@[ -f $(GOBIN)/terraform ] || { mkdir -p tmp; cd tmp; rm -rf terraform; git clone --branch $(TERRAFORM_VERSION) --depth 1 https://github.com/hashicorp/terraform.git; cd terraform; GOBIN=$(GOBIN) go install; cd ..; rm -rf terraform; }
+
+clean: testacc-down
+	@rm -rf certs/

@@ -28,11 +28,6 @@ test -f $done || {
     printf 'terraform_token.save!;'
   ) | gitlab-rails console
 
-  echo "Enabling the container registry for the instance so that Personal Access Tokens can be created with the read_registry and write_registry scopes"
-  (
-    printf 'Gitlab.config.registry["enabled"] = true'
-  ) | gitlab-rails console
-
   # 2020-09-07: Currently Gitlab (version 13.3.6 ) doesn't allow in admin API
   # ability to set a group as instance level templates.
   # To test resource_gitlab_project_test template features we add

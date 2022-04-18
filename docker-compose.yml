@@ -17,6 +17,8 @@ services:
       - logs-ce:/var/log/gitlab
       - data-ce:/var/opt/gitlab
       - ${PWD}/scripts/healthcheck-and-setup.sh:/healthcheck-and-setup.sh:Z
+      - ${PWD}/scripts/gitlab.rb:/etc/gitlab/gitlab.rb:ro
+      - ${PWD}/certs:/etc/gitlab/ssl:ro
     healthcheck:
       test: /healthcheck-and-setup.sh
       interval: 10s
@@ -38,6 +40,8 @@ services:
       - data-ee:/var/opt/gitlab
       - ${PWD}/scripts/healthcheck-and-setup.sh:/healthcheck-and-setup.sh:Z
       - ${PWD}/Gitlab-license.txt:/Gitlab-license.txt:Z
+      - ${PWD}/scripts/gitlab.rb:/etc/gitlab/gitlab.rb:ro
+      - ${PWD}/certs:/etc/gitlab/ssl:ro
     healthcheck:
       test: /healthcheck-and-setup.sh
       interval: 10s
