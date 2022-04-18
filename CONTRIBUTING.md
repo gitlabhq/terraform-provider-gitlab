@@ -1,6 +1,6 @@
 # Contributing to GitLab Terraform Provider
 
-Thank you for contributing to this provider! :tada: :heart: :trophy: 
+Thank you for contributing to this provider! :tada: :heart: :trophy:
 
 Generally we accept any change that adds or changes a Terraform resource that is in line with the [GitLab API](https://docs.gitlab.com/ee/api/api_resources.html). It is always best to [open an issue](https://github.com/gitlabhq/terraform-provider-gitlab/issues/new/choose) before starting on a change.
 
@@ -77,15 +77,14 @@ You'll first need [Go](http://www.golang.org) installed on your machine (version
    $ make build
    ```
 
-   
+
 ### Use a Remote Environment via GitPod
 
-You can choose to use your own development environment if desired, however a `.gitpod.yml` file is included within the repository to allow the use of [GitPod](https://gitpod.io/) easily. 
-This will allow you to use GitPod's integration with GitHub to quickly start a web-based development environment including Go and Docker, which are necessary 
-for running tests. To use GitPod's integration, you have two different options described below. After you've completed one of the two options, your development environment 
-will be ready within a minute or two. As part of starting up, your development environment will automatically start up the `gitlab-ce` container necessary for running 
+You can choose to use your own development environment if desired, however a `.gitpod.yml` file is included within the repository to allow the use of [GitPod](https://gitpod.io/) easily.
+This will allow you to use GitPod's integration with GitHub to quickly start a web-based development environment including Go and Docker, which are necessary
+for running tests. To use GitPod's integration, you have two different options described below. After you've completed one of the two options, your development environment
+will be ready within a minute or two. As part of starting up, your development environment will automatically start up the `gitlab-ce` container necessary for running
 tests, as described in the "Running Tests/Option 1" section below.
-
 
 #### Option 1: Manually navigate to GitPod
 
@@ -112,6 +111,8 @@ The acceptance tests can run against a Gitlab instance where you have a token wi
 #### Option 1: Run tests against a local Gitlab container with docker-compose
 
 This option is the easiest and requires [docker-compose](https://docs.docker.com/compose/install/) (version 1.13+) to be installed on your machine.
+
+Note that the you need an up-to-date version of GNU make and an up-to-date version of openssl / libressl.
 
 1. Start the Gitlab container. It will take about 5 minutes for the container to become healthy.
 
