@@ -36,7 +36,7 @@ func TestAccGitlabPersonalAccessToken_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_personal_access_token.foo", "revoked", "false"),
 					resource.TestCheckResourceAttrSet("gitlab_personal_access_token.foo", "token"),
 					resource.TestCheckResourceAttrSet("gitlab_personal_access_token.foo", "created_at"),
-					resource.TestCheckResourceAttrSet("gitlab_personal_access_token.foo", "user_id"),
+					resource.TestCheckResourceAttr("gitlab_personal_access_token.foo", "user_id", fmt.Sprintf("%d", user.ID)),
 					resource.TestCheckNoResourceAttr("gitlab_personal_access_token.foo", "expires_at"),
 				),
 			},
@@ -64,7 +64,7 @@ func TestAccGitlabPersonalAccessToken_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_personal_access_token.foo", "revoked", "false"),
 					resource.TestCheckResourceAttrSet("gitlab_personal_access_token.foo", "token"),
 					resource.TestCheckResourceAttrSet("gitlab_personal_access_token.foo", "created_at"),
-					resource.TestCheckResourceAttrSet("gitlab_personal_access_token.foo", "user_id"),
+					resource.TestCheckResourceAttr("gitlab_personal_access_token.foo", "user_id", fmt.Sprintf("%d", user.ID)),
 				),
 			},
 			// Verify upstream resource with an import.

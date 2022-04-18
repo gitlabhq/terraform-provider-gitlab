@@ -4,7 +4,7 @@ page_title: "gitlab_personal_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_personal_access_token resource allows to manage the lifecycle of a personal access token for a specified user.
-  -> Note In order to utilize this resource without failure the executing user must be an admin.
+  -> This resource requires administration privileges.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/personal_access_tokens.html
 ---
 
@@ -12,7 +12,7 @@ description: |-
 
 The `gitlab_personal_access_token` resource allows to manage the lifecycle of a personal access token for a specified user.
 
--> **Note** In order to utilize this resource without failure the executing user must be an admin. 
+-> This resource requires administration privileges. 
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)
 

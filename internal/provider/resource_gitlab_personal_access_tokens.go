@@ -29,7 +29,7 @@ var _ = registerResource("gitlab_personal_access_token", func() *schema.Resource
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_personal_access_token`" + ` resource allows to manage the lifecycle of a personal access token for a specified user.
 
--> **Note** In order to utilize this resource without failure the executing user must be an admin. 
+-> This resource requires administration privileges. 
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)`,
 
@@ -97,15 +97,13 @@ var _ = registerResource("gitlab_personal_access_token", func() *schema.Resource
 func resourceGitlabPersonalAccessTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	userId := d.Get("user_id").(int)
-
 	currentUserAdmin, err := isCurrentUserAdmin(client)
 	if err != nil {
 		return diag.Errorf("[ERROR] cannot query the user API for current user: %v", err)
 	}
 
 	if !currentUserAdmin {
-		return diag.Errorf("[ERROR] Current user needs to be admin when creating a personal access token: %v", err)
+		return diag.Errorf("current user needs to be admin when creating a personal access token")
 	}
 
 	options := &gitlab.CreatePersonalAccessTokenOptions{
@@ -113,27 +111,24 @@ func resourceGitlabPersonalAccessTokenCreate(ctx context.Context, d *schema.Reso
 		Scopes: stringSetToStringSlice(d.Get("scopes").(*schema.Set)),
 	}
 
-	log.Printf("[DEBUG] create gitlab PersonalAccessToken %s (scopes: %s) for user ID %d", *options.Name, options.Scopes, userId)
+	userID := d.Get("user_id").(int)
+	log.Printf("[DEBUG] create gitlab PersonalAccessToken %s (scopes: %s) for user ID %d", *options.Name, options.Scopes, userID)
 
 	if v, ok := d.GetOk("expires_at"); ok {
-		parsedExpiresAt, err := time.Parse("2006-01-02", v.(string))
+		parsedExpiresAt, err := parseISO8601Date(v.(string))
 		if err != nil {
-			return diag.Errorf("Invalid expires_at date: %v", err)
+			return diag.Errorf("failed to parse expires_at '%s' as ISO8601 formatted date: %v", v.(string), err)
 		}
 
-		parsedExpiresAtISOTime := gitlab.ISOTime(parsedExpiresAt)
-		options.ExpiresAt = &parsedExpiresAtISOTime
+		options.ExpiresAt = parsedExpiresAt
 	}
 
-	personalAccessToken, _, err := client.Users.CreatePersonalAccessToken(userId, options, gitlab.WithContext(ctx))
+	personalAccessToken, _, err := client.Users.CreatePersonalAccessToken(userID, options, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	tokenId := strconv.Itoa(personalAccessToken.ID)
-	userIdString := strconv.Itoa(userId)
-
-	d.SetId(buildTwoPartID(&userIdString, &tokenId))
+	d.SetId(fmt.Sprintf("%d:%d", userID, personalAccessToken.ID))
 	// NOTE: the token can only be read once after creating it
 	d.Set("token", personalAccessToken.Token)
 
@@ -141,36 +136,28 @@ func resourceGitlabPersonalAccessTokenCreate(ctx context.Context, d *schema.Reso
 }
 
 func resourceGitlabPersonalAccessTokenRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	userId, tokenId, err := parseTwoPartID(d.Id())
-	if err != nil {
-		return diag.Errorf("Error parsing ID: %s", d.Id())
-	}
-
-	userIdInt, err := strconv.Atoi(userId)
-	if err != nil {
-		return diag.Errorf("Error converting user ID to string: %v", userId)
-	}
-
 	client := meta.(*gitlab.Client)
 
-	personalAccessTokenId, err := strconv.Atoi(tokenId)
+	userID, tokenID, err := resourceGitLabPersonalAccessTokenParseId(d.Id())
 	if err != nil {
-		return diag.Errorf("%s cannot be converted to int", tokenId)
+		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] read gitlab PersonalAccessToken %d, user ID %s", personalAccessTokenId, userId)
+	log.Printf("[DEBUG] read gitlab PersonalAccessToken %d, user ID %d", tokenID, userID)
 
-	personalAccessToken, err := resourceGitlabPersonalAccessTokenFind(ctx, client, userIdInt, personalAccessTokenId)
+	personalAccessToken, err := resourceGitlabPersonalAccessTokenFind(ctx, client, userID, tokenID)
 	if errors.Is(err, errResourceGitlabPersonalAccessTokenNotFound) {
-		log.Printf("[DEBUG] failed to read gitlab PersonalAccessToken %d, user ID %s", personalAccessTokenId, userId)
+		log.Printf("[DEBUG] failed to read gitlab PersonalAccessToken %d, user ID %d", tokenID, userID)
 		d.SetId("")
+
+		return nil
 	}
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.Set("user_id", userIdInt)
+	d.Set("user_id", userID)
 	d.Set("name", personalAccessToken.Name)
 	if personalAccessToken.ExpiresAt != nil {
 		d.Set("expires_at", personalAccessToken.ExpiresAt.String())
@@ -179,8 +166,7 @@ func resourceGitlabPersonalAccessTokenRead(ctx context.Context, d *schema.Resour
 	d.Set("created_at", personalAccessToken.CreatedAt.Format(time.RFC3339))
 	d.Set("revoked", personalAccessToken.Revoked)
 
-	err = d.Set("scopes", personalAccessToken.Scopes)
-	if err != nil {
+	if err = d.Set("scopes", personalAccessToken.Scopes); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -188,25 +174,20 @@ func resourceGitlabPersonalAccessTokenRead(ctx context.Context, d *schema.Resour
 }
 
 func resourceGitlabPersonalAccessTokenDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	_, tokenId, err := parseTwoPartID(d.Id())
-	if err != nil {
-		return diag.Errorf("Error parsing ID: %s", d.Id())
-	}
-
 	client := meta.(*gitlab.Client)
 
-	personalAccessTokenId, err := strconv.Atoi(tokenId)
-	if err != nil {
-		return diag.Errorf("%s cannot be converted to int", tokenId)
-	}
-
-	log.Printf("[DEBUG] Delete gitlab PersonalAccessToken %s", d.Id())
-	_, err = client.PersonalAccessTokens.RevokePersonalAccessToken(personalAccessTokenId, gitlab.WithContext(ctx))
+	_, tokenID, err := resourceGitLabPersonalAccessTokenParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	return diag.FromErr(err)
+	log.Printf("[DEBUG] Delete gitlab PersonalAccessToken %s", d.Id())
+	_, err = client.PersonalAccessTokens.RevokePersonalAccessToken(tokenID, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	return nil
 }
 
 var errResourceGitlabPersonalAccessTokenNotFound = errors.New("personal access token not found")
@@ -239,4 +220,23 @@ func resourceGitlabPersonalAccessTokenFind(ctx context.Context, client *gitlab.C
 	}
 
 	return nil, errResourceGitlabPersonalAccessTokenNotFound
+}
+
+func resourceGitLabPersonalAccessTokenParseId(id string) (int, int, error) {
+	userID, tokenID, err := parseTwoPartID(id)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	userIID, err := strconv.Atoi(userID)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	tokenIID, err := strconv.Atoi(tokenID)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return userIID, tokenIID, nil
 }
