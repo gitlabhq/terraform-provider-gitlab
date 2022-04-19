@@ -30,3 +30,5 @@ website/build
 website/node_modules
 website/vendor
 /tmp
+certs/example.key
+certs/example.crt

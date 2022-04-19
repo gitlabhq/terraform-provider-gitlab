@@ -66,11 +66,13 @@ GITLAB_TOKEN ?= ACCTEST1234567890123
 GITLAB_BASE_URL ?= http://127.0.0.1:8080/api/v4
 
 testacc-up: ## Launch a GitLab instance.
+	mkdir -p certs
+	openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout certs/example.key -out certs/example.crt -subj "/CN=example.com" -addext "subjectAltName=DNS:IP:127.0.0.1"
 	docker-compose up -d $(SERVICE)
 	./scripts/await-healthy.sh
 
 testacc-down: ## Teardown a GitLab instance.
-	docker-compose down
+	docker-compose down --volumes
 
 testacc: ## Run acceptance tests against a GitLab instance.
 	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
