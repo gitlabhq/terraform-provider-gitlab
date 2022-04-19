@@ -30,5 +30,5 @@ website/build
 website/node_modules
 website/vendor
 /tmp
-certs/example.key
-certs/example.crt
+certs/gitlab-registry.crt
+certs/gitlab-registry.key
