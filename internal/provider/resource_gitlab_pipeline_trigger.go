@@ -41,6 +41,7 @@ var _ = registerResource("gitlab_pipeline_trigger", func() *schema.Resource {
 				Description: "The pipeline trigger token.",
 				Type:        schema.TypeString,
 				Computed:    true,
+				Sensitive:   true,
 			},
 		},
 	}
