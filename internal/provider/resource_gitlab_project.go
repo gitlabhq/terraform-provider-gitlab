@@ -663,7 +663,7 @@ A project can either be created in a group or user namespace.
 	}
 })
 
-func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceData, project *gitlab.Project) error {
+func resourceGitlabProjectSetToState(ctx context.Context, client *gitlab.Client, d *schema.ResourceData, project *gitlab.Project) error {
 	d.SetId(fmt.Sprintf("%d", project.ID))
 	d.Set("name", project.Name)
 	d.Set("path", project.Path)
@@ -694,7 +694,7 @@ func resourceGitlabProjectSetToState(client *gitlab.Client, d *schema.ResourceDa
 		return err
 	}
 	d.Set("archived", project.Archived)
-	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
+	if supportsSquashOption, err := isGitLabVersionAtLeast(ctx, client, "14.1")(); err != nil {
 		return err
 	} else if supportsSquashOption {
 		d.Set("squash_option", project.SquashOption)
@@ -938,7 +938,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.MergeCommitTemplate = gitlab.String(v.(string))
 	}
 
-	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
+	if supportsSquashOption, err := isGitLabVersionAtLeast(ctx, client, "14.1")(); err != nil {
 		return diag.FromErr(err)
 	} else if supportsSquashOption {
 		if v, ok := d.GetOk("squash_option"); ok {
@@ -1153,7 +1153,7 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 		return nil
 	}
 
-	if err := resourceGitlabProjectSetToState(client, d, project); err != nil {
+	if err := resourceGitlabProjectSetToState(ctx, client, d, project); err != nil {
 		return diag.FromErr(err)
 	}
 
@@ -1262,7 +1262,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
 	}
 
-	if supportsSquashOption, err := isGitLabVersionAtLeast(client, "14.1")(); err != nil {
+	if supportsSquashOption, err := isGitLabVersionAtLeast(ctx, client, "14.1")(); err != nil {
 		return diag.FromErr(err)
 	} else if supportsSquashOption && d.HasChange("squash_option") {
 		options.SquashOption = stringToSquashOptionValue(d.Get("squash_option").(string))

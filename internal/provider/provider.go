@@ -105,7 +105,7 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 			EarlyAuthFail: d.Get("early_auth_check").(bool),
 		}
 
-		client, err := config.Client()
+		client, err := config.Client(ctx)
 		if err != nil {
 			return nil, diag.FromErr(err)
 		}

@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -35,7 +36,7 @@ var testGitlabClient *gitlab.Client
 
 func init() {
 	if os.Getenv(resource.EnvTfAcc) != "" {
-		client, err := testGitlabConfig.Client()
+		client, err := testGitlabConfig.Client(context.Background())
 		if err != nil {
 			panic("failed to create test client: " + err.Error()) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
 		}
