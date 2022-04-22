@@ -366,6 +366,7 @@ resource "gitlab_repository_file" "this" {
   author_email = "meow@catnip.com"
   author_name = "Meow Meowington"
   commit_message = "feature: change launch codes"
+  execute_filemode = true
 }
 	`, projectID)
 }
