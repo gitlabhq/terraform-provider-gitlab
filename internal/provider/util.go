@@ -287,6 +287,19 @@ func is404(err error) bool {
 	return false
 }
 
+func isCurrentUserAdmin(client *gitlab.Client) (bool, error) {
+	currentUser, _, err := client.Users.CurrentUser()
+	if err != nil {
+		return false, err
+	}
+
+	if currentUser.IsAdmin {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
 // ISO 8601 date format
 const iso8601 = "2006-01-02"
 

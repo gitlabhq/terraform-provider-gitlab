@@ -1099,7 +1099,7 @@ func dataSourceGitlabProjectsRead(ctx context.Context, d *schema.ResourceData, m
 			WithIssuesEnabled:        withIssuesEnabledPtr,
 			WithMergeRequestsEnabled: withMergeRequestsEnabledPtr,
 			WithShared:               withSharedPtr,
-			IncludeSubgroups:         includeSubGroupsPtr,
+			IncludeSubGroups:         includeSubGroupsPtr,
 			WithCustomAttributes:     withCustomAttributesPtr,
 		}
 
