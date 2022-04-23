@@ -74,6 +74,7 @@ Read-Only:
 - `linkedin` (String)
 - `location` (String)
 - `name` (String)
+- `namespace_id` (Number)
 - `organization` (String)
 - `projects_limit` (Number)
 - `provider` (String)

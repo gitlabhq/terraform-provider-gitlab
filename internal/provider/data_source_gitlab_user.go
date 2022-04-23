@@ -171,6 +171,12 @@ var _ = registerDataSource("gitlab_user", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"namespace_id": {
+				Description: "The ID of the user's namespace. Requires admin token to access this field. Available since GitLab 14.10.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+			},
 		},
 	}
 })
@@ -223,6 +229,7 @@ func dataSourceGitlabUserRead(ctx context.Context, d *schema.ResourceData, meta 
 		return diag.Errorf("one and only one of user_id, username or email must be set")
 	}
 
+	d.SetId(fmt.Sprintf("%d", user.ID))
 	d.Set("user_id", user.ID)
 	d.Set("username", user.Username)
 	d.Set("email", user.Email)
@@ -254,8 +261,7 @@ func dataSourceGitlabUserRead(ctx context.Context, d *schema.ResourceData, meta 
 	d.Set("website_url", user.WebsiteURL)
 	d.Set("theme_id", user.ThemeID)
 	d.Set("color_scheme_id", user.ColorSchemeID)
-
-	d.SetId(fmt.Sprintf("%d", user.ID))
+	d.Set("namespace_id", user.NamespaceID)
 
 	return nil
 }

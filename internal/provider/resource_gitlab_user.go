@@ -110,6 +110,12 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 				Default:          "active",
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validUserStateValues, false)),
 			},
+			"namespace_id": {
+				Description: "The ID of the user's namespace. Available since GitLab 14.10.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+			},
 		},
 	}
 })
@@ -124,6 +130,7 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("is_external", user.External)
 	d.Set("note", user.Note)
 	d.Set("state", user.State)
+	d.Set("namespace_id", user.NamespaceID)
 }
 
 func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
