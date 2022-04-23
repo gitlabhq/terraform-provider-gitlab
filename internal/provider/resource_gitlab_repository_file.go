@@ -126,6 +126,9 @@ func resourceGitlabRepositoryFileCreate(ctx context.Context, d *schema.ResourceD
 	if startBranch, ok := d.GetOk("start_branch"); ok {
 		options.StartBranch = gitlab.String(startBranch.(string))
 	}
+	if executeFilemode, ok := d.GetOk("execute_filemode"); ok {
+		options.ExecuteFilemode = gitlab.Bool(executeFilemode.(bool))
+	}
 
 	err := resource.RetryContext(ctx, d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		repositoryFile, _, err := client.RepositoryFiles.CreateFile(project, filePath, options, gitlab.WithContext(ctx))
@@ -226,6 +229,9 @@ func resourceGitlabRepositoryFileUpdate(ctx context.Context, d *schema.ResourceD
 	}
 	if startBranch, ok := d.GetOk("start_branch"); ok {
 		updateOptions.StartBranch = gitlab.String(startBranch.(string))
+	}
+	if executeFilemode, ok := d.GetOk("execute_filemode"); ok {
+		updateOptions.ExecuteFilemode = gitlab.Bool(executeFilemode.(bool))
 	}
 
 	err = resource.RetryContext(ctx, d.Timeout(schema.TimeoutUpdate), func() *resource.RetryError {
