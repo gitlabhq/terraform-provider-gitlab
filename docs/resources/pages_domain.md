@@ -3,13 +3,13 @@
 page_title: "gitlab_pages_domain Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_pages_domain resource enables endpoints for connecting custom domain(s) and TLS certificates in GitLab Pages.
+  The gitlab_pages_domain resource allows to manage the lifecycle of a custom Pages domain including its TLS certificates.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/pages_domains.html
 ---
 
 # gitlab_pages_domain (Resource)
 
-The `gitlab_pages_domain` resource enables endpoints for connecting custom domain(s) and TLS certificates in GitLab Pages.
+The `gitlab_pages_domain` resource allows to manage the lifecycle of a custom Pages domain including its TLS certificates.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pages_domains.html)
 
@@ -21,7 +21,7 @@ The `gitlab_pages_domain` resource enables endpoints for connecting custom domai
 ### Required
 
 - `domain` (String) The custom domain.
-- `project` (String) The ID or full path of the project which the branch is created against.
+- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/ee/api/index.html#namespaced-path-encoding) owned by the authenticated user.
 
 ### Optional
 
