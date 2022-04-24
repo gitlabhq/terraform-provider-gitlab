@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -93,9 +92,9 @@ func resourceGitlabGroupShareGroupRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	// Query main group
-	group, resp, err := client.Groups.GetGroup(groupId, nil, gitlab.WithContext(ctx))
+	group, _, err := client.Groups.GetGroup(groupId, nil, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", groupId)
 			d.SetId("")
 			return nil

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -84,9 +83,9 @@ func resourceGitlabProjectFreezePeriodRead(ctx context.Context, d *schema.Resour
 
 	log.Printf("[DEBUG] read gitlab FreezePeriod %s/%d", projectID, freezePeriodID)
 
-	freezePeriod, resp, err := client.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID, gitlab.WithContext(ctx))
+	freezePeriod, _, err := client.FreezePeriods.GetFreezePeriod(projectID, freezePeriodID, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] project freeze period for %s not found so removing it from state", d.Id())
 			d.SetId("")
 			return nil

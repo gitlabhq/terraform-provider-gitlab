@@ -45,10 +45,10 @@ func TestResourceGitlabProjectShareGroupStateUpgradeV0(t *testing.T) {
 func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
-	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectShareGroupDestroy,
 		Steps: []resource.TestStep{
 			// Share a new project with a new group.
 			{
@@ -107,6 +107,34 @@ func testAccCheckGitlabProjectIsNotShared(projectName string) resource.TestCheck
 
 		return nil
 	}
+}
+
+func testAccCheckGitlabProjectShareGroupDestroy(s *terraform.State) error {
+	var projectId string
+	var groupId int
+	var err error
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type == "gitlab_project_share_group" {
+			projectId, groupId, err = projectIdAndGroupIdFromId(rs.Primary.ID)
+			if err != nil {
+				return fmt.Errorf("[ERROR] cannot get project ID and group ID from input: %v", rs.Primary.ID)
+			}
+
+			proj, _, err := testGitlabClient.Projects.GetProject(projectId, nil)
+			if err != nil {
+				return err
+			}
+
+			for _, v := range proj.SharedWithGroups {
+				if groupId == v.GroupID {
+					return fmt.Errorf("GitLab Project Share %d still exists", groupId)
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func testAccGitlabProjectShareGroupConfig(randName, accessLevel string) string {

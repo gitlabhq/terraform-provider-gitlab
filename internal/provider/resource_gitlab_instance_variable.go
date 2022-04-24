@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"log"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -62,9 +61,9 @@ func resourceGitlabInstanceVariableRead(ctx context.Context, d *schema.ResourceD
 
 	log.Printf("[DEBUG] read gitlab instance level CI variable %s", key)
 
-	v, resp, err := client.InstanceVariables.GetVariable(key, gitlab.WithContext(ctx))
+	v, _, err := client.InstanceVariables.GetVariable(key, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab instance level CI variable for %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
