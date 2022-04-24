@@ -164,7 +164,7 @@ func resourceGitlabPagesDomainRead(ctx context.Context, d *schema.ResourceData, 
 	if pagesDomain.Certificate.Expiration == nil {
 		certificate_expiration = ""
 	} else {
-		certificate_expiration = pagesDomain.Certificate.Expiration.UTC().Format(time.UnixDate)
+		certificate_expiration = pagesDomain.Certificate.Expiration.Format(time.RFC3339)
 	}
 	certificate_data := map[string]string{
 		"expired":    strconv.FormatBool(pagesDomain.Certificate.Expired),
@@ -175,7 +175,9 @@ func resourceGitlabPagesDomainRead(ctx context.Context, d *schema.ResourceData, 
 	d.Set("domain", pagesDomain.Domain)
 	d.Set("url", pagesDomain.URL)
 	d.Set("auto_ssl_enabled", pagesDomain.AutoSslEnabled)
-	d.Set("certificate_data", certificate_data)
+	if err := d.Set("certificate_data", certificate_data); err != nil {
+		return diag.FromErr(err)
+	}
 	d.Set("verified", pagesDomain.Verified)
 	d.Set("verification_code", pagesDomain.VerificationCode)
 	return nil
