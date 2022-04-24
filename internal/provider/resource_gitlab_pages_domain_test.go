@@ -12,7 +12,7 @@ import (
 
 func TestAccGitlabPagesDomain_basic(t *testing.T) {
 	testAccCheck(t)
-	
+
 	var pagesDomain gitlab.PagesDomain
 	rInt := acctest.RandInt()
 	project := testAccCreateProject(t)
@@ -109,7 +109,6 @@ func testAccGitlabPagesDomainCreate(rInt int, project string) string {
 resource "gitlab_pages_domain" "this" {
   project                     = "%[2]s"
   domain                      = "page-%[1]d.example.com"
-  auto_ssl_enabled            = false
 }
 	`, rInt, project)
 }
@@ -119,7 +118,6 @@ func testAccGitlabPagesDomainUpdate(rInt int, project string) string {
 resource "gitlab_pages_domain" "this" {
   project                     = "%[2]s"
   domain                      = "page-%[1]d.example.com"
-  auto_ssl_enabled            = true
 }
 	`, rInt+1, project)
 }
