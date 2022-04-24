@@ -3,6 +3,8 @@ package provider
 import (
 	"context"
 	"log"
+	"strconv"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -135,6 +137,11 @@ func resourceGitlabPagesDomainUpdate(ctx context.Context, d *schema.ResourceData
 	return resourceGitlabProjectMirrorRead(ctx, d, meta)
 }
 
+type Certificate struct {
+	expired    bool
+	expiration string
+}
+
 func resourceGitlabPagesDomainRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	projectID, domain, err := parseTwoPartID(d.Id())
@@ -153,13 +160,22 @@ func resourceGitlabPagesDomainRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
+	var certificate_expiration string
+	if pagesDomain.Certificate.Expiration == nil {
+		certificate_expiration = ""
+	} else {
+		certificate_expiration = pagesDomain.Certificate.Expiration.UTC().Format(time.UnixDate)
+	}
+	certificate_data := map[string]string{
+		"expired":    strconv.FormatBool(pagesDomain.Certificate.Expired),
+		"expiration": certificate_expiration,
+	}
+
 	d.Set("project", projectID)
 	d.Set("domain", pagesDomain.Domain)
 	d.Set("url", pagesDomain.URL)
 	d.Set("auto_ssl_enabled", pagesDomain.AutoSslEnabled)
-	if pagesDomain.Certificate.Expired {
-		d.Set("certificate_data", pagesDomain.Certificate)
-	}
+	d.Set("certificate_data", certificate_data)
 	d.Set("verified", pagesDomain.Verified)
 	d.Set("verification_code", pagesDomain.VerificationCode)
 	return nil
