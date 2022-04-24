@@ -137,11 +137,6 @@ func resourceGitlabPagesDomainUpdate(ctx context.Context, d *schema.ResourceData
 	return resourceGitlabProjectMirrorRead(ctx, d, meta)
 }
 
-type Certificate struct {
-	expired    bool
-	expiration string
-}
-
 func resourceGitlabPagesDomainRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	projectID, domain, err := parseTwoPartID(d.Id())
