@@ -3,11 +3,11 @@ package provider
 import (
 	"context"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -66,11 +66,26 @@ var _ = registerResource("gitlab_pages_domain", func() *schema.Resource {
 			},
 			"certificate_data": {
 				Description: "The certificate data.",
-				Type:        schema.TypeMap,
+				Type:        schema.TypeList,
+				MaxItems:    1,
 				Computed:    true,
 				Optional:    true,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"expired": {
+							Description: "Is the certificate expired?",
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Optional:    true,
+						},
+						"expiration": {
+							Description:  "The certificate expiration date.",
+							Type:         schema.TypeString,
+							ValidateFunc: validation.IsRFC3339Time,
+							Computed:     true,
+							Optional:     true,
+						},
+					},
 				},
 			},
 			"verified": {
@@ -155,22 +170,11 @@ func resourceGitlabPagesDomainRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	var certificate_expiration string
-	if pagesDomain.Certificate.Expiration == nil {
-		certificate_expiration = ""
-	} else {
-		certificate_expiration = pagesDomain.Certificate.Expiration.Format(time.RFC3339)
-	}
-	certificate_data := map[string]string{
-		"expired":    strconv.FormatBool(pagesDomain.Certificate.Expired),
-		"expiration": certificate_expiration,
-	}
-
 	d.Set("project", projectID)
 	d.Set("domain", pagesDomain.Domain)
 	d.Set("url", pagesDomain.URL)
 	d.Set("auto_ssl_enabled", pagesDomain.AutoSslEnabled)
-	if err := d.Set("certificate_data", certificate_data); err != nil {
+	if err := d.Set("certificate_data", flattenCertificateData(pagesDomain)); err != nil {
 		return diag.FromErr(err)
 	}
 	d.Set("verified", pagesDomain.Verified)
@@ -192,4 +196,25 @@ func resourceGitlabPagesDomainDelete(ctx context.Context, d *schema.ResourceData
 	}
 
 	return nil
+}
+
+func flattenCertificateData(pagesDomain *gitlab.PagesDomain) (certificate_data []map[string]interface{}) {
+	if pagesDomain == nil {
+		return
+	}
+
+	var certificate_expiration string
+	if pagesDomain.Certificate.Expiration == nil {
+		certificate_expiration = ""
+	} else {
+		certificate_expiration = pagesDomain.Certificate.Expiration.Format(time.RFC3339)
+	}
+
+	certificate_data = []map[string]interface{}{
+		{
+			"expired":    pagesDomain.Certificate.Expired,
+			"expiration": certificate_expiration,
+		},
+	}
+	return certificate_data
 }
