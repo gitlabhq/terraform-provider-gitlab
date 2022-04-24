@@ -27,7 +27,7 @@ The `gitlab_pages_domain` resource enables endpoints for connecting custom domai
 
 - `auto_ssl_enabled` (Boolean) Enables automatic generation of SSL certificates issued by Let’s Encrypt for custom domains.
 - `certificate` (String) The certificate in PEM format with intermediates following in most specific to least specific order.
-- `certificate_data` (Map of String) The certificate data.
+- `certificate_data` (Block List, Max: 1) The certificate data. (see [below for nested schema](#nestedblock--certificate_data))
 - `id` (String) The ID of this resource.
 - `key` (String) The certificate key in PEM format.
 
@@ -36,5 +36,13 @@ The `gitlab_pages_domain` resource enables endpoints for connecting custom domai
 - `url` (String) The URL for the given domain.
 - `verification_code` (String, Sensitive) The verification code for the domain.
 - `verified` (Boolean) The certificate data.
+
+<a id="nestedblock--certificate_data"></a>
+### Nested Schema for `certificate_data`
+
+Optional:
+
+- `expiration` (String) The certificate expiration date.
+- `expired` (Boolean) Is the certificate expired?
 
 
