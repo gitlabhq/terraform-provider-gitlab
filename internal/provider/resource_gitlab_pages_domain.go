@@ -13,7 +13,7 @@ import (
 
 var _ = registerResource("gitlab_pages_domain", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_pages_domain`" + ` resource enables endpoints for connecting custom domain(s) and TLS certificates in GitLab Pages.
+		Description: `The ` + "`gitlab_pages_domain`" + ` resource allows to manage the lifecycle of a custom Pages domain including its TLS certificates.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pages_domains.html)`,
 
@@ -33,7 +33,7 @@ var _ = registerResource("gitlab_pages_domain", func() *schema.Resource {
 				ForceNew:    true,
 			},
 			"project": {
-				Description: "The ID or full path of the project which the branch is created against.",
+				Description: "The ID or [URL-encoded path of the project](https://docs.gitlab.com/ee/api/index.html#namespaced-path-encoding) owned by the authenticated user.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
@@ -105,7 +105,7 @@ var _ = registerResource("gitlab_pages_domain", func() *schema.Resource {
 
 func resourceGitlabPagesDomainCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	projectId := d.Get("project").(string)
+	projectID := d.Get("project").(string)
 	domain := d.Get("domain").(string)
 	auto_ssl_enabled := d.Get("auto_ssl_enabled").(bool)
 	certificate := d.Get("certificate").(string)
@@ -120,12 +120,12 @@ func resourceGitlabPagesDomainCreate(ctx context.Context, d *schema.ResourceData
 
 	log.Printf("[DEBUG] create gitlab pages domain %s", domain)
 
-	_, _, err := client.PagesDomains.CreatePagesDomain(projectId, options, gitlab.WithContext(ctx))
+	_, _, err := client.PagesDomains.CreatePagesDomain(projectID, options, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.SetId(buildTwoPartID(&projectId, &domain))
+	d.SetId(buildTwoPartID(&projectID, &domain))
 	return resourceGitlabPagesDomainRead(ctx, d, meta)
 }
 

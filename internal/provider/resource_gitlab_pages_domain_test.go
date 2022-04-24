@@ -11,9 +11,10 @@ import (
 )
 
 func TestAccGitlabPagesDomain_basic(t *testing.T) {
+	testAccCheck(t)
+	
 	var pagesDomain gitlab.PagesDomain
 	rInt := acctest.RandInt()
-	testAccCheck(t)
 	project := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
