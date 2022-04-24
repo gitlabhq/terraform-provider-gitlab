@@ -43,21 +43,18 @@ var _ = registerResource("gitlab_pages_domain", func() *schema.Resource {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				ForceNew:    false,
-				Default:     nil,
 			},
 			"certificate": {
 				Description: "The certificate in PEM format with intermediates following in most specific to least specific order.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    false,
-				Default:     nil,
 			},
 			"key": {
 				Description: "The certificate key in PEM format.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				ForceNew:    false,
-				Default:     nil,
 			},
 			"url": {
 				Description: "The URL for the given domain.",
