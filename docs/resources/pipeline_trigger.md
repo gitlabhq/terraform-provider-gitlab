@@ -36,7 +36,7 @@ resource "gitlab_pipeline_trigger" "example" {
 
 ### Read-Only
 
-- `token` (String) The pipeline trigger token.
+- `token` (String, Sensitive) The pipeline trigger token.
 
 ## Import
 

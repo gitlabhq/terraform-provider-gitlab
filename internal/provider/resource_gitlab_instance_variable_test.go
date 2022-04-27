@@ -15,10 +15,10 @@ func TestAccGitlabInstanceVariable_basic(t *testing.T) {
 	var instanceVariable gitlab.InstanceVariable
 	rString := acctest.RandString(5)
 
-	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabInstanceVariableDestroy,
 		Steps: []resource.TestStep{
 			// Create a variable with default options
 			{
@@ -118,6 +118,29 @@ func testAccCheckGitlabInstanceVariableExists(n string, instanceVariable *gitlab
 		*instanceVariable = *gotVariable
 		return nil
 	}
+}
+
+func testAccCheckGitlabInstanceVariableDestroy(s *terraform.State) error {
+	var key string
+
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type == "gitlab_instance_variable" {
+			key = rs.Primary.ID
+		}
+	}
+
+	iv, _, err := testGitlabClient.InstanceVariables.GetVariable(key)
+	if err == nil {
+		if iv != nil {
+			return fmt.Errorf("Instance Variable %s still exists", key)
+		}
+	} else {
+		if !is404(err) {
+			return err
+		}
+	}
+
+	return nil
 }
 
 type testAccGitlabInstanceVariableExpectedAttributes struct {

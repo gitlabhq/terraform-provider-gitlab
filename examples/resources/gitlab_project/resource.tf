@@ -16,3 +16,14 @@ resource "gitlab_project" "example-two" {
     prevent_secrets        = true
   }
 }
+
+# Create a project for a given user (requires admin access)
+data "gitlab_user" "peter_parker" {
+  username = "peter_parker"
+}
+
+resource "gitlab_project" "peters_repo" {
+  name         = "peters-repo"
+  description  = "This is a description"
+  namespace_id = data.gitlab_user.peter_parker.namespace_id
+}

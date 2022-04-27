@@ -38,6 +38,7 @@ data "gitlab_user" "example-two" {
 
 - `email` (String) The public email address of the user. **Note**: before GitLab 14.8 the lookup was based on the users primary email address.
 - `id` (String) The ID of this resource.
+- `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field. Available since GitLab 14.10.
 - `user_id` (Number) The ID of the user.
 - `username` (String) The username of the user.
 

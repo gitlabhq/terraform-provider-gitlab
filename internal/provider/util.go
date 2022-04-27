@@ -225,23 +225,23 @@ func intSetToIntSlice(intSet *schema.Set) *[]int {
 
 // isGitLabVersionLessThan is a SkipFunc that returns true if the provided version is lower then
 // the current version of GitLab. It only checks the major and minor version numbers, not the patch.
-func isGitLabVersionLessThan(client *gitlab.Client, version string) func() (bool, error) {
+func isGitLabVersionLessThan(ctx context.Context, client *gitlab.Client, version string) func() (bool, error) {
 	return func() (bool, error) {
-		isAtLeast, err := isGitLabVersionAtLeast(client, version)()
+		isAtLeast, err := isGitLabVersionAtLeast(ctx, client, version)()
 		return !isAtLeast, err
 	}
 }
 
 // isGitLabVersionAtLeast is a SkipFunc that checks that the version of GitLab is at least the
 // provided wantVersion. It only checks the major and minor version numbers, not the patch.
-func isGitLabVersionAtLeast(client *gitlab.Client, wantVersion string) func() (bool, error) {
+func isGitLabVersionAtLeast(ctx context.Context, client *gitlab.Client, wantVersion string) func() (bool, error) {
 	return func() (bool, error) {
 		wantMajor, wantMinor, err := parseVersionMajorMinor(wantVersion)
 		if err != nil {
 			return false, fmt.Errorf("failed to parse wanted version %q: %w", wantVersion, err)
 		}
 
-		actualVersion, _, err := client.Version.GetVersion()
+		actualVersion, _, err := client.Version.GetVersion(gitlab.WithContext(ctx))
 		if err != nil {
 			return false, err
 		}
@@ -285,6 +285,19 @@ func is404(err error) bool {
 		return true
 	}
 	return false
+}
+
+func isCurrentUserAdmin(client *gitlab.Client) (bool, error) {
+	currentUser, _, err := client.Users.CurrentUser()
+	if err != nil {
+		return false, err
+	}
+
+	if currentUser.IsAdmin {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
 
 // ISO 8601 date format
