@@ -16,7 +16,7 @@ var _ = registerDataSource("gitlab_project_milestones", func() *schema.Resource 
 	validMilestoneStates := []string{"active", "closed"}
 
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_project_milestones`" + ` data source allows details of a project milestones.
+		Description: `The ` + "`gitlab_project_milestones`" + ` data source allows get details of a project milestones.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)`,
 
