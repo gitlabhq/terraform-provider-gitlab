@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -6,6 +9,7 @@ import (
 	"testing"
 
 	// "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
@@ -52,10 +56,4 @@ func TestProvider(t *testing.T) {
 
 func TestProvider_impl(t *testing.T) {
 	var _ *schema.Provider = New("dev")()
-}
-
-func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("GITLAB_TOKEN"); v == "" {
-		t.Fatal("GITLAB_TOKEN must be set for acceptance tests")
-	}
 }
