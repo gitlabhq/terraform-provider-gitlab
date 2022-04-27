@@ -37,7 +37,7 @@ resource "gitlab_deploy_key" "example" {
 
 ### Optional
 
-- `can_push` (Boolean) Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.
+- `can_push` (Boolean) Allow this deploy key to be used to push changes to the project. Defaults to `false`.
 - `id` (String) The ID of this resource.
 
 ## Import
@@ -46,5 +46,8 @@ Import is supported using the following syntax:
 
 ```shell
 # GitLab deploy keys can be imported using an id made up of `{project_id}:{deploy_key_id}`, e.g.
+# `project_id` can be whatever the [get single project api][get_single_project] takes for
+# its `:id` value, so for example:
 terraform import gitlab_deploy_key.test 1:3
+terraform import gitlab_deploy_key.test richardc/example:3
 ```

@@ -43,6 +43,7 @@ data "gitlab_repository_file" "example" {
 - `content` (String) File content. If the content is not yet base64 encoded, it will be encoded automatically. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
 - `content_sha256` (String) File content sha256 digest.
 - `encoding` (String) The file content encoding.
+- `execute_filemode` (Boolean) Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.
 - `file_name` (String) The filename.
 - `last_commit_id` (String) The last known commit id.
 - `size` (Number) The file size.

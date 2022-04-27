@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
@@ -22,7 +23,7 @@ type Config struct {
 }
 
 // Client returns a *gitlab.Client to interact with the configured gitlab instance
-func (c *Config) Client() (*gitlab.Client, error) {
+func (c *Config) Client(ctx context.Context) (*gitlab.Client, error) {
 	// Configure TLS/SSL
 	tlsConfig := &tls.Config{}
 
@@ -78,7 +79,7 @@ func (c *Config) Client() (*gitlab.Client, error) {
 
 	// Test the credentials by checking we can get information about the authenticated user.
 	if c.EarlyAuthFail {
-		_, _, err = client.Users.CurrentUser()
+		_, _, err = client.Users.CurrentUser(gitlab.WithContext(ctx))
 	}
 
 	return client, err

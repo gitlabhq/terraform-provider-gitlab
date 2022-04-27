@@ -40,6 +40,7 @@ func testAccDataSourceGitlabRepositoryFile(src, n string) resource.TestCheckFunc
 			"size",
 			"encoding",
 			"content",
+			"execute_filemode",
 			"ref",
 			"blob_id",
 			"commit_id",
@@ -64,6 +65,7 @@ resource "gitlab_repository_file" "foo" {
 	branch = "main"
 	content = base64encode("Meow goes the cat")
 	commit_message = "feat: Meow"
+	execute_filemode = true
 }
 
 data "gitlab_repository_file" "foo" {

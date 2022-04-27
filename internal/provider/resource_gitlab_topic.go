@@ -185,7 +185,7 @@ func resourceGitlabTopicDelete(ctx context.Context, d *schema.ResourceData, meta
 	}
 	softDestroy := d.Get("soft_destroy").(bool)
 
-	deleteNotSupported, err := isGitLabVersionLessThan(client, "14.9")()
+	deleteNotSupported, err := isGitLabVersionLessThan(ctx, client, "14.9")()
 	if err != nil {
 		return diag.FromErr(err)
 	}

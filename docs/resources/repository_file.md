@@ -75,6 +75,7 @@ resource "gitlab_repository_file" "readme" {
 
 - `author_email` (String) Email of the commit author.
 - `author_name` (String) Name of the commit author.
+- `execute_filemode` (Boolean) Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.
 - `id` (String) The ID of this resource.
 - `start_branch` (String) Name of the branch to start the new commit from.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))

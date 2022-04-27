@@ -50,6 +50,7 @@ resource "gitlab_user" "example" {
 - `id` (String) The ID of this resource.
 - `is_admin` (Boolean) Boolean, defaults to false.  Whether to enable administrative privileges
 - `is_external` (Boolean) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
+- `namespace_id` (Number) The ID of the user's namespace. Available since GitLab 14.10.
 - `note` (String) The note associated to the user.
 - `password` (String, Sensitive) The password of the user.
 - `projects_limit` (Number) Integer, defaults to 0.  Number of projects user can create.

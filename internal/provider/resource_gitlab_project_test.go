@@ -1,8 +1,7 @@
-// lintignore: AT012 // TODO: Resolve this tfproviderlint issue
-
 package provider
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -664,7 +663,7 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	})
 }
 
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
+// lintignore: AT002 // specialized import test
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
@@ -689,6 +688,7 @@ func TestAccGitlabProject_import(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // specialized import test
 func TestAccGitlabProject_nestedImport(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
@@ -771,7 +771,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 
 // lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURL(t *testing.T) {
-	// Since we do some manual setup in this test, we need to handle the test skip first.
 	testAccCheck(t)
 
 	rInt := acctest.RandInt()
@@ -867,6 +866,43 @@ resource "gitlab_project" "foo" {
 	})
 }
 
+func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
+	testAccCheck(t)
+
+	var project gitlab.Project
+	rInt := acctest.RandInt()
+
+	user := testAccCreateUsers(t, 1)[0]
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name              = "foo-%d"
+						description       = "Terraform acceptance tests"
+						visibility_level  = "public"
+
+						namespace_id = %d
+					}
+				`, rInt, user.NamespaceID),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					func(s *terraform.State) error {
+						if project.Namespace.ID != user.NamespaceID {
+							return fmt.Errorf("project was created in namespace %d but expected %d", project.Namespace.ID, user.NamespaceID)
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 type testAccGitlabProjectMirroredExpectedAttributes struct {
 	Mirror                           bool
 	MirrorTriggerBuilds              bool
@@ -896,8 +932,7 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 }
 
 // lintignore: AT002 // not a Terraform import test
-func TestAccGitlabProject_importURLMirrored(t *testing.T) {
-	// Since we do some manual setup in this test, we need to handle the test skip first.
+func TestAccGitlabProject_ImportURLMirrored(t *testing.T) {
 	testAccCheck(t)
 
 	var mirror gitlab.Project
@@ -1016,10 +1051,10 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccCheckMutualExclusiveNameAndID(rInt),
@@ -1192,11 +1227,11 @@ func testAccCheckAggregateGitlabProject(expected, received *gitlab.Project) reso
 				}
 			}
 
-			if err := resourceGitlabProjectSetToState(testGitlabClient, expectedData, expected); err != nil {
+			if err := resourceGitlabProjectSetToState(context.Background(), testGitlabClient, expectedData, expected); err != nil {
 				return err
 			}
 
-			if err := resourceGitlabProjectSetToState(testGitlabClient, receivedData, received); err != nil {
+			if err := resourceGitlabProjectSetToState(context.Background(), testGitlabClient, receivedData, received); err != nil {
 				return err
 			}
 

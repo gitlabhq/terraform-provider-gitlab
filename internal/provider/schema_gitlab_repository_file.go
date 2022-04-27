@@ -49,6 +49,11 @@ func gitlabRepositoryFileGetSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 		},
+		"execute_filemode": {
+			Description: "Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.",
+			Type:        schema.TypeBool,
+			Optional:    true,
+		},
 		"blob_id": {
 			Description: "The blob id.",
 			Type:        schema.TypeString,
@@ -76,6 +81,7 @@ func gitlabRepositoryFileToStateMap(project string, repositoryFile *gitlab.File)
 	stateMap["encoding"] = repositoryFile.Encoding
 	stateMap["content"] = repositoryFile.Content
 	stateMap["content_sha256"] = repositoryFile.SHA256
+	stateMap["execute_filemode"] = repositoryFile.ExecuteFilemode
 	stateMap["ref"] = repositoryFile.Ref
 	stateMap["blob_id"] = repositoryFile.BlobID
 	stateMap["commit_id"] = repositoryFile.CommitID

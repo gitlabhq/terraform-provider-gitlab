@@ -50,7 +50,7 @@ var _ = registerResource("gitlab_deploy_key", func() *schema.Resource {
 				},
 			},
 			"can_push": {
-				Description: "Allow this deploy key to be used to push changes to the project.  Defaults to `false`. **NOTE::** this cannot currently be managed.",
+				Description: "Allow this deploy key to be used to push changes to the project. Defaults to `false`.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
@@ -84,10 +84,12 @@ func resourceGitlabDeployKeyCreate(ctx context.Context, d *schema.ResourceData, 
 func resourceGitlabDeployKeyRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
+
 	deployKeyID, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	log.Printf("[DEBUG] read gitlab deploy key %s/%d", project, deployKeyID)
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
@@ -103,16 +105,19 @@ func resourceGitlabDeployKeyRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("title", deployKey.Title)
 	d.Set("key", deployKey.Key)
 	d.Set("can_push", deployKey.CanPush)
+
 	return nil
 }
 
 func resourceGitlabDeployKeyDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
+
 	deployKeyID, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	log.Printf("[DEBUG] Delete gitlab deploy key %s", d.Id())
 
 	_, err = client.DeployKeys.DeleteDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
@@ -128,7 +133,7 @@ func resourceGitlabDeployKeyStateImporter(ctx context.Context, d *schema.Resourc
 	s := strings.Split(d.Id(), ":")
 	if len(s) != 2 {
 		d.SetId("")
-		return nil, fmt.Errorf("Invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
+		return nil, fmt.Errorf("invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}' was %v", s)
 	}
 	project, id := s[0], s[1]
 

@@ -8,11 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabDeployKey_basic(t *testing.T) {
-	var deployKey gitlab.ProjectDeployKey
+	testAccCheck(t)
+
+	testProject := testAccCreateProject(t)
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -22,73 +23,34 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a project and deployKey with default options
 			{
-				Config: testAccGitlabDeployKeyConfig(rInt, ""),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyExists("gitlab_deploy_key.foo", &deployKey),
-					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
-						Title: fmt.Sprintf("deployKey-%d", rInt),
-						Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1",
-					}),
-				),
+				Config: testAccGitlabDeployKeyConfig(rInt, "", testProject.ID),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key.foo",
+				ImportStateIdFunc: getDeployKeyImportID("gitlab_deploy_key.foo"),
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the project deployKey to toggle all the values to their inverse
 			{
-				Config: testAccGitlabDeployKeyUpdateConfig(rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyExists("gitlab_deploy_key.foo", &deployKey),
-					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
-						Title: fmt.Sprintf("modifiedDeployKey-%d", rInt),
-						Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6pSke2kb7YBjo65xDKegbOQsAtnMupRcFxXji7L1iXivGwORq0qpC2xzbhez5jk1WgPckEaNv2/Bz0uEW6oSIXw1KT1VN2WzEUfQCbpNyZPtn4iV3nyl6VQW/Nd1SrxiFJtH1H4vu+eCo4McMXTjuBBD06fiJNrHaSw734LjQgqtXWJuVym9qS5MqraZB7wDwTQwSM6kslL7KTgmo3ONsTLdb2zZhv6CS+dcFKinQo7/ttTmeMuXGbPOVuNfT/bePVIN1MF1TislHa2L2dZdGeoynNJT4fVPjA2Xl6eHWh4ySbvnfPznASsjBhP0n/QKprYJ/5fQShdBYBcuQiIMd richardc@tamborine.example.2",
-					}),
-				),
+				Config: testAccGitlabDeployKeyUpdateConfig(rInt, testProject.ID),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key.foo",
+				ImportStateIdFunc: getDeployKeyImportID("gitlab_deploy_key.foo"),
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the project deployKey to toggle the options back
 			{
-				Config: testAccGitlabDeployKeyConfig(rInt, ""),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabDeployKeyExists("gitlab_deploy_key.foo", &deployKey),
-					testAccCheckGitlabDeployKeyAttributes(&deployKey, &testAccGitlabDeployKeyExpectedAttributes{
-						Title: fmt.Sprintf("deployKey-%d", rInt),
-						Key:   "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1",
-					}),
-				),
+				Config: testAccGitlabDeployKeyConfig(rInt, "", testProject.ID),
 			},
-		},
-	})
-}
-
-func TestAccGitlabDeployKey_suppressfunc(t *testing.T) {
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
-		Steps: []resource.TestStep{
-			// Create a project and deployKey with newline as suffix
+			// Verify import
 			{
-				Config: testAccGitlabDeployKeyConfig(rInt, ""),
-			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabDeployKey_import(t *testing.T) {
-	rInt := acctest.RandInt()
-	resourceName := "gitlab_deploy_key.foo"
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabDeployKeyConfig(rInt, ""),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportStateIdFunc: getDeployKeyImportID(resourceName),
+				ResourceName:      "gitlab_deploy_key.foo",
+				ImportStateIdFunc: getDeployKeyImportID("gitlab_deploy_key.foo"),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -96,60 +58,38 @@ func TestAccGitlabDeployKey_import(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabDeployKeyExists(n string, deployKey *gitlab.ProjectDeployKey) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rs, ok := s.RootModule().Resources[n]
-		if !ok {
-			return fmt.Errorf("Not Found: %s", n)
-		}
+func TestAccGitlabDeployKey_suppressTrailingSpace(t *testing.T) {
+	testAccCheck(t)
+	testProject := testAccCreateProject(t)
+	rInt := acctest.RandInt()
 
-		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
-		if err != nil {
-			return err
-		}
-		repoName := rs.Primary.Attributes["project"]
-		if repoName == "" {
-			return fmt.Errorf("No project ID is set")
-		}
-		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(repoName, deployKeyID)
-		if err != nil {
-			return err
-		}
-		*deployKey = *gotDeployKey
-		return nil
-	}
-}
-
-type testAccGitlabDeployKeyExpectedAttributes struct {
-	Title   string
-	Key     string
-	CanPush bool
-}
-
-func testAccCheckGitlabDeployKeyAttributes(deployKey *gitlab.ProjectDeployKey, want *testAccGitlabDeployKeyExpectedAttributes) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		if deployKey.Title != want.Title {
-			return fmt.Errorf("got title %q; want %q", deployKey.Title, want.Title)
-		}
-
-		if deployKey.Key != want.Key {
-			return fmt.Errorf("got key %q; want %q", deployKey.Key, want.Key)
-		}
-
-		if deployKey.CanPush != want.CanPush {
-			return fmt.Errorf("got can_push %t; want %t", deployKey.CanPush, want.CanPush)
-		}
-
-		return nil
-	}
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and deployKey with space as suffix
+			{
+				Config: testAccGitlabDeployKeyConfig(rInt, " ", testProject.ID),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_deploy_key.foo",
+				ImportStateIdFunc: getDeployKeyImportID("gitlab_deploy_key.foo"),
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
 }
 
 func testAccCheckGitlabDeployKeyDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
-			continue
+		deployKeyID, err := strconv.Atoi(rs.Primary.ID)
+		if err != nil {
+			return fmt.Errorf("unable to convert GitLab deploy key string into an int: %w", err)
 		}
-		deployKeyID, err := strconv.Atoi(rs.Primary.ID) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
+
 		project := rs.Primary.Attributes["project"]
 
 		gotDeployKey, _, err := testGitlabClient.DeployKeys.GetDeployKey(project, deployKeyID)
@@ -177,6 +117,7 @@ func getDeployKeyImportID(n string) resource.ImportStateIdFunc {
 		if deployKeyID == "" {
 			return "", fmt.Errorf("No deploy key ID is set")
 		}
+
 		projectID := rs.Primary.Attributes["project"]
 		if projectID == "" {
 			return "", fmt.Errorf("No project ID is set")
@@ -186,40 +127,23 @@ func getDeployKeyImportID(n string) resource.ImportStateIdFunc {
 	}
 }
 
-func testAccGitlabDeployKeyConfig(rInt int, suffix string) string {
+func testAccGitlabDeployKeyConfig(rInt int, suffix string, projectId int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
 resource "gitlab_deploy_key" "foo" {
-  project = "${gitlab_project.foo.id}"
-  title = "deployKey-%d"
-  key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1%s"
+  project = %[3]d
+  title = "deployKey-%[1]d"
+  key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCj13ozEBZ0s4el4k6mYqoyIKKKMh9hHY0sAYqSPXs2zGuVFZss1P8TPuwmdXVjHR7TiRXwC49zDrkyWJgiufggYJ1VilOohcMOODwZEJz+E5q4GCfHuh90UEh0nl8B2R0Uoy0LPeg93uZzy0hlHApsxRf/XZJz/1ytkZvCtxdllxfImCVxJReMeRVEqFCTCvy3YuJn0bce7ulcTFRvtgWOpQsr6GDK8YkcCCv2eZthVlrEwy6DEpAKTRiRLGgUj4dPO0MmO4cE2qD4ualY01PhNORJ8Q++I+EtkGt/VALkecwFuBkl18/gy+yxNJHpKc/8WVVinDeFrd/HhiY9yU0d richardc@tamborine.example.1%[2]s"
 }
-  `, rInt, rInt, suffix)
+  `, rInt, suffix, projectId)
 }
 
-func testAccGitlabDeployKeyUpdateConfig(rInt int) string {
+func testAccGitlabDeployKeyUpdateConfig(rInt int, projectId int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-  name = "foo-%d"
-  description = "Terraform acceptance tests"
-
-  # So that acceptance tests can be run in a gitlab organization
-  # with no billing
-  visibility_level = "public"
-}
-
 resource "gitlab_deploy_key" "foo" {
-  project = "${gitlab_project.foo.id}"
-  title = "modifiedDeployKey-%d"
+  project = %[2]d
+  title = "modifiedDeployKey-%[1]d"
   key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC6pSke2kb7YBjo65xDKegbOQsAtnMupRcFxXji7L1iXivGwORq0qpC2xzbhez5jk1WgPckEaNv2/Bz0uEW6oSIXw1KT1VN2WzEUfQCbpNyZPtn4iV3nyl6VQW/Nd1SrxiFJtH1H4vu+eCo4McMXTjuBBD06fiJNrHaSw734LjQgqtXWJuVym9qS5MqraZB7wDwTQwSM6kslL7KTgmo3ONsTLdb2zZhv6CS+dcFKinQo7/ttTmeMuXGbPOVuNfT/bePVIN1MF1TislHa2L2dZdGeoynNJT4fVPjA2Xl6eHWh4ySbvnfPznASsjBhP0n/QKprYJ/5fQShdBYBcuQiIMd richardc@tamborine.example.2"
+  can_push = true
 }
-  `, rInt, rInt)
+  `, rInt, projectId)
 }

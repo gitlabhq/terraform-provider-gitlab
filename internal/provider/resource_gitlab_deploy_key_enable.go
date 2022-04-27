@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -22,7 +21,7 @@ var _ = registerResource("gitlab_deploy_key_enable", func() *schema.Resource {
 		ReadContext:   resourceGitlabDeployKeyEnableRead,
 		DeleteContext: resourceGitlabDeployKeyEnableDelete,
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceGitlabDeployKeyEnableStateImporter,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -51,10 +50,11 @@ var _ = registerResource("gitlab_deploy_key_enable", func() *schema.Resource {
 				Computed:    true,
 			},
 			"can_push": {
-				Description: "Can deploy key push to the project’s repository.",
+				Description: "Can deploy key push to the project's repository.",
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     false,
+				ForceNew:    true,
 			},
 		},
 	}
@@ -63,11 +63,23 @@ var _ = registerResource("gitlab_deploy_key_enable", func() *schema.Resource {
 func resourceGitlabDeployKeyEnableCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project").(string)
-	key_id, err := strconv.Atoi(d.Get("key_id").(string)) // nolint // TODO: Resolve this golangci-lint issue: ineffectual assignment to err (ineffassign)
+
+	key_id, err := strconv.Atoi(d.Get("key_id").(string))
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	log.Printf("[DEBUG] enable gitlab deploy key %s/%d", project, key_id)
 
 	deployKey, _, err := client.DeployKeys.EnableDeployKey(project, key_id, gitlab.WithContext(ctx))
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	options := &gitlab.UpdateDeployKeyOptions{
+		CanPush: gitlab.Bool(d.Get("can_push").(bool)),
+	}
+	_, _, err = client.DeployKeys.UpdateDeployKey(project, key_id, options)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -79,11 +91,12 @@ func resourceGitlabDeployKeyEnableCreate(ctx context.Context, d *schema.Resource
 
 func resourceGitlabDeployKeyEnableRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	deployKeyID, err := strconv.Atoi(d.Get("key_id").(string))
+
+	project, deployKeyID, err := resourceGitLabDeployKeyEnableParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	log.Printf("[DEBUG] read gitlab deploy key %s/%d", project, deployKeyID)
 
 	deployKey, _, err := client.DeployKeys.GetDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
@@ -101,16 +114,18 @@ func resourceGitlabDeployKeyEnableRead(ctx context.Context, d *schema.ResourceDa
 	d.Set("key", deployKey.Key)
 	d.Set("can_push", deployKey.CanPush)
 	d.Set("project", project)
+
 	return nil
 }
 
 func resourceGitlabDeployKeyEnableDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
-	deployKeyID, err := strconv.Atoi(d.Get("key_id").(string))
+
+	project, deployKeyID, err := resourceGitLabDeployKeyEnableParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
 	log.Printf("[DEBUG] Delete gitlab deploy key %s/%d", project, deployKeyID)
 
 	response, err := client.DeployKeys.DeleteDeployKey(project, deployKeyID, gitlab.WithContext(ctx))
@@ -127,17 +142,16 @@ func resourceGitlabDeployKeyEnableDelete(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func resourceGitlabDeployKeyEnableStateImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	s := strings.Split(d.Id(), ":")
-	if len(s) != 2 {
-		d.SetId("")
-		return nil, fmt.Errorf("Invalid Deploy Key import format; expected '{project_id}:{deploy_key_id}'")
+func resourceGitLabDeployKeyEnableParseId(id string) (string, int, error) {
+	projectID, deployTokenID, err := parseTwoPartID(id)
+	if err != nil {
+		return "", 0, err
 	}
-	project, id := s[0], s[1]
 
-	d.SetId(fmt.Sprintf("%s:%s", project, id))
-	d.Set("key_id", id)
-	d.Set("project", project)
+	deployTokenIID, err := strconv.Atoi(deployTokenID)
+	if err != nil {
+		return "", 0, err
+	}
 
-	return []*schema.ResourceData{d}, nil
+	return projectID, deployTokenIID, nil
 }
