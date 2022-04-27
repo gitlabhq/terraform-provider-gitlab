@@ -1,10 +1,10 @@
 package provider
 
 import (
-    "fmt"
 	"context"
+	"fmt"
 	"log"
-    "strconv"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -24,7 +24,7 @@ var _ = registerResource("gitlab_project_milestone", func() *schema.Resource {
 
 		CreateContext: resourceGitlabProjectMilestoneCreate,
 		ReadContext:   resourceGitlabProjectMilestoneRead,
-        UpdateContext: resourceGitlabProjectMilestoneUpdate,
+		UpdateContext: resourceGitlabProjectMilestoneUpdate,
 		DeleteContext: resourceGitlabProjectMilestoneDelete,
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
@@ -38,7 +38,7 @@ var _ = registerResource("gitlab_project_milestone", func() *schema.Resource {
 func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	project := d.Get("project_id").(string)
-    title := d.Get("title").(string)
+	title := d.Get("title").(string)
 
 	options := &gitlab.CreateMilestoneOptions{
 		Title: &title,
@@ -67,9 +67,9 @@ func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.Resourc
 		log.Printf("[WARN] failed to create gitlab milestone in project %s with title %s (response %v)", project, title, resp)
 		return diag.FromErr(err)
 	}
-    d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestone.ID))
+	d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestone.ID))
 
-    updateOptions := gitlab.UpdateMilestoneOptions{}
+	updateOptions := gitlab.UpdateMilestoneOptions{}
 	if stateEvent, ok := d.GetOk("state"); ok {
 		updateOptions.StateEvent = gitlab.String(milestoneStateToStateEvent[stateEvent.(string)])
 	}
@@ -102,7 +102,7 @@ func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-    stateMap := gitlabProjectMilestoneToStateMap(milestone)
+	stateMap := gitlabProjectMilestoneToStateMap(milestone)
 	if err = setStateMapInResourceData(stateMap, d); err != nil {
 		return diag.FromErr(err)
 	}
@@ -117,27 +117,27 @@ func resourceGitlabProjectMilestoneUpdate(ctx context.Context, d *schema.Resourc
 	}
 
 	options := &gitlab.UpdateMilestoneOptions{}
-    if d.HasChange("title") {
-        options.Title = gitlab.String(d.Get("title").(string))
-    }
-    if d.HasChange("description") {
-        options.Description = gitlab.String(d.Get("description").(string))
-    }
+	if d.HasChange("title") {
+		options.Title = gitlab.String(d.Get("title").(string))
+	}
+	if d.HasChange("description") {
+		options.Description = gitlab.String(d.Get("description").(string))
+	}
 	if d.HasChange("start_date") {
 		startDate := d.Get("start_date").(string)
 		parsedStartDate, err := parseISO8601Date(startDate)
-        if err != nil {
-            return diag.Errorf("Failed to parse due_date: %s. %v", startDate, err)
-        }
-        options.StartDate = parsedStartDate
+		if err != nil {
+			return diag.Errorf("Failed to parse due_date: %s. %v", startDate, err)
+		}
+		options.StartDate = parsedStartDate
 	}
 	if d.HasChange("due_date") {
 		dueDate := d.Get("due_date").(string)
 		parsedDueDate, err := parseISO8601Date(dueDate)
-        if err != nil {
-            return diag.Errorf("Failed to parse due_date: %s. %v", dueDate, err)
-        }
-        options.DueDate = parsedDueDate
+		if err != nil {
+			return diag.Errorf("Failed to parse due_date: %s. %v", dueDate, err)
+		}
+		options.DueDate = parsedDueDate
 	}
 	if d.HasChange("state") {
 		options.StateEvent = gitlab.String(milestoneStateToStateEvent[d.Get("state").(string)])
