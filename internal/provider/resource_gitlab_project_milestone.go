@@ -18,7 +18,7 @@ var milestoneStateToStateEvent = map[string]string{
 
 var _ = registerResource("gitlab_project_milestone", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_project_milestome`" + ` resource allows to manage the lifecycle of a milestone (project).
+		Description: `The ` + "`gitlab_project_milestone`" + ` resource allows to manage the lifecycle of a milestone (project).
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)`,
 
