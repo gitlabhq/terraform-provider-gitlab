@@ -28,7 +28,6 @@ jobs:
       matrix:
         target:
           - lint-golangci
-          - lint-tfprovider
           - lint-examples-tf
           - lint-examples-sh
           - lint-generated
