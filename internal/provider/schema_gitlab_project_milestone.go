@@ -14,12 +14,12 @@ func gitlabProjectMilestoneGetSchema() map[string]*schema.Schema {
 
 	return map[string]*schema.Schema{
 		"iid": {
-			Description: "The ID of the project’s milestone.",
+			Description: "The ID of the milestone only in one project.",
 			Type:        schema.TypeInt,
 			Computed:    true,
 		},
 		"milestone_id": {
-			Description: "The ID of the project’s milestone in Gitlab DB.",
+			Description: "The global ID of the project’s milestone.",
 			Type:        schema.TypeInt,
 			Computed:    true,
 		},
@@ -40,19 +40,19 @@ func gitlabProjectMilestoneGetSchema() map[string]*schema.Schema {
 			Optional:    true,
 		},
 		"due_date": {
-			Description:      "The due date of the milestone.",
+			Description:      "The due date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.",
 			Type:             schema.TypeString,
 			Optional:         true,
 			ValidateDiagFunc: isISO6801Date,
 		},
 		"start_date": {
-			Description:      "The start date of the milestone.",
+			Description:      "The start date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.",
 			Type:             schema.TypeString,
 			Optional:         true,
 			ValidateDiagFunc: isISO6801Date,
 		},
 		"updated_at": {
-			Description: "The last update time of the milestone.",
+			Description: "The last update time of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.",
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
@@ -61,7 +61,7 @@ func gitlabProjectMilestoneGetSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: validation.ToDiagFunc(validation.IsRFC3339Time),
 		},
 		"created_at": {
-			Description: "The time of creation of the milestone.",
+			Description: "The time of creation of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.",
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
