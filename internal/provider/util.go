@@ -184,9 +184,27 @@ func parseTwoPartID(id string) (string, string, error) {
 	return parts[0], parts[1], nil
 }
 
+func parseTwoPartIDInt(id string) (string, int, error) {
+	project, stringID, err := parseTwoPartID(id)
+	if err != nil {
+		return "", 0, err
+	}
+
+	intID, err := strconv.Atoi(stringID)
+	if err != nil {
+		return "", 0, err
+	}
+
+	return project, intID, nil
+}
+
 // format the strings into an id `a:b`
 func buildTwoPartID(a, b *string) string {
 	return fmt.Sprintf("%s:%s", *a, *b)
+}
+
+func buildTwoPartIDInterface(a string, b interface{}) string {
+	return fmt.Sprintf("%s:%v", a, b)
 }
 
 var tagProtectionAccessLevelID = map[string]gitlab.AccessLevelValue{

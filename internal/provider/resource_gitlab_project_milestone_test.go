@@ -72,7 +72,7 @@ func testAccCheckGitlabProjectMilestoneDestroy(s *terraform.State) error {
 		if rs.Type != "gitlab_project_milestone" {
 			continue
 		}
-		project, milestoneID, err := resourceGitLabProjectMilestoneParseId(rs.Primary.ID)
+		project, milestoneID, err := parseTwoPartIDInt(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
@@ -134,7 +134,7 @@ func testAccCheckGitlabProjectMilestoneExists(n string, milestone *gitlab.Milest
 		if !ok {
 			return fmt.Errorf("Not Found: %s", n)
 		}
-		project, milestoneID, err := resourceGitLabProjectMilestoneParseId(rs.Primary.ID)
+		project, milestoneID, err := parseTwoPartIDInt(rs.Primary.ID)
 		if err != nil {
 			return fmt.Errorf("Error in splitting project and milestoneID")
 		}

@@ -309,20 +309,25 @@ func testAccAddGroupMembers(t *testing.T, gid interface{}, users []*gitlab.User)
 	}
 }
 
-func testAccAddProjectMilestone(t *testing.T, pid interface{}) *gitlab.Milestone {
+// testAccAddProjectMilestones is a test helper for adding milestones to project.
+// It assumes the group will be destroyed at the end of the test and will not cleanup milestones.
+func testAccAddProjectMilestones(t *testing.T, project *gitlab.Project, n int) []*gitlab.Milestone {
 	t.Helper()
 
-	milestone, _, err := testGitlabClient.Milestones.CreateMilestone(pid, &gitlab.CreateMilestoneOptions{Title: gitlab.String("Test Milestone")})
-	if err != nil {
-		t.Fatalf("failed to create milestone during test for project %v: %v", pid, err)
-	}
-	t.Cleanup(func() {
-		_, err := testGitlabClient.Milestones.DeleteMilestone(pid, milestone.ID)
+	milestones := make([]*gitlab.Milestone, n)
+
+	for i := range milestones {
+		var err error
+		milestones[i], _, err = testGitlabClient.Milestones.CreateMilestone(project.ID, &gitlab.CreateMilestoneOptions{
+			Title:       gitlab.String(fmt.Sprintf("Milestone %d", i)),
+			Description: gitlab.String(fmt.Sprintf("Description %d", i)),
+		})
 		if err != nil {
-			t.Fatalf("failed to delete milestone %d during test for project %v: %v", milestone.ID, pid, err)
+			t.Fatalf("Could not create test milestones: %v", err)
 		}
-	})
-	return milestone
+	}
+
+	return milestones
 }
 
 func testAccCreateDeployKey(t *testing.T, projectID int, options *gitlab.AddDeployKeyOptions) *gitlab.ProjectDeployKey {

@@ -20,7 +20,7 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
 	testUser := testAccCreateUsers(t, 1)[0]
 	testAccAddProjectMembers(t, testProject.ID, []*gitlab.User{testUser})
-	testMilestone := testAccAddProjectMilestone(t, testProject.ID)
+	testMilestone := testAccAddProjectMilestones(t, testProject, 1)[0]
 
 	currentUser, _, err := testGitlabClient.Users.CurrentUser()
 	if err != nil {
@@ -136,7 +136,7 @@ func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
 	testProject := testAccCreateProject(t)
 	testUser := testAccCreateUsers(t, 1)[0]
 	testAccAddProjectMembers(t, testProject.ID, []*gitlab.User{testUser})
-	testMilestone := testAccAddProjectMilestone(t, testProject.ID)
+	testMilestone := testAccAddProjectMilestones(t, testProject, 1)[0]
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },

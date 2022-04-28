@@ -2,9 +2,7 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -67,7 +65,7 @@ func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.Resourc
 		log.Printf("[WARN] failed to create gitlab milestone in project %s with title %s (response %v)", project, title, resp)
 		return diag.FromErr(err)
 	}
-	d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestone.ID))
+	d.SetId(buildTwoPartIDInterface(project, milestone.ID))
 
 	updateOptions := gitlab.UpdateMilestoneOptions{}
 	if stateEvent, ok := d.GetOk("state"); ok {
@@ -85,7 +83,7 @@ func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.Resourc
 
 func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, milestoneID, err := resourceGitLabProjectIssueParseId(d.Id())
+	project, milestoneID, err := parseTwoPartIDInt(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -111,7 +109,7 @@ func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceD
 
 func resourceGitlabProjectMilestoneUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, milestoneID, err := resourceGitLabProjectIssueParseId(d.Id())
+	project, milestoneID, err := parseTwoPartIDInt(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -155,7 +153,7 @@ func resourceGitlabProjectMilestoneUpdate(ctx context.Context, d *schema.Resourc
 
 func resourceGitlabProjectMilestoneDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, milestoneID, err := resourceGitLabProjectIssueParseId(d.Id())
+	project, milestoneID, err := parseTwoPartIDInt(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -167,23 +165,4 @@ func resourceGitlabProjectMilestoneDelete(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 	return nil
-}
-
-func resourceGitLabProjectMilestoneBuildId(project string, milestoneID int) string {
-	stringMilestoneID := fmt.Sprintf("%d", milestoneID)
-	return buildTwoPartID(&project, &stringMilestoneID)
-}
-
-func resourceGitLabProjectMilestoneParseId(id string) (string, int, error) {
-	project, milestone, err := parseTwoPartID(id)
-	if err != nil {
-		return "", 0, err
-	}
-
-	milestoneID, err := strconv.Atoi(milestone)
-	if err != nil {
-		return "", 0, err
-	}
-
-	return project, milestoneID, nil
 }

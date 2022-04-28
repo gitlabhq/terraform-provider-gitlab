@@ -28,7 +28,7 @@ func dataSourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.Resourc
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestoneID))
+	d.SetId(buildTwoPartIDInterface(project, milestoneID))
 	stateMap := gitlabProjectMilestoneToStateMap(milestone)
 
 	if err := setStateMapInResourceData(stateMap, d); err != nil {

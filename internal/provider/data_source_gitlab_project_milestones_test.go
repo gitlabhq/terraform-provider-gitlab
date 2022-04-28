@@ -5,74 +5,36 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccDataGitlabProjectMilestones_basic(t *testing.T) {
 	testAccCheck(t)
-	countMilestones := 2
-	project := testAccCreateProject(t)
+
+	testProject := testAccCreateProject(t)
+	testMilestones := testAccAddProjectMilestones(t, testProject, 2)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataGitlabProjectMilestones(countMilestones, project.ID),
+				Config: testAccDataGitlabProjectMilestonesConfig(testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
-					testAccDataSourceGitlabProjectMilestones("gitlab_project_milestone.this", "data.gitlab_project_milestones.this", countMilestones),
+					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.#", fmt.Sprintf("%d", len(testMilestones))),
+					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.0.title", testMilestones[1].Title),
+					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.0.description", testMilestones[1].Description),
+					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.1.title", testMilestones[0].Title),
+					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.1.description", testMilestones[0].Description),
 				),
 			},
 		},
 	})
 }
 
-func testAccDataSourceGitlabProjectMilestones(src string, n string, countMilestones int) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		testAttributes := attributeNamesFromSchema(gitlabProjectMilestoneGetSchema())
-
-		for numberMilestone := range make([]int, countMilestones) {
-			search := s.RootModule().Resources[n]
-			searchAttrs := search.Primary.Attributes
-
-			milestone := s.RootModule().Resources[fmt.Sprintf("%s.%d", src, numberMilestone)]
-			milestoneAttrs := milestone.Primary.Attributes
-
-			for _, attribute := range testAttributes {
-				milestoneAttr := milestoneAttrs[attribute]
-				searchAttr := searchAttrs[fmt.Sprintf("milestones.%d.%s", numberMilestone, attribute)]
-				if searchAttr != milestoneAttr {
-					return fmt.Errorf("Expected the milestone `%s` with parameter `%s` to be: `%s`, but got: `%s`", milestoneAttrs["id"], attribute, milestoneAttr, searchAttr)
-				}
-			}
-		}
-
-		return nil
-	}
-}
-
-func testAccDataGitlabProjectMilestones(countTags int, project int) string {
+func testAccDataGitlabProjectMilestonesConfig(projectID int) string {
 	return fmt.Sprintf(`
-%s
 data "gitlab_project_milestones" "this" {
-  project_id = "%d"
-  state      = "active"
-  search     = "test"
-  depends_on = [
-    gitlab_project_milestone.this,
-  ]
+  project_id   = "%d"
 }
-`, testAccDataGitlabProjectMilestonesSetup(countTags, project), project)
-}
-
-func testAccDataGitlabProjectMilestonesSetup(countTags int, project int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project_milestone" "this" {
-  count   = "%d"
-
-  project_id  = "%d"
-  title       = "test-${count.index}"
-  description = "test-${count.index}"
-}
-`, countTags, project)
+`, projectID)
 }

@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -114,7 +113,7 @@ func dataSourceGitlabProjectMilestonesRead(ctx context.Context, d *schema.Resour
 	}
 
 	log.Printf("[DEBUG] get gitlab milestones from project: %s", project)
-	d.SetId(fmt.Sprintf("%s:%d", project, optionsHash))
+	d.SetId(buildTwoPartIDInterface(project, optionsHash))
 	if err = d.Set("milestones", flattenGitlabProjectMilestones(milestones)); err != nil {
 		return diag.Errorf("Failed to set milestones to state: %v", err)
 	}
