@@ -12,12 +12,9 @@ import (
 )
 
 func TestAccDataSourceGitlabGroupVariable_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testGroup := testAccCreateGroups(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

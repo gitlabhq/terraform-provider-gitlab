@@ -20,7 +20,6 @@ func TestAccGitlabGroupBadge_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupBadgeDestroy,
 		Steps: []resource.TestStep{

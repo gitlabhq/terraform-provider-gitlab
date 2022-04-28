@@ -19,13 +19,10 @@ var updatedRSAPubKey string = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDStVqW58VZ5
 var updatedRSAPubKeyWithoutComment string = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDStVqW58VZ5afXFphIvu2JahndXslJZMkgWsNiYCNdk/NvrEbc4i7yZVoDPFQsbS9I6Ty1RMW7qy3KxJalMsVHcw8arCQFDxs/ka1NHGCUPl68t5ZxUOl900KRQ0lOzGnDQMqG/UUZdPw4CCmigTr6Z9ZBcD1fXAiUwbXR4tWrr5z9KWXC2HgF4WkIJUTIct7ilY1m9W0y79dI/+K8bZrurn3q2QK83pxqqWkLwvUsCxtlhMpwuyflyzyuz8xPZl2GlZgxeIpr68gsPHIzzWizibwFfbRYKCZO4wD0r7JCDOYs9KjcIPpCG6d3HUqijClgdQSBnLwHTdE04ZtdzO8akvy0hMzRCooI5TSc8IAHos53Gp9aaW92sPA8za+WRP6OSH6UsOW4N+iQc4jyl7/fckMSgIZlJouNqqV+P8iqIFJGs70Tj5L8G/m+P2lc3kcE4Vjmj+Fc0xG5+I/PsSOpcc6DfDfZdVDRe8yklYd/qC1jI89OCeqjxu3XcUGHj9s="
 
 func TestAccGitlabUserSSHKey_basic(t *testing.T) {
-	testAccCheck(t)
-
 	var key gitlab.SSHKey
 	testUser := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabUserSSHKeyDestroy,
 		Steps: []resource.TestStep{

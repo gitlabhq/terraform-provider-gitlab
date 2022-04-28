@@ -67,15 +67,6 @@ func isRunningInCE() (bool, error) {
 	return !isEE, err
 }
 
-// testAccCheck is a test helper that skips the current test if it is not an acceptance test.
-func testAccCheck(t *testing.T) {
-	t.Helper()
-
-	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skipf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc)
-	}
-}
-
 // orSkipFunc accepts many skipFunc and returns "true" if any returns true.
 func orSkipFunc(input ...SkipFunc) SkipFunc {
 	return func() (bool, error) {

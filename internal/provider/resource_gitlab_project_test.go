@@ -26,7 +26,6 @@ func TestAccGitlabProject_minimal(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -121,7 +120,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 	defaultsMainBranch.DefaultBranch = "main"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -416,7 +414,6 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -444,7 +441,6 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -473,7 +469,6 @@ func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectArchivedOnDestroy,
 		Steps: []resource.TestStep{
@@ -488,7 +483,6 @@ func TestAccGitlabProject_setSinglePushRuleToDefault(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -510,7 +504,6 @@ func TestAccGitlabProject_groupWithoutDefaultBranchProtection(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -535,7 +528,6 @@ func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -566,7 +558,6 @@ func TestAccGitlabProject_MergePipelines(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -593,7 +584,6 @@ func TestAccGitlabProject_MergeTrains(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -620,7 +610,6 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -668,7 +657,6 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -693,7 +681,6 @@ func TestAccGitlabProject_import(t *testing.T) {
 func TestAccGitlabProject_nestedImport(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -744,7 +731,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	pathAfterTransfer := fmt.Sprintf("foo2group-%d/foo-%d", rInt, rInt)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -771,8 +757,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 
 // lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURL(t *testing.T) {
-	testAccCheck(t)
-
 	rInt := acctest.RandInt()
 
 	// Create a base project for importing.
@@ -797,7 +781,6 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -826,7 +809,6 @@ func TestAccGitlabProject_initializeWithReadmeAndCustomDefaultBranch(t *testing.
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -867,15 +849,12 @@ resource "gitlab_project" "foo" {
 }
 
 func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
-	testAccCheck(t)
-
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
 	user := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -933,8 +912,6 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 
 // lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_ImportURLMirrored(t *testing.T) {
-	testAccCheck(t)
-
 	var mirror gitlab.Project
 	rInt := acctest.RandInt()
 
@@ -960,7 +937,6 @@ func TestAccGitlabProject_ImportURLMirrored(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1052,7 +1028,6 @@ func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1070,7 +1045,6 @@ func TestAccGitlabProject_containerExpirationPolicy(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1153,7 +1127,6 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{

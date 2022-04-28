@@ -15,12 +15,9 @@ import (
 )
 
 func TestAccGitlabPersonalAccessToken_basic(t *testing.T) {
-	testAccCheck(t)
-
 	user := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPersonalAccessTokenDestroy,
 		Steps: []resource.TestStep{

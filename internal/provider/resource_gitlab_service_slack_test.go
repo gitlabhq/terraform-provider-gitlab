@@ -19,7 +19,6 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 	slackResourceName := "gitlab_service_slack.slack"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceSlackDestroy,
 		Steps: []resource.TestStep{
@@ -88,7 +87,6 @@ func TestAccGitlabServiceSlack_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceSlackDestroy,
 		Steps: []resource.TestStep{

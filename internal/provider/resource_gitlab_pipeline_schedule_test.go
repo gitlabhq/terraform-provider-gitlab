@@ -19,7 +19,6 @@ func TestAccGitlabPipelineSchedule_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPipelineScheduleDestroy,
 		Steps: []resource.TestStep{
@@ -75,7 +74,6 @@ func TestAccGitlabPipelineSchedule_import(t *testing.T) {
 	resourceName := "gitlab_pipeline_schedule.schedule"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPipelineScheduleDestroy,
 		Steps: []resource.TestStep{

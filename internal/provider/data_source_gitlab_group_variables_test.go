@@ -12,8 +12,6 @@ import (
 )
 
 func TestAccDataSourceGitlabGroupVariables_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testGroup := testAccCreateGroups(t, 1)[0]
 	testVariables := make([]*gitlab.GroupVariable, 0)
 	for i := 0; i < 25; i++ {
@@ -21,7 +19,6 @@ func TestAccDataSourceGitlabGroupVariables_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

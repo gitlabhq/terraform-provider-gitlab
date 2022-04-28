@@ -16,7 +16,6 @@ func TestAccDataSourceGitlabUser_basic(t *testing.T) {
 	rString := fmt.Sprintf("%s", acctest.RandString(5)) // nolint // TODO: Resolve this golangci-lint issue: S1025: the argument is already a string, there's no need to use fmt.Sprintf (gosimple)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			// Get user using its email

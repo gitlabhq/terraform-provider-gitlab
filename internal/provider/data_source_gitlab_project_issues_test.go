@@ -11,13 +11,10 @@ import (
 )
 
 func TestAccDataSourceGitlabProjectIssues_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 	testIssues := testAccCreateProjectIssues(t, testProject.ID, 25)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

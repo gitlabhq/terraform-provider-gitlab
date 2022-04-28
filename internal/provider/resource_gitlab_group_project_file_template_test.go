@@ -5,22 +5,21 @@ package provider
 
 import (
 	"fmt"
+	"strconv"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
-	"strconv"
-	"testing"
 )
 
 func TestAccGitlabGroupProjectFileTemplate_basic(t *testing.T) {
 	// Since we do some manual setup in this test, we need to handle the test skip first.
-	testAccCheck(t)
 	baseGroup := testAccCreateGroups(t, 1)[0]
 	firstProject := testAccCreateProjectWithNamespace(t, baseGroup.ID)
 	secondProject := testAccCreateProjectWithNamespace(t, baseGroup.ID)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckProjectFileTemplateDestroy,
 		Steps: []resource.TestStep{

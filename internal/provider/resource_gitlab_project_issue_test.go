@@ -15,8 +15,6 @@ import (
 )
 
 func TestAccGitlabProjectIssue_basic(t *testing.T) {
-	testAccCheck(t)
-
 	var testIssue gitlab.Issue
 	var updatedTestIssue gitlab.Issue
 
@@ -31,7 +29,6 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{
@@ -151,7 +148,6 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 }
 
 func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
-	testAccCheck(t)
 	testAccCheckEE(t)
 
 	testProject := testAccCreateProject(t)
@@ -160,7 +156,6 @@ func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
 	testMilestone := testAccAddProjectMilestone(t, testProject.ID)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{
@@ -180,12 +175,9 @@ func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
 }
 
 func TestAccGitlabProjectIssue_deleteOnDestroy(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{

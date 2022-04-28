@@ -21,7 +21,6 @@ func TestAccGitlabBranchProtection_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
@@ -166,7 +165,6 @@ func TestAccGitlabBranchProtection_createWithCodeOwnerApproval(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
@@ -241,7 +239,6 @@ func TestAccGitlabBranchProtection_createWithAllowForcePush(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
@@ -297,7 +294,6 @@ func TestAccGitlabBranchProtection_createWithUnprotectAccessLevel(t *testing.T) 
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{
@@ -338,7 +334,6 @@ func TestAccGitlabBranchProtection_createWithMultipleAccessLevels(t *testing.T) 
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
 		Steps: []resource.TestStep{

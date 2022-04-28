@@ -14,13 +14,10 @@ import (
 )
 
 func TestAccGitlabDeployKey_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
 		Steps: []resource.TestStep{
@@ -62,12 +59,10 @@ func TestAccGitlabDeployKey_basic(t *testing.T) {
 }
 
 func TestAccGitlabDeployKey_suppressTrailingSpace(t *testing.T) {
-	testAccCheck(t)
 	testProject := testAccCreateProject(t)
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabDeployKeyDestroy,
 		Steps: []resource.TestStep{

@@ -13,13 +13,10 @@ import (
 )
 
 func TestAccGitlabRepositoryFile_basic(t *testing.T) {
-	testAccCheck(t)
-
 	var file gitlab.File
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -62,15 +59,12 @@ func TestAccGitlabRepositoryFile_basic(t *testing.T) {
 }
 
 func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T) {
-	testAccCheck(t)
-
 	var fooFile gitlab.File
 	var barFile gitlab.File
 	firstTestProject := testAccCreateProject(t)
 	secondTestProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -94,12 +88,9 @@ func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T)
 }
 
 func TestAccGitlabRepositoryFile_concurrentResources(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -120,13 +111,10 @@ func TestAccGitlabRepositoryFile_concurrentResources(t *testing.T) {
 }
 
 func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
-	testAccCheck(t)
-
 	var file gitlab.File
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -145,13 +133,10 @@ func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 }
 
 func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
-	testAccCheck(t)
-
 	var file gitlab.File
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{

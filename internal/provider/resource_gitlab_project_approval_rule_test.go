@@ -18,7 +18,6 @@ import (
 func TestAccGitLabProjectApprovalRule_Basic(t *testing.T) {
 	// Set up project, groups, users, and branches to use in the test.
 
-	testAccCheck(t)
 	testAccCheckEE(t)
 
 	// Need to get the current user (usually the admin) because they are automatically added as group members, and we
@@ -85,7 +84,6 @@ func TestAccGitLabProjectApprovalRule_Basic(t *testing.T) {
 func TestAccGitLabProjectApprovalRule_AnyApprover(t *testing.T) {
 	// Set up project, groups, users, and branches to use in the test.
 
-	testAccCheck(t)
 	testAccCheckEE(t)
 
 	project := testAccCreateProject(t)

@@ -15,7 +15,6 @@ import (
 )
 
 func TestAccGitlabProjectTag_basic(t *testing.T) {
-	testAccCheck(t)
 	var tag gitlab.Tag
 	var tag2 gitlab.Tag
 	rInt, rInt2, rInt3 := acctest.RandInt(), acctest.RandInt(), acctest.RandInt()
@@ -23,7 +22,6 @@ func TestAccGitlabProjectTag_basic(t *testing.T) {
 	branches := testAccCreateBranches(t, project, 1)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectTagDestroy,
 		Steps: []resource.TestStep{

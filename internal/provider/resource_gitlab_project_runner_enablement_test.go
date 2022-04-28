@@ -15,7 +15,6 @@ import (
 )
 
 func TestAccGitlabProjectRunnerEnablement_basic(t *testing.T) {
-	testAccCheck(t)
 	testGroup := testAccCreateGroups(t, 1)[0]
 	projectA := testAccCreateProjectWithNamespace(t, testGroup.ID)
 	projectB := testAccCreateProjectWithNamespace(t, testGroup.ID)
@@ -32,7 +31,6 @@ func TestAccGitlabProjectRunnerEnablement_basic(t *testing.T) {
 	runner, _, _ := testGitlabClient.Runners.RegisterNewRunner(&opts)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectRunnerEnablementDestroy(projectB.ID, runner.ID),
 		Steps: []resource.TestStep{

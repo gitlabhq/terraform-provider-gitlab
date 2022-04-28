@@ -13,12 +13,9 @@ import (
 )
 
 func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
-	testAccCheck(t)
-
 	project := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectAccessTokenDestroy,
 		Steps: []resource.TestStep{

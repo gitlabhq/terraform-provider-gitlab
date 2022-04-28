@@ -19,7 +19,6 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{
@@ -75,7 +74,6 @@ func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{

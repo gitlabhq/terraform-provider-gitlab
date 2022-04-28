@@ -8,12 +8,7 @@ import (
 	"os"
 	"testing"
 
-	// "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-
-	// "github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
@@ -39,13 +34,11 @@ var testGitlabConfig = Config{
 var testGitlabClient *gitlab.Client
 
 func init() {
-	if os.Getenv(resource.EnvTfAcc) != "" {
-		client, err := testGitlabConfig.Client(context.Background())
-		if err != nil {
-			panic("failed to create test client: " + err.Error()) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
-		}
-		testGitlabClient = client
+	client, err := testGitlabConfig.Client(context.Background())
+	if err != nil {
+		panic("failed to create test client: " + err.Error()) // lintignore: R009 // TODO: Resolve this tfproviderlint issue
 	}
+	testGitlabClient = client
 }
 
 func TestProvider(t *testing.T) {

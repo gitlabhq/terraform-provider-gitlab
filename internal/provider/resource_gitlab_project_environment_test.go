@@ -17,8 +17,6 @@ import (
 )
 
 func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
-	testAccCheck(t)
-
 	rInt := acctest.RandInt()
 	testProject := testAccCreateProject(t)
 
@@ -32,7 +30,6 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{
@@ -117,13 +114,10 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 }
 
 func TestAccGitlabProjectEnvironment_stopBeforeDestroyDisabled(t *testing.T) {
-	testAccCheck(t)
-
 	rInt := acctest.RandInt()
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{
