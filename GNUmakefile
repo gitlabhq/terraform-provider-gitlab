@@ -23,12 +23,12 @@ test: ## Run unit tests.
 
 fmt: tool-golangci-lint tool-terraform tool-shfmt tfproviderlint-plugin ## Format files and fix issues.
 	gofmt -w -s .
-	$(GOBIN)/golangci-lint run --fix
+	$(GOBIN)/golangci-lint run --build-tags acceptance --fix
 	$(GOBIN)/terraform fmt -recursive -list ./examples
 	$(GOBIN)/shfmt -l -s -w ./examples
 
 lint-golangci: tool-golangci-lint tfproviderlint-plugin ## Run golangci-lint linter (same as fmt but without modifying files).
-	$(GOBIN)/golangci-lint run
+	$(GOBIN)/golangci-lint run --build-tags acceptance
 
 lint-examples-tf: tool-terraform ## Run terraform linter on examples (same as fmt but without modifying files).
 	$(GOBIN)/terraform fmt -recursive -check ./examples
