@@ -367,9 +367,10 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		RequiredWith: []string{"import_url"},
 	},
 	"build_coverage_regex": {
-		Description: "Test coverage parsing for the project.",
+		Description: "Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.",
 		Type:        schema.TypeString,
 		Optional:    true,
+		Deprecated:  "build_coverage_regex is removed in GitLab 15.0.",
 	},
 	"issues_template": {
 		Description: "Sets the template for new issues in the project.",
@@ -714,7 +715,6 @@ func resourceGitlabProjectSetToState(ctx context.Context, client *gitlab.Client,
 	d.Set("mirror_trigger_builds", project.MirrorTriggerBuilds)
 	d.Set("mirror_overwrites_diverged_branches", project.MirrorOverwritesDivergedBranches)
 	d.Set("only_mirror_protected_branches", project.OnlyMirrorProtectedBranches)
-	d.Set("build_coverage_regex", project.BuildCoverageRegex)
 	d.Set("issues_template", project.IssuesTemplate)
 	d.Set("merge_requests_template", project.MergeRequestsTemplate)
 	d.Set("ci_config_path", project.CIConfigPath)
@@ -752,6 +752,10 @@ func resourceGitlabProjectSetToState(ctx context.Context, client *gitlab.Client,
 	d.Set("wiki_access_level", string(project.WikiAccessLevel))
 	d.Set("squash_commit_template", project.SquashCommitTemplate)
 	d.Set("merge_commit_template", project.MergeCommitTemplate)
+
+	//Note: This field is deprecated and will always be an empty string starting in GitLab 15.0.
+	d.Set("build_coverage_regex", project.BuildCoverageRegex)
+
 	return nil
 }
 
@@ -780,9 +784,12 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		PrintingMergeRequestLinkEnabled:           gitlab.Bool(d.Get("printing_merge_request_link_enabled").(bool)),
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
-		BuildCoverageRegex:                        gitlab.String(d.Get("build_coverage_regex").(string)),
 		CIConfigPath:                              gitlab.String(d.Get("ci_config_path").(string)),
 		CIForwardDeploymentEnabled:                gitlab.Bool(d.Get("ci_forward_deployment_enabled").(bool)),
+	}
+
+	if v, ok := d.GetOk("build_coverage_regex"); ok {
+		options.BuildCoverageRegex = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("path"); ok {
@@ -1312,7 +1319,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 	}
 
 	if d.HasChange("build_coverage_regex") {
-		options.BuildCoverageRegex = gitlab.String(d.Get("build_coverage_regex").(string))
+		options.IssuesTemplate = gitlab.String(d.Get("build_coverage_regex").(string))
 	}
 
 	if d.HasChange("issues_template") {
