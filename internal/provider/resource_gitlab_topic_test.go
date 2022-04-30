@@ -4,8 +4,10 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -256,6 +258,46 @@ func TestAccGitlabTopic_softDestroy(t *testing.T) {
 	})
 }
 
+func TestAccGitlabTopic_titleSupport(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabTopicDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isGitLabVersionAtLeast(context.Background(), testGitlabClient, "15.0"),
+				Config: fmt.Sprintf(`
+					resource "gitlab_topic" "this" {
+						name = "foo-%d"
+						title = "Foo-%d"
+					}
+				`, rInt, rInt),
+				ExpectError: regexp.MustCompile(`title is not supported by your version of GitLab. At least GitLab 15.0 is required`),
+			},
+			{
+				SkipFunc: isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				Config: fmt.Sprintf(`
+					resource "gitlab_topic" "this" {
+						name = "foo-%d"
+					}
+				`, rInt),
+				ExpectError: regexp.MustCompile(`title is a required attribute for GitLab 15.0 and newer. Please specify it in the configuration.`),
+			},
+			{
+				SkipFunc: isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				Config: fmt.Sprintf(`
+					resource "gitlab_topic" "this" {
+						name = "foo-%d"
+						title = "Foo-%d"
+					}
+				`, rInt, rInt),
+				Check: resource.TestCheckResourceAttr("gitlab_topic.this", "title", fmt.Sprintf("Foo-%d", rInt)),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabTopicExists(n string, assign *gitlab.Topic) resource.TestCheckFunc {
 	return func(s *terraform.State) (err error) {
 
@@ -373,43 +415,48 @@ func testAccGitlabTopicRequiredConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
   name = "foo-req-%d"
-}`, rInt)
+  title = "Foo Req %d"
+}`, rInt, rInt)
 }
 
 func testAccGitlabTopicFullConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
   name        = "foo-full-%d"
+  title       = "Foo Full %d"
   description = "Terraform acceptance tests"
   avatar      = "${path.module}/testdata/gitlab_topic/avatar.png"
   avatar_hash = filesha256("${path.module}/testdata/gitlab_topic/avatar.png")
-}`, rInt)
+}`, rInt, rInt)
 }
 
 func testAccGitlabTopicFullUpdatedAvatarConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
   name        = "foo-full-%d"
+  title       = "Foo Full %d"
   description = "Terraform acceptance tests"
   avatar 	  = "${path.module}/testdata/gitlab_topic/avatar-update.png"
   avatar_hash = filesha256("${path.module}/testdata/gitlab_topic/avatar-update.png")
-}`, rInt)
+}`, rInt, rInt)
 }
 
 func testAccGitlabTopicAvatarWithoutHashConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
   name   = "foo-%d"
+  title  = "Foo %d"
   avatar = "${path.module}/testdata/gitlab_topic/avatar.png"
-}`, rInt)
+}`, rInt, rInt)
 }
 
 func testAccGitlabTopicSoftDestroyConfig(rInt int) string {
 	return fmt.Sprintf(`
 resource "gitlab_topic" "foo" {
   name        = "foo-soft-destroy-%d"
+  title       = "Foo Soft Destroy %d"
   description = "Terraform acceptance tests"
 
   soft_destroy = true
-}`, rInt)
+}`, rInt, rInt)
 }

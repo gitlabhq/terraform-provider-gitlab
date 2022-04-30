@@ -37,6 +37,11 @@ var _ = registerResource("gitlab_topic", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
+			"title": {
+				Description: "The topic's description. Requires at least GitLab 15.0 for which it's a required argument.",
+				Type:        schema.TypeString,
+				Optional:    true,
+			},
 			"soft_destroy": {
 				Description: "Empty the topics fields instead of deleting it.",
 				Type:        schema.TypeBool,
@@ -81,8 +86,16 @@ var _ = registerResource("gitlab_topic", func() *schema.Resource {
 
 func resourceGitlabTopicCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
+	if err := resourceGitlabTopicEnsureTitleSupport(ctx, client, d); err != nil {
+		return diag.FromErr(err)
+	}
+
 	options := &gitlab.CreateTopicOptions{
 		Name: gitlab.String(d.Get("name").(string)),
+	}
+
+	if v, ok := d.GetOk("title"); ok {
+		options.Title = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("description"); ok {
@@ -129,6 +142,7 @@ func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta i
 
 	d.SetId(fmt.Sprintf("%d", topic.ID))
 	d.Set("name", topic.Name)
+	d.Set("title", topic.Title)
 	d.Set("description", topic.Description)
 	d.Set("avatar_url", topic.AvatarURL)
 	return nil
@@ -137,9 +151,16 @@ func resourceGitlabTopicRead(ctx context.Context, d *schema.ResourceData, meta i
 func resourceGitlabTopicUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	options := &gitlab.UpdateTopicOptions{}
+	if err := resourceGitlabTopicEnsureTitleSupport(ctx, client, d); err != nil {
+		return diag.FromErr(err)
+	}
 
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
+	}
+
+	if d.HasChange("title") {
+		options.Title = gitlab.String(d.Get("title").(string))
 	}
 
 	if d.HasChange("description") {
@@ -229,4 +250,19 @@ func resourceGitlabTopicGetAvatar(avatarPath string) (*gitlab.TopicAvatar, error
 		Filename: avatarPath,
 		Image:    avatarFile,
 	}, nil
+}
+
+func resourceGitlabTopicEnsureTitleSupport(ctx context.Context, client *gitlab.Client, d *schema.ResourceData) error {
+	isTitleSupported, err := isGitLabVersionAtLeast(ctx, client, "15.0")()
+	if err != nil {
+		return err
+	}
+
+	if _, ok := d.GetOk("title"); isTitleSupported && !ok {
+		return fmt.Errorf("title is a required attribute for GitLab 15.0 and newer. Please specify it in the configuration.")
+	} else if !isTitleSupported && ok {
+		return fmt.Errorf("title is not supported by your version of GitLab. At least GitLab 15.0 is required")
+	}
+
+	return nil
 }

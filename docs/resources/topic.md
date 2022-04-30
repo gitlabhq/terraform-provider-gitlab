@@ -23,7 +23,8 @@ The `gitlab_topic` resource allows to manage the lifecycle of topics that are th
 
 ```terraform
 resource "gitlab_topic" "functional_programming" {
-  name        = "Functional Programming"
+  name        = "functional-programming"
+  title       = "Functional Programming"
   description = "In computer science, functional programming is a programming paradigm where programs are constructed by applying and composing functions."
   avatar      = "${path.module}/avatar.png"
   avatar_hash = filesha256("${path.module}/avatar.png")
@@ -43,6 +44,7 @@ resource "gitlab_topic" "functional_programming" {
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `description` (String) A text describing the topic.
 - `soft_destroy` (Boolean, Deprecated) Empty the topics fields instead of deleting it.
+- `title` (String) The topic's description. Requires at least GitLab 15.0 for which it's a required argument.
 
 ### Read-Only
 
