@@ -81,7 +81,7 @@ resource "gitlab_project" "peters_repo" {
 - `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
 - `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
-- `build_coverage_regex` (String) Test coverage parsing for the project.
+- `build_coverage_regex` (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
 - `build_git_strategy` (String) The Git strategy. Defaults to fetch.
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.

@@ -1,6 +1,11 @@
 image: gitpod/workspace-go
 tasks:
-  - init: go get
+# Retrieve our go dependencies. Also inject several vscode settings that are specifically helpful to a GitPod environment and not needed when opening the repo locally.
+# The reason the settings are copied to a temp file and then moved is that applying the jq string directly to settings.json results in a blank file.
+  - init: |
+      go get
+      cat .vscode/settings.json | jq '. + {"terminal.integrated.lineHeight": 1.0,"terminal.integrated.letterSpacing": 1.0,"terminal.integrated.scrollback": 5000}'  > .vscode/temp.json
+      mv .vscode/temp.json .vscode/settings.json
   - name: Start acceptance Test Environment
     command: make testacc-up
     openMode: split-right
