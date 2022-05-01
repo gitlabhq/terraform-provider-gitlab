@@ -42,19 +42,16 @@ var _ = registerResource("gitlab_pages_domain", func() *schema.Resource {
 				Description: "Enables automatic generation of SSL certificates issued by Let’s Encrypt for custom domains.",
 				Type:        schema.TypeBool,
 				Optional:    true,
-				ForceNew:    false,
 			},
 			"certificate": {
 				Description: "The certificate in PEM format with intermediates following in most specific to least specific order.",
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    false,
 			},
 			"key": {
 				Description: "The certificate key in PEM format.",
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    false,
 			},
 			"url": {
 				Description: "The URL for the given domain.",
