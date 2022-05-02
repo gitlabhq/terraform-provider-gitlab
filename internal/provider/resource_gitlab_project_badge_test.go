@@ -29,6 +29,7 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 					testAccCheckGitlabProjectBadgeAttributes(&badge, &testAccGitlabProjectBadgeExpectedAttributes{
 						LinkURL:  fmt.Sprintf("https://example.com/badge-%d", rInt),
 						ImageURL: fmt.Sprintf("https://example.com/badge-%d.svg", rInt),
+						Name:     fmt.Sprintf("badge-%d", rInt),
 					}),
 				),
 			},
@@ -46,6 +47,7 @@ func TestAccGitlabProjectBadge_basic(t *testing.T) {
 					testAccCheckGitlabProjectBadgeAttributes(&badge, &testAccGitlabProjectBadgeExpectedAttributes{
 						LinkURL:  fmt.Sprintf("https://example.com/badge-%d", rInt),
 						ImageURL: fmt.Sprintf("https://example.com/badge-%d.svg", rInt),
+						Name:     fmt.Sprintf("badge-%d", rInt),
 					}),
 				),
 			},
@@ -83,6 +85,7 @@ func testAccCheckGitlabProjectBadgeExists(n string, badge *gitlab.ProjectBadge) 
 type testAccGitlabProjectBadgeExpectedAttributes struct {
 	LinkURL  string
 	ImageURL string
+	Name     string
 }
 
 func testAccCheckGitlabProjectBadgeAttributes(badge *gitlab.ProjectBadge, want *testAccGitlabProjectBadgeExpectedAttributes) resource.TestCheckFunc {
@@ -93,6 +96,10 @@ func testAccCheckGitlabProjectBadgeAttributes(badge *gitlab.ProjectBadge, want *
 
 		if badge.ImageURL != want.ImageURL {
 			return fmt.Errorf("got image_url %s; want %s", badge.ImageURL, want.ImageURL)
+		}
+
+		if badge.Name != want.Name {
+			return fmt.Errorf("got name %q; want %q", badge.Name, want.Name)
 		}
 
 		return nil
@@ -136,8 +143,9 @@ resource "gitlab_project_badge" "foo" {
   project   = "${gitlab_project.foo.id}"
   link_url  = "https://example.com/badge-%d"
   image_url = "https://example.com/badge-%d.svg"
+	name      = "badge-%d"
 }
-	`, rInt, rInt, rInt)
+	`, rInt, rInt, rInt, rInt)
 }
 
 func testAccGitlabProjectBadgeUpdateConfig(rInt int) string {
@@ -155,6 +163,7 @@ resource "gitlab_project_badge" "foo" {
   project   = "${gitlab_project.foo.id}"
   link_url  = "https://example.com/badge-%d"
   image_url = "https://example.com/badge-%d.svg"
+	name      = "badge-%d"
 }
-	`, rInt, rInt, rInt)
+	`, rInt, rInt, rInt, rInt)
 }
