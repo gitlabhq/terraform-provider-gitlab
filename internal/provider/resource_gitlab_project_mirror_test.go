@@ -146,12 +146,28 @@ func testAccCheckGitlabProjectMirrorAttributes(mirror *gitlab.ProjectMirror, wan
 }
 
 func testAccCheckGitlabProjectMirrorDestroy(s *terraform.State) error {
-	var mirror gitlab.ProjectMirror
-	if err := testAccCheckGitlabProjectMirrorExists("gitlab_project_mirror.foo", &mirror)(s); err != nil {
-		return err
-	}
-	if mirror.Enabled {
-		return errors.New("mirror is enabled")
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "gitlab_project_mirror" {
+			continue
+		}
+
+		projectID, rawMirrorID, err := parseTwoPartID(rs.Primary.ID)
+		if err != nil {
+			return err
+		}
+		mirrorID, err := strconv.Atoi(rawMirrorID)
+		if err != nil {
+			return err
+		}
+
+		mirror, _, err := testGitlabClient.ProjectMirrors.GetProjectMirror(projectID, mirrorID)
+		if err == nil && mirror != nil && mirror.ID == mirrorID {
+			return fmt.Errorf("Project Mirror still exists")
+		}
+		if err != nil && !is404(err) {
+			return err
+		}
+		return nil
 	}
 	return nil
 }
