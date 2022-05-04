@@ -2,13 +2,17 @@ package provider
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabRunner_basic(t *testing.T) {
+	testAccCheck(t)
+
 	group := testAccCreateGroups(t, 1)[0]
 	//The runner token is not populated on the return from the group create, so re-retrieve it to get the token.
 	group, _, err := testGitlabClient.Groups.GetGroup(group.ID, &gitlab.GetGroupOptions{})
@@ -19,27 +23,31 @@ func TestAccGitlabRunner_basic(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckManagedLicenseDestroy,
+		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
 				resource "gitlab_runner" "this" {
-					token = "%s"
+					registration_token = "%s"
 					description = "Lorem Ipsum"
 				}
 				`, group.RunnersToken),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("gitlab_runner.this", "registration_token"),
+					resource.TestCheckResourceAttrSet("gitlab_runner.this", "authentication_token"),
+				),
 			},
 			{
 				ResourceName:      "gitlab_runner.this",
 				ImportState:       true,
 				ImportStateVerify: true,
 				//These need to be ignored since they don't come back in the "get" command
-				ImportStateVerifyIgnore: []string{"authentication_token", "token"},
+				ImportStateVerifyIgnore: []string{"authentication_token", "registration_token"},
 			},
 			{
 				Config: fmt.Sprintf(`
 				resource "gitlab_runner" "this" {
-					token = "%s"
+					registration_token = "%s"
 					description = "Lorem Ipsum Dolor Sit Amet"
 				}
 				`, group.RunnersToken),
@@ -49,13 +57,15 @@ func TestAccGitlabRunner_basic(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				//These need to be ignored since they don't come back in the "get" command
-				ImportStateVerifyIgnore: []string{"authentication_token", "token"},
+				ImportStateVerifyIgnore: []string{"authentication_token", "registration_token"},
 			},
 		},
 	})
 }
 
 func TestAccGitlabRunner_comprehensive(t *testing.T) {
+	testAccCheck(t)
+
 	group := testAccCreateGroups(t, 1)[0]
 	//The runner token is not populated on the return from the group create, so re-retrieve it to get the token.
 	group, _, err := testGitlabClient.Groups.GetGroup(group.ID, &gitlab.GetGroupOptions{})
@@ -66,12 +76,12 @@ func TestAccGitlabRunner_comprehensive(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckManagedLicenseDestroy,
+		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
 				resource "gitlab_runner" "this" {
-					token = "%s"
+					registration_token = "%s"
 					description = "Lorem Ipsum"
 
 					paused = false
@@ -88,12 +98,12 @@ func TestAccGitlabRunner_comprehensive(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				//These need to be ignored since they don't come back in the "get" command
-				ImportStateVerifyIgnore: []string{"authentication_token", "token"},
+				ImportStateVerifyIgnore: []string{"authentication_token", "registration_token"},
 			},
 			{
 				Config: fmt.Sprintf(`
 				resource "gitlab_runner" "this" {
-					token = "%s"
+					registration_token = "%s"
 					description = "Lorem Ipsum Dolor Sit Amet"
 
 					paused = true
@@ -110,8 +120,31 @@ func TestAccGitlabRunner_comprehensive(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				//These need to be ignored since they don't come back in the "get" command
-				ImportStateVerifyIgnore: []string{"authentication_token", "token"},
+				ImportStateVerifyIgnore: []string{"authentication_token", "registration_token"},
 			},
 		},
 	})
+}
+
+func testAccCheckRunnerDestroy(state *terraform.State) error {
+	for _, rs := range state.RootModule().Resources {
+		if rs.Type != "gitlab_runner" {
+			continue
+		}
+
+		id, _ := strconv.Atoi(rs.Primary.ID)
+
+		runner, _, err := testGitlabClient.Runners.GetRunnerDetails(id)
+		if err == nil {
+			if runner != nil {
+				return fmt.Errorf("runner still exists")
+			}
+		}
+
+		if !is404(err) {
+			return err
+		}
+		return nil
+	}
+	return nil
 }
