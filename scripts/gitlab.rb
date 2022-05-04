@@ -8,4 +8,4 @@ registry['enable']                    = true
 registry_nginx['ssl_certificate']     = "/etc/gitlab/ssl/gitlab-registry.pem"
 registry_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab-registry.key"
 
-gitlab_rails['initial_shared_runners_registration_token'] = "LoremIpsumDolorToken"
+gitlab_rails['initial_shared_runners_registration_token'] = "ACCTEST1234567890123_RUNNER_REG_TOKEN"
