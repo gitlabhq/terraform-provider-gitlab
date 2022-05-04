@@ -283,6 +283,28 @@ func testAccAddProjectMembers(t *testing.T, pid interface{}, users []*gitlab.Use
 	}
 }
 
+func testAccCreateClusterAgents(t *testing.T, pid interface{}, n int) []*gitlab.Agent {
+	t.Helper()
+
+	var clusterAgents []*gitlab.Agent
+	for i := 0; i < n; i++ {
+		clusterAgent, _, err := testGitlabClient.ClusterAgents.RegisterAgent(pid, &gitlab.RegisterAgentOptions{
+			Name: gitlab.String(fmt.Sprintf("agent-%d", i)),
+		})
+		if err != nil {
+			t.Fatalf("could not create test cluster agent: %v", err)
+		}
+		t.Cleanup(func() {
+			_, err := testGitlabClient.ClusterAgents.DeleteAgent(pid, clusterAgent.ID)
+			if err != nil {
+				t.Fatalf("could not cleanup test cluster agent: %v", err)
+			}
+		})
+		clusterAgents = append(clusterAgents, clusterAgent)
+	}
+	return clusterAgents
+}
+
 func testAccCreateProjectIssues(t *testing.T, pid interface{}, n int) []*gitlab.Issue {
 	t.Helper()
 
