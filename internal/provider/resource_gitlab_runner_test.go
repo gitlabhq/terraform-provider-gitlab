@@ -63,6 +63,40 @@ func TestAccGitlabRunner_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabRunner_instance(t *testing.T) {
+	testAccCheck(t)
+
+	// This pulls from the gitlab.rb file, and is set on instance start-up
+	token := "ACCTEST1234567890123_RUNNER_REG_TOKEN"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() {},
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckRunnerDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+				resource "gitlab_runner" "this" {
+					registration_token = "%s"
+					description = "Lorem Ipsum"
+				}
+				`, token),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("gitlab_runner.this", "registration_token"),
+					resource.TestCheckResourceAttrSet("gitlab_runner.this", "authentication_token"),
+				),
+			},
+			{
+				ResourceName:      "gitlab_runner.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+				//These need to be ignored since they don't come back in the "get" command
+				ImportStateVerifyIgnore: []string{"authentication_token", "registration_token"},
+			},
+		},
+	})
+}
+
 func TestAccGitlabRunner_comprehensive(t *testing.T) {
 	testAccCheck(t)
 
