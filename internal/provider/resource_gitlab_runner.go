@@ -46,19 +46,19 @@ The runner will be registered at a group level if the token used is from a group
 				Description: `Whether the runner should ignore new jobs.`,
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     gitlab.Bool(false),
+				Computed:    true,
 			},
 			"locked": {
 				Description: `Whether the runner should be locked for current project.`,
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     gitlab.Bool(false),
+				Computed:    true,
 			},
 			"run_untagged": {
 				Description: `Whether the runner should handle untagged jobs.`,
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     gitlab.Bool(true),
+				Computed:    true,
 			},
 			"tag_list": {
 				Description: `List of runner’s tags.`,
@@ -71,7 +71,7 @@ The runner will be registered at a group level if the token used is from a group
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringInSlice(runnerAccessLevelAllowedValues, true),
-				Default:      "not_protected",
+				Computed:     true,
 			},
 			"maximum_timeout": {
 				Description: `Maximum timeout set when this runner handles the job.`,
