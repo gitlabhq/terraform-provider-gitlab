@@ -76,7 +76,6 @@ resource "gitlab_repository_file" "readme" {
 - `author_email` (String) Email of the commit author.
 - `author_name` (String) Name of the commit author.
 - `execute_filemode` (Boolean) Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.
-- `id` (String) The ID of this resource.
 - `start_branch` (String) Name of the branch to start the new commit from.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
@@ -87,6 +86,7 @@ resource "gitlab_repository_file" "readme" {
 - `content_sha256` (String) File content sha256 digest.
 - `encoding` (String) The file content encoding.
 - `file_name` (String) The filename.
+- `id` (String) The ID of this resource.
 - `last_commit_id` (String) The last known commit id.
 - `ref` (String) The name of branch, tag or commit.
 - `size` (Number) The file size.

@@ -30,12 +30,9 @@ resource "gitlab_pipeline_trigger" "example" {
 - `description` (String) The description of the pipeline trigger.
 - `project` (String) The name or id of the project to add the trigger to.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `token` (String, Sensitive) The pipeline trigger token.
 
 ## Import

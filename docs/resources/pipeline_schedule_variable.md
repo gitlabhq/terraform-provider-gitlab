@@ -41,7 +41,7 @@ resource "gitlab_pipeline_schedule_variable" "example" {
 - `project` (String) The id of the project to add the schedule to.
 - `value` (String) Value of the variable.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

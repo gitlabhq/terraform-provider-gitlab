@@ -44,6 +44,9 @@ resource "gitlab_label" "devops_create" {
 ### Optional
 
 - `description` (String) The description of the label.
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

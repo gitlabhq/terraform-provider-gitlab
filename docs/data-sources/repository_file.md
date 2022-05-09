@@ -32,10 +32,6 @@ data "gitlab_repository_file" "example" {
 - `project` (String) The name or ID of the project.
 - `ref` (String) The name of branch, tag or commit.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `blob_id` (String) The blob id.
@@ -45,6 +41,7 @@ data "gitlab_repository_file" "example" {
 - `encoding` (String) The file content encoding.
 - `execute_filemode` (Boolean) Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.
 - `file_name` (String) The filename.
+- `id` (String) The ID of this resource.
 - `last_commit_id` (String) The last known commit id.
 - `size` (Number) The file size.
 

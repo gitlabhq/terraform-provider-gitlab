@@ -43,7 +43,7 @@ resource "gitlab_managed_license" "mit" {
 - `name` (String) The name of the managed license (I.e., 'Apache License 2.0' or 'MIT license')
 - `project` (String) The ID of the project under which the managed license will be created.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

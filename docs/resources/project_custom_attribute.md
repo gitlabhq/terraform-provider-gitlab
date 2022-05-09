@@ -32,7 +32,7 @@ resource "gitlab_project_custom_attribute" "attr" {
 - `project` (Number) The id of the project.
 - `value` (String) Value for the Custom Attribute.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

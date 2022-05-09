@@ -80,7 +80,7 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 - `environment` (String) The name of the environment.
 - `project` (String) The ID or full path of the project which the protected environment is created against.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 
