@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/onsi/gomega"
 	"github.com/xanzy/go-gitlab"
 )
@@ -452,14 +451,6 @@ func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
 	return testAccGitlabProjectContext{
 		t:       t,
 		project: project,
-	}
-}
-
-// testCheckResourceAttrLazy works like resource.TestCheckResourceAttr, but lazy evaluates the value parameter.
-// See also: resource.TestCheckResourceAttrPtr.
-func testCheckResourceAttrLazy(name string, key string, value func() string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		return resource.TestCheckResourceAttr(name, key, value())(s)
 	}
 }
 
