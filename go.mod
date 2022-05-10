@@ -2,6 +2,9 @@ module github.com/gitlabhq/terraform-provider-gitlab
 
 go 1.17
 
+// we are waiting for a new release
+replace github.com/xanzy/go-gitlab => ../go-gitlab
+
 require (
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320
 	github.com/hashicorp/go-retryablehttp v0.7.1
