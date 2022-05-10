@@ -12,8 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-// lintignore: AT003 // TODO: Resolve this tfproviderlint issue
-func TestAccDataGitlabProjectsSearch(t *testing.T) {
+func TestAccDataGitlabProjects_search(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
@@ -52,8 +51,7 @@ func TestAccDataGitlabProjectsSearch(t *testing.T) {
 	})
 }
 
-// lintignore: AT003 // TODO: Resolve this tfproviderlint issue
-func TestAccDataGitlabProjectsGroups(t *testing.T) {
+func TestAccDataGitlabProjects_groups(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 	groupName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 	parentGroupName := fmt.Sprintf("tf-%s", acctest.RandString(5))
