@@ -40,7 +40,6 @@ resource "gitlab_system_hook" "example" {
 ### Optional
 
 - `enable_ssl_verification` (Boolean) Do SSL verification when triggering the hook.
-- `id` (String) The ID of this resource.
 - `merge_requests_events` (Boolean) Trigger hook on merge requests events.
 - `push_events` (Boolean) When true, the hook fires on push events.
 - `repository_update_events` (Boolean) Trigger hook on repository update events.
@@ -50,6 +49,7 @@ resource "gitlab_system_hook" "example" {
 ### Read-Only
 
 - `created_at` (String) The date and time the hook was created in ISO8601 format.
+- `id` (String) The ID of this resource.
 
 ## Import
 

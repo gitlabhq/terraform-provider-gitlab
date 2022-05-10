@@ -32,7 +32,7 @@ resource "gitlab_tag_protection" "TagProtect" {
 - `project` (String) The id of the project.
 - `tag` (String) Name of the tag or wildcard.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

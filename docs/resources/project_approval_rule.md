@@ -79,10 +79,13 @@ resource "gitlab_branch_protection" "any-approver" {
 ### Optional
 
 - `group_ids` (Set of Number) A list of group IDs whose members can approve of the merge request.
-- `id` (String) The ID of this resource.
 - `protected_branch_ids` (Set of Number) A list of protected branch IDs (not branch names) for which the rule applies.
 - `rule_type` (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`.
 - `user_ids` (Set of Number) A list of specific User IDs to add to the list of approvers.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 ## Import
 

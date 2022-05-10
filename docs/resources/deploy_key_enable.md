@@ -51,9 +51,12 @@ resource "gitlab_deploy_key_enable" "foo" {
 ### Optional
 
 - `can_push` (Boolean) Can deploy key push to the project's repository.
-- `id` (String) The ID of this resource.
 - `key` (String) Deploy key.
 - `title` (String) Deploy key's title.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 ## Import
 

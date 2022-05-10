@@ -89,7 +89,6 @@ resource "local_file" "config" {
 
 - `access_level` (String) The access_level of the runner. Valid values are: `not_protected`, `ref_protected`.
 - `description` (String) The runner's description.
-- `id` (String) The ID of this resource.
 - `locked` (Boolean) Whether the runner should be locked for current project.
 - `maximum_timeout` (Number) Maximum timeout set when this runner handles the job.
 - `paused` (Boolean) Whether the runner should ignore new jobs.
@@ -99,6 +98,7 @@ resource "local_file" "config" {
 ### Read-Only
 
 - `authentication_token` (String, Sensitive) The authentication token used for building a config.toml file. This value is not present when imported.
+- `id` (String) The ID of this resource.
 - `status` (String) The status of runners to show, one of: online and offline. active and paused are also possible values
 				              which were deprecated in GitLab 14.8 and will be removed in GitLab 16.0.
 

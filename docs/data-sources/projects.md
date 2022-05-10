@@ -48,7 +48,6 @@ data "gitlab_projects" "projects" {
 
 - `archived` (Boolean) Limit by archived status.
 - `group_id` (Number) The ID of the group owned by the authenticated user to look projects for within. Cannot be used with `min_access_level`, `with_programming_language` or `statistics`.
-- `id` (String) The ID of this resource.
 - `include_subgroups` (Boolean) Include projects in subgroups of this group. Default is `false`. Needs `group_id`.
 - `max_queryable_pages` (Number) The maximum number of project results pages that may be queried. Prevents overloading your Gitlab instance in case of a misconfiguration.
 - `membership` (Boolean) Limit by projects that the current user is a member of.
@@ -71,6 +70,7 @@ data "gitlab_projects" "projects" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `projects` (List of Object) A list containing the projects matching the supplied arguments (see [below for nested schema](#nestedatt--projects))
 
 <a id="nestedatt--projects"></a>

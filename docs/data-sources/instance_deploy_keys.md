@@ -32,12 +32,12 @@ data "gitlab_instance_deploy_keys" "example" {
 
 ### Optional
 
-- `id` (String) The ID of this resource.
 - `public` (Boolean) Only return deploy keys that are public.
 
 ### Read-Only
 
 - `deploy_keys` (List of Object) The list of all deploy keys across all projects of the GitLab instance. (see [below for nested schema](#nestedatt--deploy_keys))
+- `id` (String) The ID of this resource.
 
 <a id="nestedatt--deploy_keys"></a>
 ### Nested Schema for `deploy_keys`

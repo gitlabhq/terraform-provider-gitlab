@@ -41,7 +41,7 @@ resource "gitlab_project_membership" "example" {
 - `project_id` (String) The id of the project.
 - `user_id` (Number) The id of the user.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

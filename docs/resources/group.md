@@ -47,7 +47,6 @@ resource "gitlab_project" "example" {
 - `default_branch_protection` (Number) Defaults to 2. See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection
 - `description` (String) The description of the group.
 - `emails_disabled` (Boolean) Defaults to false. Disable email notifications.
-- `id` (String) The ID of this resource.
 - `lfs_enabled` (Boolean) Defaults to true. Enable/disable Large File Storage (LFS) for the projects in this group.
 - `mentions_disabled` (Boolean) Defaults to false. Disable the capability of a group from getting mentioned.
 - `parent_id` (Number) Id of the parent group (creates a nested group).
@@ -64,6 +63,7 @@ resource "gitlab_project" "example" {
 
 - `full_name` (String) The full name of the group.
 - `full_path` (String) The full path of the group.
+- `id` (String) The ID of this resource.
 - `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
 - `web_url` (String) Web URL of the group.
 

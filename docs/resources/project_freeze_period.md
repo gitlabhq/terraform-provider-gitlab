@@ -36,6 +36,9 @@ resource "gitlab_project_freeze_period" "schedule" {
 ### Optional
 
 - `cron_timezone` (String) The timezone.
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

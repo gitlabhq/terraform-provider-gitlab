@@ -53,12 +53,12 @@ resource "gitlab_project_environment" "this" {
 ### Optional
 
 - `external_url` (String) Place to link to for this environment.
-- `id` (String) The ID of this resource.
 - `stop_before_destroy` (Boolean) Determines whether the environment is attempted to be stopped before the environment is deleted.
 
 ### Read-Only
 
 - `created_at` (String) The ISO8601 date/time that this environment was created at in UTC.
+- `id` (String) The ID of this resource.
 - `slug` (String) The name of the environment in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
 - `state` (String) State the environment is in. Valid values are `available`, `stopped`.
 - `updated_at` (String) The ISO8601 date/time that this environment was last updated at in UTC.

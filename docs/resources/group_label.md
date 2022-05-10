@@ -36,6 +36,9 @@ resource "gitlab_group_label" "fixme" {
 ### Optional
 
 - `description` (String) The description of the label.
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

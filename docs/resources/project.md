@@ -96,7 +96,6 @@ resource "gitlab_project" "peters_repo" {
 - `external_authorization_classification_label` (String) The classification label for the project.
 - `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
 - `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
-- `id` (String) The ID of this resource.
 - `import_url` (String) Git URL to a repository to be imported.
 - `initialize_with_readme` (Boolean) Create main branch with first commit containing a README.md file.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
@@ -149,6 +148,7 @@ resource "gitlab_project" "peters_repo" {
 ### Read-Only
 
 - `http_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `id` (String) The ID of this resource.
 - `path_with_namespace` (String) The path of the repository with namespace.
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the

@@ -34,13 +34,13 @@ data "gitlab_group" "foo" {
 
 - `full_path` (String) The full path of the group.
 - `group_id` (Number) The ID of the group.
-- `id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `default_branch_protection` (Number) Whether developers and maintainers can push to the applicable default branch.
 - `description` (String) The description of the group.
 - `full_name` (String) The full name of the group.
+- `id` (String) The ID of this resource.
 - `lfs_enabled` (Boolean) Boolean, is LFS enabled for projects in this group.
 - `name` (String) The name of this group.
 - `parent_id` (Number) Integer, ID of the parent group.

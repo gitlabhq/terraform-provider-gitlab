@@ -41,12 +41,12 @@ resource "gitlab_project_tag" "example" {
 
 ### Optional
 
-- `id` (String) The ID of this resource.
 - `message` (String) The message of the annotated tag.
 
 ### Read-Only
 
 - `commit` (Set of Object) The commit associated with the tag. (see [below for nested schema](#nestedatt--commit))
+- `id` (String) The ID of this resource.
 - `protected` (Boolean) Bool, true if tag has tag protection.
 - `release` (Set of Object) The release associated with the tag. (see [below for nested schema](#nestedatt--release))
 - `target` (String) The unique id assigned to the commit by Gitlab.

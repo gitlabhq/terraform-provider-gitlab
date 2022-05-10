@@ -45,12 +45,12 @@ resource "gitlab_project_mirror" "foo" {
 ### Optional
 
 - `enabled` (Boolean) Determines if the mirror is enabled.
-- `id` (String) The ID of this resource.
 - `keep_divergent_refs` (Boolean) Determines if divergent refs are skipped.
 - `only_protected_branches` (Boolean) Determines if only protected branches are mirrored.
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `mirror_id` (Number) Mirror ID.
 
 ## Import

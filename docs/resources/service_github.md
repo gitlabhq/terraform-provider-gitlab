@@ -43,13 +43,13 @@ resource "gitlab_service_github" "github" {
 
 ### Optional
 
-- `id` (String) The ID of this resource.
 - `static_context` (Boolean) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
 
 ### Read-Only
 
 - `active` (Boolean) Whether the integration is active.
 - `created_at` (String) Create time.
+- `id` (String) The ID of this resource.
 - `title` (String) Title.
 - `updated_at` (String) Update time.
 

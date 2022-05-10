@@ -37,10 +37,6 @@ data "gitlab_branch" "foo" {
 - `name` (String) The name of the branch.
 - `project` (String) The full path or id of the project.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `can_push` (Boolean) Bool, true if you can push to the branch.
@@ -48,6 +44,7 @@ data "gitlab_branch" "foo" {
 - `default` (Boolean) Bool, true if branch is the default branch for the project.
 - `developer_can_merge` (Boolean) Bool, true if developer level access allows to merge branch.
 - `developer_can_push` (Boolean) Bool, true if developer level access allows git push.
+- `id` (String) The ID of this resource.
 - `merged` (Boolean) Bool, true if the branch has been merged into it's parent.
 - `protected` (Boolean) Bool, true if branch has branch protection.
 - `web_url` (String) The url of the created branch (https.)

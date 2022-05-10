@@ -39,10 +39,6 @@ resource "gitlab_branch" "example" {
 - `project` (String) The ID or full path of the project which the branch is created against.
 - `ref` (String) The ref which the branch is created from.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `can_push` (Boolean) Bool, true if you can push to the branch.
@@ -50,6 +46,7 @@ resource "gitlab_branch" "example" {
 - `default` (Boolean) Bool, true if branch is the default branch for the project.
 - `developer_can_merge` (Boolean) Bool, true if developer level access allows to merge branch.
 - `developer_can_push` (Boolean) Bool, true if developer level access allows git push.
+- `id` (String) The ID of this resource.
 - `merged` (Boolean) Bool, true if the branch has been merged into it's parent.
 - `protected` (Boolean) Bool, true if branch has branch protection.
 - `web_url` (String) The url of the created branch (https).
