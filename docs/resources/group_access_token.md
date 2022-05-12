@@ -48,12 +48,12 @@ resource "gitlab_group_variable" "example" {
 
 - `access_level` (String) The access level for the group access token. Valid values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
 - `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.
-- `id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `active` (Boolean) True if the token is active.
 - `created_at` (String) Time the token has been created, RFC3339 format.
+- `id` (String) The ID of this resource.
 - `revoked` (Boolean) True if the token is revoked.
 - `token` (String, Sensitive) The group access token. This is only populated when creating a new group access token. This attribute is not available for imported resources.
 - `user_id` (Number) The user id associated to the token.

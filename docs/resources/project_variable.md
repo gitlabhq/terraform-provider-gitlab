@@ -39,10 +39,13 @@ resource "gitlab_project_variable" "example" {
 ### Optional
 
 - `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`). Note that in Community Editions of Gitlab, values other than `*` will cause inconsistent plans.
-- `id` (String) The ID of this resource.
 - `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
 - `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 ## Import
 

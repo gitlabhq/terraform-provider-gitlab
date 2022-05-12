@@ -40,11 +40,11 @@ resource "gitlab_user_sshkey" "example" {
 ### Optional
 
 - `expires_at` (String) The expiration date of the SSH key in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)
-- `id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `created_at` (String) The time when this key was created in GitLab.
+- `id` (String) The ID of this resource.
 - `key_id` (Number) The ID of the ssh key.
 
 ## Import

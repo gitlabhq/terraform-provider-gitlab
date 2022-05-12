@@ -1,4 +1,32 @@
-## 3.14.0 (Unreleased)
+## 3.14.0 (2022-05-02)
+
+FEATURES:
+
+* **New Data Source:** `gitlab_project_variable` ([#990](https://github.com/gitlabhq/terraform-provider-gitlab/pull/990))
+* **New Data Source:** `gitlab_project_variables` ([#990](https://github.com/gitlabhq/terraform-provider-gitlab/pull/990))
+* **New Data Source:** `gitlab_group_variable` ([#990](https://github.com/gitlabhq/terraform-provider-gitlab/pull/990))
+* **New Data Source:** `gitlab_group_variables` ([#990](https://github.com/gitlabhq/terraform-provider-gitlab/pull/990))
+* **New Data Source:** `gitlab_instance_variable` ([#990](https://github.com/gitlabhq/terraform-provider-gitlab/pull/990))
+* **New Data Source:** `gitlab_instance_variables` ([#990](https://github.com/gitlabhq/terraform-provider-gitlab/pull/990))
+* **New Resource:** `gitlab_group_project_file_template` ([#971](https://github.com/gitlabhq/terraform-provider-gitlab/pull/971))
+* **New Resource:** `gitlab_service_external_wiki` ([#1003](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1003))
+* **New Resource:** `gitlab_project_runner_enablement` ([#1016](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1016))
+* **New Resource:** `gitlab_personal_access_token` ([#1007](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1007))
+
+IMPROVEMENTS:
+
+* resource/gitlab_deploy_key: Fully support `can_push` attribute ([#1009](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1009))
+* resource/gitlab_deploy_key_enable: Fully support `can_push` attribute ([#1009](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1009))
+* resource/gitlab_group_access_token: Support `owner` as access level ([#999](https://github.com/gitlabhq/terraform-provider-gitlab/pull/999))
+* resource/gitlab_pipeline_trigger: Mark `token` attribute as sensitive ([#1034](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1034))
+* resource/gitlab_project: Deprecate `build_coverage_regex` ([#1036](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1036))
+* resource/gitlab_project_access_token: Add `access_level` attribute ([#997](https://github.com/gitlabhq/terraform-provider-gitlab/pull/997))
+* resource/gitlab_project_protected_environment: Support multiple `deploy_access_levels` ([#1004](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1004))
+* resource/gitlab_project_mirror: Support deletion on destroy ([#988](https://github.com/gitlabhq/terraform-provider-gitlab/pull/988))
+* resource/gitlab_repository_file: Add `execute_filemode` attribute ([#1038](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1038))
+* resource/gitlab_user: Add `namespace_id` attribute ([#987](https://github.com/gitlabhq/terraform-provider-gitlab/pull/987))
+* datasource/gitlab_user: Add `namespace_id` attribute ([#987](https://github.com/gitlabhq/terraform-provider-gitlab/pull/987))
+* datasource/gitlab_users: Add `namespace_id` attribute ([#987](https://github.com/gitlabhq/terraform-provider-gitlab/pull/987))
 
 BUG FIXES:
 

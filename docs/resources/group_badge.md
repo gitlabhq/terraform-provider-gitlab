@@ -36,12 +36,9 @@ resource "gitlab_group_badge" "example" {
 - `image_url` (String) The image url which will be presented on group overview.
 - `link_url` (String) The url linked with the badge.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `rendered_image_url` (String) The image_url argument rendered (in case of use of placeholders).
 - `rendered_link_url` (String) The link_url argument rendered (in case of use of placeholders).
 

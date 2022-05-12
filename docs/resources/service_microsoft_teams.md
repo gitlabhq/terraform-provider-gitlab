@@ -42,7 +42,6 @@ resource "gitlab_service_microsoft_teams" "teams" {
 - `branches_to_be_notified` (String) Branches to send notifications for. Valid options are “all”, “default”, “protected”, and “default_and_protected”. The default value is “default”
 - `confidential_issues_events` (Boolean) Enable notifications for confidential issue events
 - `confidential_note_events` (Boolean) Enable notifications for confidential note events
-- `id` (String) The ID of this resource.
 - `issues_events` (Boolean) Enable notifications for issue events
 - `merge_requests_events` (Boolean) Enable notifications for merge request events
 - `note_events` (Boolean) Enable notifications for note events
@@ -56,6 +55,7 @@ resource "gitlab_service_microsoft_teams" "teams" {
 
 - `active` (Boolean) Whether the integration is active.
 - `created_at` (String) Create time.
+- `id` (String) The ID of this resource.
 - `updated_at` (String) Update time.
 
 ## Import

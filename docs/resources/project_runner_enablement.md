@@ -30,7 +30,7 @@ resource "gitlab_project_runner_enablement" "foo" {
 - `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 - `runner_id` (Number) The ID of a runner to enable for the project.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

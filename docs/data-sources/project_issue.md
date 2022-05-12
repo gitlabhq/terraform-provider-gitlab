@@ -38,10 +38,6 @@ output "welcome_issue_web_url" {
 - `iid` (Number) The internal ID of the project's issue.
 - `project` (String) The name or ID of the project.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `assignee_ids` (Set of Number) The IDs of the users to assign the issue to.
@@ -61,6 +57,7 @@ output "welcome_issue_web_url" {
 - `external_id` (String) The external ID of the issue.
 - `human_time_estimate` (String) The human-readable time estimate of the issue.
 - `human_total_time_spent` (String) The human-readable total time spent of the issue.
+- `id` (String) The ID of this resource.
 - `issue_id` (Number) The instance-wide ID of the issue.
 - `issue_link_id` (Number) The ID of the issue link.
 - `issue_type` (String) The type of issue. Valid values are: `issue`, `incident`, `test_case`.

@@ -45,7 +45,6 @@ resource "gitlab_service_slack" "slack" {
 - `confidential_issue_channel` (String) The name of the channel to receive confidential issue events notifications.
 - `confidential_issues_events` (Boolean) Enable notifications for confidential issues events.
 - `confidential_note_events` (Boolean) Enable notifications for confidential note events.
-- `id` (String) The ID of this resource.
 - `issue_channel` (String) The name of the channel to receive issue events notifications.
 - `issues_events` (Boolean) Enable notifications for issues events.
 - `merge_request_channel` (String) The name of the channel to receive merge request events notifications.
@@ -66,6 +65,7 @@ resource "gitlab_service_slack" "slack" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `job_events` (Boolean) Enable notifications for job events. **ATTENTION**: This attribute is currently not being submitted to the GitLab API, due to https://github.com/xanzy/go-gitlab/issues/1354.
 
 ## Import

@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -41,6 +42,11 @@ var _ = registerResource("gitlab_project_badge", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
+			"name": {
+				Description: "The name of the badge.",
+				Type:        schema.TypeString,
+				Optional:    true,
+			},
 			"rendered_link_url": {
 				Description: "The link_url argument rendered (in case of use of placeholders).",
 				Type:        schema.TypeString,
@@ -61,6 +67,7 @@ func resourceGitlabProjectBadgeCreate(ctx context.Context, d *schema.ResourceDat
 	options := &gitlab.AddProjectBadgeOptions{
 		LinkURL:  gitlab.String(d.Get("link_url").(string)),
 		ImageURL: gitlab.String(d.Get("image_url").(string)),
+		Name:     gitlab.String(d.Get("name").(string)),
 	}
 
 	log.Printf("[DEBUG] create gitlab project badge %q / %q", *options.LinkURL, *options.ImageURL)
@@ -79,9 +86,7 @@ func resourceGitlabProjectBadgeCreate(ctx context.Context, d *schema.ResourceDat
 
 func resourceGitlabProjectBadgeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	ids := strings.Split(d.Id(), ":")
-	projectID := ids[0]
-	badgeID, err := strconv.Atoi(ids[1])
+	projectID, badgeID, err := resourceGitlabProjectBadgeParseID(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -104,9 +109,7 @@ func resourceGitlabProjectBadgeRead(ctx context.Context, d *schema.ResourceData,
 
 func resourceGitlabProjectBadgeUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	ids := strings.Split(d.Id(), ":")
-	projectID := ids[0]
-	badgeID, err := strconv.Atoi(ids[1])
+	projectID, badgeID, err := resourceGitlabProjectBadgeParseID(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -114,6 +117,7 @@ func resourceGitlabProjectBadgeUpdate(ctx context.Context, d *schema.ResourceDat
 	options := &gitlab.EditProjectBadgeOptions{
 		LinkURL:  gitlab.String(d.Get("link_url").(string)),
 		ImageURL: gitlab.String(d.Get("image_url").(string)),
+		Name:     gitlab.String(d.Get("name").(string)),
 	}
 
 	log.Printf("[DEBUG] update gitlab project badge %s/%d", projectID, badgeID)
@@ -128,9 +132,7 @@ func resourceGitlabProjectBadgeUpdate(ctx context.Context, d *schema.ResourceDat
 
 func resourceGitlabProjectBadgeDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	ids := strings.Split(d.Id(), ":")
-	projectID := ids[0]
-	badgeID, err := strconv.Atoi(ids[1])
+	projectID, badgeID, err := resourceGitlabProjectBadgeParseID(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -148,7 +150,21 @@ func resourceGitlabProjectBadgeDelete(ctx context.Context, d *schema.ResourceDat
 func resourceGitlabProjectBadgeSetToState(d *schema.ResourceData, badge *gitlab.ProjectBadge, projectID *string) {
 	d.Set("link_url", badge.LinkURL)
 	d.Set("image_url", badge.ImageURL)
+	d.Set("name", badge.Name)
 	d.Set("rendered_link_url", badge.RenderedLinkURL)
 	d.Set("rendered_image_url", badge.RenderedImageURL)
 	d.Set("project", projectID)
+}
+
+func resourceGitlabProjectBadgeParseID(id string) (string, int, error) {
+	ids := strings.Split(id, ":")
+	if len(ids) != 2 {
+		return "", 0, fmt.Errorf("unexpected format of ID (%s), expected 'project:badge_id'", id)
+	}
+	projectID := ids[0]
+	badgeID, err := strconv.Atoi(ids[1])
+	if err != nil {
+		return "", 0, fmt.Errorf("unexpected format of ID (%s), expected 'project:badge_id'", id)
+	}
+	return projectID, badgeID, nil
 }

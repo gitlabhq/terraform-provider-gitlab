@@ -24,6 +24,7 @@ resource "gitlab_project_badge" "example" {
   project   = gitlab_project.foo.id
   link_url  = "https://example.com/badge-123"
   image_url = "https://example.com/badge-123.svg"
+  name      = "badge-123"
 }
 ```
 
@@ -38,10 +39,11 @@ resource "gitlab_project_badge" "example" {
 
 ### Optional
 
-- `id` (String) The ID of this resource.
+- `name` (String) The name of the badge.
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `rendered_image_url` (String) The image_url argument rendered (in case of use of placeholders).
 - `rendered_link_url` (String) The link_url argument rendered (in case of use of placeholders).
 

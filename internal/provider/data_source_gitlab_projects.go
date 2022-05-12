@@ -212,7 +212,6 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 
 		ReadContext: dataSourceGitlabProjectsRead,
 
-		// lintignore: S006 // TODO: Resolve this tfproviderlint issue
 		Schema: map[string]*schema.Schema{
 			"max_queryable_pages": {
 				Description: "The maximum number of project results pages that may be queried. Prevents overloading your Gitlab instance in case of a misconfiguration.",
@@ -791,6 +790,9 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 							Computed:    true,
 							Elem: &schema.Schema{
 								Type: schema.TypeMap,
+								Elem: &schema.Schema{
+									Type: schema.TypeString,
+								},
 							},
 						},
 						"packages_enabled": {

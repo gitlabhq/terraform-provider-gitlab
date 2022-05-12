@@ -77,7 +77,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		PackagesEnabled:                 true,
 		PrintingMergeRequestLinkEnabled: true,
 		PagesAccessLevel:                gitlab.PublicAccessControl,
-		BuildCoverageRegex:              "foo",
 		IssuesTemplate:                  "",
 		MergeRequestsTemplate:           "",
 		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
@@ -158,7 +157,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Archived:                       true,
 						PackagesEnabled:                false,
 						PagesAccessLevel:               gitlab.DisabledAccessControl,
-						BuildCoverageRegex:             "bar",
 						CIForwardDeploymentEnabled:     false,
 						ResolveOutdatedDiffDiscussions: false,
 						AnalyticsAccessLevel:           gitlab.DisabledAccessControl,
@@ -736,7 +734,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		PackagesEnabled:                 true,
 		PrintingMergeRequestLinkEnabled: true,
 		PagesAccessLevel:                gitlab.PrivateAccessControl,
-		BuildCoverageRegex:              "foo",
 		CIForwardDeploymentEnabled:      true,
 	}
 
@@ -1148,6 +1145,38 @@ func TestAccGitlabProject_containerExpirationPolicy(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
+	var received gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccPreCheck(t) },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+						visibility_level = "public"
+
+						build_coverage_regex = "helloWorld"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+				),
+			},
+			{
+				SkipFunc:          isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectExists(n string, project *gitlab.Project) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		var err error
@@ -1359,7 +1388,6 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, rInt)
 }
@@ -1415,7 +1443,6 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  build_coverage_regex = "foo"
 }
 
 resource "gitlab_project_variable" "foo" {
@@ -1449,7 +1476,6 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  build_coverage_regex = "foo"
 }
 
 resource "gitlab_project_variable" "foo" {
@@ -1489,7 +1515,6 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_all_discussions_are_resolved = true
   squash_option = "default_off"
   pages_access_level = "public"
-  build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
   resolve_outdated_diff_discussions = true
@@ -1589,7 +1614,6 @@ resource "gitlab_project" "foo" {
   archived = true
   packages_enabled = false
   pages_access_level = "disabled"
-  build_coverage_regex = "bar"
   ci_forward_deployment_enabled = false
   merge_pipelines_enabled = false
   merge_trains_enabled = false
@@ -1929,7 +1953,6 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_all_discussions_are_resolved = true
   squash_option = "default_off"
   pages_access_level = "public"
-  build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
   resolve_outdated_diff_discussions = true
