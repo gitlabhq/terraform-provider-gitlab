@@ -2,7 +2,9 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -16,7 +18,7 @@ var milestoneStateToStateEvent = map[string]string{
 
 var _ = registerResource("gitlab_project_milestone", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_project_milestone`" + ` resource allows to manage the lifecycle of a milestone (project).
+		Description: `The ` + "`gitlab_project_milestone`" + ` resource allows to manage the lifecycle of a project milestone.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)`,
 
@@ -27,9 +29,7 @@ var _ = registerResource("gitlab_project_milestone", func() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
-		Schema: constructSchema(
-			gitlabProjectMilestoneGetSchema(),
-		),
+		Schema: gitlabProjectMilestoneGetSchema(),
 	}
 })
 
@@ -65,7 +65,7 @@ func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.Resourc
 		log.Printf("[WARN] failed to create gitlab milestone in project %s with title %s (response %v)", project, title, resp)
 		return diag.FromErr(err)
 	}
-	d.SetId(buildTwoPartIDInterface(project, milestone.ID))
+	d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestone.ID))
 
 	updateOptions := gitlab.UpdateMilestoneOptions{}
 	if stateEvent, ok := d.GetOk("state"); ok {
@@ -83,7 +83,7 @@ func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.Resourc
 
 func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, milestoneID, err := parseTwoPartIDInt(d.Id())
+	project, milestoneID, err := resourceGitLabProjectMilestoneParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -109,7 +109,7 @@ func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceD
 
 func resourceGitlabProjectMilestoneUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, milestoneID, err := parseTwoPartIDInt(d.Id())
+	project, milestoneID, err := resourceGitLabProjectMilestoneParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -153,7 +153,7 @@ func resourceGitlabProjectMilestoneUpdate(ctx context.Context, d *schema.Resourc
 
 func resourceGitlabProjectMilestoneDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project, milestoneID, err := parseTwoPartIDInt(d.Id())
+	project, milestoneID, err := resourceGitLabProjectMilestoneParseId(d.Id())
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -165,4 +165,23 @@ func resourceGitlabProjectMilestoneDelete(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 	return nil
+}
+
+func resourceGitLabProjectMilestoneParseId(id string) (string, int, error) {
+	project, milestone, err := parseTwoPartID(id)
+	if err != nil {
+		return "", 0, err
+	}
+
+	milestoneID, err := strconv.Atoi(milestone)
+	if err != nil {
+		return "", 0, err
+	}
+
+	return project, milestoneID, nil
+}
+
+func resourceGitLabProjectMilestoneBuildId(project string, milestoneID int) string {
+	stringMilestoneID := fmt.Sprintf("%d", milestoneID)
+	return buildTwoPartID(&project, &stringMilestoneID)
 }

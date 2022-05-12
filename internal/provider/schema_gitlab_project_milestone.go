@@ -14,12 +14,12 @@ func gitlabProjectMilestoneGetSchema() map[string]*schema.Schema {
 
 	return map[string]*schema.Schema{
 		"iid": {
-			Description: "The ID of the milestone only in one project.",
+			Description: "The ID of the project's milestone.",
 			Type:        schema.TypeInt,
 			Computed:    true,
 		},
 		"milestone_id": {
-			Description: "The global ID of the project’s milestone.",
+			Description: "The instance-wide ID of the project’s milestone.",
 			Type:        schema.TypeInt,
 			Computed:    true,
 		},

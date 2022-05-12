@@ -34,7 +34,7 @@ data "gitlab_project_milestone" "example" {
 
 ### Required
 
-- `milestone_id` (Number) The global ID of the project’s milestone.
+- `milestone_id` (Number) The instance-wide ID of the project’s milestone.
 - `project_id` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 
 ### Optional
@@ -47,7 +47,7 @@ data "gitlab_project_milestone" "example" {
 - `description` (String) The description of the milestone.
 - `due_date` (String) The due date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
 - `expired` (Boolean) Bool, true if milestore expired.
-- `iid` (Number) The ID of the milestone only in one project.
+- `iid` (Number) The ID of the project's milestone.
 - `start_date` (String) The start date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
 - `state` (String) The state of the milestone. Valid values are: `active`, `closed`.
 - `title` (String) The title of a milestone.

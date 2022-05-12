@@ -3,13 +3,13 @@
 page_title: "gitlab_project_milestone Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_milestone resource allows to manage the lifecycle of a milestone (project).
+  The gitlab_project_milestone resource allows to manage the lifecycle of a project milestone.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/milestones.html
 ---
 
 # gitlab_project_milestone (Resource)
 
-The `gitlab_project_milestone` resource allows to manage the lifecycle of a milestone (project).
+The `gitlab_project_milestone` resource allows to manage the lifecycle of a project milestone.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)
 
@@ -50,8 +50,8 @@ resource "gitlab_project_milestone" "example" {
 ### Read-Only
 
 - `expired` (Boolean) Bool, true if milestore expired.
-- `iid` (Number) The ID of the milestone only in one project.
-- `milestone_id` (Number) The global ID of the project’s milestone.
+- `iid` (Number) The ID of the project's milestone.
+- `milestone_id` (Number) The instance-wide ID of the project’s milestone.
 - `web_url` (String) The web URL of the milestone.
 
 ## Import

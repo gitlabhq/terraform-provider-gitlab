@@ -18,7 +18,10 @@ func TestAccDataGitlabProjectMilestones_basic(t *testing.T) {
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDataGitlabProjectMilestonesConfig(testProject.ID),
+				Config: fmt.Sprintf(`
+                data "gitlab_project_milestones" "this" {
+                  project_id = "%d"
+                }`, testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.#", fmt.Sprintf("%d", len(testMilestones))),
 					resource.TestCheckResourceAttr("data.gitlab_project_milestones.this", "milestones.0.title", testMilestones[1].Title),
@@ -29,12 +32,4 @@ func TestAccDataGitlabProjectMilestones_basic(t *testing.T) {
 			},
 		},
 	})
-}
-
-func testAccDataGitlabProjectMilestonesConfig(projectID int) string {
-	return fmt.Sprintf(`
-data "gitlab_project_milestones" "this" {
-  project_id   = "%d"
-}
-`, projectID)
 }
