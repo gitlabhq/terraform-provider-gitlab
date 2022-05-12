@@ -37,16 +37,13 @@ data "gitlab_project_milestone" "example" {
 - `milestone_id` (Number) The instance-wide ID of the project’s milestone.
 - `project_id` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `created_at` (String) The time of creation of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
 - `description` (String) The description of the milestone.
 - `due_date` (String) The due date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
 - `expired` (Boolean) Bool, true if milestore expired.
+- `id` (String) The ID of this resource.
 - `iid` (Number) The ID of the project's milestone.
 - `start_date` (String) The start date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
 - `state` (String) The state of the milestone. Valid values are: `active`, `closed`.

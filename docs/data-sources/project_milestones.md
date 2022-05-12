@@ -36,7 +36,6 @@ data "gitlab_project_milestones" "example" {
 
 ### Optional
 
-- `id` (String) The ID of this resource.
 - `iids` (List of Number) Return only the milestones having the given `iid` (Note: ignored if `include_parent_milestones` is set as `true`).
 - `include_parent_milestones` (Boolean) Include group milestones from parent group and its ancestors. Introduced in GitLab 13.4.
 - `search` (String) Return only milestones with a title or description matching the provided string.
@@ -45,6 +44,7 @@ data "gitlab_project_milestones" "example" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `milestones` (List of Object) List of milestones from a project. (see [below for nested schema](#nestedatt--milestones))
 
 <a id="nestedatt--milestones"></a>
