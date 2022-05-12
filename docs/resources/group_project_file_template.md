@@ -55,7 +55,7 @@ resource "gitlab_group_project_file_template" "template_link" {
 - `group_id` (Number) The ID of the group that will use the file template project. This group must be the direct
                 parent of the project defined by project_id
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

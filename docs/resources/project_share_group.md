@@ -35,6 +35,9 @@ resource "gitlab_project_share_group" "test" {
 
 - `access_level` (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
 - `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

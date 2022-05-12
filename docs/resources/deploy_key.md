@@ -38,6 +38,9 @@ resource "gitlab_deploy_key" "example" {
 ### Optional
 
 - `can_push` (Boolean) Allow this deploy key to be used to push changes to the project. Defaults to `false`.
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

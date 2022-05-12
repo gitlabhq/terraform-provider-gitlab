@@ -67,7 +67,6 @@ output "welcome_issue_web_url" {
 - `epic_issue_id` (Number) The ID of the epic issue.
 - `human_time_estimate` (String) The human-readable time estimate of the issue.
 - `human_total_time_spent` (String) The human-readable total time spent of the issue.
-- `id` (String) The ID of this resource.
 - `iid` (Number) The internal ID of the project's issue.
 - `issue_type` (String) The type of issue. Valid values are: `issue`, `incident`, `test_case`.
 - `labels` (Set of String) The labels of an issue.
@@ -88,6 +87,7 @@ output "welcome_issue_web_url" {
 - `downvotes` (Number) The number of downvotes the issue has received.
 - `epic_id` (Number) ID of the epic to add the issue to. Valid values are greater than or equal to 0.
 - `external_id` (String) The external ID of the issue.
+- `id` (String) The ID of this resource.
 - `issue_id` (Number) The instance-wide ID of the issue.
 - `issue_link_id` (Number) The ID of the issue link.
 - `merge_requests_count` (Number) The number of merge requests associated with the issue.

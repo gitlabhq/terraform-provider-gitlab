@@ -39,6 +39,9 @@ resource "gitlab_group_membership" "test" {
 ### Optional
 
 - `expires_at` (String) Expiration date for the group membership. Format: `YYYY-MM-DD`
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

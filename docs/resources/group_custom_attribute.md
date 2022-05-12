@@ -32,7 +32,7 @@ resource "gitlab_group_custom_attribute" "attr" {
 - `key` (String) Key for the Custom Attribute.
 - `value` (String) Value for the Custom Attribute.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

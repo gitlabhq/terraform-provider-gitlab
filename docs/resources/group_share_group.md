@@ -36,6 +36,9 @@ resource "gitlab_group_share_group" "test" {
 ### Optional
 
 - `expires_at` (String) Share expiration date. Format: `YYYY-MM-DD`
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

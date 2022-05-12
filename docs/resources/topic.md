@@ -42,12 +42,12 @@ resource "gitlab_topic" "functional_programming" {
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `description` (String) A text describing the topic.
-- `id` (String) The ID of this resource.
 - `soft_destroy` (Boolean, Deprecated) Empty the topics fields instead of deleting it.
 
 ### Read-Only
 
 - `avatar_url` (String) The URL of the avatar image.
+- `id` (String) The ID of this resource.
 
 ## Import
 

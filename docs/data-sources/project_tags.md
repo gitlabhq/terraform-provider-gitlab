@@ -36,13 +36,13 @@ data "gitlab_project_tags" "example" {
 
 ### Optional
 
-- `id` (String) The ID of this resource.
 - `order_by` (String) Return tags ordered by `name` or `updated` fields. Default is `updated`.
 - `search` (String) Return list of tags matching the search criteria. You can use `^term` and `term$` to find tags that begin and end with `term` respectively. No other regular expressions are supported.
 - `sort` (String) Return tags sorted in `asc` or `desc` order. Default is `desc`.
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `tags` (List of Object) List of repository tags from a project. (see [below for nested schema](#nestedatt--tags))
 
 <a id="nestedatt--tags"></a>

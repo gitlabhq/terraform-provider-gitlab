@@ -42,7 +42,13 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 						Name:  fmt.Sprintf("ProjectEnvironment-%d", rInt),
 						State: "available",
 					}),
-					testCheckResourceAttrLazy("gitlab_project_environment.this", "created_at", func() string { return env1.CreatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_environment.this", "created_at", func(value string) error {
+						expectedValue := env1.CreatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
@@ -62,8 +68,20 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 						State:       "available",
 						ExternalURL: "https://example.com",
 					}),
-					testCheckResourceAttrLazy("gitlab_project_environment.this", "created_at", func() string { return env2.CreatedAt.Format(time.RFC3339) }),
-					testCheckResourceAttrLazy("gitlab_project_environment.this", "updated_at", func() string { return env2.UpdatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_environment.this", "created_at", func(value string) error {
+						expectedValue := env2.CreatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttrWith("gitlab_project_environment.this", "updated_at", func(value string) error {
+						expectedValue := env2.UpdatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import

@@ -53,7 +53,6 @@ resource "gitlab_group_cluster" "bar" {
 - `domain` (String) The base domain of the cluster.
 - `enabled` (Boolean) Determines if cluster is active or not. Defaults to `true`. This attribute cannot be read.
 - `environment_scope` (String) The associated environment to the cluster. Defaults to `*`.
-- `id` (String) The ID of this resource.
 - `kubernetes_authorization_type` (String) The cluster authorization type. Valid values are `rbac`, `abac`, `unknown_authorization`. Defaults to `rbac`.
 - `kubernetes_ca_cert` (String) TLS certificate (needed if API is using a self-signed TLS certificate).
 - `managed` (Boolean) Determines if cluster is managed by gitlab or not. Defaults to `true`. This attribute cannot be read.
@@ -63,6 +62,7 @@ resource "gitlab_group_cluster" "bar" {
 
 - `cluster_type` (String) Cluster type.
 - `created_at` (String) Create time.
+- `id` (String) The ID of this resource.
 - `platform_type` (String) Platform type.
 - `provider_type` (String) Provider type.
 

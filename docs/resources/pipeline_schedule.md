@@ -38,6 +38,9 @@ resource "gitlab_pipeline_schedule" "example" {
 
 - `active` (Boolean) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
 - `cron_timezone` (String) The timezone.
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

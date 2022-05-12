@@ -46,12 +46,12 @@ resource "gitlab_project_variable" "example" {
 ### Optional
 
 - `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.
-- `id` (String) The ID of this resource.
 
 ### Read-Only
 
 - `active` (Boolean) True if the token is active.
 - `created_at` (String) Time the token has been created, RFC3339 format.
+- `id` (String) The ID of this resource.
 - `revoked` (Boolean) True if the token is revoked.
 - `token` (String, Sensitive) The personal access token. This is only populated when creating a new personal access token. This attribute is not available for imported resources.
 

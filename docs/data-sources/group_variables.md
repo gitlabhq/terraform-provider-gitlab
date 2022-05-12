@@ -25,10 +25,10 @@ The `gitlab_group_variables` data source allows to retrieve all group-level CI/C
 ### Optional
 
 - `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`).
-- `id` (String) The ID of this resource.
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `variables` (List of Object) The list of variables returned by the search (see [below for nested schema](#nestedatt--variables))
 
 <a id="nestedatt--variables"></a>

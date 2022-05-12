@@ -1,8 +1,8 @@
 {
-    "go.testEnvVars": {
-        "TF_ACC": "1",
-        "GITLAB_TOKEN": "ACCTEST1234567890123",
-        "GITLAB_BASE_URL": "http://127.0.0.1:8080"
-    },
-    "go.testFlags": ["-count=1", "-v"]
+  "go.testEnvVars": {
+    "TF_ACC": "1",
+    "GITLAB_TOKEN": "ACCTEST1234567890123",
+    "GITLAB_BASE_URL": "http://127.0.0.1:8080"
+  },
+  "go.testFlags": ["-count=1", "-v", "-timeout=30m"]
 }

@@ -201,6 +201,17 @@ var tagProtectionAccessLevelNames = map[gitlab.AccessLevelValue]string{
 	gitlab.MaintainerPermissions: "maintainer",
 }
 
+func stringListToStringSlice(stringList []interface{}) *[]string {
+	ret := []string{}
+	if stringList == nil {
+		return &ret
+	}
+	for _, v := range stringList {
+		ret = append(ret, fmt.Sprint(v))
+	}
+	return &ret
+}
+
 func stringSetToStringSlice(stringSet *schema.Set) *[]string {
 	ret := []string{}
 	if stringSet == nil {

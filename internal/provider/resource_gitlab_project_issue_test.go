@@ -40,7 +40,13 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "project", testProject.PathWithNamespace),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "iid", "1"),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "title", "Terraform test issue"),
-					testCheckResourceAttrLazy("gitlab_project_issue.this", "created_at", func() string { return testIssue.CreatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_issue.this", "created_at", func(value string) error {
+						expectedValue := testIssue.CreatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
@@ -58,7 +64,13 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "project", testProject.PathWithNamespace),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "iid", "1"),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "title", "Terraform test issue"),
-					testCheckResourceAttrLazy("gitlab_project_issue.this", "updated_at", func() string { return updatedTestIssue.UpdatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_issue.this", "updated_at", func(value string) error {
+						expectedValue := updatedTestIssue.UpdatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
@@ -97,7 +109,13 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectIssueExists("gitlab_project_issue.this", &testIssue),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "state", "closed"),
-					testCheckResourceAttrLazy("gitlab_project_issue.this", "closed_at", func() string { return testIssue.ClosedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_issue.this", "closed_at", func(value string) error {
+						expectedValue := testIssue.ClosedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "closed_by_user_id", fmt.Sprintf("%d", currentUser.ID)),
 				),
 			},
