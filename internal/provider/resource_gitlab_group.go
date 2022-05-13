@@ -369,7 +369,7 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	if d.HasChange("parent_id") {
-		diagnostic := transferSubGroup(d, client)
+		diagnostic := transferSubGroup(ctx, d, client)
 		if diagnostic.HasError() {
 			return diagnostic
 		}
@@ -378,7 +378,7 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 	return resourceGitlabGroupRead(ctx, d, meta)
 }
 
-func transferSubGroup(d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+func transferSubGroup(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 	o, n := d.GetChange("parent_id")
 	parentId, ok := n.(int)
@@ -394,7 +394,7 @@ func transferSubGroup(d *schema.ResourceData, meta interface{}) diag.Diagnostics
 		log.Printf("[DEBUG] turn gitlab group %s from %v to a new top-level group", d.Id(), o)
 	}
 
-	_, _, err := client.Groups.TransferSubGroup(d.Id(), opt)
+	_, _, err := client.Groups.TransferSubGroup(d.Id(), opt, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.Errorf("error transfering group %s to new parent group %v: %s", d.Id(), parentId, err)
 	}
