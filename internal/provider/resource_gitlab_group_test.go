@@ -134,6 +134,16 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 	var group gitlab.Group
 	var group2 gitlab.Group
 	var nestedGroup gitlab.Group
+	var lastGid int
+	testGidNotChanged := func(s *terraform.State) error {
+		if lastGid == 0 {
+			lastGid = nestedGroup.ID
+		}
+		if lastGid != nestedGroup.ID {
+			return fmt.Errorf("group id changed")
+		}
+		return nil
+	}
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -157,8 +167,8 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						TwoFactorGracePeriod:    48,           // default value
 						DefaultBranchProtection: 2,            // default value
 						Parent:                  &group,
-						AutoDevopsEnabled:       true,
 					}),
+					testGidNotChanged,
 				),
 			},
 			{
@@ -178,8 +188,8 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						TwoFactorGracePeriod:    48,           // default value
 						DefaultBranchProtection: 2,            // default value
 						Parent:                  &group2,
-						AutoDevopsEnabled:       true,
 					}),
+					testGidNotChanged,
 				),
 			},
 			{
@@ -199,6 +209,7 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						TwoFactorGracePeriod:    48,           // default value
 						DefaultBranchProtection: 2,            // default value
 					}),
+					testGidNotChanged,
 				),
 			},
 			{
@@ -219,6 +230,7 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						DefaultBranchProtection: 2,            // default value
 						Parent:                  &group,
 					}),
+					testGidNotChanged,
 				),
 			},
 		},
@@ -503,12 +515,6 @@ resource "gitlab_group" "nested_foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-
-  # We set this to a non-default value to check later whether the group was recreated or not
-  auto_devops_enabled = true
-  lifecycle {
-    ignore_changes = [auto_devops_enabled]
-  }
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
@@ -574,11 +580,6 @@ resource "gitlab_group" "nested_foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-
-  # We need to read this value to check if the group is recreated or not
-  lifecycle {
-    ignore_changes = [auto_devops_enabled]
-  }
 }
   `, rInt, rInt, rInt, rInt, rInt, rInt)
 }
