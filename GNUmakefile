@@ -67,7 +67,7 @@ testacc-down: ## Teardown a GitLab instance.
 	docker-compose down --volumes
 
 testacc: ## Run acceptance tests against a GitLab instance.
-	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test --tags acceptance -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
 
 certs: ## Generate certs for the GitLab container registry
 	mkdir -p certs
