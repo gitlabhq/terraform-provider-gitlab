@@ -69,7 +69,7 @@ func testAccCheck(t *testing.T) {
 	t.Helper()
 
 	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
+		t.Skipf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc)
 	}
 }
 
@@ -428,7 +428,7 @@ type testAccGitlabProjectContext struct {
 // call testAccGitlabProjectContext.finish() when finished with the testAccGitlabProjectContext.
 func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
 	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
+		t.Skipf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc)
 		return testAccGitlabProjectContext{}
 	}
 
