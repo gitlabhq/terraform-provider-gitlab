@@ -378,8 +378,7 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 	return resourceGitlabGroupRead(ctx, d, meta)
 }
 
-func transferSubGroup(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*gitlab.Client)
+func transferSubGroup(ctx context.Context, d *schema.ResourceData, client *gitlab.Client) diag.Diagnostics {
 	o, n := d.GetChange("parent_id")
 	parentId, ok := n.(int)
 	if !ok {
