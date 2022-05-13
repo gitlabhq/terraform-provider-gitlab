@@ -152,7 +152,6 @@ func gitlabProjectIssueGetSchema() map[string]*schema.Schema {
 			Description: "When the issue was closed. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.",
 			Type:        schema.TypeString,
 			Computed:    true,
-			Optional:    true,
 		},
 		// NOTE: to keep things simple, users of this resource should use the `gitlab_user` data source to
 		//       get more information about the closer if desired.
@@ -160,7 +159,6 @@ func gitlabProjectIssueGetSchema() map[string]*schema.Schema {
 			Description: "The ID of the user that closed the issue. Use `gitlab_user` data source to get more information about the user.",
 			Type:        schema.TypeInt,
 			Computed:    true,
-			Optional:    true,
 		},
 		"moved_to_id": {
 			Description: "The ID of the issue that was moved to.",
@@ -187,7 +185,6 @@ func gitlabProjectIssueGetSchema() map[string]*schema.Schema {
 			Type:        schema.TypeMap,
 			Elem:        &schema.Schema{Type: schema.TypeString},
 			Computed:    true,
-			Optional:    true,
 		},
 		// NOTE(TF): these are from the `time_stats` field.
 		//           Clarify what to do with nested types.
@@ -195,25 +192,21 @@ func gitlabProjectIssueGetSchema() map[string]*schema.Schema {
 			Description: "The time estimate of the issue.",
 			Type:        schema.TypeInt,
 			Computed:    true,
-			Optional:    true,
 		},
 		"total_time_spent": {
 			Description: "The total time spent of the issue.",
 			Type:        schema.TypeInt,
 			Computed:    true,
-			Optional:    true,
 		},
 		"human_time_estimate": {
 			Description: "The human-readable time estimate of the issue.",
 			Type:        schema.TypeString,
 			Computed:    true,
-			Optional:    true,
 		},
 		"human_total_time_spent": {
 			Description: "The human-readable total time spent of the issue.",
 			Type:        schema.TypeString,
 			Computed:    true,
-			Optional:    true,
 		},
 		// NOTE(TF): end `time_stats`
 		// NOTE: not part of `CREATE`, but part of `UPDATE`
@@ -237,7 +230,6 @@ func gitlabProjectIssueGetSchema() map[string]*schema.Schema {
 			Type:        schema.TypeMap,
 			Elem:        &schema.Schema{Type: schema.TypeString},
 			Computed:    true,
-			Optional:    true,
 		},
 		"issue_link_id": {
 			Description: "The ID of the issue link.",
@@ -258,9 +250,7 @@ func gitlabProjectIssueGetSchema() map[string]*schema.Schema {
 		"task_completion_status": {
 			Description: "The task completion status. It's always a one element list.",
 			Type:        schema.TypeList,
-			MaxItems:    1,
 			Computed:    true,
-			Optional:    true,
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 					"count": {
