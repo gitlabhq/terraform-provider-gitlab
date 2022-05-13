@@ -369,20 +369,20 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 	}
 
 	if d.HasChange("parent_id") {
-		diagnostic := transferSubGroup(ctx, d, client)
-		if diagnostic.HasError() {
-			return diagnostic
+		err = transferSubGroup(ctx, d, client)
+		if err != nil {
+			return diag.FromErr(err)
 		}
 	}
 
 	return resourceGitlabGroupRead(ctx, d, meta)
 }
 
-func transferSubGroup(ctx context.Context, d *schema.ResourceData, client *gitlab.Client) diag.Diagnostics {
+func transferSubGroup(ctx context.Context, d *schema.ResourceData, client *gitlab.Client) error {
 	o, n := d.GetChange("parent_id")
 	parentId, ok := n.(int)
 	if !ok {
-		return diag.Errorf("error converting parent_id %v into an int", n)
+		return fmt.Errorf("error converting parent_id %v into an int", n)
 	}
 
 	opt := &gitlab.TransferSubGroupOptions{}
@@ -395,7 +395,7 @@ func transferSubGroup(ctx context.Context, d *schema.ResourceData, client *gitla
 
 	_, _, err := client.Groups.TransferSubGroup(d.Id(), opt, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.Errorf("error transfering group %s to new parent group %v: %s", d.Id(), parentId, err)
+		return fmt.Errorf("error transfering group %s to new parent group %v: %s", d.Id(), parentId, err)
 	}
 
 	return nil
