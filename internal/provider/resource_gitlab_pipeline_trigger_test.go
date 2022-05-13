@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -16,7 +19,6 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPipelineTriggerDestroy,
 		Steps: []resource.TestStep{
@@ -60,7 +62,6 @@ func TestAccGitlabPipelineTrigger_import(t *testing.T) {
 	resourceName := "gitlab_pipeline_trigger.trigger"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPipelineTriggerDestroy,
 		Steps: []resource.TestStep{

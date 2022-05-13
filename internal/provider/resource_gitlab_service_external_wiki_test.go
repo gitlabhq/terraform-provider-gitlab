@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -11,8 +14,6 @@ import (
 )
 
 func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 
 	var externalWikiService gitlab.ExternalWikiService
@@ -22,7 +23,6 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 	var externalWikiResourceName = "gitlab_service_external_wiki.this"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceExternalWikiDestroy,
 		Steps: []resource.TestStep{

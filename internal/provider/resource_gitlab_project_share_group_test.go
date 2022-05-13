@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -46,7 +49,6 @@ func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectShareGroupDestroy,
 		Steps: []resource.TestStep{

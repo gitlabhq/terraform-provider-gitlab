@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -16,7 +19,6 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 	jiraResourceName := "gitlab_service_jira.jira"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceJiraDestroy,
 		Steps: []resource.TestStep{
@@ -72,7 +74,6 @@ func TestAccGitlabServiceJira_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceJiraDestroy,
 		Steps: []resource.TestStep{

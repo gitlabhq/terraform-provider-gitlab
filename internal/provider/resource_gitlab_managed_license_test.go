@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -17,7 +20,6 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
@@ -53,7 +55,6 @@ func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
