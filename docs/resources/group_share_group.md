@@ -30,8 +30,8 @@ resource "gitlab_group_share_group" "test" {
 ### Required
 
 - `group_access` (String) The access level to grant the group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
-- `group_id` (String) The id of the main group.
-- `share_group_id` (Number) The id of an additional group which will be shared with the main group.
+- `group_id` (String) The id of the main group to be shared.
+- `share_group_id` (Number) The id of the additional group with which the main group will be shared.
 
 ### Optional
 
