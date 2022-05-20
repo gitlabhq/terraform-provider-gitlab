@@ -4,6 +4,11 @@ run:
   timeout: 3m
 
 linters-settings:
+  custom:
+    tfproviderlint:
+      path: ./bin/tfproviderlint-plugin.so
+      description: "Terraform Provider Lint Tool"
+      original-url: https://github.com/bflad/tfproviderlint
   errcheck:
     exclude: errcheck_excludes.txt
 
@@ -11,3 +16,4 @@ linters:
   enable:
     - gofmt
     - govet
+    - tfproviderlint

@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -10,8 +13,6 @@ import (
 )
 
 func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testProjectParent := testAccCreateProject(t)
 	testProjectKeyShared := testAccCreateProject(t)
 
@@ -26,7 +27,6 @@ func TestAccGitlabDeployKeyEnable_basic(t *testing.T) {
 	parentProjectDeployKey := testAccCreateDeployKey(t, testProjectParent.ID, &canPushDeployKeyOptions)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabDeployKeyEnableDestroy,
 		Steps: []resource.TestStep{

@@ -21,20 +21,14 @@ endif
 test: ## Run unit tests.
 	go test $(TESTARGS) $(PROVIDER_SRC_DIR)
 
-TFPROVIDERLINTX_CHECKS = -XAT001=false -XR003=false -XS002=false
-
-fmt: tool-golangci-lint tool-tfproviderlintx tool-terraform tool-shfmt ## Format files and fix issues.
+fmt: tool-golangci-lint tool-terraform tool-shfmt tfproviderlint-plugin ## Format files and fix issues.
 	gofmt -w -s .
-	$(GOBIN)/golangci-lint run --fix
-	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) --fix ./...
+	$(GOBIN)/golangci-lint run --build-tags acceptance --fix
 	$(GOBIN)/terraform fmt -recursive -list ./examples
 	$(GOBIN)/shfmt -l -s -w ./examples
 
-lint-golangci: tool-golangci-lint ## Run golangci-lint linter (same as fmt but without modifying files).
-	$(GOBIN)/golangci-lint run
-
-lint-tfprovider: tool-tfproviderlintx ## Run tfproviderlintx linter (same as fmt but without modifying files).
-	$(GOBIN)/tfproviderlintx $(TFPROVIDERLINTX_CHECKS) ./...
+lint-golangci: tool-golangci-lint tfproviderlint-plugin ## Run golangci-lint linter (same as fmt but without modifying files).
+	$(GOBIN)/golangci-lint run --build-tags acceptance
 
 lint-examples-tf: tool-terraform ## Run terraform linter on examples (same as fmt but without modifying files).
 	$(GOBIN)/terraform fmt -recursive -check ./examples
@@ -73,7 +67,7 @@ testacc-down: ## Teardown a GitLab instance.
 	docker-compose down --volumes
 
 testacc: ## Run acceptance tests against a GitLab instance.
-	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
+	TF_ACC=1 GITLAB_TOKEN=$(GITLAB_TOKEN) GITLAB_BASE_URL=$(GITLAB_BASE_URL) go test --tags acceptance -v $(PROVIDER_SRC_DIR) $(TESTARGS) -timeout 40m
 
 certs: ## Generate certs for the GitLab container registry
 	mkdir -p certs
@@ -84,9 +78,6 @@ certs: ## Generate certs for the GitLab container registry
 
 tool-golangci-lint:
 	@$(call install-tool, github.com/golangci/golangci-lint/cmd/golangci-lint)
-
-tool-tfproviderlintx:
-	@$(call install-tool, github.com/bflad/tfproviderlint/cmd/tfproviderlintx)
 
 tool-tfplugindocs:
 	@$(call install-tool, github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs)
@@ -111,3 +102,6 @@ tool-terraform:
 
 clean: testacc-down
 	@rm -rf certs/
+
+tfproviderlint-plugin:
+	@cd tools && go build -buildmode=plugin -o $(GOBIN)/tfproviderlint-plugin.so ./cmd/tfproviderlint-plugin

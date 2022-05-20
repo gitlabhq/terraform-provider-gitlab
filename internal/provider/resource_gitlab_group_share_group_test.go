@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -10,13 +13,10 @@ import (
 )
 
 func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
-	testAccCheck(t)
-
 	mainGroup := testAccCreateGroups(t, 1)[0]
 	sharedGroup := testAccCreateGroups(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabShareGroupDestroy,
 		Steps: []resource.TestStep{

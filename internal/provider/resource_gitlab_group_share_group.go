@@ -28,13 +28,13 @@ var _ = registerResource("gitlab_group_share_group", func() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Description: "The id of the main group.",
+				Description: "The id of the main group to be shared.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
 			},
 			"share_group_id": {
-				Description: "The id of an additional group which will be shared with the main group.",
+				Description: "The id of the additional group with which the main group will be shared.",
 				Type:        schema.TypeInt,
 				ForceNew:    true,
 				Required:    true,

@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -16,7 +19,6 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -113,7 +115,6 @@ func TestAccGitlabGroup_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -133,10 +134,19 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 	var group gitlab.Group
 	var group2 gitlab.Group
 	var nestedGroup gitlab.Group
+	var lastGid int
+	testGidNotChanged := func(s *terraform.State) error {
+		if lastGid == 0 {
+			lastGid = nestedGroup.ID
+		}
+		if lastGid != nestedGroup.ID {
+			return fmt.Errorf("group id changed")
+		}
+		return nil
+	}
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -158,6 +168,7 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						DefaultBranchProtection: 2,            // default value
 						Parent:                  &group,
 					}),
+					testGidNotChanged,
 				),
 			},
 			{
@@ -178,6 +189,7 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						DefaultBranchProtection: 2,            // default value
 						Parent:                  &group2,
 					}),
+					testGidNotChanged,
 				),
 			},
 			{
@@ -197,29 +209,30 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 						TwoFactorGracePeriod:    48,           // default value
 						DefaultBranchProtection: 2,            // default value
 					}),
+					testGidNotChanged,
 				),
 			},
-			// TODO In EE version, re-creating on the same path where a previous group was soft-deleted doesn't work.
-			// {
-			// 	Config: testAccGitlabNestedGroupConfig(rInt),
-			// 	Check: resource.ComposeTestCheckFunc(
-			// 		testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
-			// 		testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
-			// 		testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
-			// 		testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
-			// 			Name:        fmt.Sprintf("nfoo-name-%d", rInt),
-			// 			Path:        fmt.Sprintf("nfoo-path-%d", rInt),
-			// 			Description: "Terraform acceptance tests",
-			// 			LFSEnabled:  true,
-			//			Visibility:            "public",     // default value
-			//			ProjectCreationLevel:  "maintainer", // default value
-			//			SubGroupCreationLevel: "owner",      // default value
-			//			TwoFactorGracePeriod:  48,           // default value
-			//			DefaultBranchProtection: 2,          // default value
-			// 			Parent:      &group,
-			// 		}),
-			// 	),
-			// },
+			{
+				Config: testAccGitlabNestedGroupConfig(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabGroupExists("gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlab_group.foo2", &group2),
+					testAccCheckGitlabGroupExists("gitlab_group.nested_foo", &nestedGroup),
+					testAccCheckGitlabGroupAttributes(&nestedGroup, &testAccGitlabGroupExpectedAttributes{
+						Name:                    fmt.Sprintf("nfoo-name-%d", rInt),
+						Path:                    fmt.Sprintf("nfoo-path-%d", rInt),
+						Description:             "Terraform acceptance tests",
+						LFSEnabled:              true,
+						Visibility:              "public",     // default value
+						ProjectCreationLevel:    "maintainer", // default value
+						SubGroupCreationLevel:   "owner",      // default value
+						TwoFactorGracePeriod:    48,           // default value
+						DefaultBranchProtection: 2,            // default value
+						Parent:                  &group,
+					}),
+					testGidNotChanged,
+				),
+			},
 		},
 	})
 }
@@ -229,7 +242,6 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -250,7 +262,6 @@ func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
