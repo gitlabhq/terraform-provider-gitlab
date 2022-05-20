@@ -32,7 +32,7 @@ data "gitlab_project_milestones" "example" {
 
 ### Required
 
-- `project_id` (String) The ID or URL-encoded path of the project owned by the authenticated user.
+- `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 
 ### Optional
 
@@ -58,7 +58,8 @@ Read-Only:
 - `expired` (Boolean)
 - `iid` (Number)
 - `milestone_id` (Number)
-- `project_id` (String)
+- `project` (String)
+- `project_id` (Number)
 - `start_date` (String)
 - `state` (String)
 - `title` (String)

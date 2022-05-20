@@ -22,7 +22,7 @@ var _ = registerDataSource("gitlab_project_milestones", func() *schema.Resource 
 
 		ReadContext: dataSourceGitlabProjectMilestonesRead,
 		Schema: map[string]*schema.Schema{
-			"project_id": {
+			"project": {
 				Description: "The ID or URL-encoded path of the project owned by the authenticated user.",
 				Type:        schema.TypeString,
 				Required:    true,
@@ -69,7 +69,7 @@ var _ = registerDataSource("gitlab_project_milestones", func() *schema.Resource 
 func dataSourceGitlabProjectMilestonesRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	project := d.Get("project_id").(string)
+	project := d.Get("project").(string)
 	options := gitlab.ListMilestonesOptions{
 		ListOptions: gitlab.ListOptions{
 			PerPage: 20,
@@ -115,16 +115,16 @@ func dataSourceGitlabProjectMilestonesRead(ctx context.Context, d *schema.Resour
 
 	log.Printf("[DEBUG] get gitlab milestones from project: %s", project)
 	d.SetId(fmt.Sprintf("%s:%d", project, optionsHash))
-	if err = d.Set("milestones", flattenGitlabProjectMilestones(milestones)); err != nil {
+	if err = d.Set("milestones", flattenGitlabProjectMilestones(project, milestones)); err != nil {
 		return diag.Errorf("Failed to set milestones to state: %v", err)
 	}
 
 	return nil
 }
 
-func flattenGitlabProjectMilestones(milestones []*gitlab.Milestone) (values []map[string]interface{}) {
+func flattenGitlabProjectMilestones(project string, milestones []*gitlab.Milestone) (values []map[string]interface{}) {
 	for _, milestone := range milestones {
-		values = append(values, gitlabProjectMilestoneToStateMap(milestone))
+		values = append(values, gitlabProjectMilestoneToStateMap(project, milestone))
 	}
 	return values
 }

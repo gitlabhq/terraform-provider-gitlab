@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -8,19 +11,17 @@ import (
 )
 
 func TestAccDataSourceGitlabProjectMilestone_basic(t *testing.T) {
-	testAccCheck(t)
 
 	testProject := testAccCreateProject(t)
 	testMilestone := testAccAddProjectMilestones(t, testProject, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
                 data "gitlab_project_milestone" "this" {
-                  project_id   = "%d"
+                  project      = "%d"
                   milestone_id = "%d"
                 }`, testProject.ID, testMilestone.ID),
 				Check: resource.ComposeTestCheckFunc(

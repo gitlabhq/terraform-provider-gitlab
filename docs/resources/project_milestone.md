@@ -34,7 +34,7 @@ resource "gitlab_project_milestone" "example" {
 
 ### Required
 
-- `project_id` (String) The ID or URL-encoded path of the project owned by the authenticated user.
+- `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 - `title` (String) The title of a milestone.
 
 ### Optional
@@ -52,6 +52,7 @@ resource "gitlab_project_milestone" "example" {
 - `id` (String) The ID of this resource.
 - `iid` (Number) The ID of the project's milestone.
 - `milestone_id` (Number) The instance-wide ID of the project’s milestone.
+- `project_id` (Number) The project ID of milestone.
 - `web_url` (String) The web URL of the milestone.
 
 ## Import

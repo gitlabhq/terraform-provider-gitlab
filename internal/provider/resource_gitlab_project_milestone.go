@@ -35,7 +35,7 @@ var _ = registerResource("gitlab_project_milestone", func() *schema.Resource {
 
 func resourceGitlabProjectMilestoneCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project_id").(string)
+	project := d.Get("project").(string)
 	title := d.Get("title").(string)
 
 	options := &gitlab.CreateMilestoneOptions{
@@ -100,7 +100,7 @@ func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceD
 		return diag.FromErr(err)
 	}
 
-	stateMap := gitlabProjectMilestoneToStateMap(milestone)
+	stateMap := gitlabProjectMilestoneToStateMap(project, milestone)
 	if err = setStateMapInResourceData(stateMap, d); err != nil {
 		return diag.FromErr(err)
 	}
@@ -158,10 +158,10 @@ func resourceGitlabProjectMilestoneDelete(ctx context.Context, d *schema.Resourc
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[debug] delete gitlab milestone in project %s with ID %d", project, milestoneID)
+	log.Printf("[DEBUG] delete gitlab milestone in project %s with ID %d", project, milestoneID)
 	resp, err := client.Milestones.DeleteMilestone(project, milestoneID, gitlab.WithContext(ctx))
 	if err != nil {
-		log.Printf("[debug] failed to delete gitlab milestone in project %s with ID %d. Response %v", project, milestoneID, resp)
+		log.Printf("[DEBUG] failed to delete gitlab milestone in project %s with ID %d. Response %v", project, milestoneID, resp)
 		return diag.FromErr(err)
 	}
 	return nil

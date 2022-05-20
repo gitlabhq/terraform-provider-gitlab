@@ -21,15 +21,15 @@ var _ = registerDataSource("gitlab_project_milestone", func() *schema.Resource {
 
 func dataSourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project_id").(string)
+	project := d.Get("project").(string)
 	milestoneID := d.Get("milestone_id").(int)
 
 	milestone, _, err := client.Milestones.GetMilestone(project, milestoneID, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestoneID))
-	stateMap := gitlabProjectMilestoneToStateMap(milestone)
+	d.SetId(resourceGitLabProjectMilestoneBuildId(project, milestone.ID))
+	stateMap := gitlabProjectMilestoneToStateMap(project, milestone)
 
 	if err := setStateMapInResourceData(stateMap, d); err != nil {
 		return diag.FromErr(err)

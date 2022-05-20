@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -11,13 +14,11 @@ import (
 )
 
 func TestAccGitlabProjectMilestone_basic(t *testing.T) {
-	testAccCheck(t)
 
 	rInt1, rInt2 := acctest.RandInt(), acctest.RandInt()
 	project := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMilestoneDestroy,
 		Steps: []resource.TestStep{
@@ -25,9 +26,9 @@ func TestAccGitlabProjectMilestone_basic(t *testing.T) {
 				// create Milestone with required values only
 				Config: fmt.Sprintf(`
                 resource "gitlab_project_milestone" "this" {
-                  project_id = "%d"
-                  title      = "test-%d"
-                }`, project.ID, rInt1),
+                  project = "%v"
+                  title   = "test-%d"
+                }`, project.PathWithNamespace, rInt1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("gitlab_project_milestone.this", "iid"),
 					resource.TestCheckResourceAttrSet("gitlab_project_milestone.this", "milestone_id"),
@@ -47,8 +48,8 @@ func TestAccGitlabProjectMilestone_basic(t *testing.T) {
 				// update some Milestone attributes
 				Config: fmt.Sprintf(`
                 resource "gitlab_project_milestone" "this" {
-                  project_id = "%[1]d"
-                  title      = "test-%[2]d"
+                  project     = "%[1]d"
+                  title       = "test-%[2]d"
                   description = "test-%[2]d"
                   start_date  = "2022-04-10"
                   due_date    = "2022-04-15"
@@ -78,12 +79,12 @@ func testAccCheckGitlabProjectMilestoneDestroy(s *terraform.State) error {
 		if rs.Type != "gitlab_project_milestone" {
 			continue
 		}
-		project, milestoneID, err := resourceGitLabProjectMilestoneParseId(rs.Primary.ID)
+		projectID, milestoneID, err := resourceGitLabProjectMilestoneParseId(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
-		milestone, _, err := testGitlabClient.Milestones.GetMilestone(project, milestoneID)
+		milestone, _, err := testGitlabClient.Milestones.GetMilestone(projectID, milestoneID)
 		if err == nil && milestone != nil {
 			return errors.New("Milestone still exists")
 		}
