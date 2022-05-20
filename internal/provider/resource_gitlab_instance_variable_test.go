@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -16,7 +19,6 @@ func TestAccGitlabInstanceVariable_basic(t *testing.T) {
 	rString := acctest.RandString(5)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabInstanceVariableDestroy,
 		Steps: []resource.TestStep{

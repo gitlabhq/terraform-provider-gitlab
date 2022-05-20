@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -16,7 +19,6 @@ func TestAccGitlabServiceMicrosoftTeams_basic(t *testing.T) {
 	teamsResourceName := "gitlab_service_microsoft_teams.teams"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceMicrosoftTeamsDestroy,
 		Steps: []resource.TestStep{

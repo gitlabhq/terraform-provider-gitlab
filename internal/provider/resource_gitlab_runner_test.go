@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -11,8 +14,6 @@ import (
 )
 
 func TestAccGitlabRunner_basic(t *testing.T) {
-	testAccCheck(t)
-
 	group := testAccCreateGroups(t, 1)[0]
 	//The runner token is not populated on the return from the group create, so re-retrieve it to get the token.
 	group, _, err := testGitlabClient.Groups.GetGroup(group.ID, &gitlab.GetGroupOptions{})
@@ -21,7 +22,6 @@ func TestAccGitlabRunner_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
@@ -64,13 +64,10 @@ func TestAccGitlabRunner_basic(t *testing.T) {
 }
 
 func TestAccGitlabRunner_instance(t *testing.T) {
-	testAccCheck(t)
-
 	// This pulls from the gitlab.rb file, and is set on instance start-up
 	token := "ACCTEST1234567890123_RUNNER_REG_TOKEN"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
@@ -98,8 +95,6 @@ func TestAccGitlabRunner_instance(t *testing.T) {
 }
 
 func TestAccGitlabRunner_comprehensive(t *testing.T) {
-	testAccCheck(t)
-
 	group := testAccCreateGroups(t, 1)[0]
 	//The runner token is not populated on the return from the group create, so re-retrieve it to get the token.
 	group, _, err := testGitlabClient.Groups.GetGroup(group.ID, &gitlab.GetGroupOptions{})
@@ -108,7 +103,6 @@ func TestAccGitlabRunner_comprehensive(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() {},
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{

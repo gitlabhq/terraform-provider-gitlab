@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -18,7 +21,6 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 	pipelinesEmailResourceName := "gitlab_service_pipelines_email.email"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServicePipelinesEmailDestroy,
 		Steps: []resource.TestStep{
@@ -62,7 +64,6 @@ func TestAccGitlabServicePipelinesEmail_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServicePipelinesEmailDestroy,
 		Steps: []resource.TestStep{

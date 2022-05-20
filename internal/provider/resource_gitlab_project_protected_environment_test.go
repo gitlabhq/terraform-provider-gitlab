@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -12,7 +15,6 @@ import (
 )
 
 func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
-	testAccCheck(t)
 	testAccCheckEE(t)
 
 	// Set up project environment.
@@ -35,7 +37,6 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy(project.ID, environment.Name),
 		Steps: []resource.TestStep{

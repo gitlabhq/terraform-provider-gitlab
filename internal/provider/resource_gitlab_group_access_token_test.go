@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -14,11 +17,9 @@ func TestAccGitlabGroupAccessToken_basic(t *testing.T) {
 	var gat testAccGitlabGroupAccessTokenWrapper
 	var groupVariable gitlab.GroupVariable
 
-	testAccCheck(t)
 	testGroup := testAccCreateGroups(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupAccessTokenDestroy,
 		Steps: []resource.TestStep{

@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -17,7 +20,6 @@ func TestAccGitlabProjectMirror_basic(t *testing.T) {
 	var miror gitlab.ProjectMirror
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{
@@ -74,7 +76,6 @@ func TestAccGitlabProjectMirror_withPassword(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{
