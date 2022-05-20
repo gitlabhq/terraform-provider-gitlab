@@ -6,6 +6,6 @@ resource "gitlab_project" "example" {
 }
 
 resource "gitlab_project_milestone" "example" {
-  project_id = gitlab_project.example.id
-  title      = "example"
+  project = gitlab_project.example.id
+  title   = "example"
 }

@@ -24,8 +24,8 @@ resource "gitlab_project" "example" {
 }
 
 resource "gitlab_project_milestone" "example" {
-  project_id = gitlab_project.example.id
-  title      = "example"
+  project = gitlab_project.example.id
+  title   = "example"
 }
 ```
 
@@ -60,6 +60,6 @@ resource "gitlab_project_milestone" "example" {
 Import is supported using the following syntax:
 
 ```shell
-# Gitlab project milestone can be imported with a key composed of `<project_id>:<milestone_id>`, e.g.
+# Gitlab project milestone can be imported with a key composed of `<project>:<milestone_id>`, e.g.
 terraform import gitlab_project_milestone.example "12345:11"
 ```

@@ -26,6 +26,7 @@ var _ = registerDataSource("gitlab_project_milestones", func() *schema.Resource 
 				Description: "The ID or URL-encoded path of the project owned by the authenticated user.",
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 			},
 			"iids": {
 				Description: "Return only the milestones having the given `iid` (Note: ignored if `include_parent_milestones` is set as `true`).",

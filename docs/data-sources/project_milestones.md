@@ -18,12 +18,12 @@ The `gitlab_project_milestones` data source allows get details of a project mile
 ```terraform
 # By project ID
 data "gitlab_project_milestones" "example" {
-  project_id = "12345"
+  project = "12345"
 }
 
 # By project full path
 data "gitlab_project_milestones" "example" {
-  project_id = "foo/bar"
+  project = "foo/bar"
 }
 ```
 

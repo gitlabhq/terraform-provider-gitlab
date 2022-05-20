@@ -18,13 +18,13 @@ The `gitlab_project_milestone` data source allows get details of a project miles
 ```terraform
 # By project ID
 data "gitlab_project_milestone" "example" {
-  project_id   = "12345"
+  project      = "12345"
   milestone_id = 10
 }
 
 # By project full path
 data "gitlab_project_milestone" "example" {
-  project_id   = "foo/bar"
+  project      = "foo/bar"
   milestone_id = 10
 }
 ```
@@ -35,7 +35,7 @@ data "gitlab_project_milestone" "example" {
 ### Required
 
 - `milestone_id` (Number) The instance-wide ID of the project’s milestone.
-- `project_id` (Number) The project ID of milestone.
+- `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
 
 ### Read-Only
 
@@ -45,7 +45,7 @@ data "gitlab_project_milestone" "example" {
 - `expired` (Boolean) Bool, true if milestore expired.
 - `id` (String) The ID of this resource.
 - `iid` (Number) The ID of the project's milestone.
-- `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
+- `project_id` (Number) The project ID of milestone.
 - `start_date` (String) The start date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
 - `state` (String) The state of the milestone. Valid values are: `active`, `closed`.
 - `title` (String) The title of a milestone.
