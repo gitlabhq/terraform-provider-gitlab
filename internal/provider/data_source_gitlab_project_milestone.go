@@ -15,7 +15,7 @@ var _ = registerDataSource("gitlab_project_milestone", func() *schema.Resource {
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)`,
 
 		ReadContext: dataSourceGitlabProjectMilestoneRead,
-		Schema:      datasourceSchemaFromResourceSchema(gitlabProjectMilestoneGetSchema(), []string{"project_id", "milestone_id"}, nil),
+		Schema:      datasourceSchemaFromResourceSchema(gitlabProjectMilestoneGetSchema(), []string{"project", "milestone_id"}, nil),
 	}
 })
 
