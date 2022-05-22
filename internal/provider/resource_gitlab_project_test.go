@@ -855,6 +855,7 @@ func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
 	user := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccRequiresAtLeast(t, "14.10") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
