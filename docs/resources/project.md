@@ -81,7 +81,7 @@ resource "gitlab_project" "peters_repo" {
 - `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
 - `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
-- `build_coverage_regex` (String) Test coverage parsing for the project.
+- `build_coverage_regex` (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
 - `build_git_strategy` (String) The Git strategy. Defaults to fetch.
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
@@ -96,7 +96,6 @@ resource "gitlab_project" "peters_repo" {
 - `external_authorization_classification_label` (String) The classification label for the project.
 - `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
 - `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
-- `id` (String) The ID of this resource.
 - `import_url` (String) Git URL to a repository to be imported.
 - `initialize_with_readme` (Boolean) Create main branch with first commit containing a README.md file.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
@@ -149,6 +148,7 @@ resource "gitlab_project" "peters_repo" {
 ### Read-Only
 
 - `http_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `id` (String) The ID of this resource.
 - `path_with_namespace` (String) The path of the repository with namespace.
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the

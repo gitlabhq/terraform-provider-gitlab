@@ -37,7 +37,6 @@ data "gitlab_user" "example-two" {
 ### Optional
 
 - `email` (String) The public email address of the user. **Note**: before GitLab 14.8 the lookup was based on the users primary email address.
-- `id` (String) The ID of this resource.
 - `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field. Available since GitLab 14.10.
 - `user_id` (Number) The ID of the user.
 - `username` (String) The username of the user.
@@ -53,6 +52,7 @@ data "gitlab_user" "example-two" {
 - `current_sign_in_at` (String) Current user's sign-in date.
 - `extern_uid` (String) The external UID of the user.
 - `external` (Boolean) Whether the user is external.
+- `id` (String) The ID of this resource.
 - `is_admin` (Boolean) Whether the user is an admin.
 - `last_sign_in_at` (String) Last user's sign-in date.
 - `linkedin` (String) LinkedIn profile of the user.

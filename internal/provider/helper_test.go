@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -11,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/onsi/gomega"
 	"github.com/xanzy/go-gitlab"
 )
@@ -63,15 +65,6 @@ func isRunningInEE() (bool, error) {
 func isRunningInCE() (bool, error) {
 	isEE, err := isRunningInEE()
 	return !isEE, err
-}
-
-// testAccCheck is a test helper that skips the current test if it is not an acceptance test.
-func testAccCheck(t *testing.T) {
-	t.Helper()
-
-	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
-	}
 }
 
 // orSkipFunc accepts many skipFunc and returns "true" if any returns true.
@@ -309,20 +302,25 @@ func testAccAddGroupMembers(t *testing.T, gid interface{}, users []*gitlab.User)
 	}
 }
 
-func testAccAddProjectMilestone(t *testing.T, pid interface{}) *gitlab.Milestone {
+// testAccAddProjectMilestones is a test helper for adding milestones to project.
+// It assumes the group will be destroyed at the end of the test and will not cleanup milestones.
+func testAccAddProjectMilestones(t *testing.T, project *gitlab.Project, n int) []*gitlab.Milestone {
 	t.Helper()
 
-	milestone, _, err := testGitlabClient.Milestones.CreateMilestone(pid, &gitlab.CreateMilestoneOptions{Title: gitlab.String("Test Milestone")})
-	if err != nil {
-		t.Fatalf("failed to create milestone during test for project %v: %v", pid, err)
-	}
-	t.Cleanup(func() {
-		_, err := testGitlabClient.Milestones.DeleteMilestone(pid, milestone.ID)
+	milestones := make([]*gitlab.Milestone, n)
+
+	for i := range milestones {
+		var err error
+		milestones[i], _, err = testGitlabClient.Milestones.CreateMilestone(project.ID, &gitlab.CreateMilestoneOptions{
+			Title:       gitlab.String(fmt.Sprintf("Milestone %d", i)),
+			Description: gitlab.String(fmt.Sprintf("Description %d", i)),
+		})
 		if err != nil {
-			t.Fatalf("failed to delete milestone %d during test for project %v: %v", milestone.ID, pid, err)
+			t.Fatalf("Could not create test milestones: %v", err)
 		}
-	})
-	return milestone
+	}
+
+	return milestones
 }
 
 func testAccCreateDeployKey(t *testing.T, projectID int, options *gitlab.AddDeployKeyOptions) *gitlab.ProjectDeployKey {
@@ -429,7 +427,7 @@ type testAccGitlabProjectContext struct {
 // call testAccGitlabProjectContext.finish() when finished with the testAccGitlabProjectContext.
 func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
 	if os.Getenv(resource.EnvTfAcc) == "" {
-		t.Skip(fmt.Sprintf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc))
+		t.Skipf("Acceptance tests skipped unless env '%s' set", resource.EnvTfAcc)
 		return testAccGitlabProjectContext{}
 	}
 
@@ -452,14 +450,6 @@ func testAccGitlabProjectStart(t *testing.T) testAccGitlabProjectContext {
 	return testAccGitlabProjectContext{
 		t:       t,
 		project: project,
-	}
-}
-
-// testCheckResourceAttrLazy works like resource.TestCheckResourceAttr, but lazy evaluates the value parameter.
-// See also: resource.TestCheckResourceAttrPtr.
-func testCheckResourceAttrLazy(name string, key string, value func() string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		return resource.TestCheckResourceAttr(name, key, value())(s)
 	}
 }
 

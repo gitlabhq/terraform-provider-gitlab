@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -12,15 +15,13 @@ import (
 )
 
 func TestAccGitlabProjectIssue_basic(t *testing.T) {
-	testAccCheck(t)
-
 	var testIssue gitlab.Issue
 	var updatedTestIssue gitlab.Issue
 
 	testProject := testAccCreateProject(t)
 	testUser := testAccCreateUsers(t, 1)[0]
 	testAccAddProjectMembers(t, testProject.ID, []*gitlab.User{testUser})
-	testMilestone := testAccAddProjectMilestone(t, testProject.ID)
+	testMilestone := testAccAddProjectMilestones(t, testProject, 1)[0]
 
 	currentUser, _, err := testGitlabClient.Users.CurrentUser()
 	if err != nil {
@@ -28,7 +29,6 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{
@@ -40,7 +40,13 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "project", testProject.PathWithNamespace),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "iid", "1"),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "title", "Terraform test issue"),
-					testCheckResourceAttrLazy("gitlab_project_issue.this", "created_at", func() string { return testIssue.CreatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_issue.this", "created_at", func(value string) error {
+						expectedValue := testIssue.CreatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
@@ -58,7 +64,13 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "project", testProject.PathWithNamespace),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "iid", "1"),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "title", "Terraform test issue"),
-					testCheckResourceAttrLazy("gitlab_project_issue.this", "updated_at", func() string { return updatedTestIssue.UpdatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_issue.this", "updated_at", func(value string) error {
+						expectedValue := updatedTestIssue.UpdatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
@@ -97,7 +109,13 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectIssueExists("gitlab_project_issue.this", &testIssue),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "state", "closed"),
-					testCheckResourceAttrLazy("gitlab_project_issue.this", "closed_at", func() string { return testIssue.ClosedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith("gitlab_project_issue.this", "closed_at", func(value string) error {
+						expectedValue := testIssue.ClosedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 					resource.TestCheckResourceAttr("gitlab_project_issue.this", "closed_by_user_id", fmt.Sprintf("%d", currentUser.ID)),
 				),
 			},
@@ -130,16 +148,14 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 }
 
 func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
-	testAccCheck(t)
 	testAccCheckEE(t)
 
 	testProject := testAccCreateProject(t)
 	testUser := testAccCreateUsers(t, 1)[0]
 	testAccAddProjectMembers(t, testProject.ID, []*gitlab.User{testUser})
-	testMilestone := testAccAddProjectMilestone(t, testProject.ID)
+	testMilestone := testAccAddProjectMilestones(t, testProject, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{
@@ -159,12 +175,9 @@ func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
 }
 
 func TestAccGitlabProjectIssue_deleteOnDestroy(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{

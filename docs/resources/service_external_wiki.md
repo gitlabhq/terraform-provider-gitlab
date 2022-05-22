@@ -36,14 +36,11 @@ resource "gitlab_service_external_wiki" "wiki" {
 - `external_wiki_url` (String) The URL of the external wiki.
 - `project` (String) ID of the project you want to activate integration on.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
 - `active` (Boolean) Whether the integration is active.
 - `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
+- `id` (String) The ID of this resource.
 - `slug` (String) The name of the integration in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
 - `title` (String) Title of the integration.
 - `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.

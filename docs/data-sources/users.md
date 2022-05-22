@@ -44,13 +44,13 @@ data "gitlab_users" "example-two" {
 - `created_before` (String) Search for users created before a specific date. (Requires administrator privileges)
 - `extern_provider` (String) Lookup users by external provider. (Requires administrator privileges)
 - `extern_uid` (String) Lookup users by external UID. (Requires administrator privileges)
-- `id` (String) The ID of this resource.
 - `order_by` (String) Order the users' list by `id`, `name`, `username`, `created_at` or `updated_at`. (Requires administrator privileges)
 - `search` (String) Search users by username, name or email.
 - `sort` (String) Sort users' list in asc or desc order. (Requires administrator privileges)
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `users` (List of Object) The list of users. (see [below for nested schema](#nestedatt--users))
 
 <a id="nestedatt--users"></a>

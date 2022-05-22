@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -9,10 +12,8 @@ import (
 )
 
 func TestAccDataGitlabRepositoryFile_basic(t *testing.T) {
-	testAccCheck(t)
 	project := testAccCreateProject(t)
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

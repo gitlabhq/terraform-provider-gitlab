@@ -38,6 +38,9 @@ resource "gitlab_group_ldap_link" "test" {
 - `access_level` (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 - `force` (Boolean) If true, then delete and replace an existing LDAP link if one exists.
 - `group_access` (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
+
+### Read-Only
+
 - `id` (String) The ID of this resource.
 
 ## Import

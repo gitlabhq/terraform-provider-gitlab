@@ -32,7 +32,7 @@ resource "gitlab_user_custom_attribute" "attr" {
 - `user` (Number) The id of the user.
 - `value` (String) Value for the Custom Attribute.
 
-### Optional
+### Read-Only
 
 - `id` (String) The ID of this resource.
 

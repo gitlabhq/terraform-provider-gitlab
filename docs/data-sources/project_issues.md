@@ -42,7 +42,6 @@ data "gitlab_project_issues" "all_with_foo" {
 - `created_after` (String) Return issues created on or after the given time. Expected in ISO 8601 format (2019-03-15T08:00:00Z)
 - `created_before` (String) Return issues created on or before the given time. Expected in ISO 8601 format (2019-03-15T08:00:00Z)
 - `due_date` (String) Return issues that have no due date, are overdue, or whose due date is this week, this month, or between two weeks ago and next month. Accepts: 0 (no due date), any, today, tomorrow, overdue, week, month, next_month_and_previous_two_weeks.
-- `id` (String) The ID of this resource.
 - `iids` (List of Number) Return only the issues having the given iid
 - `issue_type` (String) Filter to a given type of issue. Valid values are [issue incident test_case]. (Introduced in GitLab 13.12)
 - `labels` (List of String) Return issues with labels. Issues must have all labels to be returned. None lists all issues with no labels. Any lists all issues with at least one label. No+Label (Deprecated) lists all issues with no labels. Predefined names are case-insensitive.
@@ -51,7 +50,7 @@ data "gitlab_project_issues" "all_with_foo" {
 - `not_assignee_id` (List of Number) Return issues that do not match the assignee id.
 - `not_author_id` (List of Number) Return issues that do not match the author id.
 - `not_labels` (List of String) Return issues that do not match the labels.
-- `not_milestone` (List of String) Return issues that do not match the milestone.
+- `not_milestone` (String) Return issues that do not match the milestone.
 - `not_my_reaction_emoji` (List of String) Return issues not reacted by the authenticated user by the given emoji.
 - `order_by` (String) Return issues ordered by. Valid values are `created_at`, `updated_at`, `priority`, `due_date`, `relative_position`, `label_priority`, `milestone_due`, `popularity`, `weight`. Default is created_at
 - `scope` (String) Return issues for the given scope. Valid values are `created_by_me`, `assigned_to_me`, `all`. Defaults to all.
@@ -64,6 +63,7 @@ data "gitlab_project_issues" "all_with_foo" {
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `issues` (List of Object) The list of issues returned by the search. (see [below for nested schema](#nestedatt--issues))
 
 <a id="nestedatt--issues"></a>

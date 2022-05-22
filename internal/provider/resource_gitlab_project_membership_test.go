@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -15,7 +18,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 	var membership gitlab.ProjectMember
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{PreCheck: func() { testAccPreCheck(t) },
+	resource.Test(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMembershipDestroy,
 		Steps: []resource.TestStep{

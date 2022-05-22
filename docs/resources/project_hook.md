@@ -37,7 +37,6 @@ resource "gitlab_project_hook" "example" {
 - `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
-- `id` (String) The ID of this resource.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests.
@@ -49,6 +48,10 @@ resource "gitlab_project_hook" "example" {
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 ## Import
 

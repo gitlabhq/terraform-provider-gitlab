@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -29,13 +28,13 @@ var _ = registerResource("gitlab_group_share_group", func() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Description: "The id of the main group.",
+				Description: "The id of the main group to be shared.",
 				Type:        schema.TypeString,
 				ForceNew:    true,
 				Required:    true,
 			},
 			"share_group_id": {
-				Description: "The id of an additional group which will be shared with the main group.",
+				Description: "The id of the additional group with which the main group will be shared.",
 				Type:        schema.TypeInt,
 				ForceNew:    true,
 				Required:    true,
@@ -93,9 +92,9 @@ func resourceGitlabGroupShareGroupRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	// Query main group
-	group, resp, err := client.Groups.GetGroup(groupId, nil, gitlab.WithContext(ctx))
+	group, _, err := client.Groups.GetGroup(groupId, nil, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", groupId)
 			d.SetId("")
 			return nil

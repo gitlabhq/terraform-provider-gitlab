@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"log"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -144,9 +143,9 @@ func resourceGitlabServiceMicrosoftTeamsRead(ctx context.Context, d *schema.Reso
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
-	p, resp, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
+	p, _, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] Removing Gitlab Microsoft Teams service %s because project %s not found", d.Id(), p.Name)
 			d.SetId("")
 			return nil

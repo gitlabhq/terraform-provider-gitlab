@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -14,7 +17,6 @@ func TestAccDataSourceGitlabUsers_basic(t *testing.T) {
 	user2 := fmt.Sprintf("user%d@test.test", rInt2)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

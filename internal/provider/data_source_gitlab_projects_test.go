@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -12,12 +15,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-// lintignore: AT003 // TODO: Resolve this tfproviderlint issue
-func TestAccDataGitlabProjectsSearch(t *testing.T) {
+func TestAccDataGitlabProjects_search(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -52,8 +53,7 @@ func TestAccDataGitlabProjectsSearch(t *testing.T) {
 	})
 }
 
-// lintignore: AT003 // TODO: Resolve this tfproviderlint issue
-func TestAccDataGitlabProjectsGroups(t *testing.T) {
+func TestAccDataGitlabProjects_groups(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 	groupName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 	parentGroupName := fmt.Sprintf("tf-%s", acctest.RandString(5))
@@ -63,7 +63,6 @@ func TestAccDataGitlabProjectsGroups(t *testing.T) {
 	subGroupProjectName2 := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -101,7 +100,6 @@ func TestAccDataGitlabProjects_searchArchivedRepository(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

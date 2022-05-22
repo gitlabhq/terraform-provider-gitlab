@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"log"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -21,7 +20,7 @@ var _ = registerResource("gitlab_service_jira", func() *schema.Resource {
 		UpdateContext: resourceGitlabServiceJiraUpdate,
 		DeleteContext: resourceGitlabServiceJiraDelete,
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceGitlabServiceJiraImportState,
+			StateContext: schema.ImportStatePassthroughContext,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -82,7 +81,7 @@ var _ = registerResource("gitlab_service_jira", func() *schema.Resource {
 				Sensitive:   true,
 			},
 			"jira_issue_transition_id": {
-				Description: "The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2.",
+				Description: "The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2. **Note**: importing this field is currently not supported.",
 				Type:        schema.TypeString,
 				Optional:    true,
 			},
@@ -167,46 +166,31 @@ func resourceGitlabServiceJiraCreate(ctx context.Context, d *schema.ResourceData
 
 func resourceGitlabServiceJiraRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-	project := d.Get("project").(string)
+	project := d.Id()
 
-	p, resp, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
-	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] Removing Gitlab Jira service %s because project %s not found", d.Id(), p.Name)
-			d.SetId("")
-			return nil
-		}
-		return diag.FromErr(err)
-	}
-
-	log.Printf("[DEBUG] Read Gitlab Jira service %s", d.Id())
+	log.Printf("[DEBUG] Read Gitlab Jira service %s", project)
 
 	jiraService, _, err := client.Services.GetJiraService(project, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
-			log.Printf("[DEBUG] gitlab jira service not found %s", project)
+			log.Printf("[DEBUG] gitlab jira service not found %s, removing from state", project)
 			d.SetId("")
 			return nil
 		}
 		return diag.FromErr(err)
 	}
 
-	if v := jiraService.Properties.URL; v != "" {
-		d.Set("url", v)
+	d.Set("project", project)
+	d.Set("url", jiraService.Properties.URL)
+	d.Set("api_url", jiraService.Properties.APIURL)
+	d.Set("username", jiraService.Properties.Username)
+	d.Set("project_key", jiraService.Properties.ProjectKey)
+	// FIXME: The API or go-gitlab doesn't return `jira_issue_transition_id` properly,
+	//        therefore we don't overwrite the value set in the config, in case it's not set in the API
+	//        response. This currently impacts the import of this attribute.
+	if jiraService.Properties.JiraIssueTransitionID != "" {
+		d.Set("jira_issue_transition_id", jiraService.Properties.JiraIssueTransitionID)
 	}
-	if v := jiraService.Properties.APIURL; v != "" {
-		d.Set("api_url", v)
-	}
-	if v := jiraService.Properties.Username; v != "" {
-		d.Set("username", v)
-	}
-	if v := jiraService.Properties.ProjectKey; v != "" {
-		d.Set("project_key", v)
-	}
-	if v := jiraService.Properties.JiraIssueTransitionID; v != "" {
-		d.Set("jira_issue_transition_id", v)
-	}
-
 	d.Set("title", jiraService.Title)
 	d.Set("created_at", jiraService.CreatedAt.String())
 	d.Set("updated_at", jiraService.UpdatedAt.String())
@@ -264,10 +248,4 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 	}
 
 	return &setJiraServiceOptions, nil
-}
-
-func resourceGitlabServiceJiraImportState(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
-	d.Set("project", d.Id())
-
-	return []*schema.ResourceData{d}, nil
 }

@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -12,7 +15,6 @@ func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			// Create the group and one member
@@ -45,8 +47,6 @@ func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 }
 
 func TestAccDataSourceGitlabMembership_pagination(t *testing.T) {
-	testAccCheck(t)
-
 	userCount := 21
 
 	group := testAccCreateGroups(t, 1)[0]
@@ -54,7 +54,6 @@ func TestAccDataSourceGitlabMembership_pagination(t *testing.T) {
 	testAccAddGroupMembers(t, group.ID, users)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

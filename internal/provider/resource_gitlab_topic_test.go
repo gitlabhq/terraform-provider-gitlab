@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -17,7 +20,6 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicDestroy,
 		Steps: []resource.TestStep{
@@ -214,7 +216,6 @@ func TestAccGitlabTopic_withoutAvatarHash(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicDestroy,
 		Steps: []resource.TestStep{
@@ -241,7 +242,6 @@ func TestAccGitlabTopic_softDestroy(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicSoftDestroy,
 		Steps: []resource.TestStep{

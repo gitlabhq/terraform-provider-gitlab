@@ -25,7 +25,7 @@ jobs:
       # This prevents the needs-triage label from being added.
       - uses: actions/checkout@v3
         if: ${{ failure() }}
-      - uses: github/issue-labeler@v2.4
+      - uses: github/issue-labeler@v2.5
         if: ${{ failure() }}
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"

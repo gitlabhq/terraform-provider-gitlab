@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"strings"
 	"time"
 
@@ -73,7 +72,7 @@ var _ = registerResource("gitlab_group", func() *schema.Resource {
 				Type:         schema.TypeInt,
 				Optional:     true,
 				Default:      2,
-				ValidateFunc: validation.IntInSlice([]int{0, 1, 2}),
+				ValidateFunc: validation.IntInSlice([]int{0, 1, 2, 3}),
 			},
 			"request_access_enabled": {
 				Description: "Defaults to false. Allow users to request member access.",
@@ -142,7 +141,6 @@ var _ = registerResource("gitlab_group", func() *schema.Resource {
 				Description: "Id of the parent group (creates a nested group).",
 				Type:        schema.TypeInt,
 				Optional:    true,
-				ForceNew:    true,
 				Default:     0,
 			},
 			"runners_token": {
@@ -251,9 +249,9 @@ func resourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta i
 	client := meta.(*gitlab.Client)
 	log.Printf("[DEBUG] read gitlab group %s", d.Id())
 
-	group, resp, err := client.Groups.GetGroup(d.Id(), nil, gitlab.WithContext(ctx))
+	group, _, err := client.Groups.GetGroup(d.Id(), nil, gitlab.WithContext(ctx))
 	if err != nil {
-		if resp != nil && resp.StatusCode == http.StatusNotFound {
+		if is404(err) {
 			log.Printf("[DEBUG] gitlab group %s not found so removing from state", d.Id())
 			d.SetId("")
 			return nil
@@ -370,7 +368,37 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 		return diag.FromErr(err)
 	}
 
+	if d.HasChange("parent_id") {
+		err = transferSubGroup(ctx, d, client)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	}
+
 	return resourceGitlabGroupRead(ctx, d, meta)
+}
+
+func transferSubGroup(ctx context.Context, d *schema.ResourceData, client *gitlab.Client) error {
+	o, n := d.GetChange("parent_id")
+	parentId, ok := n.(int)
+	if !ok {
+		return fmt.Errorf("error converting parent_id %v into an int", n)
+	}
+
+	opt := &gitlab.TransferSubGroupOptions{}
+	if parentId != 0 {
+		log.Printf("[DEBUG] transfer gitlab group %s from %v to new parent group %v", d.Id(), o, n)
+		opt.GroupID = gitlab.Int(parentId)
+	} else {
+		log.Printf("[DEBUG] turn gitlab group %s from %v to a new top-level group", d.Id(), o)
+	}
+
+	_, _, err := client.Groups.TransferSubGroup(d.Id(), opt, gitlab.WithContext(ctx))
+	if err != nil {
+		return fmt.Errorf("error transfering group %s to new parent group %v: %s", d.Id(), parentId, err)
+	}
+
+	return nil
 }
 
 func resourceGitlabGroupDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {

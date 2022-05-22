@@ -1,4 +1,5 @@
-// lintignore: AT012 // TODO: Resolve this tfproviderlint issue
+//go:build acceptance
+// +build acceptance
 
 package provider
 
@@ -25,7 +26,6 @@ func TestAccGitlabProject_minimal(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -79,7 +79,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		PackagesEnabled:                 true,
 		PrintingMergeRequestLinkEnabled: true,
 		PagesAccessLevel:                gitlab.PublicAccessControl,
-		BuildCoverageRegex:              "foo",
 		IssuesTemplate:                  "",
 		MergeRequestsTemplate:           "",
 		CIConfigPath:                    ".gitlab-ci.yml@mynamespace/myproject",
@@ -121,7 +120,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 	defaultsMainBranch.DefaultBranch = "main"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -160,7 +158,6 @@ func TestAccGitlabProject_basic(t *testing.T) {
 						Archived:                       true,
 						PackagesEnabled:                false,
 						PagesAccessLevel:               gitlab.DisabledAccessControl,
-						BuildCoverageRegex:             "bar",
 						CIForwardDeploymentEnabled:     false,
 						ResolveOutdatedDiffDiscussions: false,
 						AnalyticsAccessLevel:           gitlab.DisabledAccessControl,
@@ -417,7 +414,6 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -445,7 +441,6 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -474,7 +469,6 @@ func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectArchivedOnDestroy,
 		Steps: []resource.TestStep{
@@ -489,7 +483,6 @@ func TestAccGitlabProject_setSinglePushRuleToDefault(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -511,7 +504,6 @@ func TestAccGitlabProject_groupWithoutDefaultBranchProtection(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -536,7 +528,6 @@ func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -567,7 +558,6 @@ func TestAccGitlabProject_MergePipelines(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -594,7 +584,6 @@ func TestAccGitlabProject_MergeTrains(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -621,7 +610,6 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -665,11 +653,10 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	})
 }
 
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
+// lintignore: AT002 // specialized import test
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -690,10 +677,10 @@ func TestAccGitlabProject_import(t *testing.T) {
 	})
 }
 
+// lintignore: AT002 // specialized import test
 func TestAccGitlabProject_nestedImport(t *testing.T) {
 	rInt := acctest.RandInt()
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -737,7 +724,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 		PackagesEnabled:                 true,
 		PrintingMergeRequestLinkEnabled: true,
 		PagesAccessLevel:                gitlab.PrivateAccessControl,
-		BuildCoverageRegex:              "foo",
 		CIForwardDeploymentEnabled:      true,
 	}
 
@@ -745,7 +731,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	pathAfterTransfer := fmt.Sprintf("foo2group-%d/foo-%d", rInt, rInt)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -772,9 +757,6 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 
 // lintignore: AT002 // not a Terraform import test
 func TestAccGitlabProject_importURL(t *testing.T) {
-	// Since we do some manual setup in this test, we need to handle the test skip first.
-	testAccCheck(t)
-
 	rInt := acctest.RandInt()
 
 	// Create a base project for importing.
@@ -799,7 +781,6 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -828,7 +809,6 @@ func TestAccGitlabProject_initializeWithReadmeAndCustomDefaultBranch(t *testing.
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -869,15 +849,12 @@ resource "gitlab_project" "foo" {
 }
 
 func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
-	testAccCheck(t)
-
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
 	user := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -934,10 +911,7 @@ func testAccCheckGitlabProjectMirroredAttributes(project *gitlab.Project, want *
 }
 
 // lintignore: AT002 // not a Terraform import test
-func TestAccGitlabProject_importURLMirrored(t *testing.T) {
-	// Since we do some manual setup in this test, we need to handle the test skip first.
-	testAccCheck(t)
-
+func TestAccGitlabProject_ImportURLMirrored(t *testing.T) {
 	var mirror gitlab.Project
 	rInt := acctest.RandInt()
 
@@ -963,7 +937,6 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1054,10 +1027,9 @@ func TestAccGitlabProject_importURLMirrored(t *testing.T) {
 func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccCheckMutualExclusiveNameAndID(rInt),
@@ -1073,7 +1045,6 @@ func TestAccGitlabProject_containerExpirationPolicy(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1143,6 +1114,37 @@ func TestAccGitlabProject_containerExpirationPolicy(t *testing.T) {
 			},
 			// Verify Import
 			{
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
+	var received gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				SkipFunc: isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+						visibility_level = "public"
+
+						build_coverage_regex = "helloWorld"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+				),
+			},
+			{
+				SkipFunc:          isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
 				ResourceName:      "gitlab_project.this",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -1362,7 +1364,6 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  build_coverage_regex = "foo"
 }
 	`, rInt, rInt, rInt)
 }
@@ -1418,7 +1419,6 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  build_coverage_regex = "foo"
 }
 
 resource "gitlab_project_variable" "foo" {
@@ -1452,7 +1452,6 @@ resource "gitlab_project" "foo" {
   # So that acceptance tests can be run in a gitlab organization
   # with no billing
   visibility_level = "public"
-  build_coverage_regex = "foo"
 }
 
 resource "gitlab_project_variable" "foo" {
@@ -1492,7 +1491,6 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_all_discussions_are_resolved = true
   squash_option = "default_off"
   pages_access_level = "public"
-  build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
   resolve_outdated_diff_discussions = true
@@ -1592,7 +1590,6 @@ resource "gitlab_project" "foo" {
   archived = true
   packages_enabled = false
   pages_access_level = "disabled"
-  build_coverage_regex = "bar"
   ci_forward_deployment_enabled = false
   merge_pipelines_enabled = false
   merge_trains_enabled = false
@@ -1932,7 +1929,6 @@ resource "gitlab_project" "foo" {
   only_allow_merge_if_all_discussions_are_resolved = true
   squash_option = "default_off"
   pages_access_level = "public"
-  build_coverage_regex = "foo"
   allow_merge_on_skipped_pipeline = false
   ci_config_path = ".gitlab-ci.yml@mynamespace/myproject"
   resolve_outdated_diff_discussions = true

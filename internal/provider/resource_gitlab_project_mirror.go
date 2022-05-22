@@ -19,6 +19,10 @@ var _ = registerResource("gitlab_project_mirror", func() *schema.Resource {
 This is for *pushing* changes to a remote repository. *Pull Mirroring* can be configured using a combination of the
 import_url, mirror, and mirror_trigger_builds properties on the gitlab_project resource.
 
+-> **Destroy Behavior** GitLab 14.10 introduced an API endpoint to delete a project mirror.
+   Therefore, for GitLab 14.10 and newer the project mirror will be destroyed when the resource is destroyed.
+   For older versions, the mirror will be disabled and the resource will be destroyed.
+
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/remote_mirrors.html)`,
 
 		CreateContext: resourceGitlabProjectMirrorCreate,
@@ -139,27 +143,33 @@ func resourceGitlabProjectMirrorUpdate(ctx context.Context, d *schema.ResourceDa
 	return resourceGitlabProjectMirrorRead(ctx, d, meta)
 }
 
-// Documented remote mirrors API does not support a delete method, instead mirror is disabled.
 func resourceGitlabProjectMirrorDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	enabled := false
-
 	mirrorID := d.Get("mirror_id").(int)
 	projectID := d.Get("project").(string)
-	onlyProtectedBranches := d.Get("only_protected_branches").(bool)
-	keepDivergentRefs := d.Get("keep_divergent_refs").(bool)
 
-	options := gitlab.EditProjectMirrorOptions{
-		Enabled:               &enabled,
-		OnlyProtectedBranches: &onlyProtectedBranches,
-		KeepDivergentRefs:     &keepDivergentRefs,
-	}
-	log.Printf("[DEBUG] Disable gitlab project mirror %v for %s", mirrorID, projectID)
-
-	_, _, err := client.ProjectMirrors.EditProjectMirror(projectID, mirrorID, &options, gitlab.WithContext(ctx))
+	isDeleteSupported, err := isGitLabVersionAtLeast(ctx, client, "14.10")()
 	if err != nil {
 		return diag.FromErr(err)
+	}
+
+	if isDeleteSupported {
+		log.Printf("[DEBUG] delete gitlab project mirror %v for %s", mirrorID, projectID)
+
+		_, err := client.ProjectMirrors.DeleteProjectMirror(projectID, mirrorID, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	} else {
+		// NOTE: this code only exists to support GitLab < 14.10.
+		//       It can be removed once ~ GitLab 15.2 is out and supported.
+		options := gitlab.EditProjectMirrorOptions{Enabled: gitlab.Bool(false)}
+		log.Printf("[DEBUG] Disable gitlab project mirror %v for %s", mirrorID, projectID)
+		_, _, err := client.ProjectMirrors.EditProjectMirror(projectID, mirrorID, &options, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 
 	return nil
@@ -170,42 +180,19 @@ func resourceGitlabProjectMirrorRead(ctx context.Context, d *schema.ResourceData
 
 	ids := strings.Split(d.Id(), ":")
 	projectID := ids[0]
-	mirrorID := ids[1]
-	integerMirrorID, err := strconv.Atoi(mirrorID)
+	rawMirrorID := ids[1]
+	mirrorID, err := strconv.Atoi(rawMirrorID)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	log.Printf("[DEBUG] read gitlab project mirror %s id %v", projectID, mirrorID)
-
-	var mirror *gitlab.ProjectMirror
-	found := false
-
-	opts := &gitlab.ListProjectMirrorOptions{
-		Page:    1,
-		PerPage: 20,
+	mirror, err := resourceGitLabProjectMirrorGetMirror(ctx, client, projectID, mirrorID)
+	if err != nil {
+		return diag.FromErr(err)
 	}
 
-	for {
-		mirrors, response, err := client.ProjectMirrors.ListProjectMirror(projectID, opts, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		for _, m := range mirrors {
-			log.Printf("[DEBUG] project mirror found %v", m.ID)
-			if m.ID == integerMirrorID {
-				mirror = m
-				found = true
-				break
-			}
-		}
-		if response.CurrentPage >= response.TotalPages {
-			break
-		}
-		opts.Page++
-	}
-
-	if !found {
+	if mirror == nil {
+		log.Printf("[DEBUG] mirror %d in project %s not found, removing from state", mirrorID, projectID)
 		d.SetId("")
 		return nil
 	}
@@ -221,4 +208,48 @@ func resourceGitlabProjectMirrorSetToState(d *schema.ResourceData, projectMirror
 	d.Set("only_protected_branches", projectMirror.OnlyProtectedBranches)
 	d.Set("project", projectID)
 	d.Set("url", projectMirror.URL)
+}
+
+func resourceGitLabProjectMirrorGetMirror(ctx context.Context, client *gitlab.Client, projectID string, mirrorID int) (*gitlab.ProjectMirror, error) {
+	isGetProjectMirrorSupported, err := isGitLabVersionAtLeast(ctx, client, "14.10")()
+	if err != nil {
+		return nil, err
+	}
+
+	var mirror *gitlab.ProjectMirror
+
+	if isGetProjectMirrorSupported {
+		mirror, _, err = client.ProjectMirrors.GetProjectMirror(projectID, mirrorID, gitlab.WithContext(ctx))
+		if err != nil {
+			if is404(err) {
+				return nil, nil
+			}
+			return nil, err
+		}
+	} else {
+		// NOTE: remove this branch and move logic back to Read() function when GitLab older than 14.10 are not longer supported by this provider
+		found := false
+		options := &gitlab.ListProjectMirrorOptions{
+			Page:    1,
+			PerPage: 20,
+		}
+
+		for options.Page != 0 && !found {
+			mirrors, resp, err := client.ProjectMirrors.ListProjectMirror(projectID, options, gitlab.WithContext(ctx))
+			if err != nil {
+				return nil, err
+			}
+
+			for _, m := range mirrors {
+				if m.ID == mirrorID {
+					mirror = m
+					found = true
+					break
+				}
+			}
+			options.Page = resp.NextPage
+		}
+	}
+
+	return mirror, nil
 }

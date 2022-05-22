@@ -1,67 +1,61 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabGroupShareGroup_basic(t *testing.T) {
-	randName := acctest.RandomWithPrefix("acctest")
+	mainGroup := testAccCreateGroups(t, 1)[0]
+	sharedGroup := testAccCreateGroups(t, 1)[0]
 
-	// lintignore: AT001 // TODO: Resolve this tfproviderlint issue
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabShareGroupDestroy,
 		Steps: []resource.TestStep{
 			// Share a new group with another group
 			{
-				Config: testAccGitlabGroupShareGroupConfig(
-					randName,
+				Config: testAccGitlabGroupShareGroupConfig(mainGroup.ID, sharedGroup.ID,
 					`
 					group_access 	 = "guest"
 					expires_at     = "2099-01-01"
 					`,
 				),
-				Check: testAccCheckGitlabGroupSharedWithGroup(randName, "2099-01-01", gitlab.GuestPermissions),
+				Check: testAccCheckGitlabGroupSharedWithGroup(mainGroup.Name, sharedGroup.Name, "2099-01-01", gitlab.GuestPermissions),
+			},
+			{
+				// Verify Import
+				ResourceName:      "gitlab_group_share_group.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the share group
 			{
-				Config: testAccGitlabGroupShareGroupConfig(randName, `group_access = "reporter"`),
-				Check:  testAccCheckGitlabGroupSharedWithGroup(randName, "", gitlab.ReporterPermissions),
+				Config: testAccGitlabGroupShareGroupConfig(mainGroup.ID, sharedGroup.ID, `group_access = "reporter"`),
+				Check:  testAccCheckGitlabGroupSharedWithGroup(mainGroup.Name, sharedGroup.Name, "", gitlab.ReporterPermissions),
 			},
-			// Delete the gitlab_group_share_group resource
 			{
-				Config: testAccGitlabGroupShareGroupConfigDelete(randName),
-				Check:  testAccCheckGitlabGroupIsNotShared(randName),
+				// Verify Import
+				ResourceName:      "gitlab_group_share_group.test",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabGroupShareGroup_import(t *testing.T) {
-	randName := acctest.RandomWithPrefix("acctest")
-
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: providerFactories,
-		PreCheck:          func() { testAccPreCheck(t) },
-		CheckDestroy:      testAccCheckGitlabGroupDestroy,
-		Steps: []resource.TestStep{
+			// Update share group back to initial settings
 			{
-				// create shared groups
-				Config: testAccGitlabGroupShareGroupConfig(
-					randName,
+				Config: testAccGitlabGroupShareGroupConfig(mainGroup.ID, sharedGroup.ID,
 					`
 					group_access 	 = "guest"
-					expires_at     = "2099-03-03"
+					expires_at     = "2099-01-01"
 					`,
 				),
-				Check: testAccCheckGitlabGroupSharedWithGroup(randName, "2099-03-03", gitlab.GuestPermissions),
+				Check: testAccCheckGitlabGroupSharedWithGroup(mainGroup.Name, sharedGroup.Name, "2099-01-01", gitlab.GuestPermissions),
 			},
 			{
 				// Verify Import
@@ -73,13 +67,9 @@ func TestAccGitlabGroupShareGroup_import(t *testing.T) {
 	})
 }
 
-func testAccCheckGitlabGroupSharedWithGroup(
-	groupName string,
-	expireTime string,
-	accessLevel gitlab.AccessLevelValue,
-) resource.TestCheckFunc {
+func testAccCheckGitlabGroupSharedWithGroup(mainGroupName string, sharedGroupName string, expireTime string, accessLevel gitlab.AccessLevelValue) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
-		mainGroup, _, err := testGitlabClient.Groups.GetGroup(fmt.Sprintf("%s_main", groupName), nil)
+		mainGroup, _, err := testGitlabClient.Groups.GetGroup(mainGroupName, nil)
 		if err != nil {
 			return err
 		}
@@ -91,8 +81,8 @@ func testAccCheckGitlabGroupSharedWithGroup(
 
 		sharedGroup := mainGroup.SharedWithGroups[0]
 
-		if sharedGroup.GroupName != fmt.Sprintf("%s_share", groupName) {
-			return fmt.Errorf("group name was %s (wanted %s)", sharedGroup.GroupName, fmt.Sprintf("%s_share", groupName))
+		if sharedGroup.GroupName != sharedGroupName {
+			return fmt.Errorf("group name was %s (wanted %s)", sharedGroup.GroupName, sharedGroupName)
 		}
 
 		if gitlab.AccessLevelValue(sharedGroup.GroupAccessLevel) != accessLevel {
@@ -109,62 +99,47 @@ func testAccCheckGitlabGroupSharedWithGroup(
 	}
 }
 
-func testAccCheckGitlabGroupIsNotShared(groupName string) resource.TestCheckFunc {
-	return func(_ *terraform.State) error {
-		mainGroup, _, err := testGitlabClient.Groups.GetGroup(fmt.Sprintf("%s_main", groupName), nil)
-		if err != nil {
-			return err
-		}
+func testAccCheckGitlabShareGroupDestroy(s *terraform.State) error {
+	var groupId string
+	var sharedGroupId int
+	var err error
 
-		sharedGroupsCount := len(mainGroup.SharedWithGroups)
-		if sharedGroupsCount != 0 {
-			return fmt.Errorf("Number of shared groups was %d (wanted %d)", sharedGroupsCount, 0)
-		}
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type == "gitlab_group_share_group" {
+			groupId, sharedGroupId, err = groupIdsFromId(rs.Primary.ID)
+			if err != nil {
+				return fmt.Errorf("[ERROR] cannot get Group ID and ShareGroupId from input: %v", rs.Primary.ID)
+			}
 
-		return nil
+			// Get Main Group
+			group, _, err := testGitlabClient.Groups.GetGroup(groupId, nil)
+			if err != nil {
+				return err
+			}
+
+			// Make sure that SharedWithGroups attribute on the main group does not contain the shared group id at all
+			for _, sharedGroup := range group.SharedWithGroups {
+				if sharedGroupId == sharedGroup.GroupID {
+					return fmt.Errorf("GitLab Group Share %d still exists", sharedGroupId)
+				}
+			}
+		}
 	}
+
+	return nil
 }
 
-func testAccGitlabGroupShareGroupConfig(
-	randName string,
-	shareGroupSettings string,
-) string {
+func testAccGitlabGroupShareGroupConfig(mainGroupId int, shareGroupId int, shareGroupSettings string) string {
 	return fmt.Sprintf(
 		`
-		resource "gitlab_group" "test_main" {
-		  name = "%[1]s_main"
-		  path = "%[1]s_main"
-		}
-
-		resource "gitlab_group" "test_share" {
-		  name = "%[1]s_share"
-		  path = "%[1]s_share"
-		}
-
 		resource "gitlab_group_share_group" "test" {
-		  group_id       = gitlab_group.test_main.id
-			share_group_id = gitlab_group.test_share.id
-			%[2]s
+		  group_id       = %[1]d
+			share_group_id = %[2]d
+			%[3]s
 		}
 		`,
-		randName,
+		mainGroupId,
+		shareGroupId,
 		shareGroupSettings,
-	)
-}
-
-func testAccGitlabGroupShareGroupConfigDelete(randName string) string {
-	return fmt.Sprintf(
-		`
-		resource "gitlab_group" "test_main" {
-		  name = "%[1]s_main"
-		  path = "%[1]s_main"
-		}
-
-		resource "gitlab_group" "test_share" {
-		  name = "%[1]s_share"
-		  path = "%[1]s_share"
-		}
-		`,
-		randName,
 	)
 }

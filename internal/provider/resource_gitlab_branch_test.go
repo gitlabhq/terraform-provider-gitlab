@@ -1,13 +1,17 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
-	"testing"
 )
 
 func TestAccGitlabBranch_basic(t *testing.T) {
@@ -15,12 +19,10 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 	var branch2 gitlab.Branch
 	rInt := acctest.RandInt()
 	rInt2 := acctest.RandInt()
-	testAccCheck(t)
 	project := testAccCreateProject(t)
 	fooBranchName := fmt.Sprintf("testbranch-%d", rInt)
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchDestroy,
 		Steps: []resource.TestStep{

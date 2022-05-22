@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -9,15 +12,12 @@ import (
 )
 
 func TestAccDataSourceGitlabInstanceVariables_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testVariables := make([]*gitlab.InstanceVariable, 0)
 	for i := 0; i < 25; i++ {
 		testVariables = append(testVariables, testAccCreateInstanceVariable(t))
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

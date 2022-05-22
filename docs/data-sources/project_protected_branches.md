@@ -32,12 +32,9 @@ data "gitlab_project_protected_branches" "example" {
 
 - `project_id` (String) The integer or path with namespace that uniquely identifies the project.
 
-### Optional
-
-- `id` (String) The ID of this resource.
-
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `protected_branches` (List of Object) A list of protected branches, as defined below. (see [below for nested schema](#nestedatt--protected_branches))
 
 <a id="nestedatt--protected_branches"></a>

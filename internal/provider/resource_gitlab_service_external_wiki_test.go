@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -11,8 +14,6 @@ import (
 )
 
 func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
-	testAccCheck(t)
-
 	testProject := testAccCreateProject(t)
 
 	var externalWikiService gitlab.ExternalWikiService
@@ -22,7 +23,6 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 	var externalWikiResourceName = "gitlab_service_external_wiki.this"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceExternalWikiDestroy,
 		Steps: []resource.TestStep{
@@ -34,7 +34,13 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL1),
 					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL1),
 					resource.TestCheckResourceAttr(externalWikiResourceName, "active", "true"),
-					testCheckResourceAttrLazy(externalWikiResourceName, "created_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith(externalWikiResourceName, "created_at", func(value string) error {
+						expectedValue := externalWikiService.CreatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
@@ -49,8 +55,20 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabServiceExternalWikiExists(externalWikiResourceName, &externalWikiService),
 					resource.TestCheckResourceAttr(externalWikiResourceName, "external_wiki_url", externalWikiURL2),
-					testCheckResourceAttrLazy(externalWikiResourceName, "created_at", func() string { return externalWikiService.CreatedAt.Format(time.RFC3339) }),
-					testCheckResourceAttrLazy(externalWikiResourceName, "updated_at", func() string { return externalWikiService.UpdatedAt.Format(time.RFC3339) }),
+					resource.TestCheckResourceAttrWith(externalWikiResourceName, "created_at", func(value string) error {
+						expectedValue := externalWikiService.CreatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
+					resource.TestCheckResourceAttrWith(externalWikiResourceName, "updated_at", func(value string) error {
+						expectedValue := externalWikiService.UpdatedAt.Format(time.RFC3339)
+						if value != expectedValue {
+							return fmt.Errorf("should be equal to %s", expectedValue)
+						}
+						return nil
+					}),
 				),
 			},
 			// Verify import
