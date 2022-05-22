@@ -32,9 +32,9 @@ func TestAccGitlabPagesDomain_basic(t *testing.T) {
 			},
 			// Verify import
 			{
-				ResourceName:            "gitlab_pages_domain.this",
-				ImportState:             true,
-				ImportStateVerify:       true,
+				ResourceName:      "gitlab_pages_domain.this",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the pages domain to toggle all the values to their inverse
 			{
