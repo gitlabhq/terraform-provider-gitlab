@@ -137,8 +137,7 @@ var _ = registerDataSource("gitlab_project_issues", func() *schema.Resource {
 			},
 			"not_milestone": {
 				Description: "Return issues that do not match the milestone.",
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeString,
 				Optional:    true,
 			},
 			"my_reaction_emoji": {
@@ -251,7 +250,7 @@ func dataSourceGitlabProjectIssuesRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if v, ok := d.GetOk("not_milestone"); ok {
-		options.NotMilestone = stringSetToStringSlice(v.(*schema.Set))
+		options.NotMilestone = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("scope"); ok {
