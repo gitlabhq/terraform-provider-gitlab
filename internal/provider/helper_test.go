@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -96,6 +97,37 @@ func testAccCheckEE(t *testing.T) {
 	if !strings.HasSuffix(version.Version, "-ee") {
 		t.Skipf("Test is skipped for non-Enterprise version of GitLab (was %q)", version.String())
 	}
+}
+
+func testAccRequiresLessThan(t *testing.T, requiredMaxVersion string) {
+	isLessThan, err := isGitLabVersionLessThan(context.TODO(), testGitlabClient, requiredMaxVersion)()
+	if err != nil {
+		t.Fatalf("Failed to fetch GitLab version: %+v", err)
+	}
+
+	if !isLessThan {
+		t.Skipf("This test is only valid for GitLab versions less than %s", requiredMaxVersion)
+	}
+}
+
+func testAccRequiresAtLeast(t *testing.T, requiredMinVersion string) {
+	isAtLeast, err := isGitLabVersionAtLeast(context.TODO(), testGitlabClient, requiredMinVersion)()
+	if err != nil {
+		t.Fatalf("Failed to fetch GitLab version: %+v", err)
+	}
+
+	if !isAtLeast {
+		t.Skipf("This test is only valid for GitLab versions newer than %s", requiredMinVersion)
+	}
+}
+
+func testAccIsRunningAtLeast(t *testing.T, requiredMinVersion string) bool {
+	isAtLeast, err := isGitLabVersionAtLeast(context.TODO(), testGitlabClient, requiredMinVersion)()
+	if err != nil {
+		t.Fatalf("Failed to fetch GitLab version: %+v", err)
+	}
+
+	return isAtLeast
 }
 
 // testAccCurrentUser is a test helper for getting the current user of the provided client.
