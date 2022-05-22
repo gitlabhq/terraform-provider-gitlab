@@ -1131,7 +1131,7 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				SkipFunc: isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				SkipFunc: isGitLabVersionAtLeast(context.Background(), testGitlabClient, "15.0"),
 				Config: fmt.Sprintf(`
 					resource "gitlab_project" "this" {
 						name = "foo-%d"
@@ -1144,7 +1144,7 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 				),
 			},
 			{
-				SkipFunc:          isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				SkipFunc:          isGitLabVersionAtLeast(context.Background(), testGitlabClient, "15.0"),
 				ResourceName:      "gitlab_project.this",
 				ImportState:       true,
 				ImportStateVerify: true,
