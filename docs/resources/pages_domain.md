@@ -28,11 +28,11 @@ The `gitlab_pages_domain` resource allows to manage the lifecycle of a custom Pa
 - `auto_ssl_enabled` (Boolean) Enables automatic generation of SSL certificates issued by Let’s Encrypt for custom domains.
 - `certificate` (String) The certificate in PEM format with intermediates following in most specific to least specific order.
 - `certificate_data` (Block List, Max: 1) The certificate data. (see [below for nested schema](#nestedblock--certificate_data))
-- `id` (String) The ID of this resource.
 - `key` (String) The certificate key in PEM format.
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `url` (String) The URL for the given domain.
 - `verification_code` (String, Sensitive) The verification code for the domain.
 - `verified` (Boolean) The certificate data.
