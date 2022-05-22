@@ -20,28 +20,21 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccCheckEE(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
 			{
 				// Create a managed license with an "allowed" state
-				SkipFunc: isRunningInCE,
-				Config:   testManagedLicenseConfig(rInt, "allowed"),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
-				),
+				Config: testManagedLicenseConfig(rInt, "allowed"),
+				Check:  testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
 			},
 			{
 				// Update the managed license to have a denied state
-				SkipFunc: isRunningInCE,
-				Config:   testManagedLicenseConfig(rInt, "denied"),
-				Check: resource.ComposeTestCheckFunc(
-					//Even though the API accepts "denied", it still returns "blacklisted" until 15.0
-					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "blacklisted", &managedLicense),
-				),
+				Config: testManagedLicenseConfig(rInt, "denied"),
+				Check:  testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "denied", &managedLicense),
 			},
 			{
-				SkipFunc:          isRunningInCE,
 				ResourceName:      "gitlab_managed_license.fixme",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -55,36 +48,28 @@ func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccRequiresLessThan(t, "15.0")
+			testAccCheckEE(t)
+		},
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
 			{
 				// Create a managed license with an "approved" state
-				SkipFunc: orSkipFunc(
-					isRunningInCE,
-					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
-				),
 				Config: testManagedLicenseConfig(rInt, "approved"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
 				),
 			},
 			{
-				// Update the managed license to have a blacklisted state
-				SkipFunc: orSkipFunc(
-					isRunningInCE,
-					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
-				),
+				// Update the managed license to have a "blacklisted" state
 				Config: testManagedLicenseConfig(rInt, "blacklisted"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "blacklisted", &managedLicense),
 				),
 			},
 			{
-				SkipFunc: orSkipFunc(
-					isRunningInCE,
-					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
-				),
 				ResourceName:      "gitlab_managed_license.fixme",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -133,7 +118,11 @@ func testAccCheckGitlabManagedLicenseStatus(resource string, status string, lice
 		}
 
 		for _, gotLicense := range licenses {
-			if gotLicense.ApprovalStatus == *stringToApprovalStatus(status) {
+			approvalStatus, err := stringToApprovalStatus(context.TODO(), testGitlabClient, status)
+			if err != nil {
+				return err
+			}
+			if gotLicense.ApprovalStatus == *approvalStatus {
 				*license = *gotLicense
 				return nil
 			}

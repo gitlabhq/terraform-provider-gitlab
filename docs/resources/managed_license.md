@@ -37,8 +37,8 @@ resource "gitlab_managed_license" "mit" {
 
 ### Required
 
-- `approval_status` (String) The approval status of the license. Valid values are: `approved`, `blacklisted`, `allowed`, `denied`. "approved" and "blacklisted" 
-				have been deprecated in favor of "allowed" and "denied"; use "allowed" and "denied" for GitLab versions 15.0 and higher. 
+- `approval_status` (String) The approval status of the license. Valid values are: `approved`, `blacklisted`, `allowed`, `denied`. "approved" and "blacklisted"
+				have been deprecated in favor of "allowed" and "denied"; use "allowed" and "denied" for GitLab versions 15.0 and higher.
 				Prior to version 15.0 and after 14.6, the values are equivalent.
 - `name` (String) The name of the managed license (I.e., 'Apache License 2.0' or 'MIT license')
 - `project` (String) The ID of the project under which the managed license will be created.
