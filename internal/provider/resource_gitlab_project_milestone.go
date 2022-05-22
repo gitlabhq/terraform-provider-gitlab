@@ -94,7 +94,7 @@ func resourceGitlabProjectMilestoneRead(ctx context.Context, d *schema.ResourceD
 		if is404(err) {
 			log.Printf("[WARN] recieved 404 for gitlab milestone ID %d in project %s, removing from state", milestoneID, project)
 			d.SetId("")
-			return diag.FromErr(err)
+			return nil
 		}
 		log.Printf("[WARN] failed to read gitlab milestone ID %d in project %s. Response %v", milestoneID, project, resp)
 		return diag.FromErr(err)

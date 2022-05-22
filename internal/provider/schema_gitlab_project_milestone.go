@@ -52,20 +52,7 @@ func gitlabProjectMilestoneGetSchema() map[string]*schema.Schema {
 		"created_at": {
 			Description: "The time of creation of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.",
 			Type:        schema.TypeString,
-			Optional:    true,
 			Computed:    true,
-			// NOTE: since RFC3339 is pretty much a subset of ISO8601 and actually expected by GitLab,
-			//       we use it here to avoid having to parse the string ourselves.
-			ValidateDiagFunc: validation.ToDiagFunc(validation.IsRFC3339Time),
-		},
-		"updated_at": {
-			Description: "The last update time of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.",
-			Type:        schema.TypeString,
-			Optional:    true,
-			Computed:    true,
-			// NOTE: since RFC3339 is pretty much a subset of ISO8601 and actually expected by GitLab,
-			//       we use it here to avoid having to parse the string ourselves.
-			ValidateDiagFunc: validation.ToDiagFunc(validation.IsRFC3339Time),
 		},
 		"expired": {
 			Description: "Bool, true if milestore expired.",
@@ -85,6 +72,11 @@ func gitlabProjectMilestoneGetSchema() map[string]*schema.Schema {
 		"project_id": {
 			Description: "The project ID of milestone.",
 			Type:        schema.TypeInt,
+			Computed:    true,
+		},
+		"updated_at": {
+			Description: "The last update time of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.",
+			Type:        schema.TypeString,
 			Computed:    true,
 		},
 		"web_url": {
@@ -113,8 +105,16 @@ func gitlabProjectMilestoneToStateMap(project string, milestone *gitlab.Mileston
 	} else {
 		stateMap["start_date"] = nil
 	}
-	stateMap["updated_at"] = milestone.UpdatedAt.Format(time.RFC3339)
-	stateMap["created_at"] = milestone.CreatedAt.Format(time.RFC3339)
+	if milestone.UpdatedAt != nil {
+		stateMap["updated_at"] = milestone.UpdatedAt.Format(time.RFC3339)
+	} else {
+		stateMap["updated_at"] = nil
+	}
+	if milestone.CreatedAt != nil {
+		stateMap["created_at"] = milestone.CreatedAt.Format(time.RFC3339)
+	} else {
+		stateMap["created_at"] = nil
+	}
 	stateMap["state"] = milestone.State
 	stateMap["web_url"] = milestone.WebURL
 	if milestone.Expired != nil {

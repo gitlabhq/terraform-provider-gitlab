@@ -20,10 +20,10 @@ func TestAccDataSourceGitlabProjectMilestone_basic(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-                data "gitlab_project_milestone" "this" {
-                  project      = "%d"
-                  milestone_id = "%d"
-                }`, testProject.ID, testMilestone.ID),
+				data "gitlab_project_milestone" "this" {
+					project      = "%d"
+					milestone_id = "%d"
+				}`, testProject.ID, testMilestone.ID),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.gitlab_project_milestone.this", "milestone_id", fmt.Sprintf("%v", testMilestone.ID)),
 					resource.TestCheckResourceAttr("data.gitlab_project_milestone.this", "title", testMilestone.Title),

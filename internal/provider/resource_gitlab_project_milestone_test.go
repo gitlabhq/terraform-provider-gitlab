@@ -25,10 +25,10 @@ func TestAccGitlabProjectMilestone_basic(t *testing.T) {
 			{
 				// create Milestone with required values only
 				Config: fmt.Sprintf(`
-                resource "gitlab_project_milestone" "this" {
-                  project = "%v"
-                  title   = "test-%d"
-                }`, project.PathWithNamespace, rInt1),
+				resource "gitlab_project_milestone" "this" {
+					project = "%v"
+					title   = "test-%d"
+				}`, project.PathWithNamespace, rInt1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("gitlab_project_milestone.this", "iid"),
 					resource.TestCheckResourceAttrSet("gitlab_project_milestone.this", "milestone_id"),
@@ -47,14 +47,14 @@ func TestAccGitlabProjectMilestone_basic(t *testing.T) {
 			{
 				// update some Milestone attributes
 				Config: fmt.Sprintf(`
-                resource "gitlab_project_milestone" "this" {
-                  project     = "%[1]d"
-                  title       = "test-%[2]d"
-                  description = "test-%[2]d"
-                  start_date  = "2022-04-10"
-                  due_date    = "2022-04-15"
-                  state       = "closed"
-                }`, project.ID, rInt2),
+				resource "gitlab_project_milestone" "this" {
+					project     = "%[1]d"
+					title       = "test-%[2]d"
+					description = "test-%[2]d"
+					start_date  = "2022-04-10"
+					due_date    = "2022-04-15"
+					state       = "closed"
+				}`, project.ID, rInt2),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("gitlab_project_milestone.this", "iid"),
 					resource.TestCheckResourceAttrSet("gitlab_project_milestone.this", "milestone_id"),
