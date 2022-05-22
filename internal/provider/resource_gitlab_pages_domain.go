@@ -126,8 +126,10 @@ func resourceGitlabPagesDomainCreate(ctx context.Context, d *schema.ResourceData
 func resourceGitlabPagesDomainUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	projectID := d.Get("project").(string)
-	domain := d.Get("domain").(string)
+	projectID, domain, err := parseTwoPartID(d.Id())
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	auto_ssl_enabled := d.Get("auto_ssl_enabled").(bool)
 	certificate := d.Get("certificate").(string)
 	key := d.Get("key").(string)
