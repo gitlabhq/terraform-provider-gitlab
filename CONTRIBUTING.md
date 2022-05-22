@@ -108,6 +108,8 @@ Your workspace will automatically open the repository and branch that you select
 
 The acceptance tests can run against a Gitlab instance where you have a token with administrator permissions (likely not gitlab.com).
 
+The GitHub Actions test against the three latest GitLab releases.
+
 #### Option 1: Run tests against a local Gitlab container with docker-compose
 
 This option is the easiest and requires [docker-compose](https://docs.docker.com/compose/install/) (version 1.13+) to be installed on your machine.
@@ -160,6 +162,14 @@ $ make testacc GITLAB_TOKEN=example123 GITLAB_BASE_URL=https://example.com/api/v
 
   ```sh
   $ make testacc-up SERVICE=gitlab-ee
+  ```
+
+* **Run tests against specific GitLab version:**
+
+  Specify the GitLab release in the `GITLAB_CE_VERSION` or `GITLAB_EE_VERSION`, e.g.:
+
+  ```sh
+  $ make testacc-up GITLAB_CE_VERSION=15.0.0-ce.0
   ```
 
 * **Run a single test:**

@@ -94,6 +94,9 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     needs: [go-version]
+    strategy:
+      matrix:
+        gitlab-version: ["14.9.4-ce.0", "14.10.3-ce.0", "15.0.0-ce.0"]
     steps:
       - uses: actions/setup-go@v3
         with:
@@ -104,7 +107,7 @@ jobs:
         with:
           path: ~/go/pkg/mod
           key: ${{ github.job }}-${{ runner.os }}-go${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum', 'GNUMakefile') }}
-      - run: make testacc-up
+      - run: make testacc-up GITLAB_CE_VERSION=${{ matrix.gitlab-version }}
       - run: make testacc
 
   acceptance-ee:
@@ -114,6 +117,9 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     needs: [go-version, license-encryption-password]
+    strategy:
+      matrix:
+        gitlab-version: ["14.9.4-ee.0", "14.10.3-ee.0", "15.0.0-ee.0"]
     steps:
       - uses: actions/setup-go@v3
         with:
@@ -129,5 +135,5 @@ jobs:
           openssl version
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 20000 -in Gitlab-license.encrypted -out Gitlab-license.txt -pass "pass:${{ secrets.LICENSE_ENCRYPTION_PASSWORD }}"
       # Note we specifically launch the gitlab-ee service.
-      - run: make testacc-up SERVICE=gitlab-ee
+      - run: make testacc-up SERVICE=gitlab-ee GITLAB_EE_VERSION=${{ matrix.gitlab-version }}
       - run: make testacc
