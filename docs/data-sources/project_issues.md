@@ -50,7 +50,7 @@ data "gitlab_project_issues" "all_with_foo" {
 - `not_assignee_id` (List of Number) Return issues that do not match the assignee id.
 - `not_author_id` (List of Number) Return issues that do not match the author id.
 - `not_labels` (List of String) Return issues that do not match the labels.
-- `not_milestone` (List of String) Return issues that do not match the milestone.
+- `not_milestone` (String) Return issues that do not match the milestone.
 - `not_my_reaction_emoji` (List of String) Return issues not reacted by the authenticated user by the given emoji.
 - `order_by` (String) Return issues ordered by. Valid values are `created_at`, `updated_at`, `priority`, `due_date`, `relative_position`, `label_priority`, `milestone_due`, `popularity`, `weight`. Default is created_at
 - `scope` (String) Return issues for the given scope. Valid values are `created_by_me`, `assigned_to_me`, `all`. Defaults to all.
