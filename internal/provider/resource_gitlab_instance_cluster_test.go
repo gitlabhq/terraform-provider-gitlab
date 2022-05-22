@@ -19,6 +19,7 @@ func TestAccGitlabInstanceCluster_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccCheckIsRunningOlder15(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabInstanceClusterDestroy,
 		Steps: []resource.TestStep{
@@ -107,6 +108,7 @@ func TestAccGitlabInstanceCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccCheckIsRunningOlder15(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabInstanceClusterDestroy,
 		Steps: []resource.TestStep{

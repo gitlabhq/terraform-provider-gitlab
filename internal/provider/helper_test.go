@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -95,6 +96,12 @@ func testAccCheckEE(t *testing.T) {
 
 	if !strings.HasSuffix(version.Version, "-ee") {
 		t.Skipf("Test is skipped for non-Enterprise version of GitLab (was %q)", version.String())
+	}
+}
+
+func testAccCheckIsRunningOlder15(t *testing.T) {
+	if notSupported, err := isGitLabVersionAtLeast(context.Background(), testGitlabClient, "15.0")(); err != nil || notSupported {
+		t.Skip("This test is only valid for GitLab versions prior to 15.0")
 	}
 }
 
