@@ -53,8 +53,8 @@ var _ = registerResource("gitlab_managed_license", func() *schema.Resource {
 				ForceNew:         false,
 				ValidateFunc:     validation.StringInSlice(managedLicenseAllowedValues, true),
 				DiffSuppressFunc: checkDeprecatedValuesForDiff,
-				Description: fmt.Sprintf(`The approval status of the license. Valid values are: %s. "approved" and "blacklisted" 
-				have been deprecated in favor of "allowed" and "denied"; use "allowed" and "denied" for GitLab versions 15.0 and higher. 
+				Description: fmt.Sprintf(`The approval status of the license. Valid values are: %s. "approved" and "blacklisted"
+				have been deprecated in favor of "allowed" and "denied"; use "allowed" and "denied" for GitLab versions 15.0 and higher.
 				Prior to version 15.0 and after 14.6, the values are equivalent.`, renderValueListForDocs(managedLicenseAllowedValues)),
 			},
 		},
@@ -67,7 +67,7 @@ func resourceGitlabManagedLicenseCreate(ctx context.Context, d *schema.ResourceD
 
 	options := &gitlab.AddManagedLicenseOptions{
 		Name:           gitlab.String(d.Get("name").(string)),
-		ApprovalStatus: stringToApprovalStatus(d.Get("approval_status").(string)),
+		ApprovalStatus: stringToApprovalStatus(ctx, client, d.Get("approval_status").(string)),
 	}
 
 	log.Printf("[DEBUG] create gitlab Managed License on Project %s, with Name %s", project, *options.Name)
@@ -132,11 +132,7 @@ func resourceGitlabManagedLicenseUpdate(ctx context.Context, d *schema.ResourceD
 	}
 
 	opts := &gitlab.EditManagedLicenceOptions{
-		ApprovalStatus: stringToApprovalStatus(d.Get("approval_status").(string)),
-	}
-
-	if d.HasChange("approval_status") {
-		opts.ApprovalStatus = stringToApprovalStatus(d.Get("approval_status").(string))
+		ApprovalStatus: stringToApprovalStatus(ctx, client, d.Get("approval_status").(string)),
 	}
 
 	log.Printf("[DEBUG] update gitlab Managed License %s", d.Id())
@@ -152,20 +148,26 @@ func resourceGitlabManagedLicenseUpdate(ctx context.Context, d *schema.ResourceD
 }
 
 // Convert the incoming string into the proper constant value for passing into the API.
-func stringToApprovalStatus(s string) *gitlab.LicenseApprovalStatusValue {
-	lookup := map[string]gitlab.LicenseApprovalStatusValue{
-		"approved":    gitlab.LicenseApproved,
-		"blacklisted": gitlab.LicenseBlacklisted,
+func stringToApprovalStatus(ctx context.Context, client *gitlab.Client, s string) *gitlab.LicenseApprovalStatusValue {
+	var value gitlab.LicenseApprovalStatusValue
+	if notSupported, err := isGitLabVersionAtLeast(ctx, client, "15.0")(); err != nil || notSupported {
+		value = gitlab.LicenseApprovalStatusValue(s)
+	} else {
+		lookup := map[string]gitlab.LicenseApprovalStatusValue{
+			"approved":    gitlab.LicenseApproved,
+			"blacklisted": gitlab.LicenseBlacklisted,
 
-		// This is counter-intuitive, but currently the API response from the non-deprecated
-		// values is the deprecated values. So we have to map them here.
-		"allowed": gitlab.LicenseApproved,
-		"denied":  gitlab.LicenseBlacklisted,
-	}
+			// This is counter-intuitive, but currently the API response from the non-deprecated
+			// values is the deprecated values. So we have to map them here.
+			"allowed": gitlab.LicenseApproved,
+			"denied":  gitlab.LicenseBlacklisted,
+		}
 
-	value, ok := lookup[s]
-	if !ok {
-		return nil
+		v, ok := lookup[s]
+		if !ok {
+			return nil
+		}
+		value = v
 	}
 	return &value
 }

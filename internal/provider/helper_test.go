@@ -68,22 +68,6 @@ func isRunningInCE() (bool, error) {
 	return !isEE, err
 }
 
-// orSkipFunc accepts many skipFunc and returns "true" if any returns true.
-func orSkipFunc(input ...SkipFunc) SkipFunc {
-	return func() (bool, error) {
-		for _, item := range input {
-			result, err := item()
-			if err != nil {
-				return false, err
-			}
-			if result {
-				return result, nil
-			}
-		}
-		return false, nil
-	}
-}
-
 // testAccCheckEE is a test helper that skips the current test if the GitLab version is not GitLab Enterprise.
 // This is useful when the version needs to be checked during setup, before the Terraform acceptance test starts.
 func testAccCheckEE(t *testing.T) {

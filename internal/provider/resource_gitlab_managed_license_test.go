@@ -37,7 +37,7 @@ func TestAccGitlabManagedLicense_basic(t *testing.T) {
 				Config:   testManagedLicenseConfig(rInt, "denied"),
 				Check: resource.ComposeTestCheckFunc(
 					//Even though the API accepts "denied", it still returns "blacklisted" until 15.0
-					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "blacklisted", &managedLicense),
+					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "denied", &managedLicense),
 				),
 			},
 			{
@@ -55,36 +55,28 @@ func TestAccGitlabManagedLicense_deprecatedConfigValues(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccCheckIsRunningOlder15(t) },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckManagedLicenseDestroy,
 		Steps: []resource.TestStep{
 			{
 				// Create a managed license with an "approved" state
-				SkipFunc: orSkipFunc(
-					isRunningInCE,
-					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
-				),
-				Config: testManagedLicenseConfig(rInt, "approved"),
+				SkipFunc: isRunningInCE,
+				Config:   testManagedLicenseConfig(rInt, "approved"),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabManagedLicenseExists("gitlab_managed_license.fixme", &managedLicense),
 				),
 			},
 			{
-				// Update the managed license to have a blacklisted state
-				SkipFunc: orSkipFunc(
-					isRunningInCE,
-					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
-				),
-				Config: testManagedLicenseConfig(rInt, "blacklisted"),
+				// Update the managed license to have a "denied" state
+				SkipFunc: isRunningInCE,
+				Config:   testManagedLicenseConfig(rInt, "denied"),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "blacklisted", &managedLicense),
+					testAccCheckGitlabManagedLicenseStatus("gitlab_managed_license.fixme", "denied", &managedLicense),
 				),
 			},
 			{
-				SkipFunc: orSkipFunc(
-					isRunningInCE,
-					isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
-				),
+				SkipFunc:          isRunningInCE,
 				ResourceName:      "gitlab_managed_license.fixme",
 				ImportState:       true,
 				ImportStateVerify: true,
@@ -133,7 +125,7 @@ func testAccCheckGitlabManagedLicenseStatus(resource string, status string, lice
 		}
 
 		for _, gotLicense := range licenses {
-			if gotLicense.ApprovalStatus == *stringToApprovalStatus(status) {
+			if gotLicense.ApprovalStatus == *stringToApprovalStatus(context.Background(), testGitlabClient, status) {
 				*license = *gotLicense
 				return nil
 			}
