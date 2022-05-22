@@ -130,20 +130,24 @@ func resourceGitlabPagesDomainUpdate(ctx context.Context, d *schema.ResourceData
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	auto_ssl_enabled := d.Get("auto_ssl_enabled").(bool)
-	certificate := d.Get("certificate").(string)
-	key := d.Get("key").(string)
+	
+	options := &gitlab.UpdatePagesDomainOptions{}
 
-	options := &gitlab.UpdatePagesDomainOptions{
-		AutoSslEnabled: &auto_ssl_enabled,
-		Certificate:    &certificate,
-		Key:            &key,
+	if d.HasChange("auto_ssl_enabled") {
+		options.AutoSslEnabled = gitlab.Bool(d.Get("auto_ssl_enabled").(bool))
 	}
+	if d.HasChange("certificate") {
+		options.Certificate = gitlab.String(d.Get("certificate").(string))
+	}
+	if d.HasChange("key") {
+		options.Key = gitlab.String(d.Get("key").(string))
+	}
+
 	log.Printf("[DEBUG] update gitlab pages domain %s for %s", domain, projectID)
 
-	_, _, err := client.PagesDomains.UpdatePagesDomain(projectID, domain, options, gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
+	_, _, err2 := client.PagesDomains.UpdatePagesDomain(projectID, domain, options, gitlab.WithContext(ctx))
+	if err2 != nil {
+		return diag.FromErr(err2)
 	}
 	return resourceGitlabProjectMirrorRead(ctx, d, meta)
 }
