@@ -239,6 +239,60 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 	})
 }
 
+func TestAccGitlabRepositoryFile_createWithExecuteFilemode(t *testing.T) {
+	testProject := testAccCreateProject(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccRequiresAtLeast(t, "14.10") },
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg=="
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: change launch codes"
+						execute_filemode = false
+					}
+				`, testProject.ID),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_repository_file.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"author_email", "author_name", "commit_message"},
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_repository_file" "this" {
+						project = %d
+						file_path = "meow.txt"
+						branch = "main"
+						content = "bWVvdyBtZW93IG1lb3cgbWVvdyBtZW93Cg=="
+						author_email = "meow@catnip.com"
+						author_name = "Meow Meowington"
+						commit_message = "feature: change launch codes"
+						execute_filemode = true
+					}
+				`, testProject.ID),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_repository_file.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"author_email", "author_name", "commit_message"},
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabRepositoryFileExists(n string, file *gitlab.File) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
@@ -354,7 +408,6 @@ resource "gitlab_repository_file" "this" {
   author_email = "meow@catnip.com"
   author_name = "Meow Meowington"
   commit_message = "feature: change launch codes"
-  execute_filemode = true
 }
 	`, projectID)
 }

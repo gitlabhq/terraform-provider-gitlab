@@ -18,6 +18,7 @@ func TestAccGitlabGroupCluster_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccRequiresLessThan(t, "15.0") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupClusterDestroy,
 		Steps: []resource.TestStep{
@@ -105,6 +106,7 @@ func TestAccGitlabGroupCluster_import(t *testing.T) {
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccRequiresLessThan(t, "15.0") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupClusterDestroy,
 		Steps: []resource.TestStep{

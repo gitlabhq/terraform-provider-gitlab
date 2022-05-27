@@ -855,6 +855,7 @@ func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
 	user := testAccCreateUsers(t, 1)[0]
 
 	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccRequiresAtLeast(t, "14.10") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1131,7 +1132,7 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
 			{
-				SkipFunc: isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				SkipFunc: isGitLabVersionAtLeast(context.Background(), testGitlabClient, "15.0"),
 				Config: fmt.Sprintf(`
 					resource "gitlab_project" "this" {
 						name = "foo-%d"
@@ -1144,7 +1145,7 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 				),
 			},
 			{
-				SkipFunc:          isGitLabVersionLessThan(context.Background(), testGitlabClient, "15.0"),
+				SkipFunc:          isGitLabVersionAtLeast(context.Background(), testGitlabClient, "15.0"),
 				ResourceName:      "gitlab_project.this",
 				ImportState:       true,
 				ImportStateVerify: true,

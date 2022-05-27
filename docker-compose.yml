@@ -4,7 +4,7 @@ version: '3'
 # Only one of these services should be run at a time.
 services:
   gitlab-ce:
-    image: gitlab/gitlab-ce
+    image: gitlab/gitlab-ce:${GITLAB_CE_VERSION:-latest}
     restart: always
     ports:
       - 8080:80
@@ -25,7 +25,7 @@ services:
       timeout: 2m
 
   gitlab-ee:
-    image: gitlab/gitlab-ee
+    image: gitlab/gitlab-ee:${GITLAB_EE_VERSION:-latest}
     restart: always
     ports:
       - 8080:80
