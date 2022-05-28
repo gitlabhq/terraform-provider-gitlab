@@ -1,3 +1,30 @@
+## 3.15.0 (2022-05-29)
+
+This release was tested against GitLab 14.9, 14.10 and 15.0 for both CE and EE.
+
+FEATURES:
+
+* **New Data Source:** `gitlab_cluster_agent` ([#1073](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1073))
+* **New Data Source:** `gitlab_cluster_agents` ([#1073](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1073))
+* **New Data Source:** `gitlab_project_milestone` ([#1044](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1044))
+* **New Data Source:** `gitlab_project_milestones` ([#1044](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1044))
+* **New Resource:** `gitlab_project_milestone` ([#1044](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1044))
+* **New Resource:** `gitlab_runner` ([#1049](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1049))
+* **New Resource:** `gitlab_cluster_agent` ([#1073](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1073))
+
+IMPROVEMENTS:
+
+* resource/gitlab_group: Allow value `3` for `default_branch_protection` attribute ([#1070](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1070))
+* resource/gitlab_project_badge: Add `name` attribute ([#1052](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1052))
+* resource/gitlab_group: Transfer a subgroup does not longer re-create the group ([#1078](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1078))
+* resource/gitlab_topic: Add `name` attribute ([#1095](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1095))
+
+BUG FIXES:
+
+* resource/gitlab_project_issue: Remove `Optional` from `Computed`-only attributes ([#1081](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1081))
+* datasource/gitlab_project_issues: Fix type of `not_milestone` attribute from list of strings to a single string ([#1095](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1095))
+
+
 ## 3.14.0 (2022-05-02)
 
 FEATURES:
