@@ -87,6 +87,7 @@ resource "gitlab_project" "peters_repo" {
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) Custom Path to CI config file.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+- `cicd_settings` (Block List) Settings for the CI/CD pipelines (see [below for nested schema](#nestedblock--cicd_settings))
 - `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
 - `container_registry_enabled` (Boolean) Enable container registry for the project.
@@ -153,6 +154,17 @@ resource "gitlab_project" "peters_repo" {
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
 - `web_url` (String) URL that can be used to find the project in a browser.
+
+<a id="nestedblock--cicd_settings"></a>
+### Nested Schema for `cicd_settings`
+
+Optional:
+
+- `job_token_scope_enabled` (Boolean) Indicates CI job tokens generated in this project have restricted access to resources.
+- `keep_latest_artifact` (Boolean) Indicates if the latest artifact should be kept for this project.
+- `merge_pipelines_enabled` (Boolean) Indicates if merge pipelines are enabled for the project.
+- `merge_trains_enabled` (Boolean) Indicates if merge trains are enabled for the project.
+
 
 <a id="nestedblock--container_expiration_policy"></a>
 ### Nested Schema for `container_expiration_policy`
