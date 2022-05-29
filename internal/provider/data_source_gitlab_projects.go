@@ -1,5 +1,3 @@
-// lintignore: S031 // TODO: Resolve this tfproviderlint issue
-
 package provider
 
 import (
