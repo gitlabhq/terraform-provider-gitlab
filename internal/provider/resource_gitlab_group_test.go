@@ -40,6 +40,12 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_group.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update the group to change the description
 			{
 				Config: testAccGitlabGroupUpdateConfig(rInt, 1),
@@ -63,6 +69,12 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 						DefaultBranchProtection: 1,
 					}),
 				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_group.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the group to use zero-value `default_branch_protection`
 			{
@@ -88,6 +100,12 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_group.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update the group to put the name and description back
 			{
 				Config: testAccGitlabGroupConfig(rInt),
@@ -106,21 +124,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 					}),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabGroup_import(t *testing.T) {
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabGroupDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabGroupConfig(rInt),
-			},
+			// Verify Import
 			{
 				ResourceName:      "gitlab_group.foo",
 				ImportState:       true,
