@@ -200,7 +200,6 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 }
 
 var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
-	// lintignore: S024 // TODO: Resolve this tfproviderlint issue
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_projects`" + ` data source allows details of multiple projects to be retrieved. Optionally filtered by the set attributes.
 
@@ -223,7 +222,6 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 				Description: "The ID of the group owned by the authenticated user to look projects for within. Cannot be used with `min_access_level`, `with_programming_language` or `statistics`.",
 				Type:        schema.TypeInt,
 				Optional:    true,
-				ForceNew:    true,
 			},
 			"page": {
 				Description: "The first page to begin the query on.",
