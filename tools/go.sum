@@ -1688,8 +1688,8 @@ mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed h1:WX1yoOaKQfddO/mLzdV4wp
 mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed/go.mod h1:Xkxe497xwlCKkIaQYRfC7CSLworTXY9RMqwhhCm+8Nc=
 mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b h1:DxJ5nJdkhDlLok9K6qO+5290kphDJbHOQO1DFFFTeBo=
 mvdan.cc/lint v0.0.0-20170908181259-adc824a0674b/go.mod h1:2odslEg/xrtNQqCYg2/jCoyKnw3vv5biOc3JnIcYfL4=
-mvdan.cc/sh/v3 v3.5.0 h1:/wJEun8808ezNyNyaORnK80JAu4nimLbfibn9xOccFE=
-mvdan.cc/sh/v3 v3.5.0/go.mod h1:1JcoyAKm1lZw/2bZje/iYKWicU/KMd0rsyJeKHnsK4E=
+mvdan.cc/sh/v3 v3.5.1 h1:hmP3UOw4f+EYexsJjFxvU38+kn+V/s2CclXHanIBkmQ=
+mvdan.cc/sh/v3 v3.5.1/go.mod h1:1JcoyAKm1lZw/2bZje/iYKWicU/KMd0rsyJeKHnsK4E=
 mvdan.cc/unparam v0.0.0-20211214103731-d0ef000c54e5 h1:Jh3LAeMt1eGpxomyu3jVkmVZWW2MxZ1qIIV2TZ/nRio=
 mvdan.cc/unparam v0.0.0-20211214103731-d0ef000c54e5/go.mod h1:b8RRCBm0eeiWR8cfN88xeq2G5SG3VKGO+5UPWi5FSOY=
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
