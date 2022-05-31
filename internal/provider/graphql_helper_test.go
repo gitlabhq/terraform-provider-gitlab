@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -14,13 +15,13 @@ func TestAcc_GraphQL_basic(t *testing.T) {
 	project := testAccCreateProject(t)
 	projectToParse := &gitlab.Project{}
 
-	_, err := SendGraphQLRequest(nil, testGitlabClient, fmt.Sprintf(`
+	_, err := SendGraphQLRequest(context.Background(), testGitlabClient, fmt.Sprintf(`
 	query {
 		project(fullPath: "%s") {
 		  fullPath
 		}
 	  }
-	`, project.Namespace.FullPath), *projectToParse)
+	`, project.NameWithNamespace), *projectToParse)
 
 	fmt.Println(err)
 

@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"io/ioutil"
 	"log"
 
@@ -14,35 +13,32 @@ import (
 )
 
 func SendGraphQLRequest(ctx context.Context, client *gitlab.Client, graphQLCall string, objectToParseForResponse interface{}) (interface{}, error) {
-	//The "New Request" method automatically appends the "/api/v4" path onto the API, which needs to be replaced by "/api/graphql", so we need to use
-	//a RequestOptionFunction to overwrite the URL.
-	request, err := client.NewRequest("POST", "", ctx, []gitlab.RequestOptionFunc{func(request *retryablehttp.Request) error {
-		request, err := retryablehttp.NewRequestWithContext(ctx, "POST", client.BaseURL().RawPath, graphQLCall)
+
+	request, err := client.NewRequest("POST", "", nil, []gitlab.RequestOptionFunc{func(request *retryablehttp.Request) error {
+		//The "New Request" method automatically appends the "/api/v4" path onto the API, which needs to be replaced by "/api/graphql", so we need to use
+		//a RequestOptionFunction to overwrite the URL.
+		log.Print([]byte(graphQLCall))
+		request.URL.Path = "/api/graphql"
+		err := request.SetBody([]byte(graphQLCall))
 		if err != nil {
 			return err
 		}
+
 		return nil
 	}})
 	if err != nil {
 		return nil, err
 	}
-
-	response, err := client.Do(request, nil)
+	var testObject interface{}
+	response, err := client.Do(request, testObject)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
+	test, _ := ioutil.ReadAll(response.Body)
 
-	log.Fatalf("Body: %s", body)
-
-	err = json.Unmarshal(body, objectToParseForResponse)
-	if err != nil {
-		return nil, err
-	}
+	log.Printf("Resp Body:  %s", test)
+	log.Printf("Past Do: %v", testObject)
 
 	return objectToParseForResponse, nil
 }
