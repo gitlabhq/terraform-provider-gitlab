@@ -1048,7 +1048,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 	}
 
 	if _, ok := d.GetOk("cicd_settings"); ok {
-		err := editOrAddCicdSettings(ctx, client, d.Id(), d)
+		//err := editOrAddCicdSettings(ctx, client, d.Id(), d)
 		if err != nil {
 			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
 		}
