@@ -289,7 +289,6 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
-			// lintignore: S031 // TODO: Resolve this tfproviderlint issue
 			"push_rules": {
 				Description: "Push rules for the project.",
 				Type:        schema.TypeList,
