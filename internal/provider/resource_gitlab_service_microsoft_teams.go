@@ -143,20 +143,15 @@ func resourceGitlabServiceMicrosoftTeamsRead(ctx context.Context, d *schema.Reso
 	client := meta.(*gitlab.Client)
 	project := d.Id()
 
-	p, _, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
-	if err != nil {
-		if is404(err) {
-			log.Printf("[DEBUG] Removing Gitlab Microsoft Teams service %s because project %s not found", d.Id(), p.Name)
-			d.SetId("")
-			return nil
-		}
-		return diag.FromErr(err)
-	}
-
 	log.Printf("[DEBUG] Read Gitlab Microsoft Teams service for project %s", d.Id())
 
 	teamsService, _, err := client.Services.GetMicrosoftTeamsService(project, gitlab.WithContext(ctx))
 	if err != nil {
+		if is404(err) {
+			log.Printf("[DEBUG] Unable to find Gitlab Microsoft Teams service in project %s, removing from state", project)
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
