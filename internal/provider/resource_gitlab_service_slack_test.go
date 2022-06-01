@@ -30,6 +30,16 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "webhook", "https://test.com"),
 				),
 			},
+			{
+				ResourceName:      slackResourceName,
+				ImportStateIdFunc: getSlackProjectID(slackResourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"notify_only_broken_pipelines",
+					"notify_only_default_branch",
+				},
+			},
 			// Update slack service with more settings
 			{
 				Config: testAccGitlabServiceSlackConfig(rInt),
@@ -46,6 +56,16 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "notify_only_broken_pipelines", "true"),
 				),
 			},
+			{
+				ResourceName:      slackResourceName,
+				ImportStateIdFunc: getSlackProjectID(slackResourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"notify_only_broken_pipelines",
+					"notify_only_default_branch",
+				},
+			},
 			// Update the slack service
 			{
 				Config: testAccGitlabServiceSlackUpdateConfig(rInt),
@@ -56,6 +76,16 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "push_channel", "test push_channel"),
 					resource.TestCheckResourceAttr(slackResourceName, "notify_only_broken_pipelines", "false"),
 				),
+			},
+			{
+				ResourceName:      slackResourceName,
+				ImportStateIdFunc: getSlackProjectID(slackResourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"notify_only_broken_pipelines",
+					"notify_only_default_branch",
+				},
 			},
 			// Update the slack service to get back to previous settings
 			{
@@ -68,6 +98,16 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "notify_only_broken_pipelines", "true"),
 				),
 			},
+			{
+				ResourceName:      slackResourceName,
+				ImportStateIdFunc: getSlackProjectID(slackResourceName),
+				ImportState:       true,
+				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"notify_only_broken_pipelines",
+					"notify_only_default_branch",
+				},
+			},
 			// Update the slack service to get back to minimal settings
 			{
 				Config: testAccGitlabServiceSlackMinimalConfig(rInt),
@@ -77,22 +117,7 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(slackResourceName, "push_channel", ""),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabServiceSlack_import(t *testing.T) {
-	slackResourceName := "gitlab_service_slack.slack"
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabServiceSlackDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabServiceSlackConfig(rInt),
-			},
+			// Verify Import
 			{
 				ResourceName:      slackResourceName,
 				ImportStateIdFunc: getSlackProjectID(slackResourceName),

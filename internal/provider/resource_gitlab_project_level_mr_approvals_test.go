@@ -7,24 +7,32 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
+	testAccCheckEE(t)
 
 	var projectApprovals gitlab.ProjectApprovals
-	rInt := acctest.RandInt()
+	testProject := testAccCreateProject(t)
 
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectLevelMRApprovalsConfig(rInt),
+				Config: fmt.Sprintf(`
+					resource "gitlab_project_level_mr_approvals" "foo" {
+						project_id                                     = "%d"
+						reset_approvals_on_push                        = true
+						disable_overriding_approvers_per_merge_request = true
+						merge_requests_author_approval                 = true
+						merge_requests_disable_committers_approval     = true
+						require_password_to_approve                    = true
+					}
+				`, testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
 					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
@@ -36,9 +44,23 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify Import
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt),
+				ResourceName:      "gitlab_project_level_mr_approvals.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project_level_mr_approvals" "foo" {
+						project_id                                     = "%d"
+						reset_approvals_on_push                        = false
+						disable_overriding_approvers_per_merge_request = false
+						merge_requests_author_approval                 = false
+						merge_requests_disable_committers_approval     = false
+						require_password_to_approve                    = false
+					}
+				`, testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
 					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
@@ -50,9 +72,23 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify Import
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectLevelMRApprovalsConfig(rInt),
+				ResourceName:      "gitlab_project_level_mr_approvals.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project_level_mr_approvals" "foo" {
+						project_id                                     = "%d"
+						reset_approvals_on_push                        = true
+						disable_overriding_approvers_per_merge_request = true
+						merge_requests_author_approval                 = true
+						merge_requests_disable_committers_approval     = true
+						require_password_to_approve                    = true
+					}
+				`, testProject.ID),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectLevelMRApprovalsExists("gitlab_project_level_mr_approvals.foo", &projectApprovals),
 					testAccCheckGitlabProjectLevelMRApprovalsAttributes(&projectApprovals, &testAccGitlabProjectLevelMRApprovalsExpectedAttributes{
@@ -64,26 +100,9 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 					}),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabProjectLevelMRApprovals_import(t *testing.T) {
-	resourceName := "gitlab_project_level_mr_approvals.foo"
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
-		Steps: []resource.TestStep{
+			// Verify Import
 			{
-				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabProjectLevelMRApprovalsConfig(rInt),
-			},
-			{
-				SkipFunc:          isRunningInCE,
-				ResourceName:      resourceName,
+				ResourceName:      "gitlab_project_level_mr_approvals.foo",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -162,42 +181,4 @@ func testAccCheckGitlabProjectLevelMRApprovalsExists(n string, projectApprovals 
 		*projectApprovals = *gotApprovalConfig
 		return nil
 	}
-}
-
-func testAccGitlabProjectLevelMRApprovalsConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-	name              = "foo-%d"
-	description       = "Terraform acceptance tests"
-	visibility_level  = "public"
-}
-
-resource "gitlab_project_level_mr_approvals" "foo" {
-	project_id                                     = gitlab_project.foo.id
-	reset_approvals_on_push                        = true
-	disable_overriding_approvers_per_merge_request = true
-	merge_requests_author_approval                 = true
-	merge_requests_disable_committers_approval     = true
-	require_password_to_approve                    = true
-}
-	`, rInt)
-}
-
-func testAccGitlabProjectLevelMRApprovalsUpdateConfig(rInt int) string {
-	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
-	name              = "foo-%d"
-	description       = "Terraform acceptance tests"
-	visibility_level  = "public"
-}
-
-resource "gitlab_project_level_mr_approvals" "foo" {
-	project_id                                     = gitlab_project.foo.id
-	reset_approvals_on_push                        = false
-	disable_overriding_approvers_per_merge_request = false
-	merge_requests_author_approval                 = false
-	merge_requests_disable_committers_approval     = false
-	require_password_to_approve                    = false
-}
-	`, rInt)
 }

@@ -99,22 +99,7 @@ func TestAccGitlabInstanceCluster_basic(t *testing.T) {
 					}),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabInstanceCluster_import(t *testing.T) {
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccRequiresLessThan(t, "15.0") },
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabInstanceClusterDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccGitlabInstanceClusterConfig(rInt, true),
-			},
+			// Verify Import
 			{
 				ResourceName:            "gitlab_instance_cluster.foo",
 				ImportState:             true,

@@ -34,6 +34,12 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(pipelinesEmailResourceName, "branches_to_be_notified", "default"),
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_service_pipelines_email.email",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update the pipelinesEmail service
 			{
 				Config: testAccGitlabServicePipelinesEmailUpdateConfig(rInt),
@@ -43,6 +49,12 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(pipelinesEmailResourceName, "notify_only_broken_pipelines", "false"),
 					resource.TestCheckResourceAttr(pipelinesEmailResourceName, "branches_to_be_notified", "all"),
 				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_service_pipelines_email.email",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the pipelinesEmail service to get back to previous settings
 			{
@@ -54,24 +66,9 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(pipelinesEmailResourceName, "branches_to_be_notified", "default"),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabServicePipelinesEmail_import(t *testing.T) {
-	pipelinesEmailResourceName := "gitlab_service_pipelines_email.email"
-	rInt := acctest.RandInt()
-
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabServicePipelinesEmailDestroy,
-		Steps: []resource.TestStep{
+			// Verify Import
 			{
-				Config: testAccGitlabServicePipelinesEmailConfig(rInt),
-			},
-			{
-				ResourceName:      pipelinesEmailResourceName,
+				ResourceName:      "gitlab_service_pipelines_email.email",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},

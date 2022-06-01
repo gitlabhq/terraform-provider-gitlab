@@ -32,6 +32,13 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 					}),
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_pipeline_trigger.trigger",
+				ImportStateIdFunc: getPipelineTriggerImportID("gitlab_pipeline_trigger.trigger"),
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update the pipeline trigger to change the parameters
 			{
 				Config: testAccGitlabPipelineTriggerUpdateConfig(rInt),
@@ -41,6 +48,13 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 						Description: "Trigger",
 					}),
 				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_pipeline_trigger.trigger",
+				ImportStateIdFunc: getPipelineTriggerImportID("gitlab_pipeline_trigger.trigger"),
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update the pipeline trigger to get back to initial settings
 			{
@@ -52,25 +66,10 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 					}),
 				),
 			},
-		},
-	})
-}
-
-// lintignore: AT002 // TODO: Resolve this tfproviderlint issue
-func TestAccGitlabPipelineTrigger_import(t *testing.T) {
-	rInt := acctest.RandInt()
-	resourceName := "gitlab_pipeline_trigger.trigger"
-
-	resource.Test(t, resource.TestCase{
-		ProviderFactories: providerFactories,
-		CheckDestroy:      testAccCheckGitlabPipelineTriggerDestroy,
-		Steps: []resource.TestStep{
+			// Verify Import
 			{
-				Config: testAccGitlabPipelineTriggerConfig(rInt),
-			},
-			{
-				ResourceName:      resourceName,
-				ImportStateIdFunc: getPipelineTriggerImportID(resourceName),
+				ResourceName:      "gitlab_pipeline_trigger.trigger",
+				ImportStateIdFunc: getPipelineTriggerImportID("gitlab_pipeline_trigger.trigger"),
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
