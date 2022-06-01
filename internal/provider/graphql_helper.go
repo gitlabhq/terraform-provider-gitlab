@@ -5,40 +5,29 @@ package provider
 
 import (
 	"context"
-	"io/ioutil"
-	"log"
 
-	"github.com/hashicorp/go-retryablehttp"
 	"github.com/xanzy/go-gitlab"
 )
 
-func SendGraphQLRequest(ctx context.Context, client *gitlab.Client, graphQLCall string, objectToParseForResponse interface{}) (interface{}, error) {
+// Helper method for modifying client requests appropriately for sending a GraphQL call instead of a REST call.
+func SendGraphQLRequest(ctx context.Context, client *gitlab.Client, graphQLCall GraphQLQuery, objectToParseForResponse interface{}) (interface{}, error) {
 
-	request, err := client.NewRequest("POST", "", nil, []gitlab.RequestOptionFunc{func(request *retryablehttp.Request) error {
-		//The "New Request" method automatically appends the "/api/v4" path onto the API, which needs to be replaced by "/api/graphql", so we need to use
-		//a RequestOptionFunction to overwrite the URL.
-		log.Print([]byte(graphQLCall))
-		request.URL.Path = "/api/graphql"
-		err := request.SetBody([]byte(graphQLCall))
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}})
-	if err != nil {
-		return nil, err
-	}
-	var testObject interface{}
-	response, err := client.Do(request, testObject)
+	request, err := client.NewRequest("POST", "", graphQLCall, nil)
+	//Overwrite the path of the existing request, as otherwise the client appends /api/v4 instead.
+	request.URL.Path = "/api/graphql"
 	if err != nil {
 		return nil, err
 	}
 
-	test, _ := ioutil.ReadAll(response.Body)
-
-	log.Printf("Resp Body:  %s", test)
-	log.Printf("Past Do: %v", testObject)
+	_, err = client.Do(request, objectToParseForResponse)
+	if err != nil {
+		return nil, err
+	}
 
 	return objectToParseForResponse, nil
+}
+
+// Represents a GraphQL call to the API. All graphQL calls are a string passed to the "query" parameter, so they should be included here.
+type GraphQLQuery struct {
+	Query string `json:"query"`
 }

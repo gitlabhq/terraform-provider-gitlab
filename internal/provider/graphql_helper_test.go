@@ -7,22 +7,26 @@ import (
 	"context"
 	"fmt"
 	"testing"
-
-	"github.com/xanzy/go-gitlab"
 )
 
 func TestAcc_GraphQL_basic(t *testing.T) {
-	project := testAccCreateProject(t)
-	projectToParse := &gitlab.Project{}
 
-	_, err := SendGraphQLRequest(context.Background(), testGitlabClient, fmt.Sprintf(`
-	query {
-		project(fullPath: "%s") {
-		  fullPath
-		}
-	  }
-	`, project.NameWithNamespace), *projectToParse)
+	query := GraphQLQuery{
+		fmt.Sprint(`query {currentUser {name}}`),
+	}
 
-	fmt.Println(err)
+	var response CurrentUserResponse
+	_, _ = SendGraphQLRequest(context.Background(), testGitlabClient, query, &response)
 
+	if response.Data.CurrentUser.Name != "Administrator" {
+		t.Fail()
+	}
+}
+
+type CurrentUserResponse struct {
+	Data struct {
+		CurrentUser struct {
+			Name string `json:"name"`
+		} `json:"currentUser"`
+	} `json:"data"`
 }
