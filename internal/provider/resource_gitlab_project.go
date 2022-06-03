@@ -305,35 +305,6 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 			},
 		},
 	},
-	"cicd_settings": {
-		Description: "Settings for the CI/CD pipelines",
-		Type:        schema.TypeList,
-		Optional:    true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"job_token_scope_enabled": {
-					Description: "Indicates CI job tokens generated in this project have restricted access to resources.",
-					Type:        schema.TypeBool,
-					Optional:    true,
-				},
-				"keep_latest_artifact": {
-					Description: "Indicates if the latest artifact should be kept for this project.",
-					Type:        schema.TypeBool,
-					Optional:    true,
-				},
-				"merge_pipelines_enabled": {
-					Description: "Indicates if merge pipelines are enabled for the project.",
-					Type:        schema.TypeBool,
-					Optional:    true,
-				},
-				"merge_trains_enabled": {
-					Description: "Indicates if merge trains are enabled for the project.",
-					Type:        schema.TypeBool,
-					Optional:    true,
-				},
-			},
-		},
-	},
 	"template_name": {
 		Description:   "When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.",
 		Type:          schema.TypeString,
@@ -1047,13 +1018,6 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 	}
 
-	if _, ok := d.GetOk("cicd_settings"); ok {
-		//err := editOrAddCicdSettings(ctx, client, d.Id(), d)
-		if err != nil {
-			return diag.Errorf("Failed to edit push rules for project %q: %s", d.Id(), err)
-		}
-	}
-
 	// default_branch cannot always be set during creation.
 	// If the branch does not exist, the update will fail, so we also create it here.
 	// See: https://gitlab.com/gitlab-org/gitlab/-/issues/333426
@@ -1615,10 +1579,6 @@ func editOrAddPushRules(ctx context.Context, client *gitlab.Client, projectID st
 	}
 
 	return nil
-}
-
-func editOrAddCicdSettings(ctx context.Context, client *gitlab.Client, s string, d *schema.ResourceData) {
-	panic("unimplemented")
 }
 
 func expandEditProjectPushRuleOptions(d *schema.ResourceData, currentPushRules *gitlab.ProjectPushRules) gitlab.EditProjectPushRuleOptions {

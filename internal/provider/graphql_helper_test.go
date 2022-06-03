@@ -5,14 +5,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"testing"
 )
 
 func TestAcc_GraphQL_basic(t *testing.T) {
 
 	query := GraphQLQuery{
-		fmt.Sprint(`query {currentUser {name}}`),
+		`query {currentUser {name}}`,
 	}
 
 	var response CurrentUserResponse
