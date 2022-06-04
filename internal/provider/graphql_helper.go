@@ -1,6 +1,3 @@
-//go:build acceptance
-// +build acceptance
-
 package provider
 
 import (

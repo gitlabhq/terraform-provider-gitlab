@@ -12,7 +12,7 @@ import (
 
 func TestAccDataSourceGitlabCurrentUser_basic(t *testing.T) {
 	//The root user has no public email by default, set the public email so it shows up properly.
-	testGitlabClient.Users.ModifyUser(1, &gitlab.ModifyUserOptions{
+	_, _, _ = testGitlabClient.Users.ModifyUser(1, &gitlab.ModifyUserOptions{
 		Email: gitlab.String("admin@example.com"),
 		// The public email MUST match an email on record for the user, or it gets a bad request.
 		PublicEmail: gitlab.String("admin@example.com"),
