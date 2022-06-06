@@ -3,15 +3,15 @@
 page_title: "gitlab_current_user Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_current_user data source allows details of the current user (determined by the input provider token) to be retrieved.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/graphql/reference/index.html#querycurrentuser
+  The gitlab_current_user data source allows details of the current user (determined by token provider attribute) to be retrieved.
+  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/index.html#querycurrentuser
 ---
 
 # gitlab_current_user (Data Source)
 
-The `gitlab_current_user` data source allows details of the current user (determined by the input provider token) to be retrieved.
+The `gitlab_current_user` data source allows details of the current user (determined by `token` provider attribute) to be retrieved.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/graphql/reference/index.html#querycurrentuser)
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/index.html#querycurrentuser)
 
 ## Example Usage
 
