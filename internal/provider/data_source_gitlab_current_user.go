@@ -11,9 +11,9 @@ import (
 
 var _ = registerDataSource("gitlab_current_user", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_current_user`" + ` data source allows details of the current user (determined by the input provider token) to be retrieved.
+		Description: `The ` + "`gitlab_current_user`" + ` data source allows details of the current user (determined by ` + "`token`" + ` provider attribute) to be retrieved.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/graphql/reference/index.html#querycurrentuser)`,
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/index.html#querycurrentuser)`,
 
 		ReadContext: dataSourceGitlabCurrentUserRead,
 		Schema: map[string]*schema.Schema{
@@ -28,7 +28,7 @@ var _ = registerDataSource("gitlab_current_user", func() *schema.Resource {
 				Computed:    true,
 			},
 			"name": {
-				Description: "Human-readable name of the user. Returns **** if the user is a project bot and the requester does not have permission to view the project. ",
+				Description: "Human-readable name of the user. Returns **** if the user is a project bot and the requester does not have permission to view the project.",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
@@ -60,13 +60,12 @@ func dataSourceGitlabCurrentUserRead(ctx context.Context, d *schema.ResourceData
 	client := meta.(*gitlab.Client)
 
 	query := GraphQLQuery{
-		`query {currentUser {name, bot, groupCount, id, namespace{id} publicEmail, username}}`,
+		`query {currentUser {name, bot, groupCount, id, namespace{id}, publicEmail, username}}`,
 	}
 	log.Printf("[DEBUG] executing GraphQL Query %s to retrieve current user", query.Query)
 
 	var response CurrentUserResponse
-	_, err := SendGraphQLRequest(context.Background(), client, query, &response)
-	if err != nil {
+	if _, err := SendGraphQLRequest(ctx, client, query, &response); err != nil {
 		return diag.FromErr(err)
 	}
 
