@@ -13,9 +13,15 @@ import (
 func TestAccDataSourceGitlabCurrentUser_basic(t *testing.T) {
 	//The root user has no public email by default, set the public email so it shows up properly.
 	_, _, _ = testGitlabClient.Users.ModifyUser(1, &gitlab.ModifyUserOptions{
-		Email: gitlab.String("admin@example.com"),
 		// The public email MUST match an email on record for the user, or it gets a bad request.
 		PublicEmail: gitlab.String("admin@example.com"),
+	})
+
+	t.Cleanup(func() {
+		_, _, _ = testGitlabClient.Users.ModifyUser(1, &gitlab.ModifyUserOptions{
+			//Set back to the empty state on test completion.
+			PublicEmail: gitlab.String(""),
+		})
 	})
 
 	resource.Test(t, resource.TestCase{
@@ -24,13 +30,13 @@ func TestAccDataSourceGitlabCurrentUser_basic(t *testing.T) {
 			{
 				Config: `data "gitlab_current_user" "this" {}`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "id"),
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "name"),
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "username"),
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "bot"),
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "group_count"),
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "namespace_id"),
-					resource.TestCheckResourceAttrSet("data.gitlab_current_user.this", "public_email"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "id", "gid://gitlab/User/1"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "name", "Administrator"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "username", "root"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "bot", "false"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "group_count", "2"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "namespace_id", "gid://gitlab/Namespaces::UserNamespace/1"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "public_email", "admin@example.com"),
 				),
 			},
 		},

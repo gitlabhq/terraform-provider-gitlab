@@ -12,7 +12,7 @@ import (
 func TestAcc_GraphQL_basic(t *testing.T) {
 
 	query := GraphQLQuery{
-		`query {currentUser {name, bot, gitpodEnabled, groupCount, id, namespace{id} publicEmail, username}}`,
+		`query {currentUser {name, bot, gitpodEnabled, groupCount, id, namespace{id}, publicEmail, username}}`,
 	}
 
 	var response CurrentUserResponse
