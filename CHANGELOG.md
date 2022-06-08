@@ -1,3 +1,11 @@
+## 3.15.1 (2022-06-08)
+
+This release was tested against GitLab 14.9, 14.10 and 15.0 for both CE and EE.
+
+BUG FIXES:
+
+* resource/gitlab_service_microsoft_teams: Fix removal from state when integration is not found ([#1113](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1113))
+
 ## 3.15.0 (2022-05-29)
 
 This release was tested against GitLab 14.9, 14.10 and 15.0 for both CE and EE.
