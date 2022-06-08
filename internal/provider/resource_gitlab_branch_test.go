@@ -22,7 +22,7 @@ func TestAccGitlabBranch_basic(t *testing.T) {
 	project := testAccCreateProject(t)
 	fooBranchName := fmt.Sprintf("testbranch-%d", rInt)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabBranchDestroy,
 		Steps: []resource.TestStep{

@@ -48,7 +48,7 @@ func TestResourceGitlabProjectShareGroupStateUpgradeV0(t *testing.T) {
 func TestAccGitlabProjectShareGroup_basic(t *testing.T) {
 	randName := acctest.RandomWithPrefix("acctest")
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectShareGroupDestroy,
 		Steps: []resource.TestStep{

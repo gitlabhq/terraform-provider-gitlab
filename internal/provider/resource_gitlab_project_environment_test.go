@@ -29,7 +29,7 @@ func TestAccGitlabProjectEnvironment_basic(t *testing.T) {
 		ExternalURL: "https://example.com",
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{
@@ -117,7 +117,7 @@ func TestAccGitlabProjectEnvironment_stopBeforeDestroyDisabled(t *testing.T) {
 	rInt := acctest.RandInt()
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectEnvironmentDestroy,
 		Steps: []resource.TestStep{

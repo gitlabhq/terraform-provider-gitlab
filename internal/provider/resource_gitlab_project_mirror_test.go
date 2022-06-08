@@ -19,7 +19,7 @@ func TestAccGitlabProjectMirror_basic(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 	var miror gitlab.ProjectMirror
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{
@@ -75,7 +75,7 @@ func TestAccGitlabProjectMirror_basic(t *testing.T) {
 func TestAccGitlabProjectMirror_withPassword(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMirrorDestroy,
 		Steps: []resource.TestStep{

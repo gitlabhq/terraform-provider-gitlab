@@ -75,7 +75,7 @@ func testAccGitlabProjectVariableCheckAllVariablesDestroyed(ctx testAccGitlabPro
 func TestAccGitlabProjectVariable_basic(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccGitlabProjectVariableCheckAllVariablesDestroyed(ctx),
 		Steps: []resource.TestStep{
@@ -176,7 +176,7 @@ EOF
 func TestAccGitlabProjectVariable_scoped(t *testing.T) {
 	ctx := testAccGitlabProjectStart(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy: func(state *terraform.State) error {
 			// Destroy behavior is nondeterministic for variables with scopes in GitLab versions prior to 13.4

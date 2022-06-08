@@ -17,7 +17,7 @@ func TestAccGitlabTagProtection_basic(t *testing.T) {
 	var pt gitlab.ProtectedTag
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTagProtectionDestroy,
 		Steps: []resource.TestStep{
@@ -76,7 +76,7 @@ func TestAccGitlabTagProtection_wildcard(t *testing.T) {
 
 	wildcard := "-*"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTagProtectionDestroy,
 		Steps: []resource.TestStep{

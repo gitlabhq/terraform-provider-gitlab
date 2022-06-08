@@ -19,7 +19,7 @@ func TestAccGitlabClusterAgent_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
 	var sutClusterAgent gitlab.Agent
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabClusterAgentDestroy,
 		Steps: []resource.TestStep{

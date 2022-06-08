@@ -19,7 +19,7 @@ func TestAccGitlabGroupProjectFileTemplate_basic(t *testing.T) {
 	firstProject := testAccCreateProjectWithNamespace(t, baseGroup.ID)
 	secondProject := testAccCreateProjectWithNamespace(t, baseGroup.ID)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckProjectFileTemplateDestroy,
 		Steps: []resource.TestStep{

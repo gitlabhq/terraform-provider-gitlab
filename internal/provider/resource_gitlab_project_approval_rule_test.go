@@ -39,7 +39,7 @@ func TestAccGitLabProjectApprovalRule_Basic(t *testing.T) {
 
 	var projectApprovalRule gitlab.ProjectApprovalRule
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectApprovalRuleDestroy(project.ID),
 		Steps: []resource.TestStep{
@@ -92,7 +92,7 @@ func TestAccGitLabProjectApprovalRule_AnyApprover(t *testing.T) {
 
 	var projectApprovalRule gitlab.ProjectApprovalRule
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectApprovalRuleDestroy(project.ID),
 		Steps: []resource.TestStep{

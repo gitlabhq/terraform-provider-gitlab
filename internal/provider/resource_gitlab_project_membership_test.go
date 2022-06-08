@@ -18,7 +18,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 	var membership gitlab.ProjectMember
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMembershipDestroy,
 		Steps: []resource.TestStep{

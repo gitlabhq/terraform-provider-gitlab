@@ -18,7 +18,7 @@ func TestAccGitlabInstanceCluster_basic(t *testing.T) {
 	var cluster gitlab.InstanceCluster
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccRequiresLessThan(t, "15.0") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabInstanceClusterDestroy,
