@@ -29,6 +29,7 @@ resource "gitlab_project_membership" "example" {
   project_id   = "67890"
   user_id      = 1234
   access_level = "guest"
+  expires_at   = "2022-12-31"
 }
 ```
 
@@ -40,6 +41,10 @@ resource "gitlab_project_membership" "example" {
 - `access_level` (String) The access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `master`
 - `project_id` (String) The id of the project.
 - `user_id` (Number) The id of the user.
+
+### Optional
+
+- `expires_at` (String) Expiration date for the project membership. Format: `YYYY-MM-DD`
 
 ### Read-Only
 

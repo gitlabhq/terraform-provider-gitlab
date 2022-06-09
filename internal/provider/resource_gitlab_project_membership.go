@@ -48,6 +48,12 @@ var _ = registerResource("gitlab_project_membership", func() *schema.Resource {
 				ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevelNames, false)),
 				Required:         true,
 			},
+			"expires_at": {
+				Description:  "Expiration date for the project membership. Format: `YYYY-MM-DD`",
+				Type:         schema.TypeString,
+				ValidateFunc: validateDateFunc,
+				Optional:     true,
+			},
 		},
 	}
 })
@@ -57,11 +63,13 @@ func resourceGitlabProjectMembershipCreate(ctx context.Context, d *schema.Resour
 
 	userId := d.Get("user_id").(int)
 	projectId := d.Get("project_id").(string)
+	expiresAt := d.Get("expires_at").(string)
 	accessLevelId := accessLevelNameToValue[d.Get("access_level").(string)]
 
 	options := &gitlab.AddProjectMemberOptions{
 		UserID:      &userId,
 		AccessLevel: &accessLevelId,
+		ExpiresAt:   &expiresAt,
 	}
 	log.Printf("[DEBUG] create gitlab project membership for %d in %s", options.UserID, projectId)
 
@@ -115,10 +123,12 @@ func resourceGitlabProjectMembershipUpdate(ctx context.Context, d *schema.Resour
 
 	userId := d.Get("user_id").(int)
 	projectId := d.Get("project_id").(string)
+	expiresAt := d.Get("expires_at").(string)
 	accessLevelId := accessLevelNameToValue[strings.ToLower(d.Get("access_level").(string))]
 
 	options := gitlab.EditProjectMemberOptions{
 		AccessLevel: &accessLevelId,
+		ExpiresAt:   &expiresAt,
 	}
 	log.Printf("[DEBUG] update gitlab project membership %v for %s", userId, projectId)
 
@@ -153,7 +163,11 @@ func resourceGitlabProjectMembershipSetToState(d *schema.ResourceData, projectMe
 	d.Set("project_id", projectId)
 	d.Set("user_id", projectMember.ID)
 	d.Set("access_level", accessLevelValueToName[projectMember.AccessLevel])
-
+	if projectMember.ExpiresAt != nil {
+		d.Set("expires_at", projectMember.ExpiresAt.String())
+	} else {
+		d.Set("expires_at", "")
+	}
 	userId := strconv.Itoa(projectMember.ID)
 	d.SetId(buildTwoPartID(projectId, &userId))
 }
