@@ -25,10 +25,12 @@ data "gitlab_current_user" "example" {}
 ### Read-Only
 
 - `bot` (Boolean) Indicates if the user is a bot.
+- `global_id` (String) Global ID of the user. This is in the form of a GraphQL globally unique ID.
+- `global_namespace_id` (String) Personal namespace of the user. This is in the form of a GraphQL globally unique ID.
 - `group_count` (Number) Group count for the user.
-- `id` (String) ID of the user. This is in the form of a GraphQL globally unique ID.
+- `id` (String) ID of the user.
 - `name` (String) Human-readable name of the user. Returns **** if the user is a project bot and the requester does not have permission to view the project.
-- `namespace_id` (String) Personal namespace of the user. This is in the form of a GraphQL globally unique ID.
+- `namespace_id` (String) Personal namespace of the user.
 - `public_email` (String) User’s public email.
 - `username` (String) Username of the user. Unique within this instance of GitLab.
 

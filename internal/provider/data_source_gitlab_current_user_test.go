@@ -30,12 +30,14 @@ func TestAccDataSourceGitlabCurrentUser_basic(t *testing.T) {
 			{
 				Config: `data "gitlab_current_user" "this" {}`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "id", "gid://gitlab/User/1"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "id", "1"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "global_id", "gid://gitlab/User/1"),
 					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "name", "Administrator"),
 					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "username", "root"),
 					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "bot", "false"),
 					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "group_count", "2"),
-					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "namespace_id", "gid://gitlab/Namespaces::UserNamespace/1"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "namespace_id", "1"),
+					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "global_namespace_id", "gid://gitlab/Namespaces::UserNamespace/1"),
 					resource.TestCheckResourceAttr("data.gitlab_current_user.this", "public_email", "admin@example.com"),
 				),
 			},

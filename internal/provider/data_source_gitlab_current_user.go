@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -18,7 +19,12 @@ var _ = registerDataSource("gitlab_current_user", func() *schema.Resource {
 		ReadContext: dataSourceGitlabCurrentUserRead,
 		Schema: map[string]*schema.Schema{
 			"id": {
-				Description: "ID of the user. This is in the form of a GraphQL globally unique ID.",
+				Description: "ID of the user.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"global_id": {
+				Description: "Global ID of the user. This is in the form of a GraphQL globally unique ID.",
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
@@ -43,6 +49,11 @@ var _ = registerDataSource("gitlab_current_user", func() *schema.Resource {
 				Computed:    true,
 			},
 			"namespace_id": {
+				Description: "Personal namespace of the user.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
+			"global_namespace_id": {
 				Description: "Personal namespace of the user. This is in the form of a GraphQL globally unique ID.",
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -69,12 +80,24 @@ func dataSourceGitlabCurrentUserRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	d.SetId(response.Data.CurrentUser.ID)
+	userID, err := extractIIDFromGlobalID(response.Data.CurrentUser.ID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	namespaceID, err := extractIIDFromGlobalID(response.Data.CurrentUser.Namespace.ID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(fmt.Sprintf("%d", userID))
+	d.Set("global_id", response.Data.CurrentUser.ID)
 	d.Set("username", response.Data.CurrentUser.Username)
 	d.Set("name", response.Data.CurrentUser.Name)
 	d.Set("bot", response.Data.CurrentUser.Bot)
 	d.Set("group_count", response.Data.CurrentUser.GroupCount)
-	d.Set("namespace_id", response.Data.CurrentUser.Namespace.ID)
+	d.Set("namespace_id", fmt.Sprintf("%d", namespaceID))
+	d.Set("global_namespace_id", response.Data.CurrentUser.Namespace.ID)
 	d.Set("public_email", response.Data.CurrentUser.PublicEmail)
 
 	return nil
