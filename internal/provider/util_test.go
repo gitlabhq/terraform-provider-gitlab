@@ -6,6 +6,56 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+func TestGitlab_extractIIDFromGlobalID(t *testing.T) {
+	cases := []struct {
+		GlobalID string
+		IID      int
+	}{
+		{
+			GlobalID: "gid://gitlab/User/1",
+			IID:      1,
+		},
+		{
+			GlobalID: "gid://gitlab/Namespaces::UserNamespace/1000",
+			IID:      1000,
+		},
+	}
+
+	for _, tc := range cases {
+		iid, err := extractIIDFromGlobalID(tc.GlobalID)
+		if err != nil {
+			t.Fatalf("expected valid global id, got %q: %v", tc.GlobalID, err)
+		}
+
+		if iid != tc.IID {
+			t.Fatalf("got %v expected %v", iid, tc.IID)
+		}
+	}
+}
+
+func TestGitlab_extractIIDFromGlobalID_invalidGlobalID(t *testing.T) {
+	cases := []struct {
+		GlobalID string
+	}{
+		{
+			GlobalID: "",
+		},
+		{
+			GlobalID: "gid://gitlab/User/",
+		},
+		{
+			GlobalID: "gid://gitlab/Namespaces::UserNamespace",
+		},
+	}
+
+	for _, tc := range cases {
+		iid, err := extractIIDFromGlobalID(tc.GlobalID)
+		if err == nil {
+			t.Fatalf("expected invalid global id, got id %q instead from global id %q", iid, tc.GlobalID)
+		}
+	}
+}
+
 func TestGitlab_visbilityHelpers(t *testing.T) {
 	cases := []struct {
 		String string
