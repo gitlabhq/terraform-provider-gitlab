@@ -20,11 +20,11 @@ The `gitlab_project` resource allows to manage the lifecycle of a project.
 
 A project can either be created in a group or user namespace.
 
--> **Default Branch Protection Workaround** Projects are created with default branch protection. 
-Since this default branch protection is not currently managed via Terraform, to workaround this limitation, 
+-> **Default Branch Protection Workaround** Projects are created with default branch protection.
+Since this default branch protection is not currently managed via Terraform, to workaround this limitation,
 you can remove the default branch protection via the API and create your desired Terraform managed branch protection.
-In the `gitlab_project` resource, define a `local-exec` provisioner which invokes 
-the `/projects/:id/protected_branches/:name` API via curl to delete the branch protection on the default 
+In the `gitlab_project` resource, define a `local-exec` provisioner which invokes
+the `/projects/:id/protected_branches/:name` API via curl to delete the branch protection on the default
 branch using a `DELETE` request. Then define the desired branch protection using the `gitlab_branch_protection` resource.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/projects.html)
