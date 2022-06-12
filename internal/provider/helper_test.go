@@ -267,6 +267,27 @@ func testAccCreateProtectedBranches(t *testing.T, project *gitlab.Project, n int
 	return protectedBranches
 }
 
+// testAccCreateTags is a test helper for creating a specified number of tags.
+// It assumes the project will be destroyed at the end of the test and will not cleanup created tags.
+func testAccCreateTags(t *testing.T, project *gitlab.Project, n int) []*gitlab.Tag {
+	t.Helper()
+
+	tags := make([]*gitlab.Tag, n)
+
+	for i := range tags {
+		var err error
+		tags[i], _, err = testGitlabClient.Tags.CreateTag(project.ID, &gitlab.CreateTagOptions{
+			TagName: gitlab.String(acctest.RandomWithPrefix("acctest")),
+			Ref:     gitlab.String(project.DefaultBranch),
+		})
+		if err != nil {
+			t.Fatalf("could not create test tags: %v", err)
+		}
+	}
+
+	return tags
+}
+
 // testAccAddProjectMembers is a test helper for adding users as members of a project.
 // It assumes the project will be destroyed at the end of the test and will not cleanup members.
 func testAccAddProjectMembers(t *testing.T, pid interface{}, users []*gitlab.User) {
