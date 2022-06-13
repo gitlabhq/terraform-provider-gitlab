@@ -844,6 +844,13 @@ resource "gitlab_project" "foo" {
 					},
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
+			},
 		},
 	})
 }
@@ -878,6 +885,99 @@ func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
 						return nil
 					},
 				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_InstanceBranchProtectionDisabled(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					settings, _, err := testGitlabClient.Settings.GetSettings()
+					if err != nil {
+						t.Fatalf("failed to get settings: %v", err)
+					}
+					t.Cleanup(func() {
+						if _, _, err := testGitlabClient.Settings.UpdateSettings(&gitlab.UpdateSettingsOptions{DefaultBranchProtection: gitlab.Int(settings.DefaultBranchProtection)}); err != nil {
+							t.Fatalf("failed to update instance-wide default branch protection setting to default: %v", err)
+						}
+					})
+
+					if _, _, err := testGitlabClient.Settings.UpdateSettings(&gitlab.UpdateSettingsOptions{DefaultBranchProtection: gitlab.Int(0)}); err != nil {
+						t.Fatalf("failed to update instance-wide default branch protection setting: %v", err)
+					}
+				},
+				Config: ` `, // requires a space for empty config
+			},
+			// Without explicit default branch
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						initialize_with_readme = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
+			},
+			// Force a destroy for the project so that it can be recreated as the same resource
+			{
+				Config: ` `, // requires a space for empty config
+			},
+			// With explicit default branch set to instance-wide default
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						default_branch         = "main"
+						initialize_with_readme = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
+			},
+			// Force a destroy for the project so that it can be recreated as the same resource
+			{
+				Config: ` `, // requires a space for empty config
+			},
+			// With custom default branch
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d-custom-default-branch"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						default_branch         = "foobar-non-default-branch"
+						initialize_with_readme = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
 			},
 		},
 	})
