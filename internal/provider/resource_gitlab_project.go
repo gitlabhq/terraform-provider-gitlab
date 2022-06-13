@@ -1084,7 +1084,7 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 	// disabled (`default_branch_protection = 0`) then we don't have to wait for one.
 	waitForDefaultBranchProtection, err := expectDefaultBranchProtection(ctx, client, project)
 	if err != nil {
-		return diag.Errorf("Failed to fetch group the project %d is owned by: %+v", project.ID, err)
+		return diag.Errorf("Failed to discover if branch protection is enabled by default or not for project %d: %+v", project.ID, err)
 	}
 
 	if waitForDefaultBranchProtection {
@@ -1766,6 +1766,7 @@ func namespaceOrPathChanged(ctx context.Context, d *schema.ResourceDiff, meta in
 }
 
 func expectDefaultBranchProtection(ctx context.Context, client *gitlab.Client, project *gitlab.Project) (bool, error) {
+	// If the project is part of a group it may have default branch protection disabled for its projects
 	if project.Namespace.Kind == "group" {
 		group, _, err := client.Groups.GetGroup(project.Namespace.ID, nil, gitlab.WithContext(ctx))
 		if err != nil {
@@ -1775,7 +1776,11 @@ func expectDefaultBranchProtection(ctx context.Context, client *gitlab.Client, p
 		return group.DefaultBranchProtection != 0, nil
 	}
 
-	// projects which are not assigned to a group can't have a "no branch protection" default,
-	// thus, we always expect a default branch protection.
-	return true, nil
+	// // If the project is not part of a group it may have default branch protection disabled because of the instance-wide application settings
+	settings, _, err := client.Settings.GetSettings(nil, gitlab.WithContext(ctx))
+	if err != nil {
+		return false, err
+	}
+
+	return settings.DefaultBranchProtection != 0, nil
 }
