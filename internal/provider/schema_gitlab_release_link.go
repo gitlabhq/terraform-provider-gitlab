@@ -51,7 +51,7 @@ func gitlabReleaseLinkGetSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 		},
-		"direct_asset_link": {
+		"direct_asset_url": {
 			Description: "Full path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).",
 			Type:        schema.TypeString,
 			Computed:    true,
@@ -78,7 +78,7 @@ func gitlabReleaseLinkToStateMap(project string, tagName string, releaseLink *gi
 	}
 	stateMap["link_type"] = releaseLink.LinkType
 	stateMap["link_id"] = releaseLink.ID
-	stateMap["direct_asset_link"] = releaseLink.DirectAssetURL
+	stateMap["direct_asset_url"] = releaseLink.DirectAssetURL
 	stateMap["external"] = releaseLink.External
 
 	return stateMap

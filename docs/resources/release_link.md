@@ -48,7 +48,7 @@ resource "gitlab_release_link" "example" {
 
 ### Read-Only
 
-- `direct_asset_link` (String) Full path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).
+- `direct_asset_url` (String) Full path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).
 - `external` (Boolean) External or internal link.
 - `id` (String) The ID of this resource.
 - `link_id` (Number) The ID of the link.

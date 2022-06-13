@@ -267,39 +267,36 @@ func testAccCreateProtectedBranches(t *testing.T, project *gitlab.Project, n int
 	return protectedBranches
 }
 
-// testAccCreateTags is a test helper for creating a specified number of tags.
-// It assumes the project will be destroyed at the end of the test and will not cleanup created tags.
-func testAccCreateTags(t *testing.T, project *gitlab.Project, n int) []*gitlab.Tag {
-	t.Helper()
-
-	tags := make([]*gitlab.Tag, n)
-
-	for i := range tags {
-		var err error
-		tags[i], _, err = testGitlabClient.Tags.CreateTag(project.ID, &gitlab.CreateTagOptions{
-			TagName: gitlab.String(acctest.RandomWithPrefix("acctest")),
-			Ref:     gitlab.String(project.DefaultBranch),
-		})
-		if err != nil {
-			t.Fatalf("could not create test tags: %v", err)
-		}
-	}
-
-	return tags
-}
-
 // testAccCreateReleases is a test helper for creating a specified number of releases.
 // It assumes the project will be destroyed at the end of the test and will not cleanup created releases.
-func testAccCreateReleases(t *testing.T, project *gitlab.Project, tags []*gitlab.Tag) []*gitlab.Release {
+func testAccCreateReleases(t *testing.T, project *gitlab.Project, n int) []*gitlab.Release {
 	t.Helper()
 
-	releases := make([]*gitlab.Release, len(tags))
+	releases := make([]*gitlab.Release, n)
+	linkType := gitlab.LinkTypeValue("other")
+	linkURL1 := fmt.Sprintf("https://test/%v", *gitlab.String(acctest.RandomWithPrefix("acctest")))
+	linkURL2 := fmt.Sprintf("https://test/%v", *gitlab.String(acctest.RandomWithPrefix("acctest")))
 
 	for i := range releases {
 		var err error
 		releases[i], _, err = testGitlabClient.Releases.CreateRelease(project.ID, &gitlab.CreateReleaseOptions{
 			Name:    gitlab.String(acctest.RandomWithPrefix("acctest")),
-			TagName: &tags[i].Name,
+			TagName: gitlab.String(acctest.RandomWithPrefix("acctest")),
+			Ref:     &project.DefaultBranch,
+			Assets: &gitlab.ReleaseAssetsOptions{
+				Links: []*gitlab.ReleaseAssetLinkOptions{
+					{
+						Name:     gitlab.String(acctest.RandomWithPrefix("acctest")),
+						URL:      &linkURL1,
+						LinkType: &linkType,
+					},
+					{
+						Name:     gitlab.String(acctest.RandomWithPrefix("acctest")),
+						URL:      &linkURL2,
+						LinkType: &linkType,
+					},
+				},
+			},
 		})
 		if err != nil {
 			t.Fatalf("could not create test releases: %v", err)
