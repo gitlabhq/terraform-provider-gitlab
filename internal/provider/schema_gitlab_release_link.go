@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -34,7 +35,7 @@ func gitlabReleaseLinkGetSchema() map[string]*schema.Schema {
 			Required:    true,
 		},
 		"filepath": {
-			Description: "Optional path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).",
+			Description: "Relatively path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).",
 			Type:        schema.TypeString,
 			Optional:    true,
 		},
@@ -48,6 +49,11 @@ func gitlabReleaseLinkGetSchema() map[string]*schema.Schema {
 		"link_id": {
 			Description: "The ID of the link.",
 			Type:        schema.TypeInt,
+			Computed:    true,
+		},
+		"direct_asset_link": {
+			Description: "Full path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).",
+			Type:        schema.TypeString,
 			Computed:    true,
 		},
 		"external": {
@@ -64,9 +70,15 @@ func gitlabReleaseLinkToStateMap(project string, tagName string, releaseLink *gi
 	stateMap["tag_name"] = tagName
 	stateMap["name"] = releaseLink.Name
 	stateMap["url"] = releaseLink.URL
-	stateMap["file_path"] = releaseLink.DirectAssetURL
+	directAssetLinkArray := strings.SplitN(releaseLink.DirectAssetURL, "downloads", 2)
+	if len(directAssetLinkArray) > 1 {
+		stateMap["filepath"] = directAssetLinkArray[1]
+	} else {
+		stateMap["filepath"] = ""
+	}
 	stateMap["link_type"] = releaseLink.LinkType
 	stateMap["link_id"] = releaseLink.ID
+	stateMap["direct_asset_link"] = releaseLink.DirectAssetURL
 	stateMap["external"] = releaseLink.External
 
 	return stateMap

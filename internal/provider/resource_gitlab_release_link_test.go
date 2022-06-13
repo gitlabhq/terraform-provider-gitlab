@@ -17,7 +17,8 @@ func TestAccGitlabReleaseLink_basic(t *testing.T) {
 
 	rInt1, rInt2 := acctest.RandInt(), acctest.RandInt()
 	project := testAccCreateProject(t)
-	tag := testAccCreateTags(t, project, 1)[0]
+	tags := testAccCreateTags(t, project, 1)
+	releases := testAccCreateReleases(t, project, tags)
 
 	resource.Test(t, resource.TestCase{
 		ProviderFactories: providerFactories,
@@ -31,9 +32,10 @@ func TestAccGitlabReleaseLink_basic(t *testing.T) {
 					tag_name = "%s"
 					name     = "test-%d"
 					url      = "https://test/%d"
-				}`, project.PathWithNamespace, tag.Name, rInt1, rInt1),
+				}`, project.PathWithNamespace, releases[0].TagName, rInt1, rInt1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("gitlab_release_link.this", "link_id"),
+					resource.TestCheckResourceAttrSet("gitlab_release_link.this", "direct_asset_link"),
 					resource.TestCheckResourceAttrSet("gitlab_release_link.this", "external"),
 				),
 			},
@@ -51,11 +53,12 @@ func TestAccGitlabReleaseLink_basic(t *testing.T) {
 					tag_name  = "%s"
 					name      = "test-%d"
 					url       = "https://test/%d"
-					filepath  = "http://test/%d"
+					filepath  = "/test/%d"
 					link_type = "runbook"
-				}`, project.ID, tag.Name, rInt2, rInt2, rInt2),
+				}`, project.ID, releases[0].TagName, rInt2, rInt2, rInt2),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("gitlab_release_link.this", "link_id"),
+					resource.TestCheckResourceAttrSet("gitlab_release_link.this", "direct_asset_link"),
 					resource.TestCheckResourceAttrSet("gitlab_release_link.this", "external"),
 				),
 			},

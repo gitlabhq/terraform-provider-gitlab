@@ -288,6 +288,27 @@ func testAccCreateTags(t *testing.T, project *gitlab.Project, n int) []*gitlab.T
 	return tags
 }
 
+// testAccCreateReleases is a test helper for creating a specified number of releases.
+// It assumes the project will be destroyed at the end of the test and will not cleanup created releases.
+func testAccCreateReleases(t *testing.T, project *gitlab.Project, tags []*gitlab.Tag) []*gitlab.Release {
+	t.Helper()
+
+	releases := make([]*gitlab.Release, len(tags))
+
+	for i := range releases {
+		var err error
+		releases[i], _, err = testGitlabClient.Releases.CreateRelease(project.ID, &gitlab.CreateReleaseOptions{
+			Name:    gitlab.String(acctest.RandomWithPrefix("acctest")),
+			TagName: &tags[i].Name,
+		})
+		if err != nil {
+			t.Fatalf("could not create test releases: %v", err)
+		}
+	}
+
+	return releases
+}
+
 // testAccAddProjectMembers is a test helper for adding users as members of a project.
 // It assumes the project will be destroyed at the end of the test and will not cleanup members.
 func testAccAddProjectMembers(t *testing.T, pid interface{}, users []*gitlab.User) {
