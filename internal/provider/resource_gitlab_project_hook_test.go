@@ -18,7 +18,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 	var hook gitlab.ProjectHook
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectHookDestroy,
 		Steps: []resource.TestStep{

@@ -28,7 +28,7 @@ func TestAccGitlabProjectIssue_basic(t *testing.T) {
 		t.Fatalf("Failed to get current user: %v", err)
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{
@@ -155,7 +155,7 @@ func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
 	testAccAddProjectMembers(t, testProject.ID, []*gitlab.User{testUser})
 	testMilestone := testAccAddProjectMilestones(t, testProject, 1)[0]
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{
@@ -177,7 +177,7 @@ func TestAccGitlabProjectIssue_basicEE(t *testing.T) {
 func TestAccGitlabProjectIssue_deleteOnDestroy(t *testing.T) {
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectIssueDestroy,
 		Steps: []resource.TestStep{

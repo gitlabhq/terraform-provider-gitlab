@@ -25,7 +25,7 @@ func TestAccGitlabProject_minimal(t *testing.T) {
 	var received gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -119,7 +119,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 	defaultsMainBranch = defaults
 	defaultsMainBranch.DefaultBranch = "main"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -413,7 +413,7 @@ func TestAccGitlabProject_initializeWithReadme(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -440,7 +440,7 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -468,7 +468,7 @@ func TestAccGitlabProject_initializeWithoutReadme(t *testing.T) {
 func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectArchivedOnDestroy,
 		Steps: []resource.TestStep{
@@ -482,7 +482,7 @@ func TestAccGitlabProject_archiveOnDestroy(t *testing.T) {
 func TestAccGitlabProject_setSinglePushRuleToDefault(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -503,7 +503,7 @@ func TestAccGitlabProject_groupWithoutDefaultBranchProtection(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -527,7 +527,7 @@ func TestAccGitlabProject_IssueMergeRequestTemplates(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -557,7 +557,7 @@ func TestAccGitlabProject_MergePipelines(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -583,7 +583,7 @@ func TestAccGitlabProject_MergeTrains(t *testing.T) {
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -609,7 +609,7 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 	var received gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -656,7 +656,7 @@ func TestAccGitlabProject_willErrorOnAPIFailure(t *testing.T) {
 // lintignore: AT002 // specialized import test
 func TestAccGitlabProject_import(t *testing.T) {
 	rInt := acctest.RandInt()
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -680,7 +680,7 @@ func TestAccGitlabProject_import(t *testing.T) {
 // lintignore: AT002 // specialized import test
 func TestAccGitlabProject_nestedImport(t *testing.T) {
 	rInt := acctest.RandInt()
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -730,7 +730,7 @@ func TestAccGitlabProject_transfer(t *testing.T) {
 	pathBeforeTransfer := fmt.Sprintf("foogroup-%d/foo-%d", rInt, rInt)
 	pathAfterTransfer := fmt.Sprintf("foo2group-%d/foo-%d", rInt, rInt)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -780,7 +780,7 @@ func TestAccGitlabProject_importURL(t *testing.T) {
 		t.Fatalf("failed to commit file to base project: %v", err)
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -808,7 +808,7 @@ func TestAccGitlabProject_initializeWithReadmeAndCustomDefaultBranch(t *testing.
 	var project gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -844,6 +844,13 @@ resource "gitlab_project" "foo" {
 					},
 				),
 			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
+			},
 		},
 	})
 }
@@ -854,7 +861,7 @@ func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
 
 	user := testAccCreateUsers(t, 1)[0]
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccRequiresAtLeast(t, "14.10") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
@@ -878,6 +885,99 @@ func TestAccGitlabProject_CreateProjectInUserNamespace(t *testing.T) {
 						return nil
 					},
 				),
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_InstanceBranchProtectionDisabled(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				PreConfig: func() {
+					settings, _, err := testGitlabClient.Settings.GetSettings()
+					if err != nil {
+						t.Fatalf("failed to get settings: %v", err)
+					}
+					t.Cleanup(func() {
+						if _, _, err := testGitlabClient.Settings.UpdateSettings(&gitlab.UpdateSettingsOptions{DefaultBranchProtection: gitlab.Int(settings.DefaultBranchProtection)}); err != nil {
+							t.Fatalf("failed to update instance-wide default branch protection setting to default: %v", err)
+						}
+					})
+
+					if _, _, err := testGitlabClient.Settings.UpdateSettings(&gitlab.UpdateSettingsOptions{DefaultBranchProtection: gitlab.Int(0)}); err != nil {
+						t.Fatalf("failed to update instance-wide default branch protection setting: %v", err)
+					}
+				},
+				Config: ` `, // requires a space for empty config
+			},
+			// Without explicit default branch
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						initialize_with_readme = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
+			},
+			// Force a destroy for the project so that it can be recreated as the same resource
+			{
+				Config: ` `, // requires a space for empty config
+			},
+			// With explicit default branch set to instance-wide default
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						default_branch         = "main"
+						initialize_with_readme = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
+			},
+			// Force a destroy for the project so that it can be recreated as the same resource
+			{
+				Config: ` `, // requires a space for empty config
+			},
+			// With custom default branch
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d-custom-default-branch"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						default_branch         = "foobar-non-default-branch"
+						initialize_with_readme = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
 			},
 		},
 	})

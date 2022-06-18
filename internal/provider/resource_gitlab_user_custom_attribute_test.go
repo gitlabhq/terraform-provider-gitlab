@@ -18,7 +18,7 @@ func TestAccGitlabUserCustomAttribute_basic(t *testing.T) {
 	var customAttribute gitlab.CustomAttribute
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabUserDestroy,
 		Steps: []resource.TestStep{

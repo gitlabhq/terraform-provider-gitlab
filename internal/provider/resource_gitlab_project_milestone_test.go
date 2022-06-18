@@ -18,7 +18,7 @@ func TestAccGitlabProjectMilestone_basic(t *testing.T) {
 	rInt1, rInt2 := acctest.RandInt(), acctest.RandInt()
 	project := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectMilestoneDestroy,
 		Steps: []resource.TestStep{

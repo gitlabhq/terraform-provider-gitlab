@@ -21,7 +21,7 @@ func TestAccGitlabTopic_basic(t *testing.T) {
 	var topic gitlab.Topic
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicDestroy,
 		Steps: []resource.TestStep{
@@ -217,7 +217,7 @@ func TestAccGitlabTopic_withoutAvatarHash(t *testing.T) {
 	var topic gitlab.Topic
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicDestroy,
 		Steps: []resource.TestStep{
@@ -243,7 +243,7 @@ func TestAccGitlabTopic_softDestroy(t *testing.T) {
 	var topic gitlab.Topic
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicSoftDestroy,
 		Steps: []resource.TestStep{
@@ -261,7 +261,7 @@ func TestAccGitlabTopic_softDestroy(t *testing.T) {
 func TestAccGitlabTopic_titleSupport(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabTopicDestroy,
 		Steps: []resource.TestStep{

@@ -18,7 +18,7 @@ func TestAccGitlabInstanceVariable_basic(t *testing.T) {
 	var instanceVariable gitlab.InstanceVariable
 	rString := acctest.RandString(5)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabInstanceVariableDestroy,
 		Steps: []resource.TestStep{

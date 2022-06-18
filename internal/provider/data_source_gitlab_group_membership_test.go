@@ -14,7 +14,7 @@ import (
 func TestAccDataSourceGitlabMembership_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			// Create the group and one member

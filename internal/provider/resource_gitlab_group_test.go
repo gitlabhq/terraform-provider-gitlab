@@ -18,7 +18,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 	var group gitlab.Group
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -150,7 +150,7 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 	}
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -245,7 +245,7 @@ func TestAccGitlabGroup_disappears(t *testing.T) {
 	var group gitlab.Group
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{
@@ -265,7 +265,7 @@ func TestAccGitlabGroup_PreventForkingOutsideGroup(t *testing.T) {
 	var group gitlab.Group
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{

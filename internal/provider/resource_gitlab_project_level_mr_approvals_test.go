@@ -18,7 +18,7 @@ func TestAccGitlabProjectLevelMRApprovals_basic(t *testing.T) {
 	var projectApprovals gitlab.ProjectApprovals
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectLevelMRApprovalsDestroy,
 		Steps: []resource.TestStep{

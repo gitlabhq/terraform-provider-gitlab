@@ -16,7 +16,7 @@ func TestAccDataSourceGitlabUsers_basic(t *testing.T) {
 	rInt2 := acctest.RandInt()
 	user2 := fmt.Sprintf("user%d@test.test", rInt2)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

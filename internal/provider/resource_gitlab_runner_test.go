@@ -21,7 +21,7 @@ func TestAccGitlabRunner_basic(t *testing.T) {
 		t.Fail()
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
@@ -67,7 +67,7 @@ func TestAccGitlabRunner_instance(t *testing.T) {
 	// This pulls from the gitlab.rb file, and is set on instance start-up
 	token := "ACCTEST1234567890123_RUNNER_REG_TOKEN"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
@@ -102,7 +102,7 @@ func TestAccGitlabRunner_comprehensive(t *testing.T) {
 		t.Fail()
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckRunnerDestroy,
 		Steps: []resource.TestStep{
@@ -117,7 +117,7 @@ func TestAccGitlabRunner_comprehensive(t *testing.T) {
 					run_untagged = false
 					tag_list = ["tag_one", "tag_two"]
 					access_level = "ref_protected"
-					maximum_timeout = 3600					
+					maximum_timeout = 3600
 				}
 				`, group.RunnersToken),
 			},

@@ -18,7 +18,7 @@ func TestAccGitlabServiceGithub_basic(t *testing.T) {
 	var githubService gitlab.GithubService
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceGithubDestroy,
 		Steps: []resource.TestStep{

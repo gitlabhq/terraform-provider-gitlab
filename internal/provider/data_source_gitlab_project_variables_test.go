@@ -18,7 +18,7 @@ func TestAccDataSourceGitlabProjectVariables_basic(t *testing.T) {
 		testVariables = append(testVariables, testAccCreateProjectVariable(t, testProject.ID))
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

@@ -7,25 +7,28 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 )
 
 func TestAccDataSourceGitlabInstanceVariable_basic(t *testing.T) {
-	resource.Test(t, resource.TestCase{
+	rInt := acctest.RandInt()
+
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: `
+				Config: fmt.Sprintf(`
 					resource "gitlab_instance_variable" "this" {
-						key               = "any_key"
-					        value             = "any-value"
+						key               = "any_key_%d"
+					    value             = "any-value"
 					}
 
 					data "gitlab_instance_variable" "this" {
 						key               = gitlab_instance_variable.this.key
 					}
-				`,
+				`, rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccDataSourceGitlabInstanceVariable("gitlab_instance_variable.this", "data.gitlab_instance_variable.this"),
 				),
