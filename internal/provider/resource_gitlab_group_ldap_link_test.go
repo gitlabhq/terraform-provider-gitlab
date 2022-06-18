@@ -25,7 +25,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 		Provider: "default",
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupLdapLinkDestroy,
 		Steps: []resource.TestStep{

@@ -19,7 +19,7 @@ func TestAccGitlabUser_basic(t *testing.T) {
 	var user gitlab.User
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabUserDestroy,
 		Steps: []resource.TestStep{
@@ -330,7 +330,7 @@ func TestAccGitlabUser_password_reset(t *testing.T) {
 	var user gitlab.User
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabGroupDestroy,
 		Steps: []resource.TestStep{

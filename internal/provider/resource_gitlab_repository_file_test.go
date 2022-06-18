@@ -16,7 +16,7 @@ func TestAccGitlabRepositoryFile_basic(t *testing.T) {
 	var file gitlab.File
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -64,7 +64,7 @@ func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T)
 	firstTestProject := testAccCreateProject(t)
 	secondTestProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -90,7 +90,7 @@ func TestAccGitlabRepositoryFile_createSameFileDifferentRepository(t *testing.T)
 func TestAccGitlabRepositoryFile_concurrentResources(t *testing.T) {
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -114,7 +114,7 @@ func TestAccGitlabRepositoryFile_createOnNewBranch(t *testing.T) {
 	var file gitlab.File
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -136,7 +136,7 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 	var file gitlab.File
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,
 		Steps: []resource.TestStep{
@@ -242,7 +242,7 @@ func TestAccGitlabRepositoryFile_base64EncodingWithTextContent(t *testing.T) {
 func TestAccGitlabRepositoryFile_createWithExecuteFilemode(t *testing.T) {
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:          func() { testAccRequiresAtLeast(t, "14.10") },
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabRepositoryFileDestroy,

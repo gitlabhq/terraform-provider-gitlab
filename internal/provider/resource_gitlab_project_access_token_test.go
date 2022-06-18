@@ -15,7 +15,7 @@ import (
 func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 	project := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectAccessTokenDestroy,
 		Steps: []resource.TestStep{

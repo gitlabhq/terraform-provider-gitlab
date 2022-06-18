@@ -17,7 +17,7 @@ func TestAccDataSourceGitlabClusterAgent_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
 	testAgent := testAccCreateClusterAgents(t, testProject.ID, 1)[0]
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

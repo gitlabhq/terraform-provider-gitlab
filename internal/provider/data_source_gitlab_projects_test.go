@@ -18,7 +18,7 @@ import (
 func TestAccDataGitlabProjects_search(t *testing.T) {
 	projectName := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -62,7 +62,7 @@ func TestAccDataGitlabProjects_groups(t *testing.T) {
 	subGroupProjectName1 := fmt.Sprintf("tf-%s", acctest.RandString(5))
 	subGroupProjectName2 := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

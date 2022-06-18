@@ -30,7 +30,7 @@ func TestAccGitlabProjectRunnerEnablement_basic(t *testing.T) {
 	// Create runner in project A
 	runner, _, _ := testGitlabClient.Runners.RegisterNewRunner(&opts)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectRunnerEnablementDestroy(projectB.ID, runner.ID),
 		Steps: []resource.TestStep{

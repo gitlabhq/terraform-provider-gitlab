@@ -15,7 +15,7 @@ func TestAccDataGitlabProjectMilestones_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
 	testMilestones := testAccAddProjectMilestones(t, testProject, 2)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

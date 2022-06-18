@@ -14,7 +14,7 @@ import (
 func TestAccGitlabProjectBadge_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectBadgeDestroy,
 		Steps: []resource.TestStep{

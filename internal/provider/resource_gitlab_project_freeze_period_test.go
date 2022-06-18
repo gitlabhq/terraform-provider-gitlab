@@ -17,7 +17,7 @@ func TestAccGitlabProjectFreezePeriod_basic(t *testing.T) {
 	var schedule gitlab.FreezePeriod
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{

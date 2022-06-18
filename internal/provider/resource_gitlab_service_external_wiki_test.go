@@ -22,7 +22,7 @@ func TestAccGitlabServiceExternalWiki_basic(t *testing.T) {
 	var externalWikiURL2 = "http://mynumbertwowiki.com"
 	var externalWikiResourceName = "gitlab_service_external_wiki.this"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceExternalWikiDestroy,
 		Steps: []resource.TestStep{
