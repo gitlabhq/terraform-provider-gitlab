@@ -15,7 +15,7 @@ import (
 func TestAccDataGitlabProject_basic(t *testing.T) {
 	projectname := fmt.Sprintf("tf-%s", acctest.RandString(5))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

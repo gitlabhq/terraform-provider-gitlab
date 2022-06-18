@@ -18,7 +18,7 @@ func TestAccGitlabServiceSlack_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 	slackResourceName := "gitlab_service_slack.slack"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceSlackDestroy,
 		Steps: []resource.TestStep{

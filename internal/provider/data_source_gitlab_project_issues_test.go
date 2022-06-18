@@ -14,7 +14,7 @@ func TestAccDataSourceGitlabProjectIssues_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
 	testIssues := testAccCreateProjectIssues(t, testProject.ID, 25)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

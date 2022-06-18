@@ -21,7 +21,7 @@ func TestAccGitlabProjectTag_basic(t *testing.T) {
 	project := testAccCreateProject(t)
 	branches := testAccCreateBranches(t, project, 1)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectTagDestroy,
 		Steps: []resource.TestStep{

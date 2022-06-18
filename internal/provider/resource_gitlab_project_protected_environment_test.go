@@ -36,7 +36,7 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 		t.Fatalf("unable to share project %d with group %d", project.ID, group.ID)
 	}
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy(project.ID, environment.Name),
 		Steps: []resource.TestStep{

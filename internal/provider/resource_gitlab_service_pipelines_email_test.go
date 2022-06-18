@@ -20,7 +20,7 @@ func TestAccGitlabServicePipelinesEmail_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 	pipelinesEmailResourceName := "gitlab_service_pipelines_email.email"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServicePipelinesEmailDestroy,
 		Steps: []resource.TestStep{

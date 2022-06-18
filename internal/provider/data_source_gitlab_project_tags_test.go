@@ -15,7 +15,7 @@ func TestAccDataGitlabProjectTags_basic(t *testing.T) {
 	countTags := 3
 	project := testAccCreateProject(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{

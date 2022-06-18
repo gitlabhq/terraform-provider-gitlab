@@ -18,7 +18,7 @@ func TestAccGitlabServiceMicrosoftTeams_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 	teamsResourceName := "gitlab_service_microsoft_teams.teams"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceMicrosoftTeamsDestroy,
 		Steps: []resource.TestStep{

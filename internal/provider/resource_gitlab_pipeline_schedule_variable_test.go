@@ -18,7 +18,7 @@ func TestAccGitlabPipelineScheduleVariable_basic(t *testing.T) {
 	var variable gitlab.PipelineVariable
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPipelineScheduleVariableDestroy,
 		Steps: []resource.TestStep{

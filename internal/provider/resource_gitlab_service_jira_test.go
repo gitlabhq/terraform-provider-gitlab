@@ -18,7 +18,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 	rInt := acctest.RandInt()
 	jiraResourceName := "gitlab_service_jira.jira"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabServiceJiraDestroy,
 		Steps: []resource.TestStep{

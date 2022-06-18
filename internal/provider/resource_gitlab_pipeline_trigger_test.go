@@ -18,7 +18,7 @@ func TestAccGitlabPipelineTrigger_basic(t *testing.T) {
 	var trigger gitlab.PipelineTrigger
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabPipelineTriggerDestroy,
 		Steps: []resource.TestStep{

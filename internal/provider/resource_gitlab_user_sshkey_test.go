@@ -22,7 +22,7 @@ func TestAccGitlabUserSSHKey_basic(t *testing.T) {
 	var key gitlab.SSHKey
 	testUser := testAccCreateUsers(t, 1)[0]
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabUserSSHKeyDestroy,
 		Steps: []resource.TestStep{
