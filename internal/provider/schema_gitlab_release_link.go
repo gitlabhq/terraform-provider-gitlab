@@ -35,12 +35,12 @@ func gitlabReleaseLinkGetSchema() map[string]*schema.Schema {
 			Required:    true,
 		},
 		"filepath": {
-			Description: "Relatively path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).",
+			Description: "Relative path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).",
 			Type:        schema.TypeString,
 			Optional:    true,
 		},
 		"link_type": {
-			Description:      fmt.Sprintf("The type of the link: %s. Defaults to %s.", renderValueListForDocs(validLinkTypes), validLinkTypes[0]),
+			Description:      fmt.Sprintf("The type of the link. Valid values are %s. Defaults to %s.", renderValueListForDocs(validLinkTypes), validLinkTypes[0]),
 			Type:             schema.TypeString,
 			Optional:         true,
 			Default:          validLinkTypes[0],

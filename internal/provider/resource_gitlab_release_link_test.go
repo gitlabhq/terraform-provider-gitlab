@@ -19,7 +19,7 @@ func TestAccGitlabReleaseLink_basic(t *testing.T) {
 	project := testAccCreateProject(t)
 	releases := testAccCreateReleases(t, project, 1)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabReleaseLinkDestroy,
 		Steps: []resource.TestStep{

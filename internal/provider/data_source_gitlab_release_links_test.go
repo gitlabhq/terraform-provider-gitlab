@@ -15,7 +15,7 @@ func TestAccDataGitlabReleaseLinks_basic(t *testing.T) {
 	project := testAccCreateProject(t)
 	releases := testAccCreateReleases(t, project, 2)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -50,6 +50,17 @@ func TestAccDataGitlabReleaseLinks_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.gitlab_release_links.this", "release_links.1.name", releases[1].Assets.Links[1].Name),
 					resource.TestCheckResourceAttr("data.gitlab_release_links.this", "release_links.1.url", releases[1].Assets.Links[1].URL),
 					resource.TestCheckResourceAttr("data.gitlab_release_links.this", "release_links.1.direct_asset_url", releases[1].Assets.Links[1].DirectAssetURL),
+				),
+			},
+			{
+				// get empty list
+				Config: fmt.Sprintf(`
+				data "gitlab_release_links" "this" {
+					project = "%s"
+					tag_name = "%s"
+				}`, project.PathWithNamespace, "error_tag"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.gitlab_release_links.this", "release_links.#", fmt.Sprintf("%v", 0)),
 				),
 			},
 		},

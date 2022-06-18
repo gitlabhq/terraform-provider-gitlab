@@ -57,9 +57,12 @@ func dataSourceGitlabReleaseLinksRead(ctx context.Context, d *schema.ResourceDat
 	for options.Page != 0 {
 		paginatedReleaseLinks, resp, err := client.ReleaseLinks.ListReleaseLinks(project, tagName, &options, gitlab.WithContext(ctx))
 		if err != nil {
-			return diag.FromErr(err)
+			if is404(err) {
+				break
+			} else {
+				return diag.FromErr(err)
+			}
 		}
-
 		releaseLinks = append(releaseLinks, paginatedReleaseLinks...)
 		options.Page = resp.NextPage
 	}

@@ -43,8 +43,8 @@ resource "gitlab_release_link" "example" {
 
 ### Optional
 
-- `filepath` (String) Relatively path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).
-- `link_type` (String) The type of the link: `other`, `runbook`, `image`, `package`. Defaults to other.
+- `filepath` (String) Relative path for a [Direct Asset link](https://docs.gitlab.com/ee/user/project/releases/index.html#permanent-links-to-release-assets).
+- `link_type` (String) The type of the link. Valid values are `other`, `runbook`, `image`, `package`. Defaults to other.
 
 ### Read-Only
 
