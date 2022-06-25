@@ -75,6 +75,26 @@ func TestAccGitlabProjectAccessToken_basic(t *testing.T) {
 				// The token is only known during creating. We explicitly mention this limitation in the docs.
 				ImportStateVerifyIgnore: []string{"token"},
 			},
+			// Recreate with `owner` access level.
+			{
+				Config: fmt.Sprintf(`
+				resource "gitlab_project_access_token" "foo" {
+					project = %d
+					name    = "foo"
+					scopes  = ["api", "read_api", "read_repository", "write_repository"]
+					access_level = "owner"
+					expires_at = %q
+				}
+				`, project.ID, time.Now().Add(time.Hour*48).Format("2006-01-02")),
+			},
+			// Verify upstream resource with an import.
+			{
+				ResourceName:      "gitlab_project_access_token.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+				// The token is only known during creating. We explicitly mention this limitation in the docs.
+				ImportStateVerifyIgnore: []string{"token"},
+			},
 		},
 	})
 }
