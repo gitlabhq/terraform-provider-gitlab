@@ -9,12 +9,12 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	gitlab "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 var _ = registerResource("gitlab_release_link", func() *schema.Resource {
 	return &schema.Resource{
-		Description: `The ` + "`gitlab_release_link`" + ` resource allows to manage the lifecycle of a release links.
+		Description: `The ` + "`gitlab_release_link`" + ` resource allows to manage the lifecycle of a release link.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/releases/links.html)`,
 
@@ -37,8 +37,8 @@ func resourceGitlabReleaseLinkCreate(ctx context.Context, d *schema.ResourceData
 	url := d.Get("url").(string)
 
 	options := &gitlab.CreateReleaseLinkOptions{
-		Name: &name,
-		URL:  &url,
+		Name: gitlab.String(name),
+		URL:  gitlab.String(url),
 	}
 	if filePath, ok := d.GetOk("filepath"); ok {
 		options.FilePath = gitlab.String(filePath.(string))

@@ -19,7 +19,7 @@ var _ = registerDataSource("gitlab_release_links", func() *schema.Resource {
 		ReadContext: dataSourceGitlabReleaseLinksRead,
 		Schema: map[string]*schema.Schema{
 			"project": {
-				Description: "The ID or [URL-encoded path of the project](https://docs.gitlab.com/ee/api/index.html#namespaced-path-encoding).",
+				Description: "The ID or full path to the project.",
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
@@ -69,8 +69,7 @@ func dataSourceGitlabReleaseLinksRead(ctx context.Context, d *schema.ResourceDat
 
 	log.Printf("[DEBUG] get list release links project/tagName: %s/%s", project, tagName)
 	d.SetId(buildTwoPartID(&project, &tagName))
-	var err error
-	if err = d.Set("release_links", flattenGitlabReleaseLinks(project, tagName, releaseLinks)); err != nil {
+    if err := d.Set("release_links", flattenGitlabReleaseLinks(project, tagName, releaseLinks)); err != nil {
 		return diag.Errorf("Failed to set release links to state: %v", err)
 	}
 
