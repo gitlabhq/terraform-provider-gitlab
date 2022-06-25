@@ -34,7 +34,7 @@ data "gitlab_release_links" "example" {
 
 ### Required
 
-- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/ee/api/index.html#namespaced-path-encoding).
+- `project` (String) The ID or full path to the project.
 - `tag_name` (String) The tag associated with the Release.
 
 ### Read-Only

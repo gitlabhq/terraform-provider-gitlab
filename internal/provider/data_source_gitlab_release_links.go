@@ -69,7 +69,7 @@ func dataSourceGitlabReleaseLinksRead(ctx context.Context, d *schema.ResourceDat
 
 	log.Printf("[DEBUG] get list release links project/tagName: %s/%s", project, tagName)
 	d.SetId(buildTwoPartID(&project, &tagName))
-    if err := d.Set("release_links", flattenGitlabReleaseLinks(project, tagName, releaseLinks)); err != nil {
+	if err := d.Set("release_links", flattenGitlabReleaseLinks(project, tagName, releaseLinks)); err != nil {
 		return diag.Errorf("Failed to set release links to state: %v", err)
 	}
 

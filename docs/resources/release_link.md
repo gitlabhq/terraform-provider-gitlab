@@ -3,13 +3,13 @@
 page_title: "gitlab_release_link Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_release_link resource allows to manage the lifecycle of a release links.
+  The gitlab_release_link resource allows to manage the lifecycle of a release link.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/releases/links.html
 ---
 
 # gitlab_release_link (Resource)
 
-The `gitlab_release_link` resource allows to manage the lifecycle of a release links.
+The `gitlab_release_link` resource allows to manage the lifecycle of a release link.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/releases/links.html)
 
