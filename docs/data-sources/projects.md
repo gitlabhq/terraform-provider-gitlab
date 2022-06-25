@@ -93,6 +93,7 @@ Read-Only:
 - `build_timeout` (Number)
 - `builds_access_level` (String)
 - `ci_config_path` (String)
+- `ci_default_git_depth` (Number)
 - `ci_forward_deployment_enabled` (Boolean)
 - `container_expiration_policy` (List of Object) (see [below for nested schema](#nestedobjatt--projects--container_expiration_policy))
 - `container_registry_access_level` (String)
