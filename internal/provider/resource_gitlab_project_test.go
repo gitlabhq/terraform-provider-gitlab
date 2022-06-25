@@ -98,22 +98,21 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			KeepN:     10,
 			OlderThan: "10d",
 		},
-		ContainerRegistryAccessLevel: gitlab.EnabledAccessControl,
-		EmailsDisabled:               true,
-		ForkingAccessLevel:           gitlab.EnabledAccessControl,
-		IssuesAccessLevel:            gitlab.EnabledAccessControl,
-		MergeRequestsAccessLevel:     gitlab.EnabledAccessControl,
-		OperationsAccessLevel:        gitlab.EnabledAccessControl,
-		PublicBuilds:                 false,
-		RepositoryAccessLevel:        gitlab.EnabledAccessControl,
-		RepositoryStorage:            "default",
-		// FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
-		// SecurityAndComplianceAccessLevel:         gitlab.EnabledAccessControl,
-		SnippetsAccessLevel:  gitlab.EnabledAccessControl,
-		Topics:               []string{"foo", "bar"},
-		WikiAccessLevel:      gitlab.EnabledAccessControl,
-		SquashCommitTemplate: "hello squash",
-		MergeCommitTemplate:  "hello merge",
+		ContainerRegistryAccessLevel:     gitlab.EnabledAccessControl,
+		EmailsDisabled:                   true,
+		ForkingAccessLevel:               gitlab.EnabledAccessControl,
+		IssuesAccessLevel:                gitlab.EnabledAccessControl,
+		MergeRequestsAccessLevel:         gitlab.EnabledAccessControl,
+		OperationsAccessLevel:            gitlab.EnabledAccessControl,
+		PublicBuilds:                     false,
+		RepositoryAccessLevel:            gitlab.EnabledAccessControl,
+		RepositoryStorage:                "default",
+		SecurityAndComplianceAccessLevel: gitlab.EnabledAccessControl,
+		SnippetsAccessLevel:              gitlab.EnabledAccessControl,
+		Topics:                           []string{"foo", "bar"},
+		WikiAccessLevel:                  gitlab.EnabledAccessControl,
+		SquashCommitTemplate:             "hello squash",
+		MergeCommitTemplate:              "hello merge",
 	}
 
 	defaultsMainBranch = defaults
@@ -174,22 +173,21 @@ func TestAccGitlabProject_basic(t *testing.T) {
 							KeepN:     10,
 							OlderThan: "10d",
 						},
-						ContainerRegistryAccessLevel: gitlab.DisabledAccessControl,
-						EmailsDisabled:               false,
-						ForkingAccessLevel:           gitlab.DisabledAccessControl,
-						IssuesAccessLevel:            gitlab.DisabledAccessControl,
-						MergeRequestsAccessLevel:     gitlab.DisabledAccessControl,
-						OperationsAccessLevel:        gitlab.DisabledAccessControl,
-						PublicBuilds:                 false,
-						RepositoryAccessLevel:        gitlab.DisabledAccessControl,
-						RepositoryStorage:            "default",
-						// FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
-						// SecurityAndComplianceAccessLevel:         gitlab.DisabledAccessControl,
-						SnippetsAccessLevel:  gitlab.DisabledAccessControl,
-						Topics:               []string{},
-						WikiAccessLevel:      gitlab.DisabledAccessControl,
-						SquashCommitTemplate: "goodby squash",
-						MergeCommitTemplate:  "goodby merge",
+						ContainerRegistryAccessLevel:     gitlab.DisabledAccessControl,
+						EmailsDisabled:                   false,
+						ForkingAccessLevel:               gitlab.DisabledAccessControl,
+						IssuesAccessLevel:                gitlab.DisabledAccessControl,
+						MergeRequestsAccessLevel:         gitlab.DisabledAccessControl,
+						OperationsAccessLevel:            gitlab.DisabledAccessControl,
+						PublicBuilds:                     false,
+						RepositoryAccessLevel:            gitlab.DisabledAccessControl,
+						RepositoryStorage:                "default",
+						SecurityAndComplianceAccessLevel: gitlab.DisabledAccessControl,
+						SnippetsAccessLevel:              gitlab.DisabledAccessControl,
+						Topics:                           []string{},
+						WikiAccessLevel:                  gitlab.DisabledAccessControl,
+						SquashCommitTemplate:             "goodby squash",
+						MergeCommitTemplate:              "goodby merge",
 					}, &received),
 				),
 			},
@@ -1616,8 +1614,7 @@ resource "gitlab_project" "foo" {
   public_builds = false
   repository_access_level = "enabled"
   repository_storage = "default"
-  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
-  # security_and_compliance_access_level = "enabled"
+  security_and_compliance_access_level = "enabled"
   snippets_access_level = "enabled"
   topics = ["foo", "bar"]
   wiki_access_level = "enabled"
@@ -1716,8 +1713,7 @@ resource "gitlab_project" "foo" {
   public_builds = false
   repository_access_level = "disabled"
   repository_storage = "default"
-  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
-  # security_and_compliance_access_level = "disabled"
+  security_and_compliance_access_level = "disabled"
   snippets_access_level = "disabled"
   topics = []
   wiki_access_level = "disabled"
@@ -1858,8 +1854,7 @@ resource "gitlab_project" "foo" {
   public_builds = false
   repository_access_level = "enabled"
   repository_storage = "default"
-  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
-  # security_and_compliance_access_level = "enabled"
+  security_and_compliance_access_level = "enabled"
   snippets_access_level = "enabled"
   topics = ["foo", "bar"]
   wiki_access_level = "enabled"
@@ -2054,8 +2049,7 @@ resource "gitlab_project" "foo" {
   public_builds = false
   repository_access_level = "enabled"
   repository_storage = "default"
-  # FIXME: this is GitLab 14.9 only, which isn't released yet. Thus, wait for it before we can use it here ...
-  # security_and_compliance_access_level = "enabled"
+  security_and_compliance_access_level = "enabled"
   snippets_access_level = "enabled"
   topics = ["foo", "bar"]
   wiki_access_level = "enabled"
