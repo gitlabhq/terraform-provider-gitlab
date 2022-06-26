@@ -65,6 +65,7 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 				resource "gitlab_project_protected_environment" "this" {
 					project     = %d
 					environment = %q
+					required_approval_count = 1
 					deploy_access_levels {
 						access_level = "maintainer"
 					}
@@ -83,6 +84,8 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 					// access_level is computed when not specified.
 					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.1.access_level"),
 					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "deploy_access_levels.2.access_level"),
+					// required_approval_count is set.
+					resource.TestCheckResourceAttrSet("gitlab_project_protected_environment.this", "required_approval_count"),
 				),
 			},
 			// Verify upstream attributes with an import.

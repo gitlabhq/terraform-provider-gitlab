@@ -38,12 +38,12 @@ var _ = registerResource("gitlab_project_protected_environment", func() *schema.
 				Required:     true,
 				ValidateFunc: validation.StringIsNotEmpty,
 			},
-			// Uncomment and validate after 14.9 is released, update acceptance tests
-			// 	"required_approval_count": {
-			// 		Description:  "The number of approvals required to deploy to this environment.",
-			// 		Type:         schema.TypeInt,
-			// 		ForceNew:     true,
-			// },
+			"required_approval_count": {
+				Description: "The number of approvals required to deploy to this environment.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				ForceNew:    true,
+			},
 			"deploy_access_levels": {
 				Description: "Array of access levels allowed to deploy, with each described by a hash.",
 				Type:        schema.TypeList,
@@ -96,6 +96,10 @@ func resourceGitlabProjectProtectedEnvironmentCreate(ctx context.Context, d *sch
 		DeployAccessLevels: &deployAccessLevels,
 	}
 
+	if v, ok := d.GetOk("required_approval_count"); ok {
+		options.RequiredApprovalCount = gitlab.Int(v.(int))
+	}
+
 	project := d.Get("project").(string)
 
 	log.Printf("[DEBUG] Project %s create gitlab protected environment %q", project, *options.Name)
@@ -137,6 +141,7 @@ func resourceGitlabProjectProtectedEnvironmentRead(ctx context.Context, d *schem
 		}
 		return diag.Errorf("error getting gitlab project %q protected environment %q: %v", project, environment, err)
 	}
+	d.Set("required_approval_count", protectedEnvironment.RequiredApprovalCount)
 
 	if err := d.Set("deploy_access_levels", flattenDeployAccessLevels(protectedEnvironment.DeployAccessLevels)); err != nil {
 		return diag.Errorf("error setting deploy_access_levels: %v", err)

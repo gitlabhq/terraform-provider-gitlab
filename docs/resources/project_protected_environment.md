@@ -24,8 +24,9 @@ resource "gitlab_project_environment" "this" {
 
 # Example with access level
 resource "gitlab_project_protected_environment" "example_with_access_level" {
-  project     = gitlab_project_environment.this.project
-  environment = gitlab_project_environment.this.name
+  project                 = gitlab_project_environment.this.project
+  required_approval_count = 1
+  environment             = gitlab_project_environment.this.name
 
   deploy_access_levels {
     access_level = "developer"
@@ -54,8 +55,9 @@ resource "gitlab_project_protected_environment" "example_with_user" {
 
 # Example with multiple access levels
 resource "gitlab_project_protected_environment" "example_with_multiple" {
-  project     = gitlab_project_environment.this.project
-  environment = gitlab_project_environment.this.name
+  project                 = gitlab_project_environment.this.project
+  required_approval_count = 2
+  environment             = gitlab_project_environment.this.name
 
   deploy_access_levels {
     access_level = "developer"
@@ -79,6 +81,10 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 - `deploy_access_levels` (Block List, Min: 1) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
 - `environment` (String) The name of the environment.
 - `project` (String) The ID or full path of the project which the protected environment is created against.
+
+### Optional
+
+- `required_approval_count` (Number) The number of approvals required to deploy to this environment.
 
 ### Read-Only
 
