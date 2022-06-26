@@ -267,6 +267,45 @@ func testAccCreateProtectedBranches(t *testing.T, project *gitlab.Project, n int
 	return protectedBranches
 }
 
+// testAccCreateReleases is a test helper for creating a specified number of releases.
+// It assumes the project will be destroyed at the end of the test and will not cleanup created releases.
+func testAccCreateReleases(t *testing.T, project *gitlab.Project, n int) []*gitlab.Release {
+	t.Helper()
+
+	releases := make([]*gitlab.Release, n)
+	linkType := gitlab.LinkTypeValue("other")
+	linkURL1 := fmt.Sprintf("https://test/%v", *gitlab.String(acctest.RandomWithPrefix("acctest")))
+	linkURL2 := fmt.Sprintf("https://test/%v", *gitlab.String(acctest.RandomWithPrefix("acctest")))
+
+	for i := range releases {
+		var err error
+		releases[i], _, err = testGitlabClient.Releases.CreateRelease(project.ID, &gitlab.CreateReleaseOptions{
+			Name:    gitlab.String(acctest.RandomWithPrefix("acctest")),
+			TagName: gitlab.String(acctest.RandomWithPrefix("acctest")),
+			Ref:     &project.DefaultBranch,
+			Assets: &gitlab.ReleaseAssetsOptions{
+				Links: []*gitlab.ReleaseAssetLinkOptions{
+					{
+						Name:     gitlab.String(acctest.RandomWithPrefix("acctest")),
+						URL:      &linkURL1,
+						LinkType: &linkType,
+					},
+					{
+						Name:     gitlab.String(acctest.RandomWithPrefix("acctest")),
+						URL:      &linkURL2,
+						LinkType: &linkType,
+					},
+				},
+			},
+		})
+		if err != nil {
+			t.Fatalf("could not create test releases: %v", err)
+		}
+	}
+
+	return releases
+}
+
 // testAccAddProjectMembers is a test helper for adding users as members of a project.
 // It assumes the project will be destroyed at the end of the test and will not cleanup members.
 func testAccAddProjectMembers(t *testing.T, pid interface{}, users []*gitlab.User) {
