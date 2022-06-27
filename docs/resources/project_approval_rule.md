@@ -59,7 +59,7 @@ resource "gitlab_project_approval_rule" "example-three" {
 }
 
 # Example using `approval_rule`
-resource "gitlab_branch_protection" "any-approver" {
+resource "gitlab_project_approval_rule" "any-approver" {
   project            = 5
   name               = "Any name"
   rule_type          = "any_approver"
