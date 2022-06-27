@@ -37,6 +37,7 @@ var validProjectAccessLevelNames = []string{
 	"reporter",
 	"developer",
 	"maintainer",
+	"owner",
 
 	// Deprecated and should be removed in v4 of this provider
 	"master",
