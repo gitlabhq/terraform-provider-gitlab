@@ -58,8 +58,8 @@ resource "gitlab_project_approval_rule" "example-three" {
   user_ids           = [for user in data.gitlab_user.users : user.id]
 }
 
-# Example using `approval_rule`
-resource "gitlab_project_approval_rule" "any-approver" {
+# Example using `approval_rule` using `any_approver` as rule type
+resource "gitlab_project_approval_rule" "any_approver" {
   project            = 5
   name               = "Any name"
   rule_type          = "any_approver"
