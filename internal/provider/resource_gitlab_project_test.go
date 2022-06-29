@@ -1139,6 +1139,56 @@ func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	})
 }
 
+// Gitlab update project API call requires one from a subset of project fields to be set (See #1157)
+// If only a non-blessed field is changed, this test checks that the provider ensures the code won't return an error.
+func TestAccGitlabProject_UpdateAnalyticsAccessLevel(t *testing.T) {
+	var received gitlab.Project
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			// Create minimal test project
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+						visibility_level = "public"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update `analytics_access_level`
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "foo-%d"
+						visibility_level = "public"
+						analytics_access_level = "disabled"
+					}`, rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
+					resource.TestCheckResourceAttr("gitlab_project.this", "analytics_access_level", "disabled"),
+				),
+			},
+			// Verify Import
+			{
+				ResourceName:      "gitlab_project.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccGitlabProject_containerExpirationPolicy(t *testing.T) {
 	var received gitlab.Project
 	rInt := acctest.RandInt()
