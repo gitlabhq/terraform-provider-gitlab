@@ -313,6 +313,36 @@ func testAccCheckGitlabGroupDisappears(group *gitlab.Group) resource.TestCheckFu
 	}
 }
 
+func TestAccGitlabGroup_SetDefaultFalseBooleansOnCreate(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_group" "this" {
+						name             = "foo-%d"
+						path             = "path-%d"
+						visibility_level = "public"
+
+						require_two_factor_authentication = false
+						auto_devops_enabled               = false
+						emails_disabled                   = false
+						mentions_disabled                 = false
+						prevent_forking_outside_group     = false
+					}`, rInt, rInt),
+			},
+			{
+				ResourceName:      "gitlab_group.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabGroupExists(n string, group *gitlab.Group) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
