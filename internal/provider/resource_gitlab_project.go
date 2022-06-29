@@ -1208,14 +1208,16 @@ func resourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, meta
 func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	options := &gitlab.EditProjectOptions{}
-	transferOptions := &gitlab.TransferProjectOptions{}
-
 	// Always send the name field, to satisfy the requirement of having one
 	// of the project attributes listed below in the update call
 	// https://gitlab.com/gitlab-org/gitlab-foss/-/blob/master/lib/api/helpers/projects_helpers.rb#L120-188
-	// if d.HasChange("name") {
-	if d.Get("name").(string) != nil {
+	options := &gitlab.EditProjectOptions{
+		Name: gitlab.String(d.Get("name").(string)),
+	}
+
+	transferOptions := &gitlab.TransferProjectOptions{}
+
+	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
