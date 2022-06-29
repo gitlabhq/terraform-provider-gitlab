@@ -820,7 +820,9 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.TagList = stringSetToStringSlice(v.(*schema.Set))
 	}
 
-	if v, ok := d.GetOk("initialize_with_readme"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("initialize_with_readme"); ok {
 		options.InitializeWithReadme = gitlab.Bool(v.(bool))
 	}
 
@@ -836,7 +838,9 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.TemplateProjectID = gitlab.Int(v.(int))
 	}
 
-	if v, ok := d.GetOk("use_custom_template"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("use_custom_template"); ok {
 		options.UseCustomTemplate = gitlab.Bool(v.(bool))
 	}
 
@@ -852,7 +856,9 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.CIConfigPath = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOk("resolve_outdated_diff_discussions"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("resolve_outdated_diff_discussions"); ok {
 		options.ResolveOutdatedDiffDiscussions = gitlab.Bool(v.(bool))
 	}
 
@@ -868,11 +874,15 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.AutoDevopsDeployStrategy = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOk("auto_devops_enabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("auto_devops_enabled"); ok {
 		options.AutoDevopsEnabled = gitlab.Bool(v.(bool))
 	}
 
-	if v, ok := d.GetOk("autoclose_referenced_issues"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("autoclose_referenced_issues"); ok {
 		options.AutocloseReferencedIssues = gitlab.Bool(v.(bool))
 	}
 
@@ -896,7 +906,9 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.ContainerRegistryAccessLevel = stringToAccessControlValue(v.(string))
 	}
 
-	if v, ok := d.GetOk("emails_disabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("emails_disabled"); ok {
 		options.EmailsDisabled = gitlab.Bool(v.(bool))
 	}
 
@@ -920,7 +932,9 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		options.OperationsAccessLevel = stringToAccessControlValue(v.(string))
 	}
 
-	if v, ok := d.GetOk("public_builds"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("public_builds"); ok {
 		options.PublicBuilds = gitlab.Bool(v.(bool))
 	}
 
@@ -1128,12 +1142,16 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	var editProjectOptions gitlab.EditProjectOptions
 
-	if v, ok := d.GetOk("mirror_overwrites_diverged_branches"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("mirror_overwrites_diverged_branches"); ok {
 		editProjectOptions.MirrorOverwritesDivergedBranches = gitlab.Bool(v.(bool))
 		editProjectOptions.ImportURL = gitlab.String(d.Get("import_url").(string))
 	}
 
-	if v, ok := d.GetOk("only_mirror_protected_branches"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("only_mirror_protected_branches"); ok {
 		editProjectOptions.OnlyMirrorProtectedBranches = gitlab.Bool(v.(bool))
 		editProjectOptions.ImportURL = gitlab.String(d.Get("import_url").(string))
 	}
@@ -1146,11 +1164,15 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		editProjectOptions.MergeRequestsTemplate = gitlab.String(v.(string))
 	}
 
-	if v, ok := d.GetOk("merge_pipelines_enabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("merge_pipelines_enabled"); ok {
 		editProjectOptions.MergePipelinesEnabled = gitlab.Bool(v.(bool))
 	}
 
-	if v, ok := d.GetOk("merge_trains_enabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("merge_trains_enabled"); ok {
 		editProjectOptions.MergeTrainsEnabled = gitlab.Bool(v.(bool))
 	}
 

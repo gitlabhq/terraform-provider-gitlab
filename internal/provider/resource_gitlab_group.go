@@ -183,7 +183,9 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.ShareWithGroupLock = gitlab.Bool(v.(bool))
 	}
 
-	if v, ok := d.GetOk("require_two_factor_authentication"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("require_two_factor_authentication"); ok {
 		options.RequireTwoFactorAuth = gitlab.Bool(v.(bool))
 	}
 
@@ -195,7 +197,9 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.ProjectCreationLevel = stringToProjectCreationLevel(v.(string))
 	}
 
-	if v, ok := d.GetOk("auto_devops_enabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("auto_devops_enabled"); ok {
 		options.AutoDevopsEnabled = gitlab.Bool(v.(bool))
 	}
 
@@ -203,11 +207,15 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.SubGroupCreationLevel = stringToSubGroupCreationLevel(v.(string))
 	}
 
-	if v, ok := d.GetOk("emails_disabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("emails_disabled"); ok {
 		options.EmailsDisabled = gitlab.Bool(v.(bool))
 	}
 
-	if v, ok := d.GetOk("mentions_disabled"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("mentions_disabled"); ok {
 		options.MentionsDisabled = gitlab.Bool(v.(bool))
 	}
 
@@ -232,7 +240,9 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 
 	var updateOptions gitlab.UpdateGroupOptions
 
-	if v, ok := d.GetOk("prevent_forking_outside_group"); ok {
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("prevent_forking_outside_group"); ok {
 		updateOptions.PreventForkingOutsideGroup = gitlab.Bool(v.(bool))
 	}
 

@@ -1126,7 +1126,7 @@ func TestAccGitlabProject_ImportURLMirrored(t *testing.T) {
 func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1225,7 +1225,7 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 	var received gitlab.Project
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		CheckDestroy:      testAccCheckGitlabProjectDestroy,
 		Steps: []resource.TestStep{
@@ -1247,6 +1247,39 @@ func TestAccGitlabProject_DeprecatedBuildCoverageRegex(t *testing.T) {
 				ResourceName:      "gitlab_project.this",
 				ImportState:       true,
 				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccGitlabProject_SetDefaultFalseBooleansOnCreate(t *testing.T) {
+	rInt := acctest.RandInt()
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name             = "foo-%d"
+						visibility_level = "public"
+
+						initialize_with_readme              = false
+						resolve_outdated_diff_discussions   = false
+						auto_devops_enabled                 = false
+						autoclose_referenced_issues         = false
+						emails_disabled                     = false
+						public_builds                       = false
+						merge_pipelines_enabled             = false
+						merge_trains_enabled                = false
+					}`, rInt),
+			},
+			{
+				ResourceName:            "gitlab_project.this",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
 			},
 		},
 	})
