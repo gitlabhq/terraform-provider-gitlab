@@ -30,6 +30,7 @@ data "gitlab_project" "example" {
 
 ### Optional
 
+- `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
 - `id` (String) The integer or path with namespace that uniquely identifies the project within the gitlab install.
 - `path_with_namespace` (String) The path of the repository with namespace.
 - `public_builds` (Boolean) If true, jobs can be viewed by non-project members.

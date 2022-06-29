@@ -289,6 +289,12 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"ci_default_git_depth": {
+				Description: "Default number of revisions for shallow cloning.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+			},
 			"push_rules": {
 				Description: "Push rules for the project.",
 				Type:        schema.TypeList,
@@ -429,6 +435,7 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("wiki_access_level", string(found.WikiAccessLevel))
 	d.Set("squash_commit_template", found.SquashCommitTemplate)
 	d.Set("merge_commit_template", found.MergeCommitTemplate)
+	d.Set("ci_default_git_depth", found.CIDefaultGitDepth)
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 

@@ -190,6 +190,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"wiki_access_level":                                string(project.WikiAccessLevel),
 				"squash_commit_template":                           project.SquashCommitTemplate,
 				"merge_commit_template":                            project.MergeCommitTemplate,
+				"ci_default_git_depth":                             project.CIDefaultGitDepth,
 			}
 			values = append(values, v)
 		}
@@ -942,6 +943,12 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 						"merge_commit_template": {
 							Description: "Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)",
 							Type:        schema.TypeString,
+							Computed:    true,
+						},
+						"ci_default_git_depth": {
+							Description: "Default number of revisions for shallow cloning.",
+							Type:        schema.TypeInt,
+							Optional:    true,
 							Computed:    true,
 						},
 					},

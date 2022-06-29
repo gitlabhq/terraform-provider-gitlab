@@ -1620,6 +1620,7 @@ resource "gitlab_project" "foo" {
   wiki_access_level = "enabled"
   squash_commit_template = "hello squash"
   merge_commit_template = "hello merge"
+  ci_default_git_depth = 42
 }
 	`, rInt, rInt, defaultBranchStatement)
 }
@@ -1719,6 +1720,7 @@ resource "gitlab_project" "foo" {
   wiki_access_level = "disabled"
   squash_commit_template = "goodby squash"
   merge_commit_template = "goodby merge"
+  ci_default_git_depth = 84
 }
 	`, rInt, rInt)
 }
@@ -2055,6 +2057,7 @@ resource "gitlab_project" "foo" {
   wiki_access_level = "enabled"
   squash_commit_template = "hello squash"
   merge_commit_template = "hello merge"
+  ci_default_git_depth = 42
 
   # EE features
   approvals_before_merge = 2

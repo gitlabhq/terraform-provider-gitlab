@@ -585,6 +585,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Type:        schema.TypeString,
 		Optional:    true,
 	},
+	"ci_default_git_depth": {
+		Description: "Default number of revisions for shallow cloning.",
+		Type:        schema.TypeInt,
+		Optional:    true,
+		Computed:    true,
+	},
 }
 
 var validContainerExpirationPolicyAttributesCadenceValues = []string{
@@ -755,6 +761,8 @@ func resourceGitlabProjectSetToState(ctx context.Context, client *gitlab.Client,
 
 	//Note: This field is deprecated and will always be an empty string starting in GitLab 15.0.
 	d.Set("build_coverage_regex", project.BuildCoverageRegex)
+
+	d.Set("ci_default_git_depth", project.CIDefaultGitDepth)
 
 	return nil
 }
@@ -1146,6 +1154,10 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		editProjectOptions.MergeTrainsEnabled = gitlab.Bool(v.(bool))
 	}
 
+	if v, ok := d.GetOk("ci_default_git_depth"); ok {
+		editProjectOptions.CIDefaultGitDepth = gitlab.Int(v.(int))
+	}
+
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
 		if _, _, err := client.Projects.EditProject(d.Id(), &editProjectOptions, gitlab.WithContext(ctx)); err != nil {
 			return diag.Errorf("Could not update project %q: %s", d.Id(), err)
@@ -1459,6 +1471,10 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("merge_commit_template") {
 		options.MergeCommitTemplate = gitlab.String(d.Get("merge_commit_template").(string))
+	}
+
+	if d.HasChange("ci_default_git_depth") {
+		options.CIDefaultGitDepth = gitlab.Int(d.Get("ci_default_git_depth").(int))
 	}
 
 	if *options != (gitlab.EditProjectOptions{}) {
