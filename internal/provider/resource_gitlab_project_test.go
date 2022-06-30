@@ -1171,9 +1171,6 @@ func TestAccGitlabProject_UpdateAnalyticsAccessLevel(t *testing.T) {
 						visibility_level = "public"
 						analytics_access_level = "disabled"
 					}`, rInt),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("gitlab_project.this", "analytics_access_level", "disabled"),
-				),
 			},
 			// Verify Import
 			{
