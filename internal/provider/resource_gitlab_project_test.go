@@ -1142,7 +1142,6 @@ func TestAccGitlabProject_templateMutualExclusiveNameAndID(t *testing.T) {
 // Gitlab update project API call requires one from a subset of project fields to be set (See #1157)
 // If only a non-blessed field is changed, this test checks that the provider ensures the code won't return an error.
 func TestAccGitlabProject_UpdateAnalyticsAccessLevel(t *testing.T) {
-	var received gitlab.Project
 	rInt := acctest.RandInt()
 
 	resource.Test(t, resource.TestCase{
@@ -1154,11 +1153,9 @@ func TestAccGitlabProject_UpdateAnalyticsAccessLevel(t *testing.T) {
 				Config: fmt.Sprintf(`
 					resource "gitlab_project" "this" {
 						name = "foo-%d"
-						visibility_level = "public"
+						visibility_level                = "public"
+						analytics_access_level = "private"
 					}`, rInt),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
-				),
 			},
 			// Verify Import
 			{
@@ -1175,7 +1172,6 @@ func TestAccGitlabProject_UpdateAnalyticsAccessLevel(t *testing.T) {
 						analytics_access_level = "disabled"
 					}`, rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
 					resource.TestCheckResourceAttr("gitlab_project.this", "analytics_access_level", "disabled"),
 				),
 			},
