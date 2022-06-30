@@ -48,7 +48,7 @@ var _ = registerResource("gitlab_group_share_group", func() *schema.Resource {
 			},
 			"expires_at": {
 				Description:  "Share expiration date. Format: `YYYY-MM-DD`",
-				Type:         schema.TypeString, // Format YYYY-MM-DD
+				Type:         schema.TypeString,
 				ValidateFunc: validateDateFunc,
 				ForceNew:     true,
 				Optional:     true,
