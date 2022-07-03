@@ -155,17 +155,15 @@ func testAccCheckGitlabServiceExists(n string, service *gitlab.SlackService) res
 
 func testAccCheckGitlabServiceSlackDestroy(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
+		if rs.Type != "gitlab_service_slack" {
 			continue
 		}
 
-		gotRepo, _, err := testGitlabClient.Projects.GetProject(rs.Primary.ID, nil)
+		project := rs.Primary.ID
+
+		_, _, err := testGitlabClient.Services.GetSlackService(project)
 		if err == nil {
-			if gotRepo != nil && fmt.Sprintf("%d", gotRepo.ID) == rs.Primary.ID {
-				if gotRepo.MarkedForDeletionAt == nil {
-					return fmt.Errorf("Repository still exists")
-				}
-			}
+			return fmt.Errorf("Slack Service Integration in project %s still exists", project)
 		}
 		if !is404(err) {
 			return err
