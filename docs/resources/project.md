@@ -75,6 +75,9 @@ resource "gitlab_project" "peters_repo" {
 - `allow_merge_on_skipped_pipeline` (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
 - `analytics_access_level` (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
 - `approvals_before_merge` (Number) Number of merge request approvals required for merging. Default is 0.
+  This field **does not** work well in combination with the `gitlab_project_approval_rule` resource
+  and is most likely gonna be deprecated in a future GitLab version (see [this upstream epic](https://gitlab.com/groups/gitlab-org/-/epics/7572)).
+  In the meantime we recommend against using this attribute and use `gitlab_project_approval_rule` instead.
 - `archive_on_destroy` (Boolean) Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
 - `archived` (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 - `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
