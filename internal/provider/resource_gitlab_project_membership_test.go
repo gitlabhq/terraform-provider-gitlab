@@ -27,7 +27,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
+					access_level: "developer",
 				})),
 			},
 
@@ -44,7 +44,7 @@ func TestAccGitlabProjectMembership_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectMembershipConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(testAccCheckGitlabProjectMembershipExists("gitlab_project_membership.foo", &membership), testAccCheckGitlabProjectMembershipAttributes(&membership, &testAccGitlabProjectMembershipExpectedAttributes{
-					access_level: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
+					access_level: "developer",
 				})),
 			},
 		},

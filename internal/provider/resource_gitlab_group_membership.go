@@ -50,7 +50,7 @@ var _ = registerResource("gitlab_group_membership", func() *schema.Resource {
 			},
 			"expires_at": {
 				Description:  "Expiration date for the group membership. Format: `YYYY-MM-DD`",
-				Type:         schema.TypeString, // Format YYYY-MM-DD
+				Type:         schema.TypeString,
 				ValidateFunc: validateDateFunc,
 				Optional:     true,
 			},
@@ -166,6 +166,8 @@ func resourceGitlabGroupMembershipSetToState(d *schema.ResourceData, groupMember
 	d.Set("access_level", accessLevelValueToName[groupMember.AccessLevel])
 	if groupMember.ExpiresAt != nil {
 		d.Set("expires_at", groupMember.ExpiresAt.String())
+	} else {
+		d.Set("expires_at", "")
 	}
 	userId := strconv.Itoa(groupMember.ID)
 	d.SetId(buildTwoPartID(groupId, &userId))

@@ -37,7 +37,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists(resourceName, &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("developer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
+						accessLevel: "developer",
 					})),
 			},
 
@@ -57,7 +57,7 @@ func TestAccGitlabGroupLdapLink_basic(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupLdapLinkExists(resourceName, &ldapLink),
 					testAccCheckGitlabGroupLdapLinkAttributes(&ldapLink, &testAccGitlabGroupLdapLinkExpectedAttributes{
-						accessLevel: fmt.Sprintf("maintainer"), // nolint // TODO: Resolve this golangci-lint issue: S1039: unnecessary use of fmt.Sprintf (gosimple)
+						accessLevel: "maintainer",
 					})),
 			},
 		},
