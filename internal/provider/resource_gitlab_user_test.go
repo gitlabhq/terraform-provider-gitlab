@@ -370,26 +370,44 @@ func TestAccGitlabUser_user_skip_confirmation(t *testing.T) {
 			{
 				Config: fmt.Sprintf(`
 				resource "gitlab_user" "example_user" {
-					name             = "Example User"
-					username         = "exampleuser"
-					email            = "user%d@example.com"
-					is_admin         = true
-					projects_limit   = 0
-					can_create_group = false
-					is_external      = false
-					note             = "Ipsum Lorem."
-					password         = "Dolor Sit Amet"
+					name              = "Example User"
+					username          = "exampleuser"
+					email             = "user%d@example.com"
+					is_admin          = true
+					projects_limit    = 0
+					can_create_group  = false
+					is_external       = false
+					note              = "Ipsum Lorem."
+					password          = "Dolor Sit Amet"
+					skip_confirmation = "true"
 				  }
 				`, rInt),
-				Check: testAccCheckGitlabUserExists("gitlab_user.example_user", &user),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccCheckGitlabUserExists("gitlab_user.example_user", &user),
+
+					// Since this will never import properly, check the value directly.
+					resource.TestCheckResourceAttr("gitlab_user.example_user", "skip_confirmation", "true"),
+				),
 			},
 			{
-				ResourceName:      "gitlab_user.example_user",
-				ImportState:       true,
-				ImportStateVerify: true,
-				ImportStateVerifyIgnore: []string{
-					"password",
-				},
+				Config: fmt.Sprintf(`
+				resource "gitlab_user" "example_user" {
+					name              = "Example User"
+					username          = "exampleuser"
+					email             = "user%d@example.com"
+					is_admin          = true
+					projects_limit    = 0
+					can_create_group  = false
+					is_external       = false
+					note              = "Ipsum Lorem."
+					password          = "Dolor Sit Amet"
+					skip_confirmation = "false"
+				  }
+				`, rInt),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					// Verify false is stored in state after update
+					resource.TestCheckResourceAttr("gitlab_user.example_user", "skip_confirmation", "false"),
+				),
 			},
 		},
 	})

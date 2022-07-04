@@ -74,15 +74,15 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 				Default:     false,
 			},
 			"skip_confirmation": {
-				Description: "Boolean, defaults to true. Whether to skip confirmation.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     true,
-				ForceNew:    true,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					// Skip Confirmation doesn't come back from the API, so this will always return a diff unless this skips.
-					return true
-				},
+				Description: `Boolean, defaults to true. Whether to skip confirmation.
+				
+This field does not import properly, and GitLab does not return the value of this field to verify it was set properly on apply.
+Terraform assumes the field was set properly upon first apply, and will update the field unless other values change.
+				`,
+				Type:     schema.TypeBool,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
 			},
 			"projects_limit": {
 				Description: "Integer, defaults to 0.  Number of projects user can create.",
@@ -135,6 +135,7 @@ func resourceGitlabUserSetToState(d *schema.ResourceData, user *gitlab.User) {
 	d.Set("note", user.Note)
 	d.Set("state", user.State)
 	d.Set("namespace_id", user.NamespaceID)
+
 }
 
 func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -179,6 +180,11 @@ func resourceGitlabUserCreate(ctx context.Context, d *schema.ResourceData, meta 
 			return diag.FromErr(err)
 		}
 	}
+
+	// skip_confirmation doesn't come back on the read operation (or on any user operation),
+	// so assume it was set properly, and set it into state. This is an issue with GitLab.
+	// see https://github.com/gitlabhq/terraform-provider-gitlab/pull/1106/
+	d.Set("skip_confirmation", d.Get("skip_confirmation").(bool))
 
 	return resourceGitlabUserRead(ctx, d, meta)
 }
@@ -280,6 +286,11 @@ func resourceGitlabUserUpdate(ctx context.Context, d *schema.ResourceData, meta 
 			return diag.FromErr(err)
 		}
 	}
+
+	// skip_confirmation doesn't come back on the read operation (or on any user operation),
+	// so assume it was set properly, and set it into state. This is an issue with GitLab.
+	// see https://github.com/gitlabhq/terraform-provider-gitlab/pull/1106/
+	d.Set("skip_confirmation", d.Get("skip_confirmation").(bool))
 
 	return resourceGitlabUserRead(ctx, d, meta)
 }
