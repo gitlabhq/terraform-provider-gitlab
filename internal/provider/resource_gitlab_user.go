@@ -79,6 +79,10 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 				Optional:    true,
 				Default:     true,
 				ForceNew:    true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// Skip Confirmation doesn't come back from the API, so this will always return a diff unless this skips.
+					return true
+				},
 			},
 			"projects_limit": {
 				Description: "Integer, defaults to 0.  Number of projects user can create.",
