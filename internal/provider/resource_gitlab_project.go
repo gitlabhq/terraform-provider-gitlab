@@ -106,10 +106,14 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Default:     true,
 	},
 	"approvals_before_merge": {
-		Description: "Number of merge request approvals required for merging. Default is 0.",
-		Type:        schema.TypeInt,
-		Optional:    true,
-		Default:     0,
+		Description: `Number of merge request approvals required for merging. Default is 0.
+  This field **does not** work well in combination with the ` + "`gitlab_project_approval_rule`" + ` resource
+  and is most likely gonna be deprecated in a future GitLab version (see [this upstream epic](https://gitlab.com/groups/gitlab-org/-/epics/7572)).
+  In the meantime we recommend against using this attribute and use ` + "`gitlab_project_approval_rule`" + ` instead.
+`,
+		Type:     schema.TypeInt,
+		Optional: true,
+		Default:  0,
 	},
 	"wiki_enabled": {
 		Description: "Enable wiki for the project.",
