@@ -363,6 +363,32 @@ func testAccCreateProjectIssues(t *testing.T, pid interface{}, n int) []*gitlab.
 	return issues
 }
 
+func testAccCreateProjectIssueBoard(t *testing.T, pid interface{}) *gitlab.IssueBoard {
+	t.Helper()
+
+	issueBoard, _, err := testGitlabClient.Boards.CreateIssueBoard(pid, &gitlab.CreateIssueBoardOptions{Name: gitlab.String(acctest.RandomWithPrefix("acctest"))})
+	if err != nil {
+		t.Fatalf("could not create test issue board: %v", err)
+	}
+
+	return issueBoard
+}
+
+func testAccCreateProjectLabels(t *testing.T, pid interface{}, n int) []*gitlab.Label {
+	t.Helper()
+
+	var labels []*gitlab.Label
+	for i := 0; i < n; i++ {
+		label, _, err := testGitlabClient.Labels.CreateLabel(pid, &gitlab.CreateLabelOptions{Name: gitlab.String(acctest.RandomWithPrefix("acctest")), Color: gitlab.String("#000000")})
+		if err != nil {
+			t.Fatalf("could not create test label: %v", err)
+		}
+		labels = append(labels, label)
+	}
+
+	return labels
+}
+
 // testAccAddGroupMembers is a test helper for adding users as members of a group.
 // It assumes the group will be destroyed at the end of the test and will not cleanup members.
 func testAccAddGroupMembers(t *testing.T, gid interface{}, users []*gitlab.User) {
