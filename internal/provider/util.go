@@ -312,17 +312,13 @@ func is404(err error) bool {
 	return false
 }
 
-func isCurrentUserAdmin(client *gitlab.Client) (bool, error) {
-	currentUser, _, err := client.Users.CurrentUser()
+func isCurrentUserAdmin(ctx context.Context, client *gitlab.Client) (bool, error) {
+	currentUser, _, err := client.Users.CurrentUser(gitlab.WithContext(ctx))
 	if err != nil {
 		return false, err
 	}
 
-	if currentUser.IsAdmin {
-		return true, nil
-	} else {
-		return false, nil
-	}
+	return currentUser.IsAdmin, nil
 }
 
 // ISO 8601 date format

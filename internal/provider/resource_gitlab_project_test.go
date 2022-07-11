@@ -977,6 +977,67 @@ func TestAccGitlabProject_InstanceBranchProtectionDisabled(t *testing.T) {
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"initialize_with_readme"},
 			},
+			// Force a destroy for the project so that it can be recreated as the same resource
+			{
+				Config: ` `, // requires a space for empty config
+			},
+			// With `skip_wait_for_default_branch_protection` enabled
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d-custom-default-branch"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						initialize_with_readme = true
+
+						skip_wait_for_default_branch_protection = true
+					}
+				`, rInt),
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme", "skip_wait_for_default_branch_protection"},
+			},
+			// Force a destroy for the project so that it can be recreated as the same resource
+			{
+				Config: ` `, // requires a space for empty config
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d-custom-default-branch"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						initialize_with_readme = true
+
+						skip_wait_for_default_branch_protection = false
+					}
+				`, rInt),
+			},
+			// Check if plan is empty after changing `skip_wait_for_default_branch_protection` attribute
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "foo" {
+						name                   = "foo-%d-custom-default-branch"
+						description            = "Terraform acceptance tests"
+						visibility_level       = "public"
+						initialize_with_readme = true
+
+						skip_wait_for_default_branch_protection = true
+					}
+				`, rInt),
+				PlanOnly: true,
+			},
+			// Verify Import
+			{
+				ResourceName:            "gitlab_project.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"initialize_with_readme", "skip_wait_for_default_branch_protection"},
+			},
 		},
 	})
 }

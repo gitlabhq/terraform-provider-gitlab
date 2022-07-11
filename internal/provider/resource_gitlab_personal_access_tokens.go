@@ -29,7 +29,7 @@ var _ = registerResource("gitlab_personal_access_token", func() *schema.Resource
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_personal_access_token`" + ` resource allows to manage the lifecycle of a personal access token for a specified user.
 
--> This resource requires administration privileges. 
+-> This resource requires administration privileges.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)`,
 
@@ -97,7 +97,7 @@ var _ = registerResource("gitlab_personal_access_token", func() *schema.Resource
 func resourceGitlabPersonalAccessTokenCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
 
-	currentUserAdmin, err := isCurrentUserAdmin(client)
+	currentUserAdmin, err := isCurrentUserAdmin(ctx, client)
 	if err != nil {
 		return diag.Errorf("[ERROR] cannot query the user API for current user: %v", err)
 	}

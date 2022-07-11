@@ -671,7 +671,20 @@ branch using a ` + "`DELETE`" + ` request. Then define the desired branch protec
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
-		Schema: resourceGitLabProjectSchema,
+		Schema: constructSchema(resourceGitLabProjectSchema, map[string]*schema.Schema{
+			"skip_wait_for_default_branch_protection": {
+				Description: `If ` + "`true`" + `, the default behavior to wait for the default branch protection to be created is skipped.
+This is necessary if the current user is not an admin and the default branch protection is disabled on an instance-level.
+There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
+This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
+`,
+				Type:     schema.TypeBool,
+				Optional: true,
+				DiffSuppressFunc: func(string, string, string, *schema.ResourceData) bool {
+					return true
+				},
+			},
+		}),
 		CustomizeDiff: customdiff.All(
 			customdiff.ComputedIf("path_with_namespace", namespaceOrPathChanged),
 			customdiff.ComputedIf("ssh_url_to_repo", namespaceOrPathChanged),
@@ -1106,41 +1119,48 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		}
 	}
 
-	// If the project is assigned to a group namespace and the group has *default branch protection*
-	// disabled (`default_branch_protection = 0`) then we don't have to wait for one.
-	waitForDefaultBranchProtection, err := expectDefaultBranchProtection(ctx, client, project)
-	if err != nil {
-		return diag.Errorf("Failed to discover if branch protection is enabled by default or not for project %d: %+v", project.ID, err)
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("skip_wait_for_default_branch_protection"); ok {
+		d.Set("skip_wait_for_default_branch_protection", v.(bool))
 	}
-
-	if waitForDefaultBranchProtection {
-		// Branch protection for a newly created branch is an async action, so use WaitForState to ensure it's protected
-		// before we continue. Note this check should only be required when there is a custom default branch set
-		// See issue 800: https://github.com/gitlabhq/terraform-provider-gitlab/issues/800
-		stateConf := &resource.StateChangeConf{
-			Pending: []string{"false"},
-			Target:  []string{"true"},
-			Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
-			Refresh: func() (interface{}, string, error) {
-				branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
-				if err != nil {
-					if is404(err) {
-						// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
-						// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
-						// We don't need to wait anymore, so return "true" to exist the wait loop.
-						return branch, "true", nil
-					}
-
-					//This is legit error, return the error.
-					return nil, "", err
-				}
-
-				return branch, strconv.FormatBool(branch.Protected), nil
-			},
+	if !d.Get("skip_wait_for_default_branch_protection").(bool) {
+		// If the project is assigned to a group namespace and the group has *default branch protection*
+		// disabled (`default_branch_protection = 0`) then we don't have to wait for one.
+		waitForDefaultBranchProtection, err := expectDefaultBranchProtection(ctx, client, project)
+		if err != nil {
+			return diag.Errorf("Failed to discover if branch protection is enabled by default or not for project %d: %+v", project.ID, err)
 		}
 
-		if _, err := stateConf.WaitForStateContext(ctx); err != nil {
-			return diag.Errorf("error while waiting for branch %s to reach 'protected' status, %s", project.DefaultBranch, err)
+		if waitForDefaultBranchProtection {
+			// Branch protection for a newly created branch is an async action, so use WaitForState to ensure it's protected
+			// before we continue. Note this check should only be required when there is a custom default branch set
+			// See issue 800: https://github.com/gitlabhq/terraform-provider-gitlab/issues/800
+			stateConf := &resource.StateChangeConf{
+				Pending: []string{"false"},
+				Target:  []string{"true"},
+				Timeout: 2 * time.Minute, //The async action usually completes very quickly, within seconds. Don't wait too long.
+				Refresh: func() (interface{}, string, error) {
+					branch, _, err := client.Branches.GetBranch(project.ID, project.DefaultBranch, gitlab.WithContext(ctx))
+					if err != nil {
+						if is404(err) {
+							// When we hit a 404 here, it means the default branch wasn't created at all as part of the project
+							// this will happen when "default_branch" isn't set, or "initialize_with_readme" is set to false.
+							// We don't need to wait anymore, so return "true" to exist the wait loop.
+							return branch, "true", nil
+						}
+
+						//This is legit error, return the error.
+						return nil, "", err
+					}
+
+					return branch, strconv.FormatBool(branch.Protected), nil
+				},
+			}
+
+			if _, err := stateConf.WaitForStateContext(ctx); err != nil {
+				return diag.Errorf("error while waiting for branch %s to reach 'protected' status, %s", project.DefaultBranch, err)
+			}
 		}
 	}
 
@@ -1824,11 +1844,22 @@ func expectDefaultBranchProtection(ctx context.Context, client *gitlab.Client, p
 		return group.DefaultBranchProtection != 0, nil
 	}
 
-	// // If the project is not part of a group it may have default branch protection disabled because of the instance-wide application settings
-	settings, _, err := client.Settings.GetSettings(nil, gitlab.WithContext(ctx))
+	isAdmin, err := isCurrentUserAdmin(ctx, client)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to check if user is admin to verify is default branch protection is enabled on instance-level: %w", err)
 	}
 
-	return settings.DefaultBranchProtection != 0, nil
+	if isAdmin {
+		// If the project is not part of a group it may have default branch protection disabled because of the instance-wide application settings
+		settings, _, err := client.Settings.GetSettings(nil, gitlab.WithContext(ctx))
+		if err != nil {
+			return false, err
+		}
+
+		return settings.DefaultBranchProtection != 0, nil
+	}
+
+	// NOTE: for the lack of a better solution (at least for now), we assume that the default branch protection is NOT disabled on instance-level.
+	//       To override this behavior it's best to set `skip_wait_for_default_branch_protection = true` in the resource config.
+	return true, nil
 }
