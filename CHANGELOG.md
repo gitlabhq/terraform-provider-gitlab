@@ -1,31 +1,39 @@
+## 3.16.1 (2022-07-11)
+
+This release was tested against GitLab 14.10, 15.0 and 15.1 for both CE and EE.
+
+BUG FIXES:
+
+* resource/gitlab_project: Fix admin token requirement to check default branch protection ([#1169](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1169))
+
 ## 3.16.0 (2022-07-07)
 
 This release was tested against GitLab 14.10, 15.0 and 15.1 for both CE and EE.
 
 FEATURES:
 
-* **New Data Source:** `gitlab_current_user` ([#1118])
-* **New Data Source:** `gitlab_release_link` ([#1131])
-* **New Data Source:** `gitlab_release_links` ([#1131])
-* **New Resource:** `gitlab_release_link` ([#1131])
-* **New Resource:** `gitlab_cluster_agent_token` ([#1147])
+* **New Data Source:** `gitlab_current_user` ([#1118](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1118))
+* **New Data Source:** `gitlab_release_link` ([#1131](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1131))
+* **New Data Source:** `gitlab_release_links` ([#1131](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1131))
+* **New Resource:** `gitlab_release_link` ([#1131](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1131))
+* **New Resource:** `gitlab_cluster_agent_token` ([#1147](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1147))
 
 IMPROVEMENTS:
 
-* resource/gitlab_project_protected_environment: Add `required_approval_count` attribute ([#1097])
-* resource/gitlab_project_access_token: Add `owner` as possible value to `access_level` ([#1145])
-* resource/gitlab_project_membership: Add `owner` as possible value to `access_level` ([#1145])
-* resource/gitlab_project_share_group: Add `owner` as possible value to `access_level` ([#1145])
-* resource/gitlab_project: Add `ci_default_git_depth` attribute ([#1146])
-* datasource/gitlab_project: Add `ci_default_git_depth` attribute ([#1146])
-* datasource/gitlab_projects: Add `ci_default_git_depth` attribute ([#1146])
+* resource/gitlab_project_protected_environment: Add `required_approval_count` attribute ([#1097](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1097))
+* resource/gitlab_project_access_token: Add `owner` as possible value to `access_level` ([#1145](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1145))
+* resource/gitlab_project_membership: Add `owner` as possible value to `access_level` ([#1145](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1145))
+* resource/gitlab_project_share_group: Add `owner` as possible value to `access_level` ([#1145](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1145))
+* resource/gitlab_project: Add `ci_default_git_depth` attribute ([#1146](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1146))
+* datasource/gitlab_project: Add `ci_default_git_depth` attribute ([#1146](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1146))
+* datasource/gitlab_projects: Add `ci_default_git_depth` attribute ([#1146](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1146))
 
 BUG FIXES:
 
-* resource/gitlab_project: Fix project creation when default branch protection is disabled on instance-level (#[1128])
-* resource/gitlab_project: Fix a case where a change to a project in terraform can never apply when certain fields are modified ([#1158])
-* resource/gitlab_project: Fix passing `false` to API for explicitly set optional attributes ([#1152])
-* resource/gitlab_group: Fix passing false to API for explicitly set optional attributes ([#1152])
+* resource/gitlab_project: Fix project creation when default branch protection is disabled on instance-level ([#1128](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1128))
+* resource/gitlab_project: Fix a case where a change to a project in terraform can never apply when certain fields are modified ([#1158](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1158))
+* resource/gitlab_project: Fix passing `false` to API for explicitly set optional attributes ([#1152](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1152))
+* resource/gitlab_group: Fix passing false to API for explicitly set optional attributes ([#1152](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1152))
 
 ## 3.15.1 (2022-06-08)
 
