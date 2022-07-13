@@ -4,10 +4,16 @@ reviewable: build fmt generate test ## Run before committing.
 
 GOBIN = $(shell pwd)/bin
 PROVIDER_SRC_DIR := ./internal/provider
+TERRAFORM_PLUGIN_DIR ?= ~/.terraform.d/plugins/gitlab.local/x/gitlab/99.99.99
+TERRAFORM_PLATFORM_DIR ?= darwin_amd64
 
 build: ## Build the provider binary.
 	go mod tidy
 	GOBIN=$(GOBIN) go install
+
+local: build ## Build and Install the provider locally
+	mkdir -p $(TERRAFORM_PLUGIN_DIR)/$(TERRAFORM_PLATFORM_DIR)
+	cp -f $(GOBIN)/terraform-provider-gitlab $(TERRAFORM_PLUGIN_DIR)/$(TERRAFORM_PLATFORM_DIR)/terraform-provider-gitlab
 
 generate: tool-tfplugindocs ## Generate files to be checked in.
 	@# Setting empty environment variables to work around issue: https://github.com/hashicorp/terraform-plugin-docs/issues/12
