@@ -48,8 +48,8 @@ var _ = registerResource("gitlab_user_sshkey", func() *schema.Resource {
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					// NOTE: the ssh keys consist of three parts: `type`, `data`, `comment`, whereas the `comment` is optional
 					//       and suppressed in the diffing. It's overridden by GitLab with the username and GitLab hostname.
-					newParts := strings.SplitN(new, " ", 3)
-					oldParts := strings.SplitN(old, " ", 3)
+					newParts := strings.Fields(new)
+					oldParts := strings.Fields(old)
 					if len(newParts) < 2 || len(oldParts) < 2 {
 						// NOTE: at least one of the keys doesn't have the required two parts, thus we just compare them
 						return new == old
