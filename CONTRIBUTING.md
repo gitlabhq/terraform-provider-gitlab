@@ -78,6 +78,35 @@ You'll first need [Go](http://www.golang.org) installed on your machine (version
    ```
 
 
+You can also install the provider locally so that you can use it with Terraform experimentally.
+Run one of the following `make` commands depending on what is correct for your platform:
+
+```sh
+# Default: suitable for macOS
+make local
+
+# Set the terraform platform directory
+# e.g. for linux amd64:
+make local TERRAFORM_PLATFORM_DIR=linux_amd64
+
+# Set the terraform plugin dir, see https://www.terraform.io/cli/config/config-file#implied-local-mirror-directories
+# e.g. for Windows
+make local TERRAFORM_PLUGIN_DIR=%APPDATA%/terraform.d/plugins
+```
+
+The you can use it in your provider config like this:
+
+```hcl
+terraform {
+  required_providers {
+    gitlab = {
+      version = "99.99.99"
+      source  = "gitlab.local/x/gitlab"
+    }
+  }
+}
+```
+
 ### Use a Remote Environment via GitPod
 
 You can choose to use your own development environment if desired, however a `.gitpod.yml` file is included within the repository to allow the use of [GitPod](https://gitpod.io/) easily.
