@@ -31,6 +31,8 @@ var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
 				Description: "The name or id of the project to add the hook to.",
 				Type:        schema.TypeString,
 				Required:    true,
+				// Suppress diff if one value is path and the other is an ID for the same project
+				DiffSuppressFunc: projectIdAndPathDiffSuppressFunc,
 			},
 			"url": {
 				Description: "The url of the hook to invoke.",

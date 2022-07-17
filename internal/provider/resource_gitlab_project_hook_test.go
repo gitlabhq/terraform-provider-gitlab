@@ -82,6 +82,38 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectHook_importPreexistingHook(t *testing.T) {
+	// Testing a fix for a bad import on pre-existing hook.
+	project := testAccCreateProject(t)
+	var hook gitlab.ProjectHook
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectHookDestroy,
+		Steps: []resource.TestStep{
+			// Verify import
+			{
+				Config: fmt.Sprintf(`
+				  resource "gitlab_project_hook" "foo" {
+				    project = "%s"
+				    url = "https://example.test"
+				  }
+			    `, project.PathWithNamespace),
+				Check: testAccCheckGitlabProjectHookExists("gitlab_project_hook.foo", &hook),
+			},
+			{
+				ResourceName: "gitlab_project_hook.foo",
+				ImportStateIdFunc: func(s *terraform.State) (string, error) {
+					return fmt.Sprintf("%d:%d", project.ID, hook.ID), nil
+				},
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"token"},
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectHookExists(n string, hook *gitlab.ProjectHook) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

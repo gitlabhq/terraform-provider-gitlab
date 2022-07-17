@@ -373,6 +373,31 @@ func attributeNamesFromSchema(schema map[string]*schema.Schema) []string {
 	return names
 }
 
+// function that will compare a projects URL path to it's ID, and will return "true" of the
+// path maps properly to the ID.
+func compareProjectPathToID(urlPath string, projectId int, client *gitlab.Client) (bool, error) {
+
+	//Retrieve project by URL path so it can be compared.
+	project, _, err := client.Projects.GetProject(urlPath, nil)
+
+	if err != nil {
+		if is404(err) {
+			// Project doesn't exist, so these can't be equal by definition
+			return false, nil
+		}
+		// non-404 error
+		return false, err
+	}
+
+	return (project.ID == projectId), nil
+}
+
+func projectIdAndPathDiffSuppressFunc() func(k, oldValue, newValue string, d d *schema.ResourceData) {
+	return func(k, oldValue, newValue string, d d *schema.ResourceData) {
+
+	}
+}
+
 // datasourceSchemaFromResourceSchema is a recursive func that
 // converts an existing Resource schema to a Datasource schema.
 // All schema elements are copied, but certain attributes are ignored or changed:
