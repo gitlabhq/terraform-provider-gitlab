@@ -43,13 +43,13 @@ data "gitlab_project_membership" "example" {
 ### Optional
 
 - `full_path` (String) The full path of the project.
-- `id` (String) The ID of this resource.
 - `inherited` (Boolean) Return all project members including members through ancestor groups
 - `project_id` (Number) The ID of the project.
 - `query` (String) A query string to search for members
 
 ### Read-Only
 
+- `id` (String) The ID of this resource.
 - `members` (List of Object) The list of project members. (see [below for nested schema](#nestedatt--members))
 
 <a id="nestedatt--members"></a>

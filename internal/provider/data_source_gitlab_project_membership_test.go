@@ -1,3 +1,6 @@
+//go:build acceptance
+// +build acceptance
+
 package provider
 
 import (
@@ -8,14 +11,12 @@ import (
 )
 
 func TestAccDataSourceGitlabProjectMembership_basic(t *testing.T) {
-	testAccCheck(t)
 
 	project := testAccCreateProject(t)
 	users := testAccCreateUsers(t, 1)
 	testAccAddProjectMembers(t, project.ID, users)
 
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
@@ -32,16 +33,13 @@ func TestAccDataSourceGitlabProjectMembership_basic(t *testing.T) {
 }
 
 func TestAccDataSourceGitlabProjectMembership_pagination(t *testing.T) {
-	testAccCheck(t)
-
 	userCount := 21
 
 	project := testAccCreateProject(t)
 	users := testAccCreateUsers(t, userCount)
 	testAccAddProjectMembers(t, project.ID, users)
 
-	resource.Test(t, resource.TestCase{
-		PreCheck:          func() { testAccPreCheck(t) },
+	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
