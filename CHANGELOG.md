@@ -1,3 +1,7 @@
+## 3.17.0 (Unreleased)
+
+This release was tested against GitLab 15.0, 15.1 and 15.2 for both CE and EE.
+
 ## 3.16.1 (2022-07-11)
 
 This release was tested against GitLab 14.10, 15.0 and 15.1 for both CE and EE.
