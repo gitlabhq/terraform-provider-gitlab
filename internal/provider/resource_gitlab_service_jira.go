@@ -81,7 +81,7 @@ var _ = registerResource("gitlab_service_jira", func() *schema.Resource {
 				Sensitive:   true,
 			},
 			"jira_issue_transition_id": {
-				Description: "The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2. **Note**: importing this field is currently not supported.",
+				Description: "The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2. *Note**: importing this field is only supported since GitLab 15.2.",
 				Type:        schema.TypeString,
 				Optional:    true,
 			},
@@ -185,10 +185,12 @@ func resourceGitlabServiceJiraRead(ctx context.Context, d *schema.ResourceData, 
 	d.Set("api_url", jiraService.Properties.APIURL)
 	d.Set("username", jiraService.Properties.Username)
 	d.Set("project_key", jiraService.Properties.ProjectKey)
-	// FIXME: The API or go-gitlab doesn't return `jira_issue_transition_id` properly,
-	//        therefore we don't overwrite the value set in the config, in case it's not set in the API
-	//        response. This currently impacts the import of this attribute.
-	if jiraService.Properties.JiraIssueTransitionID != "" {
+
+	hasJiraIssueTransitionIDFixed, err := isGitLabVersionAtLeast(ctx, client, "15.2")()
+	if err != nil {
+		return diag.Errorf("failed to check if `jira_issue_transition_id` is properly supported in GitLab version: %v", err)
+	}
+	if hasJiraIssueTransitionIDFixed || jiraService.Properties.JiraIssueTransitionID != "" {
 		d.Set("jira_issue_transition_id", jiraService.Properties.JiraIssueTransitionID)
 	}
 	d.Set("title", jiraService.Title)
@@ -238,14 +240,8 @@ func expandJiraOptions(d *schema.ResourceData) (*gitlab.SetJiraServiceOptions, e
 	setJiraServiceOptions.CommitEvents = gitlab.Bool(d.Get("commit_events").(bool))
 	setJiraServiceOptions.MergeRequestsEvents = gitlab.Bool(d.Get("merge_requests_events").(bool))
 	setJiraServiceOptions.CommentOnEventEnabled = gitlab.Bool(d.Get("comment_on_event_enabled").(bool))
-
-	// Set optional properties
-	if val, ok := d.GetOk("api_url"); ok {
-		setJiraServiceOptions.APIURL = gitlab.String(val.(string))
-	}
-	if val, ok := d.GetOk("jira_issue_transition_id"); ok {
-		setJiraServiceOptions.JiraIssueTransitionID = gitlab.String(val.(string))
-	}
+	setJiraServiceOptions.APIURL = gitlab.String(d.Get("api_url").(string))
+	setJiraServiceOptions.JiraIssueTransitionID = gitlab.String(d.Get("jira_issue_transition_id").(string))
 
 	return &setJiraServiceOptions, nil
 }

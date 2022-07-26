@@ -40,8 +40,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 				ResourceName:      jiraResourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
-				// FIXME: there is a bug in the GitLab API which causes the `jira_issue_transition_id` field
-				//        to be empty in the response. Therefore, we ignore it for now in the import.
+				// TODO: as soon as we remove support for GitLab < 15.2 we can remove ignoring `jira_issue_transition_id`.
 				//        See https://gitlab.com/gitlab-org/gitlab/-/issues/362437
 				ImportStateVerifyIgnore: []string{"password", "jira_issue_transition_id"},
 			},
@@ -65,8 +64,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 				ResourceName:      jiraResourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
-				// FIXME: there is a bug in the GitLab API which causes the `jira_issue_transition_id` field
-				//        to be empty in the response. Therefore, we ignore it for now in the import.
+				// TODO: as soon as we remove support for GitLab < 15.2 we can remove ignoring `jira_issue_transition_id`.
 				//        See https://gitlab.com/gitlab-org/gitlab/-/issues/362437
 				ImportStateVerifyIgnore: []string{"password", "jira_issue_transition_id"},
 			},
@@ -89,8 +87,7 @@ func TestAccGitlabServiceJira_basic(t *testing.T) {
 				ResourceName:      jiraResourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
-				// FIXME: there is a bug in the GitLab API which causes the `jira_issue_transition_id` field
-				//        to be empty in the response. Therefore, we ignore it for now in the import.
+				// TODO: as soon as we remove support for GitLab < 15.2 we can remove ignoring `jira_issue_transition_id`.
 				//        See https://gitlab.com/gitlab-org/gitlab/-/issues/362437
 				ImportStateVerifyIgnore: []string{"password", "jira_issue_transition_id"},
 			},
