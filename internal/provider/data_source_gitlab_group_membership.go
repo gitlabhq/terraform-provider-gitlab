@@ -22,22 +22,18 @@ var _ = registerDataSource("gitlab_group_membership", func() *schema.Resource {
 		ReadContext: dataSourceGitlabGroupMembershipRead,
 		Schema: map[string]*schema.Schema{
 			"group_id": {
-				Description: "The ID of the group.",
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Optional:    true,
-				ConflictsWith: []string{
-					"full_path",
-				},
+				Description:  "The ID of the group.",
+				Type:         schema.TypeInt,
+				Computed:     true,
+				Optional:     true,
+				ExactlyOneOf: []string{"group_id", "full_path"},
 			},
 			"full_path": {
-				Description: "The full path of the group.",
-				Type:        schema.TypeString,
-				Computed:    true,
-				Optional:    true,
-				ConflictsWith: []string{
-					"group_id",
-				},
+				Description:  "The full path of the group.",
+				Type:         schema.TypeString,
+				Computed:     true,
+				Optional:     true,
+				ExactlyOneOf: []string{"group_id", "full_path"},
 			},
 			"access_level": {
 				Description:      "Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.",
@@ -154,7 +150,7 @@ func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.Resource
 	d.Set("group_id", group.ID)
 	d.Set("full_path", group.FullPath)
 
-	d.Set("members", flattenGitlabMembers(d, allGms)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
+	d.Set("members", flattenGitlabGroupMembers(d, allGms)) // lintignore: XR004 // TODO: Resolve this tfproviderlint issue
 
 	var optionsHash strings.Builder
 	optionsHash.WriteString(strconv.Itoa(group.ID))
@@ -169,7 +165,7 @@ func dataSourceGitlabGroupMembershipRead(ctx context.Context, d *schema.Resource
 	return nil
 }
 
-func flattenGitlabMembers(d *schema.ResourceData, members []*gitlab.GroupMember) []interface{} {
+func flattenGitlabGroupMembers(d *schema.ResourceData, members []*gitlab.GroupMember) []interface{} {
 	membersList := []interface{}{}
 
 	var filterAccessLevel gitlab.AccessLevelValue = gitlab.NoPermissions
