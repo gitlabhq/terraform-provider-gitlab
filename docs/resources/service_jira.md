@@ -46,7 +46,7 @@ resource "gitlab_service_jira" "jira" {
 - `comment_on_event_enabled` (Boolean) Enable comments inside Jira issues on each GitLab event (commit / merge request)
 - `commit_events` (Boolean) Enable notifications for commit events
 - `issues_events` (Boolean) Enable notifications for issues events.
-- `jira_issue_transition_id` (String) The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2. **Note**: importing this field is currently not supported.
+- `jira_issue_transition_id` (String) The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2. *Note**: importing this field is only supported since GitLab 15.2.
 - `job_events` (Boolean) Enable notifications for job events.
 - `merge_requests_events` (Boolean) Enable notifications for merge request events
 - `note_events` (Boolean) Enable notifications for note events.
