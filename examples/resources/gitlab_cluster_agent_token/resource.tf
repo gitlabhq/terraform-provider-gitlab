@@ -14,13 +14,13 @@ data "gitlab_project" "this" {
 }
 
 resource "gitlab_cluster_agent" "this" {
-  project = data.gitlab_project.this
+  project = data.gitlab_project.this.id
   name    = "my-agent"
 }
 
 resource "gitlab_cluster_agent_token" "this" {
-  project     = data.gitlab_project.this
-  agent_id    = gitlab_cluster_agent.this.id
+  project     = data.gitlab_project.this.id
+  agent_id    = gitlab_cluster_agent.this.agent_id
   name        = "my-agent-token"
   description = "Token for the my-agent used with `gitlab-agent` Helm Chart"
 }
