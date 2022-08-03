@@ -60,7 +60,7 @@ func (c *Config) Client(ctx context.Context) (*gitlab.Client, error) {
 	opts := []gitlab.ClientOptionFunc{
 		gitlab.WithHTTPClient(
 			&http.Client{
-				Transport: logging.NewTransport("GitLab", t),
+				Transport: logging.NewLoggingHTTPTransport(t),
 			},
 		),
 	}
