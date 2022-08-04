@@ -12,25 +12,18 @@ import (
 
 func TestAccDataSourceGitlabRepositoryTree_basic(t *testing.T) {
 	testProject := testAccCreateProject(t)
+	testFile := testAccCreateProjectFile(t, testProject.ID, "content", "SomeFile", testProject.DefaultBranch)
 
 	resource.ParallelTest(t, resource.TestCase{
 		ProviderFactories: providerFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: fmt.Sprintf(`
-					resource "gitlab_repository_file" "foo" {
-						project        = "%[1]d"
-						file_path      = "testfile-meow"
-						branch         = "%[2]s"
-						content        = base64encode("Meow goes the cat")
-						commit_message = "feat: Meow"
-					}
-
 					data "gitlab_repository_tree" "this" {
 						project = %[1]d
-						ref     = gitlab_repository_file.foo.branch
+						ref     = "%[2]s"
 					}
-				`, testProject.ID, testProject.DefaultBranch),
+				`, testProject.ID, testFile.Branch),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.#", "2"),
 					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.0.name", "README.md"),
@@ -38,9 +31,9 @@ func TestAccDataSourceGitlabRepositoryTree_basic(t *testing.T) {
 					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.0.path", "README.md"),
 					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.0.mode", "100644"),
 
-					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.1.name", "testfile-meow"),
+					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.1.name", testFile.FilePath),
 					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.1.type", "blob"),
-					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.1.path", "testfile-meow"),
+					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.1.path", testFile.FilePath),
 					resource.TestCheckResourceAttr("data.gitlab_repository_tree.this", "tree.1.mode", "100644"),
 				),
 			},

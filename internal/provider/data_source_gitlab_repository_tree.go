@@ -23,15 +23,15 @@ var _ = registerDataSource("gitlab_repository_tree", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
-			"path": {
-				Description: "The path inside repository. Used to get content of subdirectories.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
 			"ref": {
 				Description: "The name of a repository branch or tag.",
 				Type:        schema.TypeString,
 				Required:    true,
+			},
+			"path": {
+				Description: "The path inside repository. Used to get content of subdirectories.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 			"recursive": {
 				Description: "Boolean value used to get a recursive tree (false by default).",
