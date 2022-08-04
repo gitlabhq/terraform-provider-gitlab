@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/logging"
 	"github.com/xanzy/go-gitlab"
@@ -29,7 +29,7 @@ func (c *Config) Client(ctx context.Context) (*gitlab.Client, error) {
 
 	// If a CACertFile has been specified, use that for cert validation
 	if c.CACertFile != "" {
-		caCert, err := ioutil.ReadFile(c.CACertFile)
+		caCert, err := os.ReadFile(c.CACertFile)
 		if err != nil {
 			return nil, err
 		}
