@@ -69,6 +69,11 @@ var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 					Required:    true,
 					ForceNew:    true,
 				},
+				"commit_message": {
+					Description: "Commit message.",
+					Type:        schema.TypeString,
+					Required:    true,
+				},
 				"start_branch": {
 					Description: "Name of the branch to start the new commit from.",
 					Type:        schema.TypeString,
@@ -83,11 +88,6 @@ var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
 					Description: "Name of the commit author.",
 					Type:        schema.TypeString,
 					Optional:    true,
-				},
-				"commit_message": {
-					Description: "Commit message.",
-					Type:        schema.TypeString,
-					Required:    true,
 				},
 			},
 			gitlabRepositoryFileGetSchema(),

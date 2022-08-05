@@ -519,6 +519,30 @@ func testAccCreateInstanceVariable(t *testing.T) *gitlab.InstanceVariable {
 	return variable
 }
 
+func testAccCreateProjectFile(t *testing.T, projectID int, fileContent string, filePath string, branch string) *gitlab.FileInfo {
+
+	file, _, err := testGitlabClient.RepositoryFiles.CreateFile(projectID, filePath, &gitlab.CreateFileOptions{
+		Branch:        &branch,
+		Encoding:      gitlab.String("base64"),
+		Content:       &fileContent,
+		CommitMessage: gitlab.String(fmt.Sprintf("Random_Commit_Message_%d", acctest.RandInt())),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		if _, err := testGitlabClient.RepositoryFiles.DeleteFile(projectID, filePath, &gitlab.DeleteFileOptions{
+			Branch:        &branch,
+			CommitMessage: gitlab.String(fmt.Sprintf("Delete_Random_Commit_Message_%d", acctest.RandInt())),
+		}); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	return file
+}
+
 // testAccGitlabProjectContext encapsulates a GitLab client and test project to be used during an
 // acceptance test.
 type testAccGitlabProjectContext struct {
