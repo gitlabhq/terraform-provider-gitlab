@@ -25,108 +25,7 @@ var _ = registerResource("gitlab_project_hook", func() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceGitlabProjectHookStateImporter,
 		},
-
-		Schema: map[string]*schema.Schema{
-			"project": {
-				Description: "The name or id of the project to add the hook to.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"url": {
-				Description: "The url of the hook to invoke.",
-				Type:        schema.TypeString,
-				Required:    true,
-			},
-			"token": {
-				Description: "A token to present when invoking the hook. The token is not available for imported resources.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				Sensitive:   true,
-			},
-			"push_events": {
-				Description: "Invoke the hook for push events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     true,
-			},
-			"push_events_branch_filter": {
-				Description: "Invoke the hook for push events on matching branches only.",
-				Type:        schema.TypeString,
-				Optional:    true,
-			},
-			"issues_events": {
-				Description: "Invoke the hook for issues events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"confidential_issues_events": {
-				Description: "Invoke the hook for confidential issues events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"merge_requests_events": {
-				Description: "Invoke the hook for merge requests.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"tag_push_events": {
-				Description: "Invoke the hook for tag push events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"note_events": {
-				Description: "Invoke the hook for notes events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"confidential_note_events": {
-				Description: "Invoke the hook for confidential notes events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"job_events": {
-				Description: "Invoke the hook for job events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"pipeline_events": {
-				Description: "Invoke the hook for pipeline events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"wiki_page_events": {
-				Description: "Invoke the hook for wiki page events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"deployment_events": {
-				Description: "Invoke the hook for deployment events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"releases_events": {
-				Description: "Invoke the hook for releases events.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-			},
-			"enable_ssl_verification": {
-				Description: "Enable ssl verification when invoking the hook.",
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     true,
-			},
-		},
+		Schema: gitlabProjectHookSchema(),
 	}
 })
 
@@ -180,28 +79,17 @@ func resourceGitlabProjectHookRead(ctx context.Context, d *schema.ResourceData, 
 	hook, _, err := client.Projects.GetProjectHook(project, hookId, gitlab.WithContext(ctx))
 	if err != nil {
 		if is404(err) {
-			log.Printf("[DEBUG] gitlab project hook not found %s/%d", project, hookId)
+			log.Printf("[DEBUG] gitlab project hook not found %s/%d, removing from state", project, hookId)
 			d.SetId("")
 			return nil
 		}
 		return diag.FromErr(err)
 	}
 
-	d.Set("url", hook.URL)
-	d.Set("push_events", hook.PushEvents)
-	d.Set("push_events_branch_filter", hook.PushEventsBranchFilter)
-	d.Set("issues_events", hook.IssuesEvents)
-	d.Set("confidential_issues_events", hook.ConfidentialIssuesEvents)
-	d.Set("merge_requests_events", hook.MergeRequestsEvents)
-	d.Set("tag_push_events", hook.TagPushEvents)
-	d.Set("note_events", hook.NoteEvents)
-	d.Set("confidential_note_events", hook.ConfidentialNoteEvents)
-	d.Set("job_events", hook.JobEvents)
-	d.Set("pipeline_events", hook.PipelineEvents)
-	d.Set("wiki_page_events", hook.WikiPageEvents)
-	d.Set("deployment_events", hook.DeploymentEvents)
-	d.Set("releases_events", hook.ReleasesEvents)
-	d.Set("enable_ssl_verification", hook.EnableSSLVerification)
+	stateMap := gitlabProjectHookToStateMap(project, hook)
+	if err = setStateMapInResourceData(stateMap, d); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

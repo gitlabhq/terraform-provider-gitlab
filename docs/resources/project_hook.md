@@ -51,7 +51,9 @@ resource "gitlab_project_hook" "example" {
 
 ### Read-Only
 
+- `hook_id` (Number) The id of the project hook.
 - `id` (String) The ID of this resource.
+- `project_id` (Number) The id of the project for the hook.
 
 ## Import
 
