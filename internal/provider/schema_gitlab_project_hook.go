@@ -18,7 +18,7 @@ func gitlabProjectHookSchema() map[string]*schema.Schema {
 			Computed:    true,
 		},
 		"hook_id": {
-			Description: "The id of the project hook",
+			Description: "The id of the project hook.",
 			Type:        schema.TypeInt,
 			Computed:    true,
 		},

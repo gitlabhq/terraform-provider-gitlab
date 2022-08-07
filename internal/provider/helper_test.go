@@ -322,6 +322,22 @@ func testAccAddProjectMembers(t *testing.T, pid interface{}, users []*gitlab.Use
 	}
 }
 
+func testAccCreateProjectHooks(t *testing.T, pid interface{}, n int) []*gitlab.ProjectHook {
+	t.Helper()
+
+	var hooks []*gitlab.ProjectHook
+	for i := 0; i < n; i++ {
+		hook, _, err := testGitlabClient.Projects.AddProjectHook(pid, &gitlab.AddProjectHookOptions{
+			URL: gitlab.String(fmt.Sprintf("https://%s.com", acctest.RandomWithPrefix("acctest"))),
+		})
+		if err != nil {
+			t.Fatalf("could not create project hook: %v", err)
+		}
+		hooks = append(hooks, hook)
+	}
+	return hooks
+}
+
 func testAccCreateClusterAgents(t *testing.T, pid interface{}, n int) []*gitlab.Agent {
 	t.Helper()
 
