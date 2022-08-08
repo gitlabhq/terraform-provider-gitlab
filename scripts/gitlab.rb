@@ -1,3 +1,6 @@
+external_url "http://127.0.0.1:8080"
+nginx['listen_port'] = 80
+
 pages_external_url 'http://127.0.0.1:5051'
 pages_nginx['redirect_http_to_https'] = false
 pages_nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab-registry.pem"
