@@ -51,6 +51,47 @@ func TestAccGitlabGroupMembership_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroupMembership_skipRemoveFromSubgroup(t *testing.T) {
+	testUser := testAccCreateUsers(t, 1)[0]
+	testGroup := testAccCreateGroups(t, 1)[0]
+	testSubgroup := testAccCreateSubGroups(t, testGroup, 1)[0]
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupMembershipDestroy,
+		Steps: []resource.TestStep{
+			// Add user to main and subgroup individually
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_group_membership" "main_group" {
+						group_id                     = "%d"
+						user_id                      = %d
+						access_level                 = "developer"
+						skip_subresources_on_destroy = true
+					}
+
+					resource "gitlab_group_membership" "sub_group" {
+						group_id     = "%d"
+						user_id      = %d
+						access_level = "maintainer"
+					}
+				`, testGroup.ID, testUser.ID, testSubgroup.ID, testUser.ID),
+			},
+			// Remove user from main group without removing from subgroup
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_group_membership" "sub_group" {
+						group_id     = "%d"
+						user_id      = %d
+						access_level = "maintainer"
+					}
+				`, testSubgroup.ID, testUser.ID),
+				Check: testAccCheckGitlabGroupMembershipExists("gitlab_group_membership.sub_group", &gitlab.GroupMember{}),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabGroupMembershipExists(n string, membership *gitlab.GroupMember) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

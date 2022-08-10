@@ -39,6 +39,8 @@ resource "gitlab_group_membership" "test" {
 ### Optional
 
 - `expires_at` (String) Expiration date for the group membership. Format: `YYYY-MM-DD`
+- `skip_subresources_on_destroy` (Boolean) Whether the deletion of direct memberships of the removed member in subgroups and projects should be skipped. Only used during a destroy.
+- `unassign_issuables_on_destroy` (Boolean) Whether the removed member should be unassigned from any issues or merge requests inside a given group or project. Only used during a destroy.
 
 ### Read-Only
 

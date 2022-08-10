@@ -54,6 +54,18 @@ var _ = registerResource("gitlab_group_membership", func() *schema.Resource {
 				ValidateFunc: validateDateFunc,
 				Optional:     true,
 			},
+			"skip_subresources_on_destroy": {
+				Description: "Whether the deletion of direct memberships of the removed member in subgroups and projects should be skipped. Only used during a destroy.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
+			"unassign_issuables_on_destroy": {
+				Description: "Whether the removed member should be unassigned from any issues or merge requests inside a given group or project. Only used during a destroy.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+			},
 		},
 	}
 })
@@ -149,9 +161,14 @@ func resourceGitlabGroupMembershipDelete(ctx context.Context, d *schema.Resource
 		return diag.FromErr(err)
 	}
 
-	log.Printf("[DEBUG] Delete gitlab group membership %v for %s", userId, groupId)
+	options := gitlab.RemoveGroupMemberOptions{
+		SkipSubresources:  gitlab.Bool(d.Get("skip_subresources_on_destroy").(bool)),
+		UnassignIssuables: gitlab.Bool(d.Get("unassign_issuables_on_destroy").(bool)),
+	}
 
-	_, err = client.GroupMembers.RemoveGroupMember(groupId, userId, &gitlab.RemoveGroupMemberOptions{}, gitlab.WithContext(ctx))
+	log.Printf("[DEBUG] Delete gitlab group membership %v for %s with options: %+v", userId, groupId, options)
+
+	_, err = client.GroupMembers.RemoveGroupMember(groupId, userId, &options, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
