@@ -151,7 +151,7 @@ func resourceGitlabGroupMembershipDelete(ctx context.Context, d *schema.Resource
 
 	log.Printf("[DEBUG] Delete gitlab group membership %v for %s", userId, groupId)
 
-	_, err = client.GroupMembers.RemoveGroupMember(groupId, userId, gitlab.WithContext(ctx))
+	_, err = client.GroupMembers.RemoveGroupMember(groupId, userId, &gitlab.RemoveGroupMemberOptions{}, gitlab.WithContext(ctx))
 	if err != nil {
 		return diag.FromErr(err)
 	}
