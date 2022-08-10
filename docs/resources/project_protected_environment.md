@@ -4,12 +4,23 @@ page_title: "gitlab_project_protected_environment Resource - terraform-provider-
 subcategory: ""
 description: |-
   The gitlab_project_protected_environment resource allows to manage the lifecycle of a protected environment in a project.
+  ~> In order to use a user or group in the deploy_access_levels configuration,
+     you need to make sure that users have access to the project and groups must have this project shared.
+     You may use the gitlab_project_membership and gitlab_project_shared_group resources to achieve this.
+     Unfortunately, the GitLab API does not complain about users and groups without access to the project and just ignores those.
+     In case this happens you will get perpetual state diffs.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_environments.html
 ---
 
 # gitlab_project_protected_environment (Resource)
 
 The `gitlab_project_protected_environment` resource allows to manage the lifecycle of a protected environment in a project.
+
+~> In order to use a user or group in the `deploy_access_levels` configuration,
+   you need to make sure that users have access to the project and groups must have this project shared.
+   You may use the `gitlab_project_membership` and `gitlab_project_shared_group` resources to achieve this.
+   Unfortunately, the GitLab API does not complain about users and groups without access to the project and just ignores those.
+   In case this happens you will get perpetual state diffs.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_environments.html)
 
