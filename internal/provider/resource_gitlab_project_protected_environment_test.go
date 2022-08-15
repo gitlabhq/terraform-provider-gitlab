@@ -98,6 +98,59 @@ func TestAccGitlabProjectProtectedEnvironment_basic(t *testing.T) {
 	})
 }
 
+func TestAccGitlabProjectProtectedEnvironment_regressionIssue1132(t *testing.T) {
+	testAccCheckEE(t)
+
+	// Set up project environment.
+	project := testAccCreateProject(t)
+	environment := testAccCreateProjectEnvironment(t, project.ID, &gitlab.CreateEnvironmentOptions{
+		Name: gitlab.String(acctest.RandomWithPrefix("test-protected-environment")),
+	})
+
+	// Set up project user.
+	user := testAccCreateUsers(t, 1)[0]
+	testAccAddProjectMembers(t, project.ID, []*gitlab.User{user})
+
+	// Set up group access.
+	group := testAccCreateGroups(t, 1)[0]
+	if _, err := testGitlabClient.Projects.ShareProjectWithGroup(project.ID, &gitlab.ShareWithGroupOptions{
+		GroupID:     &group.ID,
+		GroupAccess: gitlab.AccessLevel(gitlab.MaintainerPermissions),
+	}); err != nil {
+		t.Fatalf("unable to share project %d with group %d", project.ID, group.ID)
+	}
+
+	additionalGroup := testAccCreateGroups(t, 1)[0]
+	if _, err := testGitlabClient.Projects.ShareProjectWithGroup(project.ID, &gitlab.ShareWithGroupOptions{
+		GroupID:     &additionalGroup.ID,
+		GroupAccess: gitlab.AccessLevel(gitlab.MaintainerPermissions),
+	}); err != nil {
+		t.Fatalf("unable to share project %d with group %d", project.ID, additionalGroup.ID)
+	}
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabProjectProtectedEnvironmentDestroy(project.ID, environment.Name),
+		Steps: []resource.TestStep{
+			// Create a basic protected environment.
+			{
+				Config: fmt.Sprintf(`
+				resource "gitlab_project_protected_environment" "this" {
+					project     = %d
+					environment = %q
+					deploy_access_levels {
+						access_level = "developer"
+					}
+
+					deploy_access_levels {
+						group_id = %d
+					}
+				}`, project.ID, environment.Name, additionalGroup.ID),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabProjectProtectedEnvironmentDestroy(projectID int, environmentName string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		_, _, err := testGitlabClient.ProtectedEnvironments.GetProtectedEnvironment(projectID, environmentName)
