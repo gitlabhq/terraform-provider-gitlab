@@ -21,7 +21,7 @@ func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
 	// PreCheck runs after Config so load test data here
 	var samlLink gitlab.SAMLGroupLink
 	testSamlLink := gitlab.SAMLGroupLink{
-		Name: "test_saml_group"
+		Name: "test_saml_group",
 	}
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -51,7 +51,7 @@ func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
 				SkipFunc: isRunningInCE,
 				Config:   testAccGitlabGroupSamlLinkUpdateConfig(rInt, &testSamlLink),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupSamlLinkExists(resourceName, &samlLink))
+					testAccCheckGitlabGroupSamlLinkExists(resourceName, &samlLink)),
 			},
 		},
 	})
