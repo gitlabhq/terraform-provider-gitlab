@@ -64,6 +64,14 @@ var validProjectEnvironmentStates = []string{
 	"available", "stopped",
 }
 
+var validGroupSamlLinkAccessLevelNames = []string{
+	"Guest",
+	"Reporter",
+	"Developer",
+	"Maintainer",
+	"Owner"
+}
+
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
 	"no one":     gitlab.NoPermissions,
 	"minimal":    gitlab.MinimalAccessPermissions,
