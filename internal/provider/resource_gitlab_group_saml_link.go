@@ -104,7 +104,7 @@ func resourceGitlabGroupSamlLinkRead(ctx context.Context, d *schema.ResourceData
 		for _, samlLink := range samlLinks {
 			if buildTwoPartID(&groupId, &samlLink.Name) == d.Id() {
 				d.Set("group_id", groupId)
-				d.Set("access_level", samlLink.AccessLevel])
+				d.Set("access_level", samlLink.AccessLevel)
 				d.Set("saml_group_name", samlLink.Name)
 				found = true
 				break

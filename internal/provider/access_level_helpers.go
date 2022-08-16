@@ -70,7 +70,7 @@ var validGroupSamlLinkAccessLevelNames = []string{
 	"Reporter",
 	"Developer",
 	"Maintainer",
-	"Owner"
+	"Owner",
 }
 
 var accessLevelNameToValue = map[string]gitlab.AccessLevelValue{
