@@ -32,7 +32,13 @@ func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
 			// Create a group SAML link as a developer (uses testAccGitlabGroupLdapSamlCreateConfig for Config)
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabGroupSamlLinkCreateConfig(rInt, &testSamlLink),
+				Config: fmt.Sprintf(`
+				resource "gitlab_group_saml_link" "foo" {
+					group_id 		= "%d"
+					access_level 	= "Developer"
+					saml_group_name = "%s"
+				
+				}`, rInt, rInt, testSamlLink.Name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupSamlLinkExists(resourceName, &samlLink)),
 			},
@@ -49,7 +55,12 @@ func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
 			// Update the group SAML link to change the access level (uses testAccGitlabGroupSamlLinkUpdateConfig for Config)
 			{
 				SkipFunc: isRunningInCE,
-				Config:   testAccGitlabGroupSamlLinkUpdateConfig(rInt, &testSamlLink),
+				Config: fmt.Sprintf(`
+				resource "gitlab_group_saml_link" "foo" {
+					group_id 		= "%d"
+					access_level 	= "Maintainer"
+					saml_group_name = "%s"
+				}`, rInt, rInt, testSamlLink.Name),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabGroupSamlLinkExists(resourceName, &samlLink)),
 			},
@@ -155,35 +166,4 @@ func testAccGetGitlabGroupSamlLink(samlLink *gitlab.SAMLGroupLink, resourceState
 	}
 
 	return nil
-}
-
-func testAccGitlabGroupSamlLinkCreateConfig(rInt int, testSamlLink *gitlab.SAMLGroupLink) string {
-	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-    name = "foo%d"
-	path = "foo%d"
-	description = "Terraform acceptance test - Group SAML Links 1"
-}
-
-resource "gitlab_group_saml_link" "foo" {
-    group_id 		= "${gitlab_group.foo.id}"
-	access_level 	= "Developer"
-	saml_group_name = "%s"
-
-}`, rInt, rInt, testSamlLink.Name)
-}
-
-func testAccGitlabGroupSamlLinkUpdateConfig(rInt int, testSamlLink *gitlab.SAMLGroupLink) string {
-	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-    name = "foo%d"
-	path = "foo%d"
-	description = "Terraform acceptance test - Group SAML Links 2"
-}
-
-resource "gitlab_group_saml_link" "foo" {
-    group_id 		= "${gitlab_group.foo.id}"
-    access_level 	= "Maintainer"
-	saml_group_name = "%s"
-}`, rInt, rInt, testSamlLink.Name)
 }
