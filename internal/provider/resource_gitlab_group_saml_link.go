@@ -88,31 +88,20 @@ func resourceGitlabGroupSamlLinkRead(ctx context.Context, d *schema.ResourceData
 
 	// Try to fetch all group links from GitLab
 	log.Printf("[DEBUG] Read GitLab group SamlLinks %s", group)
-	samlLinks, _, err := client.Groups.ListGroupSAMLLinks(group, nil, gitlab.WithContext(ctx))
+	samlLink, _, err := client.Groups.GetGroupSAMLLink(group, samlGroupName, nil, gitlab.WithContext(ctx))
 	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	if samlLinks != nil {
-		// Check if the SAML link exists in the returned list of links
-		found := false
-		for _, samlLink := range samlLinks {
-			if samlLink.Name == samlGroupName {
-				d.Set("group", group)
-				d.Set("access_level", samlLink.AccessLevel)
-				d.Set("saml_group_name", samlLink.Name)
-				found = true
-				break
-			}
-		}
-
-		if !found {
+		if is404(err) {
 			log.Printf("[DEBUG] GitLab SAML Group Link %d, group ID %s not found, removing from state", samlGroupName, group)
 			d.SetId("")
 			return nil
 		}
+		return diag.FromErr(err)
 	}
 
+	d.Set("group", group)
+	d.Set("access_level", samlLink.AccessLevel)
+	d.Set("saml_group_name", samlLink.Name)
+	
 	return nil
 }
 
