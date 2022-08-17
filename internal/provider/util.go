@@ -248,6 +248,41 @@ func intSetToIntSlice(intSet *schema.Set) *[]int {
 	return &ret
 }
 
+func intListToIntSlice(intList []interface{}) *[]int {
+	ret := []int{}
+	if intList == nil {
+		return &ret
+	}
+	for _, envVal := range intList {
+		ret = append(ret, envVal.(int))
+	}
+	return &ret
+}
+
+func stringListToVisibilityLevelSlice(strings []interface{}) *[]gitlab.VisibilityValue {
+	ret := []gitlab.VisibilityValue{}
+	if strings == nil {
+		return &ret
+	}
+	for _, envVal := range strings {
+		ret = append(ret, *stringToVisibilityLevel(envVal.(string)))
+	}
+	return &ret
+}
+
+func stringListToCommaSeparatedString(stringList []interface{}) *string {
+	ret := strings.Join(*stringListToStringSlice(stringList), ",")
+	return &ret
+}
+
+func fromIntegerMap(value interface{}) map[string]int {
+	integerMap := make(map[string]int)
+	for k, v := range value.(map[string]interface{}) {
+		integerMap[k] = v.(int)
+	}
+	return integerMap
+}
+
 // isGitLabVersionLessThan is a SkipFunc that returns true if the provided version is lower then
 // the current version of GitLab. It only checks the major and minor version numbers, not the patch.
 func isGitLabVersionLessThan(ctx context.Context, client *gitlab.Client, version string) func() (bool, error) {
