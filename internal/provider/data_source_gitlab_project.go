@@ -249,8 +249,8 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 			},
 			"repository_storage": {
 				Description: "	Which storage shard the repository is on. (administrator only)",
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
 			},
 			"requirements_access_level": {
 				Description: fmt.Sprintf("Set the requirements access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),

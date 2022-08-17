@@ -19,16 +19,17 @@ import (
 const encoding = "base64"
 
 // NOTE: this lock is a bit of a hack to prevent parallel calls to the GitLab Repository Files API.
-//       If it is called concurrently, the API will return a 400 error along the lines of:
-//       ```
-//       (400 Bad Request) DELETE https://gitlab.com/api/v4/projects/30716/repository/files/somefile.yaml: 400
-//       {message: 9:Could not update refs/heads/master. Please refresh and try again..}
-//       ```
 //
-//       This lock only solves half of the problem, where the provider is responsible for
-//       the concurrency. The other half is if the API is called outside of terraform at the same time
-//       this resource makes calls to the API.
-//       To mitigate this, simple retries are used.
+//	If it is called concurrently, the API will return a 400 error along the lines of:
+//	```
+//	(400 Bad Request) DELETE https://gitlab.com/api/v4/projects/30716/repository/files/somefile.yaml: 400
+//	{message: 9:Could not update refs/heads/master. Please refresh and try again..}
+//	```
+//
+//	This lock only solves half of the problem, where the provider is responsible for
+//	the concurrency. The other half is if the API is called outside of terraform at the same time
+//	this resource makes calls to the API.
+//	To mitigate this, simple retries are used.
 var resourceGitlabRepositoryFileApiLock = newLock()
 
 var _ = registerResource("gitlab_repository_file", func() *schema.Resource {
