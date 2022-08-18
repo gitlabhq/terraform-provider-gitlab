@@ -539,9 +539,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	},
 	"repository_storage": {
 		Description: "	Which storage shard the repository is on. (administrator only)",
-		Type:        schema.TypeString,
-		Optional:    true,
-		Computed:    true,
+		Type:     schema.TypeString,
+		Optional: true,
+		Computed: true,
 	},
 	"requirements_access_level": {
 		Description:      fmt.Sprintf("Set the requirements access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
