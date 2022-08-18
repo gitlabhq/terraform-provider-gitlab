@@ -539,9 +539,9 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 	},
 	"repository_storage": {
 		Description: "	Which storage shard the repository is on. (administrator only)",
-		Type:     schema.TypeString,
-		Optional: true,
-		Computed: true,
+		Type:        schema.TypeString,
+		Optional:    true,
+		Computed:    true,
 	},
 	"requirements_access_level": {
 		Description:      fmt.Sprintf("Set the requirements access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
@@ -1202,6 +1202,12 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if v, ok := d.GetOk("ci_default_git_depth"); ok {
 		editProjectOptions.CIDefaultGitDepth = gitlab.Int(v.(int))
+	}
+
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("ci_forward_deployment_enabled"); ok {
+		editProjectOptions.CIForwardDeploymentEnabled = gitlab.Bool(v.(bool))
 	}
 
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
