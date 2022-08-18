@@ -810,7 +810,6 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 		CIConfigPath:                              gitlab.String(d.Get("ci_config_path").(string)),
-		CIForwardDeploymentEnabled:                gitlab.Bool(d.Get("ci_forward_deployment_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("build_coverage_regex"); ok {
