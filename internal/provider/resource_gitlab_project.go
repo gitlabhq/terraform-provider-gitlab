@@ -810,7 +810,6 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 		Mirror:                                    gitlab.Bool(d.Get("mirror").(bool)),
 		MirrorTriggerBuilds:                       gitlab.Bool(d.Get("mirror_trigger_builds").(bool)),
 		CIConfigPath:                              gitlab.String(d.Get("ci_config_path").(string)),
-		CIForwardDeploymentEnabled:                gitlab.Bool(d.Get("ci_forward_deployment_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("build_coverage_regex"); ok {
@@ -1202,6 +1201,12 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if v, ok := d.GetOk("ci_default_git_depth"); ok {
 		editProjectOptions.CIDefaultGitDepth = gitlab.Int(v.(int))
+	}
+
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("ci_forward_deployment_enabled"); ok {
+		editProjectOptions.CIForwardDeploymentEnabled = gitlab.Bool(v.(bool))
 	}
 
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {

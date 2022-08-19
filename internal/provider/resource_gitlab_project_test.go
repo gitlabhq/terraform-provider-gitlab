@@ -1377,6 +1377,7 @@ func TestAccGitlabProject_SetDefaultFalseBooleansOnCreate(t *testing.T) {
 						public_builds                       = false
 						merge_pipelines_enabled             = false
 						merge_trains_enabled                = false
+						ci_forward_deployment_enabled       = false
 					}`, rInt),
 			},
 			{
