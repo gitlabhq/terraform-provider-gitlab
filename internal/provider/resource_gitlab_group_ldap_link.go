@@ -57,7 +57,7 @@ var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
 			},
 			// Changing GitLab API parameter "provider" to "ldap_provider" to avoid clashing with the Terraform "provider" key word
 			"ldap_provider": {
-				Description: "The name of the LDAP provider as stored in the GitLab database.",
+				Description: "The name of the LDAP provider as stored in the GitLab database. Note that this is NOT the value of the `label` attribute as shown in the web UI. In most cases this will be `ldapmain` but you may use the [LDAP check rake task](https://docs.gitlab.com/ee/administration/raketasks/ldap.html#check) for receiving the LDAP server name: `LDAP: ... Server: ldapmain`",
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
