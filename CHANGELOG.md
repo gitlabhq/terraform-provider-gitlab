@@ -1,6 +1,33 @@
-## 3.17.0 (Unreleased)
+## 3.17.0 (2022-08-24)
 
 This release was tested against GitLab 15.1, 15.2 and 15.3 for both CE and EE.
+
+FEATURES:
+
+* **New Data Source:** `gitlab_project_hook` ([#1204](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1204))
+* **New Data Source:** `gitlab_project_hooks` ([#1204](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1204))
+* **New Data Source:** `gitlab_project_membership` ([#593](https://github.com/gitlabhq/terraform-provider-gitlab/pull/593))
+* **New Data Source:** `gitlab_repository_tree` ([#1198](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1198))
+* **New Data Source:** `gitlab_group_hook` ([#1221](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1221))
+* **New Data Source:** `gitlab_group_hooks` ([#1221](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1221))
+* **New Resource:** `gitlab_group_hook` ([#1221](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1221))
+* **New Resource:** `gitlab_application_settings` (experimental) ([#1201](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1201))
+* **New Resource:** `gitlab_project_issue_board` ([#1173](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1173))
+* **New Resource:** `gitlab_user_gpgkey` ([#1181](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1181))
+
+IMPROVEMENTS:
+
+* resource/gitlab_service_jira: Support `jira_issue_transition_id` attribute for GitLab 15.2 ([#1188](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1188))
+* resource/gitlab_project_protected_environment: Add docs that users and groups must be shared with the project ([#1210](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1210))
+* resource/gitlab_branch_protection: Automatically take ownership of projects default branch without an import ([#1216](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1216))
+* resource/gitlab_group_ldap_link: Clarify value for `ldap_provider` attribute ([#1220](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1220))
+* resource/gitlab_group_membership: Support `skip_subresources_on_destroy` and `unassign_issuables_on_destroy` removal option attributes ([#1209](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1209))
+* resource/gitlab_project: Reference doc for required `gitlab_group_project_template` resource when using `template_project_id` attribute ([#1223](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1223))
+
+BUG FIXES:
+
+* resource/gitlab_user_sshkey: Ignore leading and trailing whitespaces in key ([#1175](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1175))
+* resource/gitlab_project: Fix setting `ci_forward_deployment_enabled` to `false` during creation ([#1218](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1218))
 
 ## 3.16.1 (2022-07-11)
 
