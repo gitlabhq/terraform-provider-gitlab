@@ -383,6 +383,44 @@ func TestAccGitlabBranchProtection_createWithMultipleAccessLevels(t *testing.T) 
 	})
 }
 
+func TestAccGitlabBranchProtection_createForProjectDefaultBranch(t *testing.T) {
+	testProjectName := acctest.RandomWithPrefix("tf-acc-test")
+	var protectedBranch gitlab.ProtectedBranch
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabBranchProtectionDestroy,
+		Steps: []resource.TestStep{
+			// Create a project and protect its default branch with custom settings
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "%s"
+						initialize_with_readme = true
+					}
+
+					resource "gitlab_branch_protection" "default_branch" {
+						project = gitlab_project.this.id
+						branch = gitlab_project.this.default_branch
+
+						// non-default setting
+						allow_force_push = true
+					}
+				`, testProjectName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckGitlabBranchProtectionExists("gitlab_branch_protection.default_branch", &protectedBranch),
+					func(_ *terraform.State) error {
+						if protectedBranch.AllowForcePush != true {
+							return fmt.Errorf("allow_force_push is not set to true")
+						}
+						return nil
+					},
+				),
+			},
+		},
+	})
+}
+
 func testAccCheckGitlabBranchProtectionPersistsInStateCorrectly(n string, pb *gitlab.ProtectedBranch) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]

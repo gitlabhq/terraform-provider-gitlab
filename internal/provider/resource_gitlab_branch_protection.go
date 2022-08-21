@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -42,6 +41,14 @@ var (
 var _ = registerResource("gitlab_branch_protection", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_branch_protection`" + ` resource allows to manage the lifecycle of a protected branch of a repository.
+
+~> **Branch Protection Behavior for the default branch**
+   Depending on the GitLab instance, group or project setting the default branch of a project is created automatically by GitLab behind the scenes.
+   Due to [some](https://github.com/gitlabhq/terraform-provider-gitlab/issues/792) [limitations](https://discuss.hashicorp.com/t/ignore-the-order-of-a-complex-typed-list/42242) in the Terraform Provider SDK and the GitLab API,
+   when creating a new project and trying to manage the branch protection setting for its default branch the ` + "`gitlab_branch_protection`" + ` resource will
+   automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
+   Having multiple ` + "`gitlab_branch_protection`" + ` resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
+   This behavior might change in the future.
 
 ~> The ` + "`allowed_to_push`" + `, ` + "`allowed_to_merge`" + `, ` + "`allowed_to_unprotect`" + `, ` + "`unprotect_access_level`" + ` and ` + "`code_owner_approval_required`" + ` attributes require a GitLab Enterprise instance.
 
@@ -124,12 +131,25 @@ func resourceGitlabBranchProtectionCreate(ctx context.Context, d *schema.Resourc
 	log.Printf("[DEBUG] create gitlab branch protection on branch %q for project %s", branch, project)
 
 	if d.IsNewResource() {
-		existing, resp, err := client.ProtectedBranches.GetProtectedBranch(project, branch, gitlab.WithContext(ctx))
-		if err != nil && resp.StatusCode != http.StatusNotFound {
-			return diag.Errorf("error looking up protected branch %q on project %q: %v", branch, project, err)
+		existing, _, err := client.ProtectedBranches.GetProtectedBranch(project, branch, gitlab.WithContext(ctx))
+		if err == nil {
+			projectDetails, _, err := client.Projects.GetProject(project, nil, gitlab.WithContext(ctx))
+			if err != nil {
+				return diag.Errorf("Failed to get project details for %q to get the name of the default branch: %v", project, err)
+			}
+
+			if projectDetails.DefaultBranch == branch {
+				log.Printf("[DEBUG] this branch protection is for the default branch %q in project %q, thus we allow configuring it even though this is a new resource! We do this by quickly unprotect it, because it's not editable ...!", branch, project)
+				_, err := client.ProtectedBranches.UnprotectRepositoryBranches(project, branch, gitlab.WithContext(ctx))
+				if err != nil {
+					return diag.Errorf("Failed to unprotect default branch %q in project %q while trying to 'import' it: %v", branch, project, err)
+				}
+			} else {
+				return diag.Errorf("protected branch %q on project %q already exists: %+v", branch, project, *existing)
+			}
 		}
-		if resp.StatusCode != http.StatusNotFound {
-			return diag.Errorf("protected branch %q on project %q already exists: %+v", branch, project, *existing)
+		if err != nil && !is404(err) {
+			return diag.Errorf("error looking up protected branch %q on project %q: %v", branch, project, err)
 		}
 	}
 
