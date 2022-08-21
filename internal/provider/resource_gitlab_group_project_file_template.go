@@ -14,9 +14,10 @@ import (
 var _ = registerResource("gitlab_group_project_file_template", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`gitlab_group_project_file_template`" + ` resource allows setting a project from which
-custom file templates will be loaded. The project selected must be a direct child of the group identified.
+custom file templates will be loaded. In order to use this resource, the project selected must be a direct child of
+the group selected. After the resource has run, ` + "`gitlab_project_template.template_project_id`" + ` is available for use.
 For more information about which file types are available as templates, view 
-[GitLab's documentation](https://docs.gitlab.com/ee/user/admin_area/settings/instance_template_repository.html#supported-file-types-and-locations)
+[GitLab's documentation](https://docs.gitlab.com/ee/user/group/custom_project_templates.html)
 
 -> This resource requires a GitLab Enterprise instance with a Premium license.
 
