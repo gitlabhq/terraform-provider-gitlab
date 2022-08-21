@@ -225,6 +225,30 @@ func testAccCreateGroups(t *testing.T, n int) []*gitlab.Group {
 	return groups
 }
 
+// testAccCreateSubGroups is a test helper for creating a specified number of subgroups.
+func testAccCreateSubGroups(t *testing.T, parentGroup *gitlab.Group, n int) []*gitlab.Group {
+	t.Helper()
+
+	groups := make([]*gitlab.Group, n)
+
+	for i := range groups {
+		var err error
+		name := acctest.RandomWithPrefix("acctest-group")
+		groups[i], _, err = testGitlabClient.Groups.CreateGroup(&gitlab.CreateGroupOptions{
+			Name: gitlab.String(name),
+			Path: gitlab.String(name),
+			// So that acceptance tests can be run in a gitlab organization with no billing.
+			Visibility: gitlab.Visibility(gitlab.PublicVisibility),
+			ParentID:   gitlab.Int(parentGroup.ID),
+		})
+		if err != nil {
+			t.Fatalf("could not create test subgroup: %v", err)
+		}
+	}
+
+	return groups
+}
+
 // testAccCreateBranches is a test helper for creating a specified number of branches.
 // It assumes the project will be destroyed at the end of the test and will not cleanup created branches.
 func testAccCreateBranches(t *testing.T, project *gitlab.Project, n int) []*gitlab.Branch {
