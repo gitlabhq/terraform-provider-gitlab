@@ -317,7 +317,7 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		ForceNew:      true,
 	},
 	"template_project_id": {
-		Description:   "When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`.",
+		Description:   "When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.",
 		Type:          schema.TypeInt,
 		Optional:      true,
 		ConflictsWith: []string{"template_name"},

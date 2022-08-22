@@ -146,7 +146,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `squash_option` (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]
 - `tags` (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
 - `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
-- `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`.
+- `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
 - `topics` (Set of String) The list of topics for the project.
 - `use_custom_template` (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
 - `visibility_level` (String) Set to `public` to create a public project.
