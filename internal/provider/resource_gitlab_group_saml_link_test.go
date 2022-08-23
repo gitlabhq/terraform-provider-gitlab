@@ -12,7 +12,7 @@ import (
 )
 
 func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
-	testAccCheckEE(t)
+	testAccRequiresAtLeast(t, "15.3")
 
 	testGroup := testAccCreateGroups(t, 1)[0]
 
