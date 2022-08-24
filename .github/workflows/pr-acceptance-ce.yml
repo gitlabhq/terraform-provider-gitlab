@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gitlab-version: ["15.0.4-ce.0", "15.1.3-ce.0", "15.2.0-ce.0"]
+        gitlab-version: ["15.1.5-ce.0", "15.2.3-ce.0", "15.3.1-ce.0"]
     steps:
       - uses: actions/setup-go@v3
         with:
