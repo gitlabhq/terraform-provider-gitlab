@@ -12,6 +12,7 @@ import (
 )
 
 func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
+	testAccCheckEE(t)
 	testAccRequiresAtLeast(t, "15.3")
 
 	testGroup := testAccCreateGroups(t, 1)[0]
@@ -26,7 +27,7 @@ func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
 				Config: fmt.Sprintf(`
 					resource "gitlab_group_saml_link" "this" {
 						group   		= "%d"
-						access_level 	= "Developer"
+						access_level 	= "developer"
 						saml_group_name = "test_saml_group"
 
 					}
@@ -43,7 +44,7 @@ func TestAccGitlabGroupSamlLink_basic(t *testing.T) {
 				Config: fmt.Sprintf(`
 					resource "gitlab_group_saml_link" "this" {
 						group   		= "%d"
-						access_level 	= "Maintainer"
+						access_level 	= "maintainer"
 						saml_group_name = "test_saml_group"
 
 					}

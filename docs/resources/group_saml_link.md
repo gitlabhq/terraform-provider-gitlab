@@ -28,7 +28,7 @@ resource "gitlab_group_saml_link" "test" {
 
 ### Required
 
-- `access_level` (String) Access level for members of the SAML group. Valid values are: `Guest`, `Reporter`, `Developer`, `Maintainer`, `Owner`.
+- `access_level` (String) Access level for members of the SAML group. Valid values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
 - `group` (String) The ID or path of the group to add the SAML Group Link to.
 - `saml_group_name` (String) The name of the SAML group.
 
