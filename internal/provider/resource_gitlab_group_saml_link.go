@@ -13,11 +13,11 @@ import (
 
 var _ = registerResource("gitlab_group_saml_link", func() *schema.Resource {
 	validGroupSamlLinkAccessLevelNames := []string{
-		"Guest",
-		"Reporter",
-		"Developer",
-		"Maintainer",
-		"Owner",
+		"guest",
+		"reporter",
+		"developer",
+		"maintainer",
+		"owner",
 	}
 
 	return &schema.Resource{
