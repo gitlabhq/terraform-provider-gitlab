@@ -249,6 +249,22 @@ func testAccCreateSubGroups(t *testing.T, parentGroup *gitlab.Group, n int) []*g
 	return groups
 }
 
+func testAccCreateGroupHooks(t *testing.T, gid interface{}, n int) []*gitlab.GroupHook {
+	t.Helper()
+
+	var hooks []*gitlab.GroupHook
+	for i := 0; i < n; i++ {
+		hook, _, err := testGitlabClient.Groups.AddGroupHook(gid, &gitlab.AddGroupHookOptions{
+			URL: gitlab.String(fmt.Sprintf("https://%s.com", acctest.RandomWithPrefix("acctest"))),
+		})
+		if err != nil {
+			t.Fatalf("could not create group hook: %v", err)
+		}
+		hooks = append(hooks, hook)
+	}
+	return hooks
+}
+
 // testAccCreateBranches is a test helper for creating a specified number of branches.
 // It assumes the project will be destroyed at the end of the test and will not cleanup created branches.
 func testAccCreateBranches(t *testing.T, project *gitlab.Project, n int) []*gitlab.Branch {
