@@ -18,3 +18,21 @@ gitlab_rails['application_settings_cache_seconds'] = 0
 gitlab_rails['env'] = {
     'IN_MEMORY_APPLICATION_SETTINGS' => 'false'
 }
+
+# Enable SAML authentication for GitLab (required for SAML group links).
+# see https://docs.gitlab.com/ee/integration/saml.html
+gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
+gitlab_rails['omniauth_block_auto_created_users'] = false
+gitlab_rails['omniauth_providers'] = [
+  {
+    name: "saml",
+    label: "Dummy Test Provider",
+    args: {
+      assertion_consumer_service_url: "https://gitlab.example.com/users/auth/saml/callback",
+      idp_cert_fingerprint: "aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa",
+      idp_sso_target_url: "https://saml.provider.example.com/sso/saml",
+      issuer: "https://gitlab.example.com",
+      name_identifier_format: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+    }
+  }
+]
