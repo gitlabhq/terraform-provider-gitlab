@@ -134,7 +134,7 @@ func resourceGitlabGroupLabelImporter(ctx context.Context, d *schema.ResourceDat
 	client := meta.(*gitlab.Client)
 	parts := strings.SplitN(d.Id(), ":", 2)
 	if len(parts) != 2 {
-		return nil, fmt.Errorf("invalid label id (should be <group ID>.<label name>): %s", d.Id())
+		return nil, fmt.Errorf("invalid label id (should be <group ID>:<label name>): %s", d.Id())
 	}
 
 	d.SetId(parts[1])
