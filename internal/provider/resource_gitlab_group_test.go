@@ -241,6 +241,55 @@ func TestAccGitlabGroup_nested(t *testing.T) {
 	})
 }
 
+func TestAccGitlabGroup_EE(t *testing.T) {
+	testAccCheckEE(t)
+
+	testGroupName := acctest.RandomWithPrefix("acctest-group")
+
+	resource.ParallelTest(t, resource.TestCase{
+		ProviderFactories: providerFactories,
+		CheckDestroy:      testAccCheckGitlabGroupDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_group" "this" {
+						name = "%[1]s"
+						path = "%[1]s"
+
+						membership_lock                    = true
+						extra_shared_runners_minutes_limit = 21
+						shared_runners_minutes_limit       = 42
+					}
+				`, testGroupName),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_group.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_group" "this" {
+						name = "%[1]s"
+						path = "%[1]s"
+
+						membership_lock                    = false
+						extra_shared_runners_minutes_limit = 0
+						shared_runners_minutes_limit       = 0
+					}
+				`, testGroupName),
+			},
+			// Verify import
+			{
+				ResourceName:      "gitlab_group.this",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccGitlabGroup_disappears(t *testing.T) {
 	var group gitlab.Group
 	rInt := acctest.RandInt()

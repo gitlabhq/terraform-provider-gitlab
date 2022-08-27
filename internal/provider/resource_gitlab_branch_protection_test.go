@@ -399,12 +399,30 @@ func TestAccGitlabBranchProtection_createForProjectDefaultBranch(t *testing.T) {
 						initialize_with_readme = true
 					}
 
+					resource "gitlab_group" "maintainers" {
+						name = "maintainers"
+						path = "maintainers"
+					}
+
+					resource "gitlab_project_share_group" "this" {
+						project_id = gitlab_project.this.id
+						group_id = gitlab_group.maintainers.id
+
+						group_access = "maintainer"
+					}
+
 					resource "gitlab_branch_protection" "default_branch" {
 						project = gitlab_project.this.id
 						branch = gitlab_project.this.default_branch
 
 						// non-default setting
 						allow_force_push = true
+
+						allowed_to_merge {
+							group_id = gitlab_group.maintainers.id
+						}
+
+						depends_on = [gitlab_project_share_group.this]
 					}
 				`, testProjectName),
 				Check: resource.ComposeTestCheckFunc(
@@ -416,6 +434,40 @@ func TestAccGitlabBranchProtection_createForProjectDefaultBranch(t *testing.T) {
 						return nil
 					},
 				),
+			},
+			{
+				Config: fmt.Sprintf(`
+					resource "gitlab_project" "this" {
+						name = "%s"
+						initialize_with_readme = true
+					}
+
+					resource "gitlab_group" "maintainers" {
+						name = "maintainers"
+						path = "maintainers"
+					}
+
+					resource "gitlab_project_share_group" "this" {
+						project_id = gitlab_project.this.id
+						group_id = gitlab_group.maintainers.id
+
+						group_access = "maintainer"
+					}
+
+					resource "gitlab_branch_protection" "default_branch" {
+						project = gitlab_project.this.id
+						branch = gitlab_project.this.default_branch
+
+						// non-default setting
+						allow_force_push = false
+
+						allowed_to_merge {
+							group_id = gitlab_group.maintainers.id
+						}
+
+						depends_on = [gitlab_project_share_group.this]
+					}
+				`, testProjectName),
 			},
 		},
 	})

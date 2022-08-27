@@ -155,6 +155,21 @@ var _ = registerResource("gitlab_group", func() *schema.Resource {
 				Optional:    true,
 				Default:     false,
 			},
+			"membership_lock": {
+				Description: "Users cannot be added to projects in this group.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+			},
+			"extra_shared_runners_minutes_limit": {
+				Description: "Can be set by administrators only. Additional CI/CD minutes for this group.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+			},
+			"shared_runners_minutes_limit": {
+				Description: "Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+			},
 		},
 	}
 })
@@ -229,6 +244,20 @@ func resourceGitlabGroupCreate(ctx context.Context, d *schema.ResourceData, meta
 		options.DefaultBranchProtection = gitlab.Int(v.(int))
 	}
 
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("membership_lock"); ok {
+		options.MembershipLock = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("extra_shared_runners_minutes_limit"); ok {
+		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(v.(int))
+	}
+
+	if v, ok := d.GetOk("shared_runners_minutes_limit"); ok {
+		options.SharedRunnersMinutesLimit = gitlab.Int(v.(int))
+	}
+
 	log.Printf("[DEBUG] create gitlab group %q", *options.Name)
 
 	group, _, err := client.Groups.CreateGroup(options, gitlab.WithContext(ctx))
@@ -296,6 +325,9 @@ func resourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta i
 	d.Set("share_with_group_lock", group.ShareWithGroupLock)
 	d.Set("default_branch_protection", group.DefaultBranchProtection)
 	d.Set("prevent_forking_outside_group", group.PreventForkingOutsideGroup)
+	d.Set("membership_lock", group.MembershipLock)
+	d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
+	d.Set("shared_runners_minutes_limit", group.SharedRunnersMinutesLimit)
 
 	return nil
 }
@@ -369,6 +401,18 @@ func resourceGitlabGroupUpdate(ctx context.Context, d *schema.ResourceData, meta
 
 	if d.HasChange("prevent_forking_outside_group") {
 		options.PreventForkingOutsideGroup = gitlab.Bool(d.Get("prevent_forking_outside_group").(bool))
+	}
+
+	if d.HasChange("membership_lock") {
+		options.MembershipLock = gitlab.Bool(d.Get("membership_lock").(bool))
+	}
+
+	if d.HasChange("extra_shared_runners_minutes_limit") {
+		options.ExtraSharedRunnersMinutesLimit = gitlab.Int(d.Get("extra_shared_runners_minutes_limit").(int))
+	}
+
+	if d.HasChange("shared_runners_minutes_limit") {
+		options.SharedRunnersMinutesLimit = gitlab.Int(d.Get("shared_runners_minutes_limit").(int))
 	}
 
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())

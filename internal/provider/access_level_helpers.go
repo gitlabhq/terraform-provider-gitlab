@@ -44,8 +44,9 @@ var validProjectAccessLevelNames = []string{
 }
 
 // NOTE(TF): the documentation here https://docs.gitlab.com/ee/api/protected_branches.html
-//           mentions an `60 => Admin access` level, but it actually seems to not exist.
-//           Ignoring here that I've every read about this ...
+//
+//	mentions an `60 => Admin access` level, but it actually seems to not exist.
+//	Ignoring here that I've every read about this ...
 var validProtectedBranchTagAccessLevelNames = []string{
 	"no one", "developer", "maintainer",
 }
