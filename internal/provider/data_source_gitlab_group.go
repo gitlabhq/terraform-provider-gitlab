@@ -97,6 +97,21 @@ var _ = registerDataSource("gitlab_group", func() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 			},
+			"membership_lock": {
+				Description: "Users cannot be added to projects in this group.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
+			"extra_shared_runners_minutes_limit": {
+				Description: "Can be set by administrators only. Additional CI/CD minutes for this group.",
+				Type:        schema.TypeInt,
+				Computed:    true,
+			},
+			"shared_runners_minutes_limit": {
+				Description: "Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.",
+				Type:        schema.TypeInt,
+				Computed:    true,
+			},
 		},
 	}
 })
@@ -142,6 +157,9 @@ func dataSourceGitlabGroupRead(ctx context.Context, d *schema.ResourceData, meta
 	d.Set("runners_token", group.RunnersToken)
 	d.Set("default_branch_protection", group.DefaultBranchProtection)
 	d.Set("prevent_forking_outside_group", group.PreventForkingOutsideGroup)
+	d.Set("membership_lock", group.MembershipLock)
+	d.Set("extra_shared_runners_minutes_limit", group.ExtraSharedRunnersMinutesLimit)
+	d.Set("shared_runners_minutes_limit", group.SharedRunnersMinutesLimit)
 
 	d.SetId(fmt.Sprintf("%d", group.ID))
 
