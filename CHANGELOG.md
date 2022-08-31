@@ -1,3 +1,11 @@
+## 3.18.0 (2022-09-05)
+
+This release was tested against GitLab 15.1, 15.2 and 15.3 for both CE and EE.
+
+FEATURES
+
+* **New Resource:** `gitlab_group_saml_link` ([#1243](https://github.com/gitlabhq/terraform-provider-gitlab/pull/1243))
+
 ## 3.17.0 (2022-08-24)
 
 This release was tested against GitLab 15.1, 15.2 and 15.3 for both CE and EE.
