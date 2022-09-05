@@ -295,6 +295,11 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"ci_config_path": {
+				Description: "CI config file path for the project.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"push_rules": {
 				Description: "Push rules for the project.",
 				Type:        schema.TypeList,
@@ -436,6 +441,7 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("squash_commit_template", found.SquashCommitTemplate)
 	d.Set("merge_commit_template", found.MergeCommitTemplate)
 	d.Set("ci_default_git_depth", found.CIDefaultGitDepth)
+	d.Set("ci_config_path", found.CIConfigPath)
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 
