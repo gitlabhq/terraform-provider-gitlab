@@ -267,6 +267,11 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"suggestion_commit_message": {
+				Description: "The commit message used to apply merge request suggestions.",
+				Type:        schema.TypeString,
+				Computed:    true,
+			},
 			"topics": {
 				Description: "The list of topics for the project.",
 				Type:        schema.TypeSet,
@@ -434,6 +439,7 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("requirements_access_level", string(found.RequirementsAccessLevel))
 	d.Set("security_and_compliance_access_level", string(found.SecurityAndComplianceAccessLevel))
 	d.Set("snippets_access_level", string(found.SnippetsAccessLevel))
+	d.Set("suggestion_commit_message", found.SuggestionCommitMessage)
 	if err := d.Set("topics", found.Topics); err != nil {
 		return diag.Errorf("error setting topics: %v", err)
 	}

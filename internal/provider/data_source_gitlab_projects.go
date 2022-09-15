@@ -186,6 +186,7 @@ func flattenProjects(projects []*gitlab.Project) (values []map[string]interface{
 				"requirements_access_level":                        string(project.RequirementsAccessLevel),
 				"security_and_compliance_access_level":             string(project.SecurityAndComplianceAccessLevel),
 				"snippets_access_level":                            string(project.SnippetsAccessLevel),
+				"suggestion_commit_message":                        project.SuggestionCommitMessage,
 				"topics":                                           project.Topics,
 				"wiki_access_level":                                string(project.WikiAccessLevel),
 				"squash_commit_template":                           project.SquashCommitTemplate,
@@ -920,6 +921,11 @@ var _ = registerDataSource("gitlab_projects", func() *schema.Resource {
 						},
 						"snippets_access_level": {
 							Description: fmt.Sprintf("Set the snippets access level. Valid values are %s.", renderValueListForDocs(validProjectAccessLevels)),
+							Type:        schema.TypeString,
+							Computed:    true,
+						},
+						"suggestion_commit_message": {
+							Description: "The commit message used to apply merge request suggestions.",
 							Type:        schema.TypeString,
 							Computed:    true,
 						},

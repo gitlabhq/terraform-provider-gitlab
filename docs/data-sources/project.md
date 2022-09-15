@@ -82,6 +82,7 @@ data "gitlab_project" "example" {
 - `snippets_enabled` (Boolean) Enable snippets for the project.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
+- `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
 - `topics` (Set of String) The list of topics for the project.
 - `visibility_level` (String) Repositories are created as private by default.
 - `web_url` (String) URL that can be used to find the project in a browser.
