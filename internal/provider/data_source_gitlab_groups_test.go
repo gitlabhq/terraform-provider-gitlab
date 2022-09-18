@@ -113,7 +113,7 @@ data "gitlab_groups" "foo" {
 func testAccDataSourceGitlabLotsOfGroups() string {
 	return fmt.Sprintf(`
 resource "gitlab_group" "foo" {
-  name             = format("lots group%%02d", count.index+1)
+  name             = format("lotsgroup%%02d", count.index+1)
   description      = format("description%%02d", count.index+1)
   path             = "/"
   count            = 99
