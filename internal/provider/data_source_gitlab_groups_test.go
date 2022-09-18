@@ -21,22 +21,22 @@ func TestAccDataSourceGitlabGroups_basic(t *testing.T) {
 			{
 				Config: testAccDataSourceGitlabGroupsConfig(rInt, rInt2),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("gitlab_group.foo", "name", "foo-name-1"),
-					resource.TestCheckResourceAttr("gitlab_group.foo2", "name", "foo-name-2"),
+					resource.TestCheckResourceAttr("gitlab_group.foo1", "name", fmt.Sprintf("foo1-name-%d", rInt)),
+					resource.TestCheckResourceAttr("gitlab_group.foo2", "name", fmt.Sprintf("foo2-name-%d", rInt2)),
 				),
 			},
 			{
 				Config: testAccDataSourceGitlabGroupsConfigSort(rInt, rInt2),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.gitlab_groups.foo", "groups.#", "2"),
-					resource.TestCheckResourceAttr("data.gitlab_groups.foo", "groups.0.name", "foo-name-1"),
-					resource.TestCheckResourceAttr("data.gitlab_groups.foo", "groups.1.description", "description-2"),
+					resource.TestCheckResourceAttr("data.gitlab_groups.foos", "groups.#", "2"),
+					resource.TestCheckResourceAttr("data.gitlab_groups.foos", "groups.0.name", fmt.Sprintf("foo1-name-%d", rInt)),
+					resource.TestCheckResourceAttr("data.gitlab_groups.foos", "groups.1.description", fmt.Sprintf("description-%d", rInt2)),
 				),
 			},
 			{
 				Config: testAccDataSourceGitlabGroupsConfigSearch(rInt, rInt2),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.gitlab_groups.foo", "groups.#", "1"),
+					resource.TestCheckResourceAttr("data.gitlab_groups.foos", "groups.#", "1"),
 				),
 			},
 			{
@@ -45,7 +45,7 @@ func TestAccDataSourceGitlabGroups_basic(t *testing.T) {
 			{
 				Config: testAccDataSourceGitlabLotsOfGroupsSearch(),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.gitlab_groups.foo", "groups.#", "99"),
+					resource.TestCheckResourceAttr("data.gitlab_groups.foos", "groups.#", "42"),
 				),
 			},
 		},
@@ -54,15 +54,15 @@ func TestAccDataSourceGitlabGroups_basic(t *testing.T) {
 
 func testAccDataSourceGitlabGroupsConfig(rInt int, rInt2 int) string {
 	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-  name = "foo-name-%d"
-  path = "foo-path-%d"
+resource "gitlab_group" "foo1" {
+  name = "foo1-name-%d"
+  path = "foo1-path-%d"
   description = "description-%d"
 }
 
 resource "gitlab_group" "foo2" {
-  name = "foo-name-%d"
-  path = "foo-path-%d"
+  name = "foo2-name-%d"
+  path = "foo2-path-%d"
   description = "description-%d"
 }
 	`, rInt, rInt, rInt, rInt2, rInt2, rInt2)
@@ -70,20 +70,20 @@ resource "gitlab_group" "foo2" {
 
 func testAccDataSourceGitlabGroupsConfigSort(rInt int, rInt2 int) string {
 	return fmt.Sprintf(`
-resource "gitlab_group" "foo" {
-  name = "foo-name-%d"
-  path = "foo-path-%d"
+resource "gitlab_group" "foo1" {
+  name = "foo1-name-%d"
+  path = "foo1-path-%d"
   description = "description-%d"
 }
 
 resource "gitlab_group" "foo2" {
-  name = "foo-name-%d"
-  path = "foo-path-%d"
+  name = "foo2-name-%d"
+  path = "foo2-path-%d"
   description = "description-%d"
 }
 
-data "gitlab_groups" "foo" {
-  sort = "desc"
+data "gitlab_groups" "foos" {
+  sort = "asc"
   search = "foo"
   order_by = "name"
 }
@@ -104,8 +104,8 @@ resource "gitlab_group" "foo2" {
   description = "description-%d"
 }
 
-data "gitlab_groups" "foo" {
-  search = "foo-name-%d"
+data "gitlab_groups" "foos" {
+  search = "%d"
 }
 	`, rInt, rInt, rInt, rInt2, rInt2, rInt2, rInt2)
 }
@@ -116,14 +116,14 @@ resource "gitlab_group" "foo" {
   name             = format("lots-group-%%02d", count.index+1)
   description      = format("description-%%02d", count.index+1)
   path             = format("lots-group-path-%%02d", count.index+1)
-  count            = 99
+  count            = 42
 }
 `)
 }
 
 func testAccDataSourceGitlabLotsOfGroupsSearch() string {
 	return fmt.Sprintf(`%v
-data "gitlab_groups" "foo" {
+data "gitlab_groups" "foos" {
 	search = "lots"
 }
 	`, testAccDataSourceGitlabLotsOfGroups())
