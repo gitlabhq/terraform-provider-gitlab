@@ -4,5 +4,5 @@ data "gitlab_groups" "example" {
 }
 
 data "gitlab_groups" "example-two" {
-  search = "foo"
+  search = "GitLab"
 }
