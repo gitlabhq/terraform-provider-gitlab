@@ -15,6 +15,17 @@ import (
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
+var validProjectAccessTokenScopes = []string{
+	"api",
+	"read_user",
+	"read_api",
+	"read_repository",
+	"write_repository",
+	"read_registry",
+	"write_registry"
+}
+
+
 var _ = registerResource("gitlab_project_access_token", func() *schema.Resource {
 	return &schema.Resource{
 		Description: `The ` + "`" + `gitlab_project_access_token` + "`" + ` resource allows to manage the lifecycle of a project access token.
@@ -42,13 +53,13 @@ var _ = registerResource("gitlab_project_access_token", func() *schema.Resource 
 				ForceNew:    true,
 			},
 			"scopes": {
-				Description: "Valid values: `api`, `read_api`, `read_repository`, `write_repository`.",
+				Description: "Valid values: `api`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`.",
 				Type:        schema.TypeSet,
 				Required:    true,
 				ForceNew:    true,
 				Elem: &schema.Schema{
 					Type:         schema.TypeString,
-					ValidateFunc: validation.StringInSlice([]string{"api", "read_api", "read_repository", "write_repository"}, false),
+					ValidateFunc: validation.StringInSlice(validProjectAccessTokenScopes, false),
 				},
 			},
 			"expires_at": {

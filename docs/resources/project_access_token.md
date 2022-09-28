@@ -39,7 +39,7 @@ resource "gitlab_project_variable" "example" {
 
 - `name` (String) A name to describe the project access token.
 - `project` (String) The id of the project to add the project access token to.
-- `scopes` (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`.
+- `scopes` (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`.
 
 ### Optional
 
