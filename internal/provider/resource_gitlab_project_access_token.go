@@ -22,9 +22,8 @@ var validProjectAccessTokenScopes = []string{
 	"read_repository",
 	"write_repository",
 	"read_registry",
-	"write_registry"
+	"write_registry",
 }
-
 
 var _ = registerResource("gitlab_project_access_token", func() *schema.Resource {
 	return &schema.Resource{
