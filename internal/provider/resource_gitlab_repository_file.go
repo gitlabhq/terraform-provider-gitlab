@@ -163,8 +163,8 @@ func resourceGitlabRepositoryFileRead(ctx context.Context, d *schema.ResourceDat
 
 	repositoryFile, _, err := client.RepositoryFiles.GetFile(project, filePath, options, gitlab.WithContext(ctx))
 	if err != nil {
-		if strings.Contains(err.Error(), "404 File Not Found") {
-			log.Printf("[WARN] file %s not found, removing from state", filePath)
+		if is404(err) {
+			log.Printf("[DEBUG] file %s not found, removing from state", filePath)
 			d.SetId("")
 			return nil
 		}
