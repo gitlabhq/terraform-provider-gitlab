@@ -1331,10 +1331,12 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("approvals_before_merge") {
 		options.ApprovalsBeforeMerge = gitlab.Int(d.Get("approvals_before_merge").(int))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("wiki_enabled") {
 		options.WikiEnabled = gitlab.Bool(d.Get("wiki_enabled").(bool))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("snippets_enabled") {
@@ -1382,11 +1384,13 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 	if d.HasChange("mirror") {
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.Mirror = gitlab.Bool(d.Get("mirror").(bool))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("mirror_trigger_builds") {
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorTriggerBuilds = gitlab.Bool(d.Get("mirror_trigger_builds").(bool))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("only_mirror_protected_branches") {
@@ -1397,6 +1401,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 	if d.HasChange("mirror_overwrites_diverged_branches") {
 		options.ImportURL = gitlab.String(d.Get("import_url").(string))
 		options.MirrorOverwritesDivergedBranches = gitlab.Bool(d.Get("mirror_overwrites_diverged_branches").(bool))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("build_coverage_regex") {
@@ -1405,6 +1410,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("issues_template") {
 		options.IssuesTemplate = gitlab.String(d.Get("issues_template").(string))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("merge_requests_template") {
@@ -1477,6 +1483,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("external_authorization_classification_label") {
 		options.ExternalAuthorizationClassificationLabel = gitlab.String(d.Get("external_authorization_classification_label").(string))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("forking_access_level") {
@@ -1509,6 +1516,7 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("requirements_access_level") {
 		options.RequirementsAccessLevel = stringToAccessControlValue(d.Get("requirements_access_level").(string))
+		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("security_and_compliance_access_level") {
