@@ -158,6 +158,7 @@ Read-Only:
 - `ssh_url_to_repo` (String)
 - `star_count` (Number)
 - `statistics` (Map of Number)
+- `suggestion_commit_message` (String)
 - `tag_list` (Set of String)
 - `topics` (Set of String)
 - `visibility` (String)

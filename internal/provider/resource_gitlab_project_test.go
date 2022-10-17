@@ -109,6 +109,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 		RepositoryStorage:                "default",
 		SecurityAndComplianceAccessLevel: gitlab.EnabledAccessControl,
 		SnippetsAccessLevel:              gitlab.EnabledAccessControl,
+		SuggestionCommitMessage:          "hello suggestion",
 		Topics:                           []string{"foo", "bar"},
 		WikiAccessLevel:                  gitlab.EnabledAccessControl,
 		SquashCommitTemplate:             "hello squash",
@@ -1754,6 +1755,7 @@ resource "gitlab_project" "foo" {
   repository_storage = "default"
   security_and_compliance_access_level = "enabled"
   snippets_access_level = "enabled"
+  suggestion_commit_message = "hello suggestion"
   topics = ["foo", "bar"]
   wiki_access_level = "enabled"
   squash_commit_template = "hello squash"
@@ -1996,6 +1998,7 @@ resource "gitlab_project" "foo" {
   repository_storage = "default"
   security_and_compliance_access_level = "enabled"
   snippets_access_level = "enabled"
+  suggestion_commit_message = "hello suggestion"
   topics = ["foo", "bar"]
   wiki_access_level = "enabled"
   squash_commit_template = "hello squash"
@@ -2191,6 +2194,7 @@ resource "gitlab_project" "foo" {
   repository_storage = "default"
   security_and_compliance_access_level = "enabled"
   snippets_access_level = "enabled"
+  suggestion_commit_message = "hello suggestion"
   topics = ["foo", "bar"]
   wiki_access_level = "enabled"
   squash_commit_template = "hello squash"

@@ -144,6 +144,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `snippets_enabled` (Boolean) Enable snippets for the project.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
 - `squash_option` (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]
+- `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
 - `tags` (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
 - `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
 - `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.

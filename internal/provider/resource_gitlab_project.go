@@ -564,6 +564,11 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Computed:         true,
 		ValidateDiagFunc: validation.ToDiagFunc(validation.StringInSlice(validProjectAccessLevels, false)),
 	},
+	"suggestion_commit_message": {
+		Description: "The commit message used to apply merge request suggestions.",
+		Type:        schema.TypeString,
+		Optional:    true,
+	},
 	"topics": {
 		Description: "The list of topics for the project.",
 		Type:        schema.TypeSet,
@@ -769,6 +774,7 @@ func resourceGitlabProjectSetToState(ctx context.Context, client *gitlab.Client,
 	d.Set("requirements_access_level", string(project.RequirementsAccessLevel))
 	d.Set("security_and_compliance_access_level", string(project.SecurityAndComplianceAccessLevel))
 	d.Set("snippets_access_level", string(project.SnippetsAccessLevel))
+	d.Set("suggestion_commit_message", project.SuggestionCommitMessage)
 	if err := d.Set("topics", project.Topics); err != nil {
 		return fmt.Errorf("error setting topics: %v", err)
 	}
@@ -972,6 +978,10 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 
 	if v, ok := d.GetOk("snippets_access_level"); ok {
 		options.SnippetsAccessLevel = stringToAccessControlValue(v.(string))
+	}
+
+	if v, ok := d.GetOk("suggestion_commit_message"); ok {
+		options.SuggestionCommitMessage = gitlab.String(v.(string))
 	}
 
 	if v, ok := d.GetOk("topics"); ok {
@@ -1512,6 +1522,10 @@ func resourceGitlabProjectUpdate(ctx context.Context, d *schema.ResourceData, me
 
 	if d.HasChange("snippets_access_level") {
 		options.SnippetsAccessLevel = stringToAccessControlValue(d.Get("snippets_access_level").(string))
+	}
+
+	if d.HasChange("suggestion_commit_message") {
+		options.SuggestionCommitMessage = gitlab.String(d.Get("suggestion_commit_message").(string))
 	}
 
 	if d.HasChange("topics") {
