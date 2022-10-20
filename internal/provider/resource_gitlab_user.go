@@ -75,7 +75,6 @@ var _ = registerResource("gitlab_user", func() *schema.Resource {
 			},
 			"skip_confirmation": {
 				Description: `Boolean, defaults to true. Whether to skip confirmation.
-				
 This field does not import properly, and GitLab does not return the value of this field to verify it was set properly on apply.
 Terraform assumes the field was set properly upon first apply, and will update the field unless other values change.
 				`,
