@@ -199,11 +199,18 @@ func testAccCreateUsers(t *testing.T, n int) []*gitlab.User {
 func testAccCreateGroups(t *testing.T, n int) []*gitlab.Group {
 	t.Helper()
 
+	return testAccCreateGroupsWithPrefix(t, n, "acctest-group")
+}
+
+// testAccCreateGroups is a test helper for creating a specified number of groups with specific prefix.
+func testAccCreateGroupsWithPrefix(t *testing.T, n int, prefix string) []*gitlab.Group {
+	t.Helper()
+
 	groups := make([]*gitlab.Group, n)
 
 	for i := range groups {
 		var err error
-		name := acctest.RandomWithPrefix("acctest-group")
+		name := acctest.RandomWithPrefix(prefix)
 		groups[i], _, err = testGitlabClient.Groups.CreateGroup(&gitlab.CreateGroupOptions{
 			Name: gitlab.String(name),
 			Path: gitlab.String(name),
