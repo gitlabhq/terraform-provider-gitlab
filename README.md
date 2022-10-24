@@ -22,6 +22,6 @@ Check out the [CONTRIBUTING.md](/CONTRIBUTING.md) guide for tips on how to contr
 
 You are welcome to join our [Discord Server](https://discord.gg/CCc6Pe5EYy) or the monthly community hours:
 
-- [Google Calendar signup](https://calendar.google.com/event?action=TEMPLATE&tmeid=MnZyN2owdmYxaDdiMWdjNGdoMzQ3bWM0dDlfMjAyMjA0MjdUMTQzMDAwWiBjXzh0bjczaDNjYW5mam1zY2pwamJqNjFpNDVrQGc&tmsrc=c_8tn73h3canfjmscjpjbj61i45k%40group.calendar.google.com&scp=ALL )
+- [Terraform Provider Office Hour Call](https://www.meetup.com/gitlab-virtual-meetups/)
 - [Recordings](https://www.youtube.com/playlist?list=PL05JrBw4t0KrMncKb6v9S0wB_liBky39P)
 - [Notes](https://docs.google.com/document/d/1-rgmylTUlO2lPRmbmGk0aB-mktg8nYu0NxOkFw9bo_M/edit#)
