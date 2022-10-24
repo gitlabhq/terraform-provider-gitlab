@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -121,32 +120,7 @@ func dataSourceGitlabGroupSubgroupsRead(ctx context.Context, d *schema.ResourceD
 
 func flattenSubgroupsForState(subgroups []*gitlab.Group) (values []map[string]interface{}) {
 	for _, group := range subgroups {
-		values = append(values, map[string]interface{}{
-			"auto_devops_enabled":               group.AutoDevopsEnabled,
-			"avatar_url":                        group.AvatarURL,
-			"created_at":                        group.CreatedAt.Format(time.RFC3339),
-			"default_branch_protection":         group.DefaultBranchProtection,
-			"description":                       group.Description,
-			"emails_disabled":                   group.EmailsDisabled,
-			"file_template_project_id":          group.FileTemplateProjectID,
-			"full_name":                         group.FullName,
-			"full_path":                         group.FullPath,
-			"group_id":                          group.ID,
-			"lfs_enabled":                       group.LFSEnabled,
-			"mentions_disabled":                 group.MentionsDisabled,
-			"name":                              group.Name,
-			"parent_id":                         group.ParentID,
-			"path":                              group.Path,
-			"project_creation_level":            group.ProjectCreationLevel,
-			"request_access_enabled":            group.RequestAccessEnabled,
-			"require_two_factor_authentication": group.RequireTwoFactorAuth,
-			"share_with_group_lock":             group.ShareWithGroupLock,
-			"statistics":                        group.Statistics,
-			"subgroup_creation_level":           group.SubGroupCreationLevel,
-			"two_factor_grace_period":           group.TwoFactorGracePeriod,
-			"visibility":                        group.Visibility,
-			"web_url":                           group.WebURL,
-		})
+		values = append(values, gitlabGroupToStateMap(group))
 	}
 	return values
 }
