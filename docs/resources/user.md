@@ -55,7 +55,6 @@ resource "gitlab_user" "example" {
 - `projects_limit` (Number) Integer, defaults to 0.  Number of projects user can create.
 - `reset_password` (Boolean) Boolean, defaults to false. Send user password reset link.
 - `skip_confirmation` (Boolean) Boolean, defaults to true. Whether to skip confirmation.
-				
 This field does not import properly, and GitLab does not return the value of this field to verify it was set properly on apply.
 Terraform assumes the field was set properly upon first apply, and will update the field unless other values change.
 - `state` (String) String, defaults to 'active'. The state of the user account. Valid values are `active`, `deactivated`, `blocked`.

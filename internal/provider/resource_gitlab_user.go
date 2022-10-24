@@ -82,6 +82,9 @@ Terraform assumes the field was set properly upon first apply, and will update t
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
+				DiffSuppressFunc: func(string, string, string, *schema.ResourceData) bool {
+					return true
+				},
 			},
 			"projects_limit": {
 				Description: "Integer, defaults to 0.  Number of projects user can create.",
