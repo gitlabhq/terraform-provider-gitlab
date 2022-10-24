@@ -4,8 +4,9 @@ go 1.16
 
 require (
 	github.com/bflad/tfproviderlint v0.28.1
-	github.com/golangci/golangci-lint v1.50.0
+	github.com/golangci/golangci-lint v1.50.1
 	github.com/hashicorp/terraform-plugin-docs v0.13.0
-	golang.org/x/tools v0.1.12
+	github.com/spf13/viper v1.13.0 // indirect
+	golang.org/x/tools v0.2.0
 	mvdan.cc/sh/v3 v3.5.1
 )
