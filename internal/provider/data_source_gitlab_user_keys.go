@@ -17,7 +17,21 @@ var _ = registerDataSource("gitlab_user_keys", func() *schema.Resource {
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#list-ssh-keys-for-user)`,
 
 		ReadContext: dataSourceGitlabUserKeysRead,
-		Schema:      gitlabUserKeysSchema(),
+		Schema: map[string]*schema.Schema{
+			"user_id": {
+				Description: "The user ID.",
+				Type:        schema.TypeInt,
+				Required:    true,
+			},
+			"keys": {
+				Description: "The user's keys.",
+				Type:        schema.TypeList,
+				Computed:    true,
+				Elem: &schema.Resource{
+					Schema: datasourceSchemaFromResourceSchema(gitlabUserSSHKeySchema(), nil, nil),
+				},
+			},
+		},
 	}
 })
 
@@ -29,11 +43,11 @@ func dataSourceGitlabUserKeysRead(ctx context.Context, d *schema.ResourceData, m
 
 	log.Printf("[INFO] Reading Gitlab user")
 
-	userIDData, userIDOk := d.GetOk("id_or_username")
+	userIDData, userIDOk := d.GetOk("user_id")
 
 	if userIDOk {
 		// Get SSH keys by user
-		keys, _, err = client.Users.ListSSHKeysForUser(userIDData, &gitlab.ListSSHKeysForUserOptions{}, gitlab.WithContext(ctx))
+		keys, _, err = client.Users.ListSSHKeysForUser(userIDData.(int), &gitlab.ListSSHKeysForUserOptions{}, gitlab.WithContext(ctx))
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -42,8 +56,9 @@ func dataSourceGitlabUserKeysRead(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	d.SetId(fmt.Sprintf("%d", userIDData))
-	d.Set("keys", flattenSSHKeysForState(keys))
-
+	if err := d.Set("keys", flattenSSHKeysForState(keys)); err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 
