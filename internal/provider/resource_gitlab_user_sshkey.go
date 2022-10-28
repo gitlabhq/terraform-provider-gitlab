@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	gitlab "github.com/xanzy/go-gitlab"
 )
 
@@ -26,59 +24,7 @@ var _ = registerResource("gitlab_user_sshkey", func() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: schema.ImportStatePassthroughContext,
 		},
-
-		Schema: map[string]*schema.Schema{
-			"user_id": {
-				Description: "The ID of the user to add the ssh key to.",
-				Type:        schema.TypeInt,
-				ForceNew:    true,
-				Required:    true,
-			},
-			"title": {
-				Description: "The title of the ssh key.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-			},
-			"key": {
-				Description: "The ssh key. The SSH key `comment` (trailing part) is optional and ignored for diffing, because GitLab overrides it with the username and GitLab hostname.",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Required:    true,
-				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
-					// NOTE: the ssh keys consist of three parts: `type`, `data`, `comment`, whereas the `comment` is optional
-					//       and suppressed in the diffing. It's overridden by GitLab with the username and GitLab hostname.
-					newParts := strings.Fields(new)
-					oldParts := strings.Fields(old)
-					if len(newParts) < 2 || len(oldParts) < 2 {
-						// NOTE: at least one of the keys doesn't have the required two parts, thus we just compare them
-						return new == old
-					}
-
-					// NOTE: both keys have the required two parts, thus we compare the parts separately, ignoring the rest
-					return newParts[0] == oldParts[0] && newParts[1] == oldParts[1]
-				},
-			},
-			"expires_at": {
-				Description: "The expiration date of the SSH key in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)",
-				Type:        schema.TypeString,
-				ForceNew:    true,
-				Optional:    true,
-				// NOTE: since RFC3339 is pretty much a subset of ISO8601 and actually expected by GitLab,
-				//       we use it here to avoid having to parse the string ourselves.
-				ValidateDiagFunc: validation.ToDiagFunc(validation.IsRFC3339Time),
-			},
-			"key_id": {
-				Description: "The ID of the ssh key.",
-				Type:        schema.TypeInt,
-				Computed:    true,
-			},
-			"created_at": {
-				Description: "The time when this key was created in GitLab.",
-				Type:        schema.TypeString,
-				Computed:    true,
-			},
-		},
+		Schema: gitlabUserSSHKeySchema(),
 	}
 })
 
