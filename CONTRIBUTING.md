@@ -109,7 +109,7 @@ terraform {
 
 ### M1/M2 Environments
 
-The apple silicon environments currently have an issue where the local GitLab container will now start to run tests. We recommend that you use GitPod for developing the 
+The apple silicon environments currently have an issue where the local GitLab container will not start to run tests. We recommend that you use GitPod for developing the 
 provider until this issue is resolved. If you manage to get a mac environment working properly, please let us know by creating an issue!
 
 ### Use a Remote Environment via GitPod
