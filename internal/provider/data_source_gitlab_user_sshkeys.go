@@ -51,30 +51,32 @@ var _ = registerDataSource("gitlab_user_sshkeys", func() *schema.Resource {
 
 func dataSourceGitlabUserKeysRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
-
-	var keys []*gitlab.SSHKey
-	var err error
-
 	log.Printf("[INFO] Reading Gitlab user")
+
+	options := gitlab.ListSSHKeysForUserOptions{
+		PerPage: 2,
+		Page:    1,
+	}
+	var keys []*gitlab.SSHKey
 
 	userIDData, userIDOk := d.GetOk("user_id")
 	usernameData, usernameOk := d.GetOk("username")
-
+	var uid interface{}
 	if userIDOk {
-		// Get SSH keys by user ID
-		keys, _, err = client.Users.ListSSHKeysForUser(userIDData.(int), &gitlab.ListSSHKeysForUserOptions{}, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
-		}
+		uid = userIDData.(int)
 	} else if usernameOk {
-		username := strings.ToLower(usernameData.(string))
-		// Get SSH keys by username
-		keys, _, err = client.Users.ListSSHKeysForUser(username, &gitlab.ListSSHKeysForUserOptions{}, gitlab.WithContext(ctx))
-		if err != nil {
-			return diag.FromErr(err)
-		}
+		uid = strings.ToLower(usernameData.(string))
 	} else {
 		return diag.Errorf("one and only one of user_id or username must be set")
+	}
+
+	for options.Page != 0 {
+		paginatedKeys, resp, err := client.Users.ListSSHKeysForUser(uid, &options, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		keys = append(keys, paginatedKeys...)
+		options.Page = resp.NextPage
 	}
 
 	d.SetId(fmt.Sprintf("%d", userIDData))
