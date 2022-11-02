@@ -32,3 +32,4 @@ website/vendor
 /tmp
 certs/gitlab-registry.crt
 certs/gitlab-registry.key
+/go/
