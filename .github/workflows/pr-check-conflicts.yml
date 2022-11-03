@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Docs: https://github.com/marketplace/actions/label-conflicting-pull-requests
-      - uses: eps1lon/actions-label-merge-conflict@v2.0.1
+      - uses: eps1lon/actions-label-merge-conflict@v2.1.0
         with:
           dirtyLabel: merge-conflict
           repoToken: ${{ secrets.GITHUB_TOKEN }}
