@@ -16,10 +16,17 @@ The `gitlab_group_ldap_link` resource allows to manage the lifecycle of an LDAP 
 ## Example Usage
 
 ```terraform
-resource "gitlab_group_ldap_link" "test" {
+resource "gitlab_group_ldap_link" "cn" {
   group_id      = "12345"
   cn            = "testuser"
   group_access  = "developer"
+  ldap_provider = "ldapmain"
+}
+
+resource "gitlab_group_ldap_link" "filter" {
+  group_id      = "12345"
+  filter        = "(objectClass=*)"
+  group_access  = "reporter"
   ldap_provider = "ldapmain"
 }
 ```
@@ -29,13 +36,14 @@ resource "gitlab_group_ldap_link" "test" {
 
 ### Required
 
-- `cn` (String) The CN of the LDAP group to link with.
 - `group_id` (String) The id of the GitLab group.
 - `ldap_provider` (String) The name of the LDAP provider as stored in the GitLab database. Note that this is NOT the value of the `label` attribute as shown in the web UI. In most cases this will be `ldapmain` but you may use the [LDAP check rake task](https://docs.gitlab.com/ee/administration/raketasks/ldap.html#check) for receiving the LDAP server name: `LDAP: ... Server: ldapmain`
 
 ### Optional
 
 - `access_level` (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
+- `cn` (String) The CN of the LDAP group to link with.
+- `filter` (String) The LDAP filter for the group. Make sure to use [valid LDAP Search Filter Syntax](https://learn.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax?redirectedfrom=MSDN).
 - `force` (Boolean) If true, then delete and replace an existing LDAP link if one exists.
 - `group_access` (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 
@@ -48,6 +56,9 @@ resource "gitlab_group_ldap_link" "test" {
 Import is supported using the following syntax:
 
 ```shell
-# GitLab group ldap links can be imported using an id made up of `group_id:ldap_provider:cn`, e.g.
-terraform import gitlab_group_ldap_link.test "12345:ldapmain:testuser"
+# GitLab group ldap links can be imported using an id made up of
+# `group_id:ldap_provider:cn`
+terraform import gitlab_group_ldap_link.cn "12345:ldapmain:testuser"
+# or `group_id:ldap_provider:filter
+terraform import gitlab_group_ldap_link.test "12345:ldapmain:(objectClass=*)"
 ```

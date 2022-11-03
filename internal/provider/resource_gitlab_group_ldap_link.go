@@ -33,10 +33,18 @@ var _ = registerResource("gitlab_group_ldap_link", func() *schema.Resource {
 				ForceNew:    true,
 			},
 			"cn": {
-				Description: "The CN of the LDAP group to link with.",
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
+				Description:  "The CN of the LDAP group to link with.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				ExactlyOneOf: []string{"cn", "filter"},
+			},
+			"filter": {
+				Description:  "The LDAP filter for the group. Make sure to use [valid LDAP Search Filter Syntax](https://learn.microsoft.com/en-us/windows/win32/adsi/search-filter-syntax?redirectedfrom=MSDN).",
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				ExactlyOneOf: []string{"cn", "filter"},
 			},
 			"access_level": {
 				Description:      fmt.Sprintf("Minimum access level for members of the LDAP group. Valid values are: %s", renderValueListForDocs(validGroupAccessLevelNames)),
@@ -77,7 +85,8 @@ func resourceGitlabGroupLdapLinkCreate(ctx context.Context, d *schema.ResourceDa
 	client := meta.(*gitlab.Client)
 
 	groupId := d.Get("group_id").(string)
-	cn := d.Get("cn").(string)
+	cn, isCN := d.GetOk("cn")
+	filter, isFilter := d.GetOk("filter")
 
 	var groupAccess gitlab.AccessLevelValue
 	if v, ok := d.GetOk("group_access"); ok {
@@ -88,14 +97,8 @@ func resourceGitlabGroupLdapLinkCreate(ctx context.Context, d *schema.ResourceDa
 		return diag.Errorf("Neither `group_access` nor `access_level` (deprecated) is set")
 	}
 
-	ldap_provider := d.Get("ldap_provider").(string)
+	ldapProvider := d.Get("ldap_provider").(string)
 	force := d.Get("force").(bool)
-
-	options := &gitlab.AddGroupLDAPLinkOptions{
-		CN:          &cn,
-		GroupAccess: &groupAccess,
-		Provider:    &ldap_provider,
-	}
 
 	if force {
 		if err := resourceGitlabGroupLdapLinkDelete(ctx, d, meta); err != nil {
@@ -103,13 +106,39 @@ func resourceGitlabGroupLdapLinkCreate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
-	LdapLink, _, err := client.Groups.AddGroupLDAPLink(groupId, options, gitlab.WithContext(ctx))
-	if err != nil {
-		return diag.FromErr(err)
+	if isCN {
+		options := &gitlab.AddGroupLDAPLinkOptions{
+			CN:          gitlab.String(cn.(string)),
+			GroupAccess: &groupAccess,
+			Provider:    &ldapProvider,
+		}
+
+		log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
+		LdapLink, _, err := client.Groups.AddGroupLDAPLink(groupId, options, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		d.SetId(buildTwoPartID(&LdapLink.Provider, &LdapLink.CN))
+
 	}
 
-	d.SetId(buildTwoPartID(&LdapLink.Provider, &LdapLink.CN))
+	if isFilter {
+		options := &gitlab.AddGroupLDAPLinkOptions{
+			Filter:      gitlab.String(filter.(string)),
+			GroupAccess: &groupAccess,
+			Provider:    &ldapProvider,
+		}
+
+		log.Printf("[DEBUG] Create GitLab group LdapLink %s", d.Id())
+		LdapLink, _, err := client.Groups.AddGroupLDAPLink(groupId, options, gitlab.WithContext(ctx))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		d.SetId(buildTwoPartID(&LdapLink.Provider, &LdapLink.Filter))
+
+	}
 
 	return resourceGitlabGroupLdapLinkRead(ctx, d, meta)
 }
@@ -141,11 +170,15 @@ func resourceGitlabGroupLdapLinkRead(ctx context.Context, d *schema.ResourceData
 		// Check if the LDAP link exists in the returned list of links
 		found := false
 		for _, ldapLink := range ldapLinks {
+			d.Set("group_id", groupId)
+			d.Set("group_access", accessLevelValueToName[ldapLink.GroupAccess])
+			d.Set("ldap_provider", ldapLink.Provider)
 			if buildTwoPartID(&ldapLink.Provider, &ldapLink.CN) == d.Id() {
-				d.Set("group_id", groupId)
 				d.Set("cn", ldapLink.CN)
-				d.Set("group_access", accessLevelValueToName[ldapLink.GroupAccess])
-				d.Set("ldap_provider", ldapLink.Provider)
+				found = true
+				break
+			} else if buildTwoPartID(&ldapLink.Provider, &ldapLink.Filter) == d.Id() {
+				d.Set("filter", ldapLink.Filter)
 				found = true
 				break
 			}
@@ -162,12 +195,29 @@ func resourceGitlabGroupLdapLinkRead(ctx context.Context, d *schema.ResourceData
 
 func resourceGitlabGroupLdapLinkDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	client := meta.(*gitlab.Client)
+
+	cn, isCN := d.GetOk("cn")
+	filter, isFilter := d.GetOk("filter")
+
 	groupId := d.Get("group_id").(string)
-	cn := d.Get("cn").(string)
-	ldap_provider := d.Get("ldap_provider").(string)
+	ldapProvider := d.Get("ldap_provider").(string)
+
+	options := &gitlab.DeleteGroupLDAPLinkWithCNOrFilterOptions{}
+
+	if isCN {
+		options = &gitlab.DeleteGroupLDAPLinkWithCNOrFilterOptions{
+			CN:       gitlab.String(cn.(string)),
+			Provider: &ldapProvider,
+		}
+	} else if isFilter {
+		options = &gitlab.DeleteGroupLDAPLinkWithCNOrFilterOptions{
+			Filter:   gitlab.String(filter.(string)),
+			Provider: &ldapProvider,
+		}
+	}
 
 	log.Printf("[DEBUG] Delete GitLab group LdapLink %s", d.Id())
-	_, err := client.Groups.DeleteGroupLDAPLinkForProvider(groupId, ldap_provider, cn, gitlab.WithContext(ctx))
+	_, err := client.Groups.DeleteGroupLDAPLinkWithCNOrFilter(groupId, options, gitlab.WithContext(ctx))
 	if err != nil {
 		switch err.(type) { // nolint // TODO: Resolve this golangci-lint issue: S1034: assigning the result of this type assertion to a variable (switch err := err.(type)) could eliminate type assertions in switch cases (gosimple)
 		case *gitlab.ErrorResponse:
@@ -188,11 +238,11 @@ func resourceGitlabGroupLdapLinkDelete(ctx context.Context, d *schema.ResourceDa
 func resourceGitlabGroupLdapLinkImporter(ctx context.Context, d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 	parts := strings.SplitN(d.Id(), ":", 3)
 	if len(parts) != 3 {
-		return nil, fmt.Errorf("invalid ldap link import id (should be <group id>:<ldap provider>:<ladp cn>): %s", d.Id())
+		return nil, fmt.Errorf("invalid ldap link import id (should be <group id>:<ldap provider>:<ldap cn/ldap filter>): %s", d.Id())
 	}
 
-	groupId, ldapProvider, ldapCN := parts[0], parts[1], parts[2]
-	d.SetId(buildTwoPartID(&ldapProvider, &ldapCN))
+	groupId, ldapProvider, ldapCNOrFilter := parts[0], parts[1], parts[2]
+	d.SetId(buildTwoPartID(&ldapProvider, &ldapCNOrFilter))
 	d.Set("group_id", groupId)
 	d.Set("force", false)
 
