@@ -50,7 +50,7 @@ jobs:
           sed -n "/## $LATEST_TAG/,/## $PREVIOUS_TAG"'/{//!p;}' CHANGELOG.md > /tmp/RELEASE-NOTES.md
           cat /tmp/RELEASE-NOTES.md
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3.1.0
+        uses: goreleaser/goreleaser-action@v3.2.0
         with:
           version: latest
           args: release --release-notes /tmp/RELEASE-NOTES.md --rm-dist
