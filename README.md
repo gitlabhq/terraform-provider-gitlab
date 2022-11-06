@@ -20,7 +20,7 @@ Check out the [CONTRIBUTING.md](/CONTRIBUTING.md) guide for tips on how to contr
 
 ## Community
 
-You are welcome to join our [Discord Server](https://discord.gg/CCc6Pe5EYy) or the monthly community hours:
+You are welcome to join the [GitLab Discord Server](https://discord.gg/gitlab) or the monthly community hours:
 
 - [Terraform Provider Office Hour Call](https://www.meetup.com/gitlab-virtual-meetups/)
 - [Recordings](https://www.youtube.com/playlist?list=PL05JrBw4t0KrMncKb6v9S0wB_liBky39P)
