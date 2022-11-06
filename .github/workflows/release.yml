@@ -38,7 +38,7 @@ jobs:
           go-version: ${{ needs.go-version.outputs.go-version }}
       - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5.1.0
+        uses: crazy-max/ghaction-import-gpg@v5.2.0
         with:
           # These secrets will need to be configured for the repository:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
