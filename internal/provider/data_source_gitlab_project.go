@@ -305,6 +305,11 @@ var _ = registerDataSource("gitlab_project", func() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 			},
+			"ci_separated_caches": {
+				Description: "Use separate caches for protected branches.",
+				Type:        schema.TypeBool,
+				Computed:    true,
+			},
 			"push_rules": {
 				Description: "Push rules for the project.",
 				Type:        schema.TypeList,
@@ -448,6 +453,7 @@ func dataSourceGitlabProjectRead(ctx context.Context, d *schema.ResourceData, me
 	d.Set("merge_commit_template", found.MergeCommitTemplate)
 	d.Set("ci_default_git_depth", found.CIDefaultGitDepth)
 	d.Set("ci_config_path", found.CIConfigPath)
+	d.Set("ci_separated_caches", found.CISeperateCache)
 
 	log.Printf("[DEBUG] Reading Gitlab project %q push rules", d.Id())
 

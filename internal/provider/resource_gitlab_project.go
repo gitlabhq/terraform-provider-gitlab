@@ -402,6 +402,12 @@ var resourceGitLabProjectSchema = map[string]*schema.Schema{
 		Optional:    true,
 		Default:     true,
 	},
+	"ci_separated_caches": {
+		Description: "Use separate caches for protected branches.",
+		Type:        schema.TypeBool,
+		Optional:    true,
+		Default:     true,
+	},
 	"merge_pipelines_enabled": {
 		Description: "Enable or disable merge pipelines.",
 		Type:        schema.TypeBool,
@@ -747,6 +753,7 @@ func resourceGitlabProjectSetToState(ctx context.Context, client *gitlab.Client,
 	d.Set("merge_requests_template", project.MergeRequestsTemplate)
 	d.Set("ci_config_path", project.CIConfigPath)
 	d.Set("ci_forward_deployment_enabled", project.CIForwardDeploymentEnabled)
+	d.Set("ci_separated_caches", project.CISeperateCache)
 	d.Set("merge_pipelines_enabled", project.MergePipelinesEnabled)
 	d.Set("merge_trains_enabled", project.MergeTrainsEnabled)
 	d.Set("resolve_outdated_diff_discussions", project.ResolveOutdatedDiffDiscussions)
@@ -1217,6 +1224,12 @@ func resourceGitlabProjectCreate(ctx context.Context, d *schema.ResourceData, me
 	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
 	if v, ok := d.GetOkExists("ci_forward_deployment_enabled"); ok {
 		editProjectOptions.CIForwardDeploymentEnabled = gitlab.Bool(v.(bool))
+	}
+
+	// nolint:staticcheck // SA1019 ignore deprecated GetOkExists
+	// lintignore: XR001 // TODO: replace with alternative for GetOkExists
+	if v, ok := d.GetOkExists("ci_separated_caches"); ok {
+		editProjectOptions.CISeperateCache = gitlab.Bool(v.(bool))
 	}
 
 	if (editProjectOptions != gitlab.EditProjectOptions{}) {
