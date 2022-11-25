@@ -3,9 +3,9 @@
 page_title: "gitlab_application_settings Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_application_settings resource allows to manage the GitLabLab application settings.
+  The gitlab_application_settings resource allows to manage the GitLab application settings.
   ~> This is an experimental resource. By nature it doesn't properly fit into how Terraform resources are meant to work.
-     Feel free to join the discussion https://github.com/gitlabhq/terraform-provider-gitlab/issues/957 if you have any
+     Feel free to join the discussion https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/957 if you have any
      ideas or questions regarding this resource.
   ~> All gitlab_application_settings use the same ID gitlab.
   !> This resource does not implement any destroy logic, it's a no-op at this point.
@@ -16,10 +16,10 @@ description: |-
 
 # gitlab_application_settings (Resource)
 
-The `gitlab_application_settings` resource allows to manage the GitLabLab application settings.
+The `gitlab_application_settings` resource allows to manage the GitLab application settings.
 
 ~> This is an **experimental resource**. By nature it doesn't properly fit into how Terraform resources are meant to work.
-   Feel free to join the [discussion](https://github.com/gitlabhq/terraform-provider-gitlab/issues/957) if you have any
+   Feel free to join the [discussion](https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/957) if you have any
    ideas or questions regarding this resource.
 
 ~> All `gitlab_application_settings` use the same ID `gitlab`.
@@ -152,6 +152,7 @@ resource "gitlab_application_settings" "this" {
 - `grafana_enabled` (Boolean) Enable Grafana.
 - `grafana_url` (String) Grafana URL.
 - `gravatar_enabled` (Boolean) Enable Gravatar.
+- `group_owners_can_manage_default_branch_protection` (Boolean) Prevent overrides of default branch protection.
 - `hashed_storage_enabled` (Boolean) Create new projects using hashed storage paths: Enable immutable, hash-based paths and repository names to store repositories on disk. This prevents repositories from having to be moved or renamed when the Project URL changes and may improve disk I/O performance. (Always enabled in GitLab versions 13.0 and later, configuration is scheduled for removal in 14.0).
 - `help_page_hide_commercial_content` (Boolean) Hide marketing-related entries from help.
 - `help_page_support_url` (String) Alternate support URL for help page and help dropdown.

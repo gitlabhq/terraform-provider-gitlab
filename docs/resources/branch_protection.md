@@ -6,7 +6,7 @@ description: |-
   The gitlab_branch_protection resource allows to manage the lifecycle of a protected branch of a repository.
   ~> Branch Protection Behavior for the default branch
      Depending on the GitLab instance, group or project setting the default branch of a project is created automatically by GitLab behind the scenes.
-     Due to some https://github.com/gitlabhq/terraform-provider-gitlab/issues/792 limitations https://discuss.hashicorp.com/t/ignore-the-order-of-a-complex-typed-list/42242 in the Terraform Provider SDK and the GitLab API,
+     Due to some https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/792 limitations https://discuss.hashicorp.com/t/ignore-the-order-of-a-complex-typed-list/42242 in the Terraform Provider SDK and the GitLab API,
      when creating a new project and trying to manage the branch protection setting for its default branch the gitlab_branch_protection resource will
      automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
      Having multiple gitlab_branch_protection resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
@@ -21,7 +21,7 @@ The `gitlab_branch_protection` resource allows to manage the lifecycle of a prot
 
 ~> **Branch Protection Behavior for the default branch**
    Depending on the GitLab instance, group or project setting the default branch of a project is created automatically by GitLab behind the scenes.
-   Due to [some](https://github.com/gitlabhq/terraform-provider-gitlab/issues/792) [limitations](https://discuss.hashicorp.com/t/ignore-the-order-of-a-complex-typed-list/42242) in the Terraform Provider SDK and the GitLab API,
+   Due to [some](https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/792) [limitations](https://discuss.hashicorp.com/t/ignore-the-order-of-a-complex-typed-list/42242) in the Terraform Provider SDK and the GitLab API,
    when creating a new project and trying to manage the branch protection setting for its default branch the `gitlab_branch_protection` resource will
    automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
    Having multiple `gitlab_branch_protection` resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
@@ -93,7 +93,7 @@ resource "gitlab_branch_protection" "main" {
 - `allowed_to_merge` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_merge))
 - `allowed_to_push` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_push))
 - `allowed_to_unprotect` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_unprotect))
-- `code_owner_approval_required` (Boolean) Can be set to true to require code owner approval before merging.
+- `code_owner_approval_required` (Boolean) Can be set to true to require code owner approval before merging. Only available own Premium and Ultimate instances.
 - `merge_access_level` (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`.
 - `push_access_level` (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`.
 - `unprotect_access_level` (String) Access levels allowed to unprotect. Valid values are: `no one`, `developer`, `maintainer`.

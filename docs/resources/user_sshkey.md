@@ -35,7 +35,7 @@ resource "gitlab_user_sshkey" "example" {
 
 - `key` (String) The ssh key. The SSH key `comment` (trailing part) is optional and ignored for diffing, because GitLab overrides it with the username and GitLab hostname.
 - `title` (String) The title of the ssh key.
-- `user_id` (Number) The ID of the user to add the ssh key to.
+- `user_id` (Number) The ID or username of the user.
 
 ### Optional
 
