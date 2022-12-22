@@ -84,6 +84,8 @@ resource "gitlab_project" "peters_repo" {
 - `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
 - `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
+- `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
+- `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `build_coverage_regex` (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
 - `build_git_strategy` (String) The Git strategy. Defaults to fetch.
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
@@ -91,13 +93,15 @@ resource "gitlab_project" "peters_repo" {
 - `ci_config_path` (String) Custom Path to CI config file.
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+- `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
-- `container_registry_enabled` (Boolean) Enable container registry for the project.
+- `container_registry_enabled` (Boolean, Deprecated) Enable container registry for the project.
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
 - `emails_disabled` (Boolean) Disable email notifications.
 - `external_authorization_classification_label` (String) The classification label for the project.
+- `forked_from_project_id` (Number) The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
 - `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
 - `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
 - `import_url` (String) Git URL to a repository to be imported.
@@ -134,6 +138,7 @@ resource "gitlab_project" "peters_repo" {
 - `request_access_enabled` (Boolean) Allow users to request member access.
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+- `restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
 - `shared_runners_enabled` (Boolean) Enable shared runners for this project.
 - `skip_wait_for_default_branch_protection` (Boolean) If `true`, the default behavior to wait for the default branch protection to be created is skipped.
@@ -156,6 +161,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 
 ### Read-Only
 
+- `avatar_url` (String) The URL of the avatar image.
 - `http_url_to_repo` (String) URL that can be provided to `git clone` to clone the
 - `id` (String) The ID of this resource.
 - `path_with_namespace` (String) The path of the repository with namespace.

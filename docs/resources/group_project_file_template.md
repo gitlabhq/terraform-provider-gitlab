@@ -42,8 +42,8 @@ resource "gitlab_project" "bar" {
 }
 
 resource "gitlab_group_project_file_template" "template_link" {
-  group_id = gitlab_group.foo.id
-  project  = gitlab_project.bar.id
+  group_id                 = gitlab_group.foo.id
+  file_template_project_id = gitlab_project.bar.id
 }
 ```
 

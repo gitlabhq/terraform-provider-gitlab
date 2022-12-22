@@ -44,6 +44,8 @@ resource "gitlab_project" "example" {
 ### Optional
 
 - `auto_devops_enabled` (Boolean) Defaults to false. Default to Auto DevOps pipeline for all projects within this group.
+- `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
+- `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `default_branch_protection` (Number) Defaults to 2. See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection
 - `description` (String) The description of the group.
 - `emails_disabled` (Boolean) Defaults to false. Disable email notifications.
@@ -64,6 +66,7 @@ resource "gitlab_project" "example" {
 
 ### Read-Only
 
+- `avatar_url` (String) The URL of the avatar image.
 - `full_name` (String) The full name of the group.
 - `full_path` (String) The full path of the group.
 - `id` (String) The ID of this resource.

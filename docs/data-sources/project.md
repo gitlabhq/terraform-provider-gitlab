@@ -47,6 +47,7 @@ data "gitlab_project" "example" {
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) CI config file path for the project.
+- `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (List of Object) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
 - `default_branch` (String) The default branch for the project.
@@ -76,6 +77,7 @@ data "gitlab_project" "example" {
 - `request_access_enabled` (Boolean) Allow users to request member access.
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
+- `restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
 - `runners_token` (String) Registration token to use during runner setup.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.

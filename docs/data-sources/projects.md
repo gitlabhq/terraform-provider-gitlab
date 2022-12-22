@@ -148,6 +148,7 @@ Read-Only:
 - `request_access_enabled` (Boolean)
 - `requirements_access_level` (String)
 - `resolve_outdated_diff_discussions` (Boolean)
+- `restrict_user_defined_variables` (Boolean)
 - `runners_token` (String)
 - `security_and_compliance_access_level` (String)
 - `shared_runners_enabled` (Boolean)
