@@ -35,6 +35,7 @@ data "gitlab_group_membership" "example" {
 - `access_level` (String) Only return members with the desired access level. Acceptable values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
 - `full_path` (String) The full path of the group.
 - `group_id` (Number) The ID of the group.
+- `inherited` (Boolean) Return all project members including members through ancestor groups.
 
 ### Read-Only
 

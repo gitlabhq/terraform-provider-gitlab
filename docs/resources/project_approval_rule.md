@@ -5,6 +5,11 @@ subcategory: ""
 description: |-
   The gitlab_project_approval_rule resource allows to manage the lifecycle of a project-level approval rule.
   -> This resource requires a GitLab Enterprise instance.
+  ~> A project is limited to one "anyapprover" rule at a time, any attempt to create a second rule of type "anyapprover" will fail. As a result, if
+     an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
+     to prevent a common error with this resource.
+  ~> Since a project is limited to one "anyapprover" rule, attempting to add two "anyapprover" rules to the same project in terraform will result in
+     terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals
 ---
 
@@ -13,6 +18,13 @@ description: |-
 The `gitlab_project_approval_rule` resource allows to manage the lifecycle of a project-level approval rule.
 
 -> This resource requires a GitLab Enterprise instance.
+
+~> A project is limited to one "any_approver" rule at a time, any attempt to create a second rule of type "any_approver" will fail. As a result, if 
+   an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
+   to prevent a common error with this resource.
+
+~> Since a project is limited to one "any_approver" rule, attempting to add two "any_approver" rules to the same project in terraform will result in 
+   terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals)
 
@@ -78,6 +90,7 @@ resource "gitlab_project_approval_rule" "any_approver" {
 
 ### Optional
 
+- `disable_importing_default_any_approver_rule_on_create` (Boolean) When this flag is set, the default `any_approver` rule will not be imported if present.
 - `group_ids` (Set of Number) A list of group IDs whose members can approve of the merge request.
 - `protected_branch_ids` (Set of Number) A list of protected branch IDs (not branch names) for which the rule applies.
 - `rule_type` (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`.

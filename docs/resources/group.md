@@ -50,6 +50,7 @@ resource "gitlab_project" "example" {
 - `description` (String) The description of the group.
 - `emails_disabled` (Boolean) Defaults to false. Disable email notifications.
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
+- `ip_restriction_ranges` (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
 - `lfs_enabled` (Boolean) Defaults to true. Enable/disable Large File Storage (LFS) for the projects in this group.
 - `membership_lock` (Boolean) Users cannot be added to projects in this group.
 - `mentions_disabled` (Boolean) Defaults to false. Disable the capability of a group from getting mentioned.

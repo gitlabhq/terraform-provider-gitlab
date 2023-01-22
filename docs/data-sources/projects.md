@@ -52,7 +52,7 @@ data "gitlab_projects" "projects" {
 - `max_queryable_pages` (Number) The maximum number of project results pages that may be queried. Prevents overloading your Gitlab instance in case of a misconfiguration.
 - `membership` (Boolean) Limit by projects that the current user is a member of.
 - `min_access_level` (Number) Limit to projects where current user has at least this access level, refer to the [official documentation](https://docs.gitlab.com/ee/api/members.html) for values. Cannot be used with `group_id`.
-- `order_by` (String) Return projects ordered by `id`, `name`, `path`, `created_at`, `updated_at`, or `last_activity_at` fields. Default is `created_at`.
+- `order_by` (String) Return projects ordered ordered by: `id`, `name`, `path`, `created_at`, `updated_at`, `last_activity_at`, `similarity`, `repository_size`, `storage_size`, `packages_size`, `wiki_size`. Some values or only available in certain circumstances. See [upstream docs](https://docs.gitlab.com/ee/api/projects.html#list-all-projects) for details.
 - `owned` (Boolean) Limit by projects owned by the current user.
 - `page` (Number) The first page to begin the query on.
 - `per_page` (Number) The number of results to return per page.
