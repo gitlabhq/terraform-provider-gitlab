@@ -12,7 +12,7 @@ description: |-
 
 The `gitlab_personal_access_token` resource allows to manage the lifecycle of a personal access token for a specified user.
 
--> This resource requires administration privileges.
+-> This resource requires administration privileges and are only supported on GitLab Self-Managed.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)
 
