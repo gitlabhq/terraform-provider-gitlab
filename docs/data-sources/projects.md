@@ -112,6 +112,7 @@ Read-Only:
 - `id` (Number)
 - `import_error` (String)
 - `import_status` (String)
+- `import_url` (String)
 - `issues_access_level` (String)
 - `issues_enabled` (Boolean)
 - `jobs_enabled` (Boolean)
