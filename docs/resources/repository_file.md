@@ -80,7 +80,7 @@ resource "gitlab_repository_file" "readme_for_dogs" {
 - `branch` (String) Name of the branch to which to commit to.
 - `commit_message` (String) Commit message.
 - `content` (String) File content. If the content is not yet base64 encoded, it will be encoded automatically. No other encoding is currently supported, because of a [GitLab API bug](https://gitlab.com/gitlab-org/gitlab/-/issues/342430).
-- `file_path` (String) The full path of the file. It must be relative to the root of the project without a leading slash `/`.
+- `file_path` (String) The full path of the file. It must be relative to the root of the project without a leading slash `/` or `./`.
 - `project` (String) The name or ID of the project.
 
 ### Optional

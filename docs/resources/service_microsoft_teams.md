@@ -35,7 +35,7 @@ resource "gitlab_service_microsoft_teams" "teams" {
 ### Required
 
 - `project` (String) ID of the project you want to activate integration on.
-- `webhook` (String) The Microsoft Teams webhook. For example, https://outlook.office.com/webhook/...
+- `webhook` (String) The Microsoft Teams webhook (Example, https://outlook.office.com/webhook/...). This value cannot be imported.
 
 ### Optional
 

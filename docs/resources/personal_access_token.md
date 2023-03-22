@@ -40,7 +40,7 @@ resource "gitlab_project_variable" "example" {
 ### Required
 
 - `name` (String) The name of the personal access token.
-- `scopes` (Set of String) The scope for the personal access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `sudo`.
+- `scopes` (Set of String) The scope for the personal access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `sudo`, `admin_mode`.
 - `user_id` (Number) The id of the user.
 
 ### Optional

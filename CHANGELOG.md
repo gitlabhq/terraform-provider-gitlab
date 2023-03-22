@@ -1,3 +1,42 @@
+## 15.10.0 (2023-03-22)
+
+This release was tested against GitLab 15.8, 15.9 and 15.10 for both CE and EE.
+
+FEATURES:
+
+- **New Resource:** `gitlab_application` ([#1436](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1436))
+- **New Resource:** `gitlab_service_custom_issue_tracker` ([#1459](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1459))
+
+IMPROVEMENTS:
+
+- resource/gitlab_personal_access_token: Support `admin_mode` as value in the `scopes` attribute ([#1456](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1456))
+- resource/gitlab_group: Remove explicit attribute defaults. This solves an issue where newly imported resources may have plan changes for default attributes. In some cases, the new API-based default values are more permissive than the old provider-based defaults. See The linked MR for details. ([#1479](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1479))
+- resource/gitlab_repository_file: Add validator to avoid leading `/` and `./` in path ([#1472](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1472))
+- resource/gitlab_project: Deprecate the `name_regex_delete` in favor of the `name_regex` attribute ([#1466](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1466))
+- resource/gitlab_project: Support `environments_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- resource/gitlab_project: Support `feature_flags_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- resource/gitlab_project: Support `infrastructure_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- resource/gitlab_project: Support `monitor_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- resource/gitlab_project: Support `release_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_project: Mark `runners_token` as sensitive ([#1461](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1461))
+- datasource/gitlab_project: Support `environments_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_project: Support `feature_flags_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_project: Support `infrastructure_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_project: Support `monitor_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_project: Support `release_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_projects: Support `environments_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_projects: Support `feature_flags_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_projects: Support `infrastructure_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_projects: Support `monitor_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+- datasource/gitlab_projects: Support `release_access_level` attribute ([#1469](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1469))
+
+BUG FIXES:
+
+- resource/gitlab_project: Add validator to the `id` attribute to prevent misuse ([#1476](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1476))
+- resource/gitlab_group: Wait for the group to be fully created and functional ([#1465](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1465))
+- resource/gitlab_service_slack: Fix perpetual diff in `webhook` attribute due to upstream API deprecation ([#1470](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1470))
+- resource/gitlab_service_microsoft_teams: Fix perpetual diff in `webhook` attribute due to upstream API deprecation ([#1470](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1470))
+
 ## 15.9.0 (2023-02-22)
 
 This release was tested against GitLab 15.7, 15.8 and 15.9 for both CE and EE.

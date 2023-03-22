@@ -160,13 +160,16 @@ resource "gitlab_project" "import_private" {
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
 - `emails_disabled` (Boolean) Disable email notifications.
+- `environments_access_level` (String) Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
 - `external_authorization_classification_label` (String) The classification label for the project.
+- `feature_flags_access_level` (String) Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.
 - `forked_from_project_id` (Number) The id of the project to fork. During create the project is forked and during an update the fork relation is changed.
 - `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
 - `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
 - `import_url` (String) Git URL to a repository to be imported. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. They can also not be imported using `terraform import`. See the examples section for how to properly use it.
 - `import_url_password` (String, Sensitive) The password for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. This field cannot be imported using `terraform import`. See the examples section for how to properly use it.
 - `import_url_username` (String) The username for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. This field cannot be imported using `terraform import`.  See the examples section for how to properly use it.
+- `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
 - `initialize_with_readme` (Boolean) Create main branch with first commit containing a README.md file.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
 - `issues_enabled` (Boolean) Enable issue tracking for the project.
@@ -182,6 +185,7 @@ resource "gitlab_project" "import_private" {
 - `mirror` (Boolean) Enable project pull mirror.
 - `mirror_overwrites_diverged_branches` (Boolean) Enable overwrite diverged branches for a mirrored project.
 - `mirror_trigger_builds` (Boolean) Enable trigger builds on pushes for a mirrored project.
+- `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
 - `mr_default_target_self` (Boolean) For forked projects, target merge requests to this project. If false, the target will be the upstream project.
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
 - `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Set to true if you want allow merges only if all discussions are resolved.
@@ -195,6 +199,7 @@ resource "gitlab_project" "import_private" {
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
 - `public_builds` (Boolean) If true, jobs can be viewed by non-project members.
 - `push_rules` (Block List, Max: 1) Push rules for the project. (see [below for nested schema](#nestedblock--push_rules))
+- `releases_access_level` (String) Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
 - `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests.
 - `repository_access_level` (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
 - `repository_storage` (String) Which storage shard the repository is on. (administrator only)
@@ -218,6 +223,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
 - `topics` (Set of String) The list of topics for the project.
 - `use_custom_template` (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
+		~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting.html#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
 - `visibility_level` (String) Set to `public` to create a public project.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
 - `wiki_enabled` (Boolean) Enable wiki for the project.
@@ -240,7 +246,8 @@ Optional:
 - `cadence` (String) The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
 - `enabled` (Boolean) If true, the policy is enabled.
 - `keep_n` (Number) The number of images to keep.
-- `name_regex_delete` (String) The regular expression to match image names to delete. **Note**: the upstream API has some inconsistencies with the `name_regex` field here. It's basically unusable at the moment.
+- `name_regex` (String) The regular expression to match image names to delete.
+- `name_regex_delete` (String, Deprecated) The regular expression to match image names to delete.
 - `name_regex_keep` (String) The regular expression to match image names to keep.
 - `older_than` (String) The number of days to keep images.
 

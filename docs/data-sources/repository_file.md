@@ -28,7 +28,7 @@ data "gitlab_repository_file" "example" {
 
 ### Required
 
-- `file_path` (String) The full path of the file. It must be relative to the root of the project without a leading slash `/`.
+- `file_path` (String) The full path of the file. It must be relative to the root of the project without a leading slash `/` or `./`.
 - `project` (String) The name or ID of the project.
 - `ref` (String) The name of branch, tag or commit.
 

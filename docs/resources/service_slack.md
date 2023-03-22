@@ -37,7 +37,7 @@ resource "gitlab_service_slack" "slack" {
 ### Required
 
 - `project` (String) ID of the project you want to activate integration on.
-- `webhook` (String) Webhook URL (ex.: https://hooks.slack.com/services/...)
+- `webhook` (String) Webhook URL (Example, https://hooks.slack.com/services/...). This value cannot be imported.
 
 ### Optional
 
