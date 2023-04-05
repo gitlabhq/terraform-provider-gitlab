@@ -23,6 +23,14 @@ This provider requires at least [Terraform 1.0](https://www.terraform.io/downloa
 
 ```terraform
 # Configure the GitLab Provider
+terraform {
+  required_providers {
+    gitlab = {
+      source  = "gitlabhq/site24x7"
+    }
+  }
+}
+
 provider "gitlab" {
   token = var.gitlab_token
 }
