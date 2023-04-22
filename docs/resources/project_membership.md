@@ -3,14 +3,14 @@
 page_title: "gitlab_project_membership Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_membership resource allows to manage the lifecycle of a users project membersip.
+  The gitlab_project_membership resource allows to manage the lifecycle of a users project membership.
   -> If a project should grant membership to an entire group use the gitlab_project_share_group resource instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
 ---
 
 # gitlab_project_membership (Resource)
 
-The `gitlab_project_membership` resource allows to manage the lifecycle of a users project membersip.
+The `gitlab_project_membership` resource allows to manage the lifecycle of a users project membership.
 
 -> If a project should grant membership to an entire group use the `gitlab_project_share_group` resource instead.
 

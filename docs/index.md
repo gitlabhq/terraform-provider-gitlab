@@ -49,7 +49,7 @@ resource "gitlab_project_variable" "sample_project_variable" {
 resource "gitlab_deploy_key" "sample_deploy_key" {
   project = gitlab_project.sample_project.id
   title   = "terraform example"
-  key     = "ssh-rsa AAAA..."
+  key     = "ssh-ed25519 AAAA..."
 }
 
 # Add a group

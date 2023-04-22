@@ -51,7 +51,6 @@ output "welcome_issue_web_url" {
 - `discussion_to_resolve` (String) The ID of a discussion to resolve. This fills out the issue with a default description and mark the discussion as resolved. Use in combination with merge_request_to_resolve_discussions_of.
 - `downvotes` (Number) The number of downvotes the issue has received.
 - `due_date` (String) The due date. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
-**Note:** removing a due date is currently not supported, see https://github.com/xanzy/go-gitlab/issues/1384 for details.
 - `epic_id` (Number) ID of the epic to add the issue to. Valid values are greater than or equal to 0.
 - `epic_issue_id` (Number) The ID of the epic issue.
 - `external_id` (String) The external ID of the issue.

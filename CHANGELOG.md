@@ -1,3 +1,26 @@
+## 15.11.0 (2023-04-22)
+
+This release was tested against GitLab 15.9, 15.10 and 15.11 for both CE and EE.
+
+BREAKING CHANGES:
+
+- resource/gitlab_project: Remove specialized branch protection logic for GitLab prior to 14.11 ([!1486](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1486))
+
+IMPROVEMENTS:
+
+- resource/gitlab_application_settings: Support `can_create_group` attribute ([!1484](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1484))
+- resource/gitlab_project: Support `keep_latest_artifact` attribute ([!1506](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1506))
+- resource/gitlab_group_subgroups: Support `skip_groups` attribute ([!1516](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1516))
+- datasource/gitlab_project: Support `keep_latest_artifact` attribute ([!1506](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1506))
+- datasource/gitlab_projects: Support `keep_latest_artifact` attribute ([!1506](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1506))
+
+BUG FIXES:
+
+- resource/gitlab_project: Fix waiting when `skip_wait_for_default_branch_protection` is disabled ([!1489](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1489))
+- resource/gitlab_group_ldap_link: Fix re-creating LDAP link if it was removed out of bounds ([!1495](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1495))
+- resource/gitlab_runner: Fix plan for `tags` attribute to make it order independent ([!1492](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1492))
+
+
 ## 15.10.0 (2023-03-22)
 
 This release was tested against GitLab 15.8, 15.9 and 15.10 for both CE and EE.

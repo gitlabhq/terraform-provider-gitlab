@@ -4,7 +4,7 @@ page_title: "gitlab_application Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_application resource allows to manage the lifecycle of applications in gitlab.
-  ~> In order to use a user for a user to create an application, they must have admin priviledges at the instance level.
+  ~> In order to use a user for a user to create an application, they must have admin privileges at the instance level.
   To create an OIDC application, a scope of "openid".
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/applications.html
 ---
@@ -13,7 +13,7 @@ description: |-
 
 The `gitlab_application` resource allows to manage the lifecycle of applications in gitlab.
 
-~> In order to use a user for a user to create an application, they must have admin priviledges at the instance level.
+~> In order to use a user for a user to create an application, they must have admin privileges at the instance level.
 To create an OIDC application, a scope of "openid".
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/applications.html)
@@ -47,7 +47,7 @@ This is only populated when creating a new application. This attribute is not av
 
 - `application_id` (String) Internal name of the application.
 - `id` (String) The ID of this Terraform resource. In the format of `<application_id>`.
-- `secret` (String, Sensitive) Application secret. Sensative and must be kept secret. This is only populated when creating a new application. This attribute is not available for imported resources.
+- `secret` (String, Sensitive) Application secret. Sensitive and must be kept secret. This is only populated when creating a new application. This attribute is not available for imported resources.
 
 ## Import
 

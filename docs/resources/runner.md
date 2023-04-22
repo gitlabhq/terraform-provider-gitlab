@@ -12,8 +12,8 @@ description: |-
 # gitlab_runner (Resource)
 
 The `gitlab_runner` resource allows to manage the lifecycle of a runner.
-		
-A runner can either be registered at an instance level or group level. 
+
+A runner can either be registered at an instance level or group level.
 The runner will be registered at a group level if the token used is from a group, or at an instance level if the token used is for the instance.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/runners.html#register-a-new-runner)
@@ -93,7 +93,7 @@ resource "local_file" "config" {
 - `maximum_timeout` (Number) Maximum timeout set when this runner handles the job.
 - `paused` (Boolean) Whether the runner should ignore new jobs.
 - `run_untagged` (Boolean) Whether the runner should handle untagged jobs.
-- `tag_list` (List of String) List of runner’s tags.
+- `tag_list` (Set of String) List of runner’s tags.
 
 ### Read-Only
 

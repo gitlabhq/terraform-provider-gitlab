@@ -47,7 +47,7 @@ resource "gitlab_project_milestone" "example" {
 ### Read-Only
 
 - `created_at` (String) The time of creation of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
-- `expired` (Boolean) Bool, true if milestore expired.
+- `expired` (Boolean) Bool, true if milestone expired.
 - `id` (String) The ID of this resource.
 - `iid` (Number) The ID of the project's milestone.
 - `milestone_id` (Number) The instance-wide ID of the project’s milestone.

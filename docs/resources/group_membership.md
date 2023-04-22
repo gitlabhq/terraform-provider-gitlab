@@ -3,14 +3,14 @@
 page_title: "gitlab_group_membership Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_membership resource allows to manage the lifecycle of a users group membersip.
+  The gitlab_group_membership resource allows to manage the lifecycle of a users group membership.
   -> If a group should grant membership to another group use the gitlab_group_share_group resource instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
 ---
 
 # gitlab_group_membership (Resource)
 
-The `gitlab_group_membership` resource allows to manage the lifecycle of a users group membersip.
+The `gitlab_group_membership` resource allows to manage the lifecycle of a users group membership.
 
 -> If a group should grant membership to another group use the `gitlab_group_share_group` resource instead.
 

@@ -30,7 +30,7 @@ resource "gitlab_project" "foo" {
 resource "gitlab_deploy_key" "parent" {
   project = gitlab_project.parent.id
   title   = "Example deploy key"
-  key     = "ssh-rsa AAAA..."
+  key     = "ssh-ed25519 AAAA..."
 }
 
 # Enable the deployment key on the second repo

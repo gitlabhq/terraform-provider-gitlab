@@ -44,7 +44,7 @@ resource "gitlab_user_gpgkey" "example_user" {
 
 ### Optional
 
-- `user_id` (Number) The ID of the user to add the GPG key to. If this field is omitted, this resource manages a GPG key for the current user. Otherwise, this resource manages a GPG key for the speicifed user, and an admin token is required.
+- `user_id` (Number) The ID of the user to add the GPG key to. If this field is omitted, this resource manages a GPG key for the current user. Otherwise, this resource manages a GPG key for the specified user, and an admin token is required.
 
 ### Read-Only
 

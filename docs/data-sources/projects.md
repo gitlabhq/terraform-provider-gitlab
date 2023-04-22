@@ -119,6 +119,7 @@ Read-Only:
 - `issues_access_level` (String)
 - `issues_enabled` (Boolean)
 - `jobs_enabled` (Boolean)
+- `keep_latest_artifact` (Boolean)
 - `last_activity_at` (String)
 - `lfs_enabled` (Boolean)
 - `merge_commit_template` (String)

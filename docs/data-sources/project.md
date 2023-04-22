@@ -64,6 +64,7 @@ data "gitlab_project" "example" {
 - `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
 - `issues_enabled` (Boolean) Enable issue tracking for the project.
+- `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
 - `merge_commit_template` (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.

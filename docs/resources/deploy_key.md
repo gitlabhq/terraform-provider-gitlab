@@ -22,7 +22,7 @@ The `gitlab_deploy_key` resource allows to manage the lifecycle of a deploy key.
 resource "gitlab_deploy_key" "example" {
   project = "example/deploying"
   title   = "Example deploy key"
-  key     = "ssh-rsa AAAA..."
+  key     = "ssh-ed25519 AAAA..."
 }
 ```
 
