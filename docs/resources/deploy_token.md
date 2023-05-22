@@ -58,6 +58,7 @@ resource "gitlab_deploy_token" "example" {
 
 ### Read-Only
 
+- `deploy_token_id` (Number) The id of the deploy token.
 - `id` (String) The ID of this resource.
 - `token` (String, Sensitive) The secret token. This is only populated when creating a new deploy token. **Note**: The token is not available for imported resources.
 

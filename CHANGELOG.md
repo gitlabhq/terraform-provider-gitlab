@@ -1,3 +1,54 @@
+## 16.0.0 (2023-05-22)
+
+- This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.
+- **Note:** this is a major release and breaks some interfaces in resources and data sources of 
+  this provider, but also drops support for older GitLab versions.
+
+BREAKING CHANGES:
+
+See [Terraform GitLab Provider Version 16.0 Upgrade Guide](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/guides/version-16.0-upgrade) for details.
+
+BREAKING CHANGES:
+
+- resource/gitlab_instance_variable: Change `value` attribute to non-sensitive ([!1521](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1521))
+- resource/gitlab_group_variable: Change `value` attribute to non-sensitive ([!1521](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1521))
+- resource/gitlab_project_variable: Change `value` attribute to non-sensitive ([!1521](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1521))
+- resource/gitlab_deploy_token: Change resource id format to `<token-type>:<type-id>:<token-id>` ([!1523](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1523))
+- resource/gitlab_deploy_key: Change resource id format to `<project>:<key-id>` ([!1522](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1522))
+- resource/gitlab_project_hook: Change resource id format to `<project>:<hook-id>` ([!1483](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1483))
+- resource/gitlab_group_label: Change resource id format to `<group>:<label-name>` ([!1525](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1525))
+- resource/gitlab_label: Rename resource to `gitlab_project_label` ([!1526](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1526))
+- resource/gitlab_project_label: Change resource id format to `<project>:<label-name>` ([!1526](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1526))
+- resource/gitlab_managed_license: Remove resource ([!1512](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1512))
+- resource/gitlab_pipeline_schedule_variable: Change resource id format to `<project>:<schedule-id>:<variable-id>` ([!1529](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1529))
+- resource/gitlab_repository_file: Remove support for auto-encoding logic ([!1530](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1530))
+- resource/gitlab_group_ldap_link: Change resource id format to `<group>:<provider>:[cn]:[filter]` ([!1527](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1527))
+- resource/gitlab_group_ldap_link: Rename `group_id` attribute to `group` ([!1532](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1532))
+- resource/gitlab_service_*: Rename `gitlab_service_*` resources to `gitlab_integration_*` ([!1534](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1534))
+- resource/gitlab_project: Remove `operations_access_level` ([!1548](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1548))
+- datasource/gitlab_project: Remove `operations_access_level` ([!1548](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1548))
+- datasource/gitlab_projects: Remove `operations_access_level` ([!1548](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1548))
+- resource/gitlab_pipeline_trigger: Change resource id format to `<project>:<trigger-id>` ([!1551](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1551))
+- resource/gitlab_pipeline_schedule: Change resource id format to `<project>:<schedule-id>` ([!1551](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1551))
+- resource/gitlab_project_freeze_period: Change `project_id` attribute to `project` ([!1553](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1553))
+- resource/gitlab_project_level_mr_approvals: Change `project_id` attribute to `project` ([!1553](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1553))
+- resource/gitlab_project_membership: Change `project_id` attribute to `project` ([!1553](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1553))
+- resource/gitlab_project_share_group: Change `project_id` attribute to `project` ([!1553](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1553))
+- resource/gitlab_project_access_token: Require `expires_at` attribute ([!1557](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1557))
+
+FEATURES:
+
+- resource/gitlab_instance_variable: Support `raw` attribute ([!1533](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1533))
+- resource/gitlab_group_variable: Support `raw` attribute ([!1533](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1533))
+- resource/gitlab_project_variable: Support `raw` attribute ([!1533](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1533))
+- datasource/gitlab_instance_variable: Support `raw` attribute ([!1533](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1533))
+- datasource/gitlab_group_variable: Support `raw` attribute ([!1533](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1533))
+- datasource/gitlab_project_variable: Support `raw` attribute ([!1533](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1533))
+
+IMPROVEMENTS:
+
+- resource/gitlab_project_environment: Wait for environment to stop before deleting it ([!1509](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1509))
+
 ## 15.11.0 (2023-04-22)
 
 This release was tested against GitLab 15.9, 15.10 and 15.11 for both CE and EE.

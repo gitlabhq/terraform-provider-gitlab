@@ -53,6 +53,7 @@ Read-Only:
 - `masked` (Boolean)
 - `project` (String)
 - `protected` (Boolean)
+- `raw` (Boolean)
 - `value` (String)
 - `variable_type` (String)
 

@@ -41,6 +41,7 @@ resource "gitlab_deploy_key" "example" {
 
 ### Read-Only
 
+- `deploy_key_id` (Number) The id of the project deploy key.
 - `id` (String) The ID of this resource.
 
 ## Import

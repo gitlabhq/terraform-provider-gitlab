@@ -192,7 +192,6 @@ resource "gitlab_project" "import_private" {
 - `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Set to true if you want allow merges only if all discussions are resolved.
 - `only_allow_merge_if_pipeline_succeeds` (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
 - `only_mirror_protected_branches` (Boolean) Enable only mirror protected branches for a mirrored project.
-- `operations_access_level` (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
 - `packages_enabled` (Boolean) Enable packages repository for the project.
 - `pages_access_level` (String) Enable pages access control
 - `path` (String) The path of the repository.

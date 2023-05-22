@@ -40,6 +40,7 @@ resource "gitlab_group_label" "fixme" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `label_id` (Number) The id of the group label.
 
 ## Import
 

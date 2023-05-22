@@ -29,13 +29,14 @@ resource "gitlab_group_ldap_link" "test" {
 
 ### Required
 
-- `cn` (String) The CN of the LDAP group to link with.
-- `group_id` (String) The id of the GitLab group.
+- `group` (String) The ID or URL-encoded path of the group
 - `ldap_provider` (String) The name of the LDAP provider as stored in the GitLab database. Note that this is NOT the value of the `label` attribute as shown in the web UI. In most cases this will be `ldapmain` but you may use the [LDAP check rake task](https://docs.gitlab.com/ee/administration/raketasks/ldap.html#check) for receiving the LDAP server name: `LDAP: ... Server: ldapmain`
 
 ### Optional
 
 - `access_level` (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
+- `cn` (String) The CN of the LDAP group to link with. Required if `filter` is not provided.
+- `filter` (String) The LDAP filter for the group. Required if `cn` is not provided. Requires GitLab Premium or above.
 - `force` (Boolean) If true, then delete and replace an existing LDAP link if one exists.
 - `group_access` (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 
@@ -48,6 +49,11 @@ resource "gitlab_group_ldap_link" "test" {
 Import is supported using the following syntax:
 
 ```shell
-# GitLab group ldap links can be imported using an id made up of `group_id:ldap_provider:cn`, e.g.
-terraform import gitlab_group_ldap_link.test "12345:ldapmain:testuser"
+# GitLab group ldap links can be imported using an id made up of `group_id:ldap_provider:cn:filter`. CN and Filter are mutually exclusive, so one will be missing.
+
+# If using the CN for the group link, the ID will end with a blank filter (":"). e.g.,
+terraform import gitlab_group_ldap_link.test "12345:ldapmain:testcn:"
+
+# If using the Filter for the group link, the ID will have two "::" in the middle due to having a blank CN. e.g.,
+terraform import gitlab_group_ldap_link.test "12345:ldapmain::testfilter"
 ```

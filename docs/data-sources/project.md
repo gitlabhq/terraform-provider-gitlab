@@ -74,7 +74,6 @@ data "gitlab_project" "example" {
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
 - `name` (String) The name of the project.
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
-- `operations_access_level` (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
 - `path` (String) The path of the repository.
 - `pipelines_enabled` (Boolean) Enable pipelines for the project.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line

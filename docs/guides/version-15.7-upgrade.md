@@ -11,7 +11,7 @@ the release cadence and versioning has been
 starting with 15.7 (22nd Dec 2022).
 
 The version bump from [`3.20.0`](https://registry.terraform.io/providers/gitlabhq/gitlab/3.20.0) to
-[`v15.7.0`](https://registry.terraform.io/providers/gitlabhq/gitlab/15.7.0) introduced a few breaking changes,
+[`15.7.0`](https://registry.terraform.io/providers/gitlabhq/gitlab/15.7.0) introduced a few breaking changes,
 which are described below.
 
 

@@ -20,13 +20,13 @@ The `gitlab_project_membership` resource allows to manage the lifecycle of a use
 
 ```terraform
 resource "gitlab_project_membership" "test" {
-  project_id   = "12345"
+  project      = "12345"
   user_id      = 1337
   access_level = "guest"
 }
 
 resource "gitlab_project_membership" "example" {
-  project_id   = "67890"
+  project      = "67890"
   user_id      = 1234
   access_level = "guest"
   expires_at   = "2022-12-31"
@@ -39,7 +39,7 @@ resource "gitlab_project_membership" "example" {
 ### Required
 
 - `access_level` (String) The access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
-- `project_id` (String) The id of the project.
+- `project` (String) The ID or URL-encoded path of the project.
 - `user_id` (Number) The id of the user.
 
 ### Optional

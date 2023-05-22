@@ -140,7 +140,6 @@ Read-Only:
 - `only_allow_merge_if_pipeline_succeeds` (Boolean)
 - `only_mirror_protected_branches` (Boolean)
 - `open_issues_count` (Number)
-- `operations_access_level` (String)
 - `owner` (List of Object) (see [below for nested schema](#nestedobjatt--projects--owner))
 - `packages_enabled` (Boolean)
 - `path` (String)

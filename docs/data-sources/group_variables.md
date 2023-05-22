@@ -53,6 +53,7 @@ Read-Only:
 - `key` (String)
 - `masked` (Boolean)
 - `protected` (Boolean)
+- `raw` (Boolean)
 - `value` (String)
 - `variable_type` (String)
 

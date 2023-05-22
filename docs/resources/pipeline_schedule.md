@@ -42,6 +42,7 @@ resource "gitlab_pipeline_schedule" "example" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `pipeline_schedule_id` (Number) The pipeline schedule id.
 
 ## Import
 

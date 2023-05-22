@@ -17,7 +17,7 @@ The `gitlab_project_freeze_period` resource allows to manage the lifecycle of a 
 
 ```terraform
 resource "gitlab_project_freeze_period" "schedule" {
-  project_id    = gitlab_project.foo.id
+  project       = gitlab_project.foo.id
   freeze_start  = "0 23 * * 5"
   freeze_end    = "0 7 * * 1"
   cron_timezone = "UTC"
@@ -31,7 +31,7 @@ resource "gitlab_project_freeze_period" "schedule" {
 
 - `freeze_end` (String) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
 - `freeze_start` (String) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
-- `project_id` (String) The id of the project to add the schedule to.
+- `project` (String) The ID or URL-encoded path of the project to add the schedule to.
 
 ### Optional
 

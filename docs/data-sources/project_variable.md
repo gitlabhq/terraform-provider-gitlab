@@ -46,6 +46,7 @@ data "gitlab_project_variable" "bar" {
 - `id` (String) The ID of this resource.
 - `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+- `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
 - `value` (String) The value of the variable.
 - `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
 

@@ -17,7 +17,7 @@ The `gitlab_project_issue` data source allows to retrieve details about an issue
 
 ```terraform
 data "gitlab_project" "foo" {
-  id = "foo/bar/baz"
+  path_with_namespace = "foo/bar/baz"
 }
 
 data "gitlab_project_issue" "welcome_issue" {

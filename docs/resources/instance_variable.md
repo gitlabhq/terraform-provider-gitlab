@@ -30,12 +30,13 @@ resource "gitlab_instance_variable" "example" {
 ### Required
 
 - `key` (String) The name of the variable.
-- `value` (String, Sensitive) The value of the variable.
+- `value` (String) The value of the variable.
 
 ### Optional
 
 - `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
+- `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
 - `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
 
 ### Read-Only
