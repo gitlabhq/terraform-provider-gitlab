@@ -47,7 +47,7 @@ resource "gitlab_group_variable" "example" {
 ### Optional
 
 - `access_level` (String) The access level for the group access token. Valid values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
-- `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.
+- `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD.
 
 ### Read-Only
 

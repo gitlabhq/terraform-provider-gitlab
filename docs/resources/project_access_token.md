@@ -37,7 +37,6 @@ resource "gitlab_project_variable" "example" {
 
 ### Required
 
-- `expires_at` (String) Time the token will expire it, YYYY-MM-DD format.
 - `name` (String) A name to describe the project access token.
 - `project` (String) The id of the project to add the project access token to.
 - `scopes` (Set of String) Valid values: `api`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`.
@@ -45,6 +44,7 @@ resource "gitlab_project_variable" "example" {
 ### Optional
 
 - `access_level` (String) The access level for the project access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`. Default is `maintainer`.
+- `expires_at` (String) Time the token will expire it, YYYY-MM-DD format.
 
 ### Read-Only
 

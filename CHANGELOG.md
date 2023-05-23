@@ -1,3 +1,23 @@
+## 16.0.1 (2023-05-23)
+
+This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.
+
+BREAKING CHANGES:
+
+Since this is a bug fix release for a major release with breaking changes you may
+want to follow the [Terraform GitLab Provider Version 16.0 Upgrade Guide](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/guides/version-16.0-upgrade) for details.
+
+BUG FIXES:
+
+- resource/gitlab_pipeline_schedule_variable: Fix panic when `pipeline_schedule_id` is a `float64` in state
+- resource/gitlab_project_variable: Fix panic when upgrading from a state that was created prior to GitLab 13.4
+- resource/gitlab_project_level_mr_approvals: Add state migration for `project_id` to `project`
+- resource/gitlab_project_freeze_period: Add state migration for `project_id` to `project`
+- resource/gitlab_project_membership: Add state migration for `project_id` to `project`
+- resource/gitlab_project_share_group: Add state migration for `project_id` to `project`
+- resource/gitlab_project_access_token: Mark `expires_at` as computed
+- resource/gitlab_group_access_token: Mark `expires_at` as computed
+
 ## 16.0.0 (2023-05-22)
 
 - This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.

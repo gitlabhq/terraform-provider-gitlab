@@ -45,7 +45,7 @@ resource "gitlab_project_variable" "example" {
 
 ### Optional
 
-- `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD. Default is never.
+- `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD.
 
 ### Read-Only
 
