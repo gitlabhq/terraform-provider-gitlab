@@ -1,3 +1,16 @@
+## 16.0.3 (2023-05-24)
+
+This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.
+
+BREAKING CHANGES:
+
+Since this is a bug fix release for a major release with breaking changes you may
+want to follow the [Terraform GitLab Provider Version 16.0 Upgrade Guide](https://registry.terraform.io/providers/gitlabhq/gitlab/latest/docs/guides/version-16.0-upgrade) for details.
+
+BUG FIXES:
+
+- resource/gitlab_group_ldap_link: Fix state migration for `group_id` to `group`
+
 ## 16.0.2 (2023-05-23)
 
 This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.

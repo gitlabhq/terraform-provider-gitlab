@@ -22,13 +22,13 @@ which may require actions on the users side. These are described below:
 - `gitlab_pipeline_trigger`
 - `gitlab_pipeline_schedule`
 
-Some resource `id` formats weren't uniquly identifiable and didn't contain
-all the information to retrive a particular resource from the GitLab API
+Some resource `id` formats weren't uniquely identifiable and did not contain
+all the information to retrieve a particular resource from the GitLab API
 given this id.
 
 Therefore, you may need to change your `terraform import` commands to use fully
-identifiable resource ids as described in the repsective docs.
-This may also affect any use of the `id` attribute (`gitlab_*.*.id`) access in 
+identifiable resource ids as described in the respective docs.
+This may also affect any use of the `id` attribute (`gitlab_*.*.id`) access in
 your Terraform configuration code.
 
 ## Change variable `value` attribute to non-sensitive
@@ -39,7 +39,7 @@ your Terraform configuration code.
 - `gitlab_group_variable`
 - `gitlab_project_variable`
 
-The `value` attribute of the `gitlab_*_variable` resources has been changed 
+The `value` attribute of the `gitlab_*_variable` resources has been changed
 from `sensitive` to non-sensitive.
 
 Therefore, you may want to use the `sensitive()` or `nonsensitive()` Terraform functions.
@@ -57,7 +57,7 @@ The `expires_at` attribate for the `gitlab_project_access_token` resource is now
 - `gitlab_project_membership`
 - `gitlab_project_share_group`
 
-Some resources used a `project_id` attriute to identify a project by numerical id.
+Some resources used a `project_id` attribute to identify a project by numerical id.
 This attribute has been removed in favor of a new `project` attribute which supports
 both numerical ids and full paths to the project to identify id.
 This aligns with the rest of the project-scoped resources.
@@ -66,17 +66,24 @@ This aligns with the rest of the project-scoped resources.
 
 - `gitlab_group_ldap_link`
 
-Some resources used a `group_id` attriute to identify a group by numerical id.
+Some resources used a `group_id` attribute to identify a group by numerical id.
 This attribute has been removed in favor of a new `group` attribute which supports
 both numerical ids and full paths to the group to identify id.
 This aligns with the rest of the group-scoped resources.
 
 ## Deprecate `gitlab_service_*` resources
 
-All the `gitlab_service_*` resources have been deprecated in favor 
+All the `gitlab_service_*` resources have been deprecated in favor
 of the new `gitlab_integration_*` resources.
-Make sure to adapt to the new ones within the next 3 releases as we'll be 
+Make sure to adapt to the new ones within the next 3 releases as we'll be
 removing the `gitlab_service_*` resources with the upcoming 16.3 release.
+
+## Deprecate `gitlab_label` resource
+
+The `gitlab_label` resource has been deprecated in favor of the new
+`gitlab_project_label` resource.
+Make sure to adapt to the new resource within the next 3 releases as we'll be
+removing the `gitlab_label` resource with the upcoming 16.3 release.
 
 ## Misc removals
 
