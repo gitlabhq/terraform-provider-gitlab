@@ -25,7 +25,7 @@ resource "gitlab_pipeline_schedule" "example" {
 
 resource "gitlab_pipeline_schedule_variable" "example" {
   project              = gitlab_pipeline_schedule.example.project
-  pipeline_schedule_id = gitlab_pipeline_schedule.example.id
+  pipeline_schedule_id = gitlab_pipeline_schedule.example.pipelie_schedule_id
   key                  = "EXAMPLE_KEY"
   value                = "example"
 }

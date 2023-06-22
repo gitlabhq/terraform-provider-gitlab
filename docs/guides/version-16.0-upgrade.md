@@ -31,6 +31,10 @@ identifiable resource ids as described in the respective docs.
 This may also affect any use of the `id` attribute (`gitlab_*.*.id`) access in
 your Terraform configuration code.
 
+For `gitlab_deploy_key` and `gitlab_pipeline_schedule` you need
+to use the `deploy_key_id` and `pipeline_schedule_id` attributes, respectively to
+refer to them in sub-resources, like `gitlab_deploy_key_enable` and `gitlab_pipeline_schedule_variable`.
+
 ## Change variable `value` attribute to non-sensitive
 
 **Affected resources**:
@@ -46,7 +50,12 @@ Therefore, you may want to use the `sensitive()` or `nonsensitive()` Terraform f
 
 ## Require `expires_at` attribute for Project Access Tokens
 
-The `expires_at` attribate for the `gitlab_project_access_token` resource is now required.
+The `expires_at` attribate for the `gitlab_project_access_token` resource is required in
+version 16.0.0.
+
+In 16.0.1 and later, this attribute is optional again due to GitLab applying a default 
+when it's empty, however setting it to a date too far in the future may cause an error
+depending on the configuration of your GitLab instance.
 
 ## Change `project_id` attribute to `project`
 
@@ -84,6 +93,14 @@ The `gitlab_label` resource has been deprecated in favor of the new
 `gitlab_project_label` resource.
 Make sure to adapt to the new resource within the next 3 releases as we'll be
 removing the `gitlab_label` resource with the upcoming 16.3 release.
+
+## Remove support for unencoded test in `gitlab_repository_file`
+
+Support for non-base64 encoded text in `gitlab_repository_file` has been removed.
+If unencoded values are used, terraform will now return an error noting 
+`Invalid base64 string in "content"`. 
+Instead, use the [`base64encode()`](https://developer.hashicorp.com/terraform/language/functions/base64encode)
+function from terraform to encode any values if they are not already encoded.
 
 ## Misc removals
 

@@ -44,5 +44,3 @@ data "gitlab_repository_file" "example" {
 - `id` (String) The ID of this resource.
 - `last_commit_id` (String) The last known commit id.
 - `size` (Number) The file size.
-
-

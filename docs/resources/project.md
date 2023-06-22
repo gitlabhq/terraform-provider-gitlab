@@ -246,8 +246,8 @@ Optional:
 - `cadence` (String) The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
 - `enabled` (Boolean) If true, the policy is enabled.
 - `keep_n` (Number) The number of images to keep.
-- `name_regex` (String) The regular expression to match image names to delete.
-- `name_regex_delete` (String, Deprecated) The regular expression to match image names to delete.
+- `name_regex` (String, Deprecated) The regular expression to match image names to delete.
+- `name_regex_delete` (String) The regular expression to match image names to delete.
 - `name_regex_keep` (String) The regular expression to match image names to keep.
 - `older_than` (String) The number of days to keep images.
 

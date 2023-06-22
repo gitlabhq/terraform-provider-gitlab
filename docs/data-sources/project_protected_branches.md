@@ -69,5 +69,3 @@ Read-Only:
 - `access_level_description` (String)
 - `group_id` (Number)
 - `user_id` (Number)
-
-

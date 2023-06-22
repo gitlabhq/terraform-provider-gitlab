@@ -297,5 +297,3 @@ resource "gitlab_application_settings" "this" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-
-

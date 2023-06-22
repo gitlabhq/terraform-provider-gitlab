@@ -46,5 +46,3 @@ Read-Only:
 - `created_by_user_id` (Number)
 - `name` (String)
 - `project` (String)
-
-

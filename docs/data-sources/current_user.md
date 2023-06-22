@@ -33,5 +33,3 @@ data "gitlab_current_user" "example" {}
 - `namespace_id` (String) Personal namespace of the user.
 - `public_email` (String) User’s public email.
 - `username` (String) Username of the user. Unique within this instance of GitLab.
-
-

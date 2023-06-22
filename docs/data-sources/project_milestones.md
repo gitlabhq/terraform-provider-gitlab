@@ -65,5 +65,3 @@ Read-Only:
 - `title` (String)
 - `updated_at` (String)
 - `web_url` (String)
-
-

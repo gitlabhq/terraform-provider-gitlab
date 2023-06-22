@@ -65,5 +65,3 @@ Read-Only:
 - `state` (String)
 - `username` (String)
 - `web_url` (String)
-
-

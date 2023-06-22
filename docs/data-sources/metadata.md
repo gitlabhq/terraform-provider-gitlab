@@ -38,5 +38,3 @@ Read-Only:
 - `enabled` (Boolean) Indicates whether KAS is enabled.
 - `external_url` (String) URL used by the agents to communicate with KAS. It’s null if kas.enabled is false.
 - `version` (String) Version of KAS. It’s null if kas.enabled is false.
-
-

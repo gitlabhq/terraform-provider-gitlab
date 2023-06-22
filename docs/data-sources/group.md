@@ -53,5 +53,3 @@ data "gitlab_group" "foo" {
 - `shared_runners_minutes_limit` (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
 - `visibility_level` (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.
 - `web_url` (String) Web URL of the group.
-
-

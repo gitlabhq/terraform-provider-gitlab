@@ -61,5 +61,3 @@ Read-Only:
 - `token` (String)
 - `url` (String)
 - `wiki_page_events` (Boolean)
-
-

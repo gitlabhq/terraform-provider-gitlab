@@ -65,5 +65,3 @@ Read-Only:
 - `parent_ids` (Set of String)
 - `short_id` (String)
 - `title` (String)
-
-

@@ -1,3 +1,21 @@
+## 16.1.0 (2023-06-22)
+
+This release was tested against GitLab 15.11, 16.0 and 16.1 for both CE and EE.
+
+IMRPOVEMENTS:
+
+- resource/gitlab_tag_protection: Support `allowed_to_create` attribute ([!1549](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1549))
+
+BUG FIXES:
+
+- resource/gitlab_deploy_token: Fix dynamic `username` attribute reading after creation ([!1569](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1569))
+- resource/gitlab_branch_protection: Remove unsupported `no one` value for `unprotect_access_level` ([!1594](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1594))
+- resource/gitlab_project: Fix deprecation of `name_regex` attribute ([!1600](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1600))
+
+MISC:
+
+- Added a new guide for how to contribute a new resource from scratch ([!1487](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1487))
+
 ## 16.0.3 (2023-05-24)
 
 This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.

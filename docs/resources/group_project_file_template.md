@@ -60,5 +60,3 @@ resource "gitlab_group_project_file_template" "template_link" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-
-

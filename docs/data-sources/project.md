@@ -130,5 +130,3 @@ Read-Only:
 - `member_check` (Boolean)
 - `prevent_secrets` (Boolean)
 - `reject_unsigned_commits` (Boolean)
-
-

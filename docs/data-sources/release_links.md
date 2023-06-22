@@ -56,5 +56,3 @@ Read-Only:
 - `project` (String)
 - `tag_name` (String)
 - `url` (String)
-
-

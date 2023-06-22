@@ -34,5 +34,3 @@ data "gitlab_application" "oidc" {
 - `confidential` (Boolean) Indicates if the application is kept confidential.
 - `name` (String) The name of the GitLab application.
 - `redirect_url` (String) The redirect url of the application.
-
-

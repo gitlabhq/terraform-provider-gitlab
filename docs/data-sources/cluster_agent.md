@@ -39,5 +39,3 @@ data "gitlab_cluster_agent" "example" {
 - `created_by_user_id` (Number) The ID of the user who created the agent.
 - `id` (String) The ID of this resource.
 - `name` (String) The Name of the agent.
-
-

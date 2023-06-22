@@ -36,5 +36,3 @@ data "gitlab_instance_variable" "foo" {
 - `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
 - `value` (String) The value of the variable.
 - `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
-
-

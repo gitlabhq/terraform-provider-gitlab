@@ -54,5 +54,3 @@ data "gitlab_project_hook" "example" {
 - `token` (String) A token to present when invoking the hook. The token is not available for imported resources.
 - `url` (String) The url of the hook to invoke.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.
-
-

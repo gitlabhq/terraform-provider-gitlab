@@ -82,5 +82,3 @@ Read-Only:
 
 - `description` (String)
 - `tag_name` (String)
-
-

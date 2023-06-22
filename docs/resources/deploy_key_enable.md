@@ -36,7 +36,7 @@ resource "gitlab_deploy_key" "parent" {
 # Enable the deployment key on the second repo
 resource "gitlab_deploy_key_enable" "foo" {
   project = gitlab_project.foo.id
-  key_id  = gitlab_deploy_key.parent.id
+  key_id  = gitlab_deploy_key.parent.deploy_key_id
 }
 ```
 

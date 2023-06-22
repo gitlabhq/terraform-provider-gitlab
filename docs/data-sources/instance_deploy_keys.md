@@ -63,5 +63,3 @@ Read-Only:
 - `name_with_namespace` (String)
 - `path` (String)
 - `path_with_namespace` (String)
-
-

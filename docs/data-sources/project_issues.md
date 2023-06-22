@@ -118,5 +118,3 @@ Read-Only:
 
 - `completed_count` (Number)
 - `count` (Number)
-
-

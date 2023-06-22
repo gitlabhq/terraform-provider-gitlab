@@ -244,5 +244,3 @@ Read-Only:
 - `group_access_level` (String)
 - `group_id` (Number)
 - `group_name` (String)
-
-

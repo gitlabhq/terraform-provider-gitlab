@@ -4,12 +4,17 @@ page_title: "gitlab_tag_protection Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_tag_protection resource allows to manage the lifecycle of a tag protection.
+  ~> As tag protections cannot be updated, they are deleted and recreated when a change is requested. This means that if the deletion succeeds but the creation fails, tags will be left unprotected.
+  If this is a potential issue for you, please use the create_before_destroy meta-argument: https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_tags.html
 ---
 
 # gitlab_tag_protection (Resource)
 
 The `gitlab_tag_protection` resource allows to manage the lifecycle of a tag protection.
+
+~> As tag protections cannot be updated, they are deleted and recreated when a change is requested. This means that if the deletion succeeds but the creation fails, tags will be left unprotected.
+If this is a potential issue for you, please use the `create_before_destroy` meta-argument: https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_tags.html)
 
@@ -20,6 +25,12 @@ resource "gitlab_tag_protection" "TagProtect" {
   project             = "12345"
   tag                 = "TagProtected"
   create_access_level = "developer"
+  allowed_to_create {
+    user_id = 42
+  }
+  allowed_to_create {
+    group_id = 43
+  }
 }
 ```
 
@@ -32,9 +43,26 @@ resource "gitlab_tag_protection" "TagProtect" {
 - `project` (String) The id of the project.
 - `tag` (String) Name of the tag or wildcard.
 
+### Optional
+
+- `allowed_to_create` (Block Set) User or group which are allowed to create. (see [below for nested schema](#nestedblock--allowed_to_create))
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--allowed_to_create"></a>
+### Nested Schema for `allowed_to_create`
+
+Optional:
+
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+
+Read-Only:
+
+- `access_level` (String) Level of access.
+- `access_level_description` (String) Readable description of level of access.
 
 ## Import
 

@@ -56,5 +56,3 @@ Read-Only:
 - `raw` (Boolean)
 - `value` (String)
 - `variable_type` (String)
-
-

@@ -39,5 +39,3 @@ Read-Only:
 - `key_id` (Number)
 - `title` (String)
 - `user_id` (Number)
-
-

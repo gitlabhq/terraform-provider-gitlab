@@ -68,5 +68,3 @@ data "gitlab_user" "example-two" {
 - `two_factor_enabled` (Boolean) Whether user's two-factor auth is enabled.
 - `user_provider` (String) The UID provider of the user.
 - `website_url` (String) User's website URL.
-
-

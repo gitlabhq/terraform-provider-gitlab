@@ -35,5 +35,3 @@ The `gitlab_label` resource allows to manage the lifecycle of a project label.
 
 - `id` (String) The ID of this resource.
 - `label_id` (Number) The id of the project label.
-
-

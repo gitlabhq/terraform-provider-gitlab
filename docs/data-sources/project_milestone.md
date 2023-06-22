@@ -51,5 +51,3 @@ data "gitlab_project_milestone" "example" {
 - `title` (String) The title of a milestone.
 - `updated_at` (String) The last update time of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
 - `web_url` (String) The web URL of the milestone.
-
-

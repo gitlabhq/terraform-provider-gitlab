@@ -49,5 +49,3 @@ data "gitlab_release_link" "example" {
 - `link_type` (String) The type of the link. Valid values are `other`, `runbook`, `image`, `package`. Defaults to other.
 - `name` (String) The name of the link. Link names must be unique within the release.
 - `url` (String) The URL of the link. Link URLs must be unique within the release.
-
-

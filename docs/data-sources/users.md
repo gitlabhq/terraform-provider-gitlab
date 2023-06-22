@@ -85,5 +85,3 @@ Read-Only:
 - `two_factor_enabled` (Boolean)
 - `username` (String)
 - `website_url` (String)
-
-
