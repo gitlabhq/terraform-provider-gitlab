@@ -7,6 +7,7 @@ description: |-
   -> the provider needs to be configured with admin-level access for this resource to work.
   -> You must specify either password or reset_password.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html
+  -> This resource is only available in self-managed Gitlab instances.
 ---
 
 # gitlab_user (Resource)
