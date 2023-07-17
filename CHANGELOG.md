@@ -1,3 +1,11 @@
+## 16.1.1 (2023-07-17)
+
+This release was tested against GitLab 15.11, 16.0 and 16.1 for both CE and EE.
+
+IMRPOVEMENTS:
+
+- resource/gitlab_repository_file: Support the use of the `encoding` parameter. This allows using `text` encoding, which re-introduces the ability to have plaintext comparisons during a plan operation ([!1633](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1633))
+
 ## 16.1.0 (2023-06-22)
 
 This release was tested against GitLab 15.11, 16.0 and 16.1 for both CE and EE.

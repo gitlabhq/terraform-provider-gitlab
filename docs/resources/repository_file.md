@@ -87,6 +87,7 @@ resource "gitlab_repository_file" "readme_for_dogs" {
 
 - `author_email` (String) Email of the commit author.
 - `author_name` (String) Name of the commit author.
+- `encoding` (String) The file content encoding. Default value is `base64`. Valid values are: `base64`, `text`.
 - `execute_filemode` (Boolean) Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.
 - `overwrite_on_create` (Boolean) Enable overwriting existing files, defaults to `false`. This attribute is only used during `create` and must be use carefully. We suggest to use `imports` whenever possible and limit the use of this attribute for when the project was imported on the same `apply`. This attribute is not supported during a resource import.
 - `start_branch` (String) Name of the branch to start the new commit from.
@@ -97,7 +98,6 @@ resource "gitlab_repository_file" "readme_for_dogs" {
 - `blob_id` (String) The blob id.
 - `commit_id` (String) The commit id.
 - `content_sha256` (String) File content sha256 digest.
-- `encoding` (String) The file content encoding.
 - `file_name` (String) The filename.
 - `id` (String) The ID of this resource.
 - `last_commit_id` (String) The last known commit id.
