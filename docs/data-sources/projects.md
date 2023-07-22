@@ -61,6 +61,7 @@ data "gitlab_projects" "projects" {
 - `sort` (String) Return projects sorted in `asc` or `desc` order. Default is `desc`.
 - `starred` (Boolean) Limit by projects starred by the current user.
 - `statistics` (Boolean) Include project statistics. Cannot be used with `group_id`.
+- `topic` (Set of String) Limit by projects that have all of the given topics.
 - `visibility` (String) Limit by visibility `public`, `internal`, or `private`.
 - `with_custom_attributes` (Boolean) Include custom attributes in response _(admins only)_.
 - `with_issues_enabled` (Boolean) Limit by projects with issues feature enabled. Default is `false`.

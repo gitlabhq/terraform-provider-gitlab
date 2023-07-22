@@ -1,3 +1,22 @@
+## 16.2.0 (2023-07-22)
+
+This release was tested against GitLab 15.11, 16.0 and 16.1 for both CE and EE.
+
+IMPROVEMENTS:
+
+- **New Resource:** `gitlab_project_compliance_framework` ([!1616](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1616))
+- **New Resource:** `gitlab_compliance_framework` ([!1599](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1599))
+- resource/gitlab_group_badge: Improve examples to contain common badges ([!1627](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1627))
+- resource/branch_protection: Add support for `admin` as a value for `unprotect_access_level` ([!1626](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1626))
+- datasource/gitlab_groups: Add `top_level_only` support ([!1606](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1606))
+- datasource/gitlab_project: Add `topic` support ([!1610](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1610))
+
+BUG FIXES:
+
+- resource/gitlab_application_settings: Fix documentation to list the correct `import_sources` ([!1638](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1638))
+- resource/gitlab_project: Previously, `name_regex_delete` was improperly deprecated. Remove deprecation notice, and add notice to `name_regex`, which is the proper field ([!1600](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1600))
+- resource/gitlab_repository_file: Fix an issue where updating a repository file when using the `text` encoding returned a base64 encoding error ([!1642](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1642))
+
 ## 16.1.1 (2023-07-17)
 
 This release was tested against GitLab 15.11, 16.0 and 16.1 for both CE and EE.

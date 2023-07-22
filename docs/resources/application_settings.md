@@ -166,7 +166,7 @@ resource "gitlab_application_settings" "this" {
 - `housekeeping_gc_period` (Number) Number of Git pushes after which git gc is run.
 - `housekeeping_incremental_repack_period` (Number) Number of Git pushes after which an incremental git repack is run.
 - `html_emails_enabled` (Boolean) Enable HTML emails.
-- `import_sources` (List of String) Sources to allow project import from, possible values: github, bitbucket, bitbucket_server, gitlab, fogbugz, git, gitlab_project, gitea, manifest, and phabricator.
+- `import_sources` (List of String) Sources to allow project import from. Valid values are: `github`, `bitbucket`, `bitbucket_server`, `fogbugz`, `git`, `gitlab_project`, `gitea`, `manifest`
 - `in_product_marketing_emails_enabled` (Boolean) Enable in-product marketing emails.
 - `inactive_projects_delete_after_months` (Number) If delete_inactive_projects is true, the time (in months) to wait before deleting inactive projects. Introduced in GitLab 14.10. Became operational in GitLab 15.0.
 - `inactive_projects_min_size_mb` (Number) If delete_inactive_projects is true, the minimum repository size for projects to be checked for inactivity. Introduced in GitLab 14.10. Became operational in GitLab 15.0.

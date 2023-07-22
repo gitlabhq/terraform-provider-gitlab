@@ -40,6 +40,7 @@ data "gitlab_groups" "example-two" {
 - `order_by` (String) Order the groups' list by `id`, `name`, `path`, or `similarity`. (Requires administrator privileges)
 - `search` (String) Search groups by name or path.
 - `sort` (String) Sort groups' list in asc or desc order. (Requires administrator privileges)
+- `top_level_only` (Boolean) Limit to top level groups, excluding all subgroups.
 
 ### Read-Only
 
