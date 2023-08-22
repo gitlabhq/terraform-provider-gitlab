@@ -64,6 +64,7 @@ resource "gitlab_project" "example" {
 - `subgroup_creation_level` (String) Defaults to owner. Allowed to create subgroups.
 - `two_factor_grace_period` (Number) Defaults to 48. Time before Two-factor authentication is enforced (in hours).
 - `visibility_level` (String) The group's visibility. Can be `private`, `internal`, or `public`.
+- `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
 
 ### Read-Only
 

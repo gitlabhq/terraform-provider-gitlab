@@ -79,3 +79,4 @@ Read-Only:
 - `two_factor_grace_period` (Number)
 - `visibility` (String)
 - `web_url` (String)
+- `wiki_access_level` (String)

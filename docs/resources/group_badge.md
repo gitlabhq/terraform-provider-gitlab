@@ -57,6 +57,10 @@ resource "gitlab_group_badge" "gitlab_release" {
 - `image_url` (String) The image url which will be presented on group overview.
 - `link_url` (String) The url linked with the badge.
 
+### Optional
+
+- `name` (String) The name of the badge.
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.

@@ -66,3 +66,4 @@ Read-Only:
 - `runners_token` (String)
 - `visibility_level` (String)
 - `web_url` (String)
+- `wiki_access_level` (String)

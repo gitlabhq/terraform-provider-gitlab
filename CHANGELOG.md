@@ -1,3 +1,28 @@
+## 16.3.0 (2023-08-22)
+
+This release was tested against GitLab 16.0, 16.1, and 16.2 for both CE and EE
+
+IMPROVEMENTS:
+
+- **New Resource:** `gitlab_user_runner` allows managing runners using the new runner flow without using a registration token ([!1618](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1618))
+- **New Resource:** `gitlab_group_epic_board` allows managing epic boards for groups ([!1658](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1658))
+- **New Resource:** `gitlab_project_job_token_allow` allows managing the inbound allow list for a project when using Job Tokens ([!1631](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1631))
+- resource/repository_file: Add the ability to specify a different commit message for Create/Update/Delete operation ([!1629](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1629))
+- resource/gitlab_project_level_mr_approvals: Add support for `selective_code_owner_removals` ([!1641](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1641))
+- resource/gitlab_group: Add support for `wiki_access_level` ([!1656](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1656))
+- resource/gitlab_group_badge: Add support for `name` ([!1655](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1655))
+- datasource/gitlab_group: Add support for `wiki_access_level` ([!1656](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1656))
+- datasource/gitlab_groups: Add support for `wiki_access_level` ([!1656](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1656))
+
+
+BUG FIXES:
+
+- resource/gitlab_group_access_token: Require the `expires_at` attribute ([!1661](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1661))
+- resource/gitlab_personal_access_token: Require the `expires_at` attribute ([!1661](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1661))
+- resource/gitlab_project_access_token: Require the `expires_at` attribute ([!1661](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1661))
+- resource/gitlab_pipeline_schedule_variable: Fix several spelling errors in the documentation that would make examples non-functional ([!1647](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1647))
+
+
 ## 16.2.0 (2023-07-22)
 
 This release was tested against GitLab 15.11, 16.0 and 16.1 for both CE and EE.
@@ -95,7 +120,7 @@ BUG FIXES:
 ## 16.0.0 (2023-05-22)
 
 - This release was tested against GitLab 15.10, 15.11 and 16.0 for both CE and EE.
-- **Note:** this is a major release and breaks some interfaces in resources and data sources of 
+- **Note:** this is a major release and breaks some interfaces in resources and data sources of
   this provider, but also drops support for older GitLab versions.
 
 BREAKING CHANGES:
