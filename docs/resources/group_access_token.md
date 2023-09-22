@@ -43,7 +43,7 @@ resource "gitlab_group_variable" "example" {
 - `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD.
 - `group` (String) The ID or path of the group to add the group access token to.
 - `name` (String) The name of the group access token.
-- `scopes` (Set of String) The scope for the group access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_api`, `read_registry`, `write_registry`, `read_repository`, `write_repository`.
+- `scopes` (Set of String) The scope for the group access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_api`, `read_registry`, `write_registry`, `read_repository`, `write_repository`, `create_runner`.
 
 ### Optional
 

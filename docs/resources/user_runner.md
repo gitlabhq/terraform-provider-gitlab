@@ -37,4 +37,4 @@ The `gitlab_user_runner` resource allows creating a GitLab runner using the new 
 ### Read-Only
 
 - `id` (String) The ID of the gitlab runner.
-- `token` (String) The authentication token to use when setting up a new runner with this configuration. This value cannot be imported.
+- `token` (String, Sensitive) The authentication token to use when setting up a new runner with this configuration. This value cannot be imported.

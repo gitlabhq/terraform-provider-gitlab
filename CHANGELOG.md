@@ -1,3 +1,29 @@
+## 16.4.0 (2023-09-22)
+
+This release was tested against GitLab 16.2, 16.3, and 16.4 for both CE and EE
+
+BREAKING CHANGES:
+
+This breaking change was made early for security reasons. If a configuration relies on the value being non-sensitive, 
+users can use the [`nonsensitive()`](https://developer.hashicorp.com/terraform/language/functions/nonsensitive) function
+in Terraform.
+
+- resource/gitlab_user_runner: `token` is now marked as sensitive ([!1688](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1688))
+
+IMPROVEMENTS:
+
+- resource/gitlab_project_mirror: Updated documentation to include a warning about `keep_divergent_refs` default value ([!1691](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1691))
+- resource/gitlab_project_protected_environment: Add support for `approval_rules` ([!1679](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1679))
+- resource/gitlab_group_access_token: Add support for the `create_runner` scope ([!1675](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1675))
+- resource/gitlab_personal_access_token: Add support for the `create_runner` scope ([!1675](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1675))
+- resource/gitlab_project_access_token: Add support for the `create_runner` scope ([!1675](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1675))
+
+BUG FIXES:
+
+- resource/gitlab_branch: No longer returns an error when the branch is missing during a destroy ([!1690](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1690))
+- datasource/gitlab_cluster_agents: Fixed an issue where `agent_id` was always `0` ([!1677](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1677))
+- datasource/gitlab_group_subgroups: Fixed an issue where the data source returned a maximum of 20 subgroups ([!1689](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1689))
+
 ## 16.3.0 (2023-08-22)
 
 This release was tested against GitLab 16.0, 16.1, and 16.2 for both CE and EE
