@@ -1,3 +1,11 @@
+## 16.4.1 (2023-09-25)
+
+This release was tested against GitLab 16.2, 16.3, and 16.4 for both CE and EE
+
+BUG FIXES:
+
+- resource/gitlab_project_protected_environment: Fix segfault when using `for_each` for `deploy_access_levels` when `approval_rules` are not specified ([!1699](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1699))
+
 ## 16.4.0 (2023-09-22)
 
 This release was tested against GitLab 16.2, 16.3, and 16.4 for both CE and EE
