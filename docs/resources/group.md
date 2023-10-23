@@ -38,32 +38,33 @@ resource "gitlab_project" "example" {
 
 ### Required
 
-- `name` (String) The name of this group.
+- `name` (String) The name of the group.
 - `path` (String) The path of the group.
 
 ### Optional
 
-- `auto_devops_enabled` (Boolean) Defaults to false. Default to Auto DevOps pipeline for all projects within this group.
+- `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
-- `default_branch_protection` (Number) Defaults to 2. See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection
-- `description` (String) The description of the group.
-- `emails_disabled` (Boolean) Defaults to false. Disable email notifications.
+- `default_branch_protection` (Number) See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
+- `description` (String) The group's description.
+- `emails_disabled` (Boolean) Disable email notifications.
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
 - `ip_restriction_ranges` (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
-- `lfs_enabled` (Boolean) Defaults to true. Enable/disable Large File Storage (LFS) for the projects in this group.
+- `lfs_enabled` (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
 - `membership_lock` (Boolean) Users cannot be added to projects in this group.
-- `mentions_disabled` (Boolean) Defaults to false. Disable the capability of a group from getting mentioned.
+- `mentions_disabled` (Boolean) Disable the capability of a group from getting mentioned.
 - `parent_id` (Number) Id of the parent group (creates a nested group).
 - `prevent_forking_outside_group` (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
-- `project_creation_level` (String) Defaults to maintainer. Determine if developers can create projects in the group.
-- `request_access_enabled` (Boolean) Defaults to false. Allow users to request member access.
-- `require_two_factor_authentication` (Boolean) Defaults to false. Require all users in this group to setup Two-factor authentication.
-- `share_with_group_lock` (Boolean) Defaults to false. Prevent sharing a project with another group within this group.
+- `project_creation_level` (String) Determine if developers can create projects in the group. Valid values are: `noone`, `maintainer`, `developer`
+- `request_access_enabled` (Boolean) Allow users to request member access.
+- `require_two_factor_authentication` (Boolean) Require all users in this group to setup Two-factor authentication.
+- `share_with_group_lock` (Boolean) Prevent sharing a project with another group within this group.
 - `shared_runners_minutes_limit` (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
-- `subgroup_creation_level` (String) Defaults to owner. Allowed to create subgroups.
+- `shared_runners_setting` (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+- `subgroup_creation_level` (String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
 - `two_factor_grace_period` (Number) Defaults to 48. Time before Two-factor authentication is enforced (in hours).
-- `visibility_level` (String) The group's visibility. Can be `private`, `internal`, or `public`.
+- `visibility_level` (String) The group's visibility. Can be `private`, `internal`, or `public`. Valid values are: `private`, `internal`, `public`.
 - `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
 
 ### Read-Only

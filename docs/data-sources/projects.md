@@ -105,6 +105,7 @@ Read-Only:
 - `default_branch` (String)
 - `description` (String)
 - `emails_disabled` (Boolean)
+- `empty_repo` (Boolean)
 - `environments_access_level` (String)
 - `external_authorization_classification_label` (String)
 - `feature_flags_access_level` (String)

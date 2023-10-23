@@ -147,7 +147,7 @@ resource "gitlab_project" "import_private" {
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `build_coverage_regex` (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
-- `build_git_strategy` (String) The Git strategy. Defaults to fetch.
+- `build_git_strategy` (String) The Git strategy. Defaults to fetch. Valid values are `clone`, `fetch`.
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) Custom Path to CI config file.
@@ -193,11 +193,12 @@ resource "gitlab_project" "import_private" {
 - `only_allow_merge_if_pipeline_succeeds` (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
 - `only_mirror_protected_branches` (Boolean) Enable only mirror protected branches for a mirrored project.
 - `packages_enabled` (Boolean) Enable packages repository for the project.
-- `pages_access_level` (String) Enable pages access control
+- `pages_access_level` (String) Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
 - `path` (String) The path of the repository.
 - `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
-- `public_builds` (Boolean) If true, jobs can be viewed by non-project members.
+- `public_builds` (Boolean, Deprecated) If true, jobs can be viewed by non-project members.
+- `public_jobs` (Boolean) If true, jobs can be viewed by non-project members.
 - `push_rules` (Block List, Max: 1) Push rules for the project. (see [below for nested schema](#nestedblock--push_rules))
 - `releases_access_level` (String) Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
 - `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests.
@@ -224,13 +225,14 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `topics` (Set of String) The list of topics for the project.
 - `use_custom_template` (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
 		~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting.html#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
-- `visibility_level` (String) Set to `public` to create a public project.
+- `visibility_level` (String) Set to `public` to create a public project. Valid values are `private`, `internal`, `public`.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
 - `wiki_enabled` (Boolean) Enable wiki for the project.
 
 ### Read-Only
 
 - `avatar_url` (String) The URL of the avatar image.
+- `empty_repo` (Boolean) Whether the project is empty.
 - `http_url_to_repo` (String) URL that can be provided to `git clone` to clone the
 - `id` (String) The ID of this resource.
 - `path_with_namespace` (String) The path of the repository with namespace.

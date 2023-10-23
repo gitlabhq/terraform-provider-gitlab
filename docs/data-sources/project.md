@@ -55,6 +55,7 @@ data "gitlab_project" "example" {
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
 - `emails_disabled` (Boolean) Disable email notifications.
+- `empty_repo` (Boolean) Whether the project is empty.
 - `environments_access_level` (String) Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
 - `external_authorization_classification_label` (String) The classification label for the project.
 - `feature_flags_access_level` (String) Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.

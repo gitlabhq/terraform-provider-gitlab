@@ -74,6 +74,7 @@ Read-Only:
 - `request_access_enabled` (Boolean)
 - `require_two_factor_authentication` (Boolean)
 - `share_with_group_lock` (Boolean)
+- `shared_runners_setting` (String)
 - `statistics` (Map of String)
 - `subgroup_creation_level` (String)
 - `two_factor_grace_period` (Number)

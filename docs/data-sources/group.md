@@ -51,6 +51,7 @@ data "gitlab_group" "foo" {
 - `request_access_enabled` (Boolean) Boolean, is request for access enabled to the group.
 - `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
 - `shared_runners_minutes_limit` (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+- `shared_runners_setting` (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
 - `visibility_level` (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.
 - `web_url` (String) Web URL of the group.
 - `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.

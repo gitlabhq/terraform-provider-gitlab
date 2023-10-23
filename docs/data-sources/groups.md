@@ -64,6 +64,7 @@ Read-Only:
 - `prevent_forking_outside_group` (Boolean)
 - `request_access_enabled` (Boolean)
 - `runners_token` (String)
+- `shared_runners_setting` (String)
 - `visibility_level` (String)
 - `web_url` (String)
 - `wiki_access_level` (String)

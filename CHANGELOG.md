@@ -1,3 +1,27 @@
+## 16.5.0 (2023-10-22)
+
+This release was tested against GitLab 16.3, 16.4, and 16.5 for both CE and EE
+
+IMPROVEMENTS:
+
+- **New Resource:** `gitlab_group_protected_environment` allows managing group-level protected environments ([!1707](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1707))
+- resource/gitlab_user_sshkey: Added support for creating an SSH key for the current user by making `user_id` optional ([!1726](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1726))
+- resource/gitlab_group: Added support for managing the `shared_runners_setting` attribute ([!1710](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1710))
+- resource/gitlab_project: Added support for creating an empty repository using the `empty_repo` attribute ([!1713](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1713))
+- resource/gitlab_project: Added support for the `public_jobs` attribute, deprecating the old `public_builds` attribute ([!1700](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1700))
+- datasource/gitlab_project: Added support for reading the `empty_repo` attribute ([!1713](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1713))
+- datasource/gitlab_projects: Added support for reading the `empty_repo` attribute ([!1713](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1713))
+- datasource/gitlab_group: Added support for reading the `shared_runner_setting` attribute ([!1717](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1717))
+- datasource/gitlab_groups: Added support for reading the `shared_runner_setting` attribute ([!1717](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1717))
+- datasource/gitlab_group_subgroups: Added support for reading the `shared_runner_setting` attribute ([!1719](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1719))
+
+BUG FIXES:
+
+- resource/gitlab_group: Removed "default" hints in the documentation, since defaults can be changed by admins in some cases ([!1696](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1696))
+- resource/gitlab_group_ldap_link: Fixed an issue where changing CN or Filter didn't force a new resource ([!1729](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1729))
+- resource/gitlab_project: Fixed an issue where the documentation didn't contain valid values for several fields ([!1714](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1714))
+- resource/gitlab_tag_protection: Fix d an issue where the resource read the wrong `create_access_level` when using `no one` ([!1694](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1694))
+
 ## 16.4.1 (2023-09-25)
 
 This release was tested against GitLab 16.2, 16.3, and 16.4 for both CE and EE
