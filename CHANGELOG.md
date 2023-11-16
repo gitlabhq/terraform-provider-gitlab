@@ -1,3 +1,24 @@
+## 16.6.0 (2023-11-16)
+
+This release was tested against GitLab 16.4, 16.5, and 16.6 for both CE and EE
+
+KNOWN ISSUES:
+
+- Attempting to use the `gitlab_users` datasource with `sort` will not return users in the specified sort order when used with GitLab 16.6.0, as GitLab 16.6.0 uses relevancy sorting and ignores `sort`. This will be resolved with GitLab 16.6.1.
+
+IMPROVEMENTS:
+
+- **New Resource:** `gitlab_project_level_notifications` allows managing notification events for project ([!1715](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1715))
+- resource/gitlab_project_approval_rule: added support for `applies_to_all_protected_branches` ([!1755](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1755))
+- resource/gitlab_pipeline_schedule: added support for `take_ownership`, which will take ownership of the pipeline schedule prior to attempting an update ([!1745](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1745))
+- resource/gitlab_group: added support for `push_rules` ([!1730](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1730))
+
+BUG FIXES:
+
+- resource/gitlab_user_runner: Fixed an issue where not including `maximum_timeout` could cause an issue when updating the runner ([!1758](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1758))
+- datasource/gitlab_user: When using `email`, the the data source will now return the first user returned from the API instead of encountering an error when more than one is identified. When used with GitLab 16.6.0, this will always be the exact match if an exact match is available. ([!1743](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1743))
+
+
 ## 16.5.0 (2023-10-22)
 
 This release was tested against GitLab 16.3, 16.4, and 16.5 for both CE and EE

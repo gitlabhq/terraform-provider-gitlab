@@ -38,10 +38,12 @@ resource "gitlab_pipeline_schedule" "example" {
 
 - `active` (Boolean) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
 - `cron_timezone` (String) The timezone.
+- `take_ownership` (Boolean) When set to `true`, the user represented by the token running Terraform will take ownership of the scheduled pipeline prior to editing it. This can help when managing scheduled pipeline drift when other users are making changes outside Terraform.
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+- `owner` (Number) The ID of the user that owns the pipeline schedule.
 - `pipeline_schedule_id` (Number) The pipeline schedule id.
 
 ## Import
