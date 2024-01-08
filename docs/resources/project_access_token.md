@@ -4,12 +4,15 @@ page_title: "gitlab_project_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_access_token resource allows to manage the lifecycle of a project access token.
+  ~>  Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
   Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/project_access_tokens.html
 ---
 
 # gitlab_project_access_token (Resource)
 
 The `gitlab_project_access_token` resource allows to manage the lifecycle of a project access token.
+
+~>  Use of the `timestamp()` function with expires_at will cause the resource to be re-created with every apply, it's recommended to use `plantimestamp()` or a static value instead.
 
 **Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/project_access_tokens.html)
 

@@ -1,3 +1,24 @@
+## 16.7.0 (2023-12-21)
+
+This release was tested against GitLab 16.5, 16.6, and 16.7 for both CE and EE
+
+DEPRECATION:
+
+- This release updates the recommended Terraform version for this Provider from 1.0.0 to 1.4.0, and updates the version of Terraform we use for CI/CD to 1.4.0 as a result. This is related to a bug that was fixed in Terraform 1.4.0 related to how complex objects are compared. Without using Terraform 1.4.0, the provider cannot guarantee that plan output using nested objects is the same every time. Prior versions will likely still result in a successul plan and apply, but we will ask you to update prior to assisting with issue triage.
+
+IMPROVEMENTS:
+
+- resource/gitlab_branch_protection: Updating `allowed_to_push` will no longer destroy and re-create branch protection, it will instead update it in-place ([!1593](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1593))
+- resource/gitlab_group_issue_board: Issue boards now supports the use of scoped labels, and label position can be explicitly configured ([!1771](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1771))
+- resource/gitlab_project: Add support for `group_runners_enabled` ([!1735](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1735))
+- datasource/gitlab_group: Groups with many projects will now be retrieved significantly faster ([!1770](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1770))
+- datasource/gitlab_project: Add support for `group_runners_enabled` ([!1735](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1735))
+
+BUG FIXES:
+
+- resource/gitlab_pipeline_schedule: Fixed an issue where a pipeline schedule with no owner could cause a provider panic ([!1762](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1762))
+- resource/gitlab_group_ldap_link: Fixed an issue with `force` that could cause an error when attempting to delete an ldap link ([!1757](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1757))
+
 ## 16.6.0 (2023-11-16)
 
 This release was tested against GitLab 16.4, 16.5, and 16.6 for both CE and EE

@@ -314,7 +314,7 @@ func (r *gitlabApplicationResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	if !data.Confidential.IsNull() {
-		options.Confidential = gitlab.Bool(data.Confidential.ValueBool())
+		options.Confidential = gitlab.Ptr(data.Confidential.ValueBool())
 	}
 
 	// Create application

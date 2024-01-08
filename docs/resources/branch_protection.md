@@ -90,10 +90,10 @@ resource "gitlab_branch_protection" "main" {
 ### Optional
 
 - `allow_force_push` (Boolean) Can be set to true to allow users with push access to force push.
-- `allowed_to_merge` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_merge))
-- `allowed_to_push` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_push))
-- `allowed_to_unprotect` (Block Set) Defines permissions for action. (see [below for nested schema](#nestedblock--allowed_to_unprotect))
-- `code_owner_approval_required` (Boolean) Can be set to true to require code owner approval before merging. Only available own Premium and Ultimate instances.
+- `allowed_to_merge` (Block Set) Array of access levels and user(s)/group(s) allowed to merge to protected branch. (see [below for nested schema](#nestedblock--allowed_to_merge))
+- `allowed_to_push` (Block Set) Array of access levels and user(s)/group(s) allowed to push to protected branch. (see [below for nested schema](#nestedblock--allowed_to_push))
+- `allowed_to_unprotect` (Block Set) Array of access levels and user(s)/group(s) allowed to unprotect push to protected branch. (see [below for nested schema](#nestedblock--allowed_to_unprotect))
+- `code_owner_approval_required` (Boolean) Can be set to true to require code owner approval before merging. Only available for Premium and Ultimate instances.
 - `merge_access_level` (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`.
 - `push_access_level` (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`.
 - `unprotect_access_level` (String) Access levels allowed to unprotect. Valid values are: `developer`, `maintainer`, `admin`.
@@ -101,7 +101,7 @@ resource "gitlab_branch_protection" "main" {
 ### Read-Only
 
 - `branch_protection_id` (Number) The ID of the branch protection (not the branch name).
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project-id:branch>`.
 
 <a id="nestedblock--allowed_to_merge"></a>
 ### Nested Schema for `allowed_to_merge`
@@ -113,8 +113,8 @@ Optional:
 
 Read-Only:
 
-- `access_level` (String) Level of access.
-- `access_level_description` (String) Readable description of level of access.
+- `access_level` (String) Access levels allowed to merge to protected branch. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level_description` (String) Readable description of access level.
 
 
 <a id="nestedblock--allowed_to_push"></a>
@@ -127,8 +127,8 @@ Optional:
 
 Read-Only:
 
-- `access_level` (String) Level of access.
-- `access_level_description` (String) Readable description of level of access.
+- `access_level` (String) Access levels allowed to push to protected branch. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level_description` (String) Readable description of access level.
 
 
 <a id="nestedblock--allowed_to_unprotect"></a>
@@ -141,8 +141,8 @@ Optional:
 
 Read-Only:
 
-- `access_level` (String) Level of access.
-- `access_level_description` (String) Readable description of level of access.
+- `access_level` (String) Access levels allowed to unprotect push to protected branch. Valid values are: `developer`, `maintainer`, `admin`.
+- `access_level_description` (String) Readable description of access level.
 
 ## Import
 

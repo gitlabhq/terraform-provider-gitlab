@@ -112,6 +112,7 @@ Read-Only:
 - `forked_from_project` (List of Object) (see [below for nested schema](#nestedobjatt--projects--forked_from_project))
 - `forking_access_level` (String)
 - `forks_count` (Number)
+- `group_runners_enabled` (Boolean)
 - `http_url_to_repo` (String)
 - `id` (Number)
 - `import_error` (String)

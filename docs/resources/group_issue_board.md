@@ -28,6 +28,7 @@ The `gitlab_group_issue_board` resource allows to manage the lifecycle of a issu
 
 ### Optional
 
+- `labels` (Set of String) The list of label names which the board should be scoped to.
 - `lists` (Block Set) The list of issue board lists. (see [below for nested schema](#nestedblock--lists))
 - `milestone_id` (Number) The milestone the board should be scoped to.
 
@@ -41,8 +42,8 @@ The `gitlab_group_issue_board` resource allows to manage the lifecycle of a issu
 Optional:
 
 - `label_id` (Number) The ID of the label the list should be scoped to.
+- `position` (Number) The explicit position of the list within the board, zero based.
 
 Read-Only:
 
 - `id` (Number) The ID of the list.
-- `position` (Number) The position of the list within the board. The position for the list is based on the its position in the `lists` array.

@@ -18,6 +18,7 @@ which may be consumed to better understand the behavior of the API.
 Use the navigation to the left to read about the valid data sources and resources.
 
 This provider requires at least [Terraform 1.0](https://www.terraform.io/downloads.html).
+A minimum of Terraform 1.4.0 is recommended.
 
 ## Example Usage
 

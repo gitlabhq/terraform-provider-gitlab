@@ -32,40 +32,52 @@ data "gitlab_project_protected_branches" "example" {
 
 - `project_id` (String) The integer or path with namespace that uniquely identifies the project.
 
+### Optional
+
+- `protected_branches` (Block List) A list of protected branches, as defined below. (see [below for nested schema](#nestedblock--protected_branches))
+
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `protected_branches` (List of Object) A list of protected branches, as defined below. (see [below for nested schema](#nestedatt--protected_branches))
+- `id` (Number) The ID of this resource.
 
-<a id="nestedatt--protected_branches"></a>
+<a id="nestedblock--protected_branches"></a>
 ### Nested Schema for `protected_branches`
 
+Optional:
+
+- `merge_access_levels` (Block Set) Array of access levels and user(s)/group(s) allowed to merge to protected branch. (see [below for nested schema](#nestedblock--protected_branches--merge_access_levels))
+- `push_access_levels` (Block Set) Array of access levels and user(s)/group(s) allowed to push to protected branch. (see [below for nested schema](#nestedblock--protected_branches--push_access_levels))
+
 Read-Only:
 
-- `allow_force_push` (Boolean)
-- `code_owner_approval_required` (Boolean)
-- `id` (Number)
-- `merge_access_levels` (List of Object) (see [below for nested schema](#nestedobjatt--protected_branches--merge_access_levels))
-- `name` (String)
-- `push_access_levels` (List of Object) (see [below for nested schema](#nestedobjatt--protected_branches--push_access_levels))
+- `allow_force_push` (Boolean) Whether force push is allowed.
+- `code_owner_approval_required` (Boolean) Reject code pushes that change files listed in the CODEOWNERS file.
+- `id` (Number) The ID of this resource.
+- `name` (String) The name of the protected branch.
 
-<a id="nestedobjatt--protected_branches--merge_access_levels"></a>
+<a id="nestedblock--protected_branches--merge_access_levels"></a>
 ### Nested Schema for `protected_branches.merge_access_levels`
 
+Optional:
+
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+
 Read-Only:
 
-- `access_level` (String)
-- `access_level_description` (String)
-- `group_id` (Number)
-- `user_id` (Number)
+- `access_level` (String) Access levels allowed to merge to protected branch. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level_description` (String) Readable description of access level.
 
 
-<a id="nestedobjatt--protected_branches--push_access_levels"></a>
+<a id="nestedblock--protected_branches--push_access_levels"></a>
 ### Nested Schema for `protected_branches.push_access_levels`
 
+Optional:
+
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+
 Read-Only:
 
-- `access_level` (String)
-- `access_level_description` (String)
-- `group_id` (Number)
-- `user_id` (Number)
+- `access_level` (String) Access levels allowed to push to protected branch. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level_description` (String) Readable description of access level.
