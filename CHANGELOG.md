@@ -1,4 +1,27 @@
-## 16.7.0 (2023-12-21)
+## 16.8.0 (2024-01-18)
+
+This release was tested against GitLab 16.6, 16.7, and 16.8 for both CE and EE
+
+BREAKING CHANGE:
+
+- gitlab_application_settings: Removed support for `delayed_group_deletion` and `delayed_project_deletion`, which haven't been supported since GitLab 16.0 ([!1799](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1799))
+
+IMPROVEMENTS:
+
+- **New Resource** `gitlab_global_level_notifications` allows managing global notifications for the user ([!1801](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1801))
+- resource/gitlab_project: Added support for the `timeouts` block, to allow configurable timeouts for creating projects ([]())
+- resource/gitlab_application_settings: Added support for `housekeeping_optimize_repository_period`, and updated the description of `housekeeping_enabled` to be more descriptive of what fields were required for a successful apply ([!1777](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1777))
+- datasource/gitlab_project: Added support for `shared_with_groups` which includes groups that are shared with the project ([!1795](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1795))
+- datasource/gitlab_group: Added support for `shared_with_groups` which includes groups that are shared with the group ([!1769](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1769))
+- datasource/gitlab_user: Added support for the `is_bot` attribute ([!1798](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1798))
+- datasource/gitlab_users: Added support for the `is_bot` attribute ([!1798](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1798))
+
+BUG FIXES:
+
+- resource/gitlab_pipeline_schedule_variable: Fixed an issue where deleting the pipeline associated to the variable outside of terraform would cause the resource to be stuck in an error state ([!1796](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1796))
+- resource/gitlab_project_hook: Fixed an issue where changing the URL of a webhook would delete the associated `token`. Changing the URL will now force a new webhook to be created ([!1794](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1794))
+
+## 16.7.0 (2024-01-08)
 
 This release was tested against GitLab 16.5, 16.6, and 16.7 for both CE and EE
 

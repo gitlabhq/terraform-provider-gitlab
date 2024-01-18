@@ -59,6 +59,7 @@ data "gitlab_user" "example-two" {
 - `external` (Boolean) Whether the user is external.
 - `id` (String) The ID of this resource.
 - `is_admin` (Boolean) Whether the user is an admin.
+- `is_bot` (Boolean) Whether the user is a bot.
 - `last_sign_in_at` (String) Last user's sign-in date.
 - `linkedin` (String) LinkedIn profile of the user.
 - `location` (String) The location of the user.

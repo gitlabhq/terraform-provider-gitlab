@@ -89,6 +89,7 @@ data "gitlab_project" "example" {
 - `restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+- `shared_with_groups` (List of Object) Describes groups which have access shared to this project. (see [below for nested schema](#nestedatt--shared_with_groups))
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
 - `snippets_enabled` (Boolean) Enable snippets for the project.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
@@ -131,3 +132,14 @@ Read-Only:
 - `member_check` (Boolean)
 - `prevent_secrets` (Boolean)
 - `reject_unsigned_commits` (Boolean)
+
+
+<a id="nestedatt--shared_with_groups"></a>
+### Nested Schema for `shared_with_groups`
+
+Read-Only:
+
+- `group_access_level` (Number)
+- `group_full_path` (String)
+- `group_id` (Number)
+- `group_name` (String)

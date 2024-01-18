@@ -88,10 +88,8 @@ resource "gitlab_application_settings" "this" {
 - `default_project_visibility` (String) What visibility level new projects receive. Can take private, internal and public as a parameter.
 - `default_projects_limit` (Number) Project limit per user.
 - `default_snippet_visibility` (String) What visibility level new snippets receive. Can take private, internal and public as a parameter.
-- `delayed_group_deletion` (Boolean) Enable delayed group deletion. Introduced in GitLab 15.0. From GitLab 15.1, disables and locks the group-level setting for delayed protect deletion when set to false.
-- `delayed_project_deletion` (Boolean) Enable delayed project deletion by default in new groups. From GitLab 15.1, can only be enabled when delayed_group_deletion is true.
 - `delete_inactive_projects` (Boolean) Enable inactive project deletion feature. Introduced in GitLab 14.10. Became operational in GitLab 15.0 (with feature flag inactive_projects_deletion).
-- `deletion_adjourned_period` (Number) The number of days to wait before deleting a project or group that is marked for deletion. Value must be between 1 and 90. From GitLab 15.1, a hook on deletion_adjourned_period sets the period to 1 on every update, and sets both delayed_project_deletion and delayed_group_deletion to false if the period is 0.
+- `deletion_adjourned_period` (Number) The number of days to wait before deleting a project or group that is marked for deletion. Value must be between 1 and 90.
 - `diff_max_files` (Number) Maximum files in a diff.
 - `diff_max_lines` (Number) Maximum lines in a diff.
 - `diff_max_patch_bytes` (Number) Maximum diff patch size, in bytes.
@@ -161,10 +159,13 @@ resource "gitlab_application_settings" "this" {
 - `help_text` (String) GitLab server administrator information.
 - `hide_third_party_offers` (Boolean) Do not display offers from third parties in GitLab.
 - `home_page_url` (String) Redirect to this URL when not logged in.
-- `housekeeping_enabled` (Boolean) (If enabled, requires: housekeeping_bitmaps_enabled, housekeeping_full_repack_period, housekeeping_gc_period, and housekeeping_incremental_repack_period) Enable or disable Git housekeeping.
-- `housekeeping_full_repack_period` (Number) Number of Git pushes after which an incremental git repack is run.
-- `housekeeping_gc_period` (Number) Number of Git pushes after which git gc is run.
-- `housekeeping_incremental_repack_period` (Number) Number of Git pushes after which an incremental git repack is run.
+- `housekeeping_enabled` (Boolean) Enable or disable Git housekeeping.
+				If enabled, requires either housekeeping_optimize_repository_period OR housekeeping_bitmaps_enabled, housekeeping_full_repack_period, housekeeping_gc_period, and housekeeping_incremental_repack_period.
+				Options housekeeping_bitmaps_enabled, housekeeping_full_repack_period, housekeeping_gc_period, and housekeeping_incremental_repack_period are deprecated. Use housekeeping_optimize_repository_period instead.
+- `housekeeping_full_repack_period` (Number, Deprecated) Number of Git pushes after which an incremental git repack is run.
+- `housekeeping_gc_period` (Number, Deprecated) Number of Git pushes after which git gc is run.
+- `housekeeping_incremental_repack_period` (Number, Deprecated) Number of Git pushes after which an incremental git repack is run.
+- `housekeeping_optimize_repository_period` (Number) Number of Git pushes after which an incremental git repack is run.
 - `html_emails_enabled` (Boolean) Enable HTML emails.
 - `import_sources` (List of String) Sources to allow project import from. Valid values are: `github`, `bitbucket`, `bitbucket_server`, `fogbugz`, `git`, `gitlab_project`, `gitea`, `manifest`
 - `in_product_marketing_emails_enabled` (Boolean) Enable in-product marketing emails.

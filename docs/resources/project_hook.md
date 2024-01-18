@@ -29,7 +29,7 @@ resource "gitlab_project_hook" "example" {
 ### Required
 
 - `project` (String) The name or id of the project to add the hook to.
-- `url` (String) The url of the hook to invoke.
+- `url` (String) The url of the hook to invoke. Forces re-creation to preserve `token`.
 
 ### Optional
 

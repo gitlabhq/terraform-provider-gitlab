@@ -52,6 +52,18 @@ data "gitlab_group" "foo" {
 - `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
 - `shared_runners_minutes_limit` (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
 - `shared_runners_setting` (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+- `shared_with_groups` (List of Object) Describes groups which have access shared to this group. (see [below for nested schema](#nestedatt--shared_with_groups))
 - `visibility_level` (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.
 - `web_url` (String) Web URL of the group.
 - `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
+
+<a id="nestedatt--shared_with_groups"></a>
+### Nested Schema for `shared_with_groups`
+
+Read-Only:
+
+- `expires_at` (String)
+- `group_access_level` (Number)
+- `group_full_path` (String)
+- `group_id` (Number)
+- `group_name` (String)

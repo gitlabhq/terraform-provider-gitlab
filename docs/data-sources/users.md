@@ -70,6 +70,7 @@ Read-Only:
 - `external` (Boolean)
 - `id` (Number)
 - `is_admin` (Boolean)
+- `is_bot` (Boolean)
 - `last_sign_in_at` (String)
 - `linkedin` (String)
 - `location` (String)

@@ -223,6 +223,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `tags` (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
 - `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
 - `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `topics` (Set of String) The list of topics for the project.
 - `use_custom_template` (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
 		~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting.html#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
@@ -275,6 +276,15 @@ Optional:
 - `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
 - `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
 - `reject_unsigned_commits` (Boolean) Reject commit when it’s not signed through GPG.
+
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `delete` (String)
 
 ## Import
 
