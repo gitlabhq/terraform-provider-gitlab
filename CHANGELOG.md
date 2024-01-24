@@ -1,3 +1,12 @@
+## 16.8.1 (2024-01-24)
+
+This release was tested against GitLab 16.6, 16.7, and 16.8 for both CE and EE
+
+BUG FIXES:
+
+- resource/gitlab_compliance_framework: Improved permissions-based error handling for the resource, so permissions errors don't result in a "provider error" warning ([!6193](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/issues/6193))
+- resource/gitlab_pipeline_schedule: Fixed an issue with `take_ownership = true` where the ownership would only be updated when a separate attribute change was identified. The provider will now always assume ownership even if no other changes are identified ([!1765](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1765))
+
 ## 16.8.0 (2024-01-18)
 
 This release was tested against GitLab 16.6, 16.7, and 16.8 for both CE and EE
@@ -9,7 +18,7 @@ BREAKING CHANGE:
 IMPROVEMENTS:
 
 - **New Resource** `gitlab_global_level_notifications` allows managing global notifications for the user ([!1801](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1801))
-- resource/gitlab_project: Added support for the `timeouts` block, to allow configurable timeouts for creating projects ([]())
+- resource/gitlab_project: Added support for the `timeouts` block, to allow configurable timeouts for creating projects ([!1797](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1797))
 - resource/gitlab_application_settings: Added support for `housekeeping_optimize_repository_period`, and updated the description of `housekeeping_enabled` to be more descriptive of what fields were required for a successful apply ([!1777](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1777))
 - datasource/gitlab_project: Added support for `shared_with_groups` which includes groups that are shared with the project ([!1795](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1795))
 - datasource/gitlab_group: Added support for `shared_with_groups` which includes groups that are shared with the group ([!1769](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1769))

@@ -42,7 +42,7 @@ resource "gitlab_pipeline_schedule" "example" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project-id>:<pipeline-schedule-id>`.
 - `owner` (Number) The ID of the user that owns the pipeline schedule.
 - `pipeline_schedule_id` (Number) The pipeline schedule id.
 
