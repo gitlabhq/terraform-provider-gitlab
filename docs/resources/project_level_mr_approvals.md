@@ -44,7 +44,7 @@ resource "gitlab_project_level_mr_approvals" "foo" {
 
 - `disable_overriding_approvers_per_merge_request` (Boolean) Set to `true` to disable overriding approvers per merge request.
 - `merge_requests_author_approval` (Boolean) Set to `true` to allow merge requests authors to approve their own merge requests.
-- `merge_requests_disable_committers_approval` (Boolean) Set to `true` to allow merge requests committers to approve their own merge requests.
+- `merge_requests_disable_committers_approval` (Boolean) Set to `false` to allow merge requests committers to approve their own merge requests.
 - `require_password_to_approve` (Boolean) Set to `true` to require authentication to approve merge requests.
 - `reset_approvals_on_push` (Boolean) Set to `true` to remove all approvals in a merge request when new commits are pushed to its source branch. Default is `true`.
 - `selective_code_owner_removals` (Boolean) Reset approvals from Code Owners if their files changed. Can be enabled only if reset_approvals_on_push is disabled.
