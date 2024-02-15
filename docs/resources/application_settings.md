@@ -118,9 +118,9 @@ resource "gitlab_application_settings" "this" {
 - `elasticsearch_limit_indexing` (Boolean) Limit Elasticsearch to index certain namespaces and projects.
 - `elasticsearch_max_bulk_concurrency` (Number) Maximum concurrency of Elasticsearch bulk requests per indexing operation. This only applies to repository indexing operations.
 - `elasticsearch_max_bulk_size_mb` (Number) Maximum size of Elasticsearch bulk indexing requests in MB. This only applies to repository indexing operations.
-- `elasticsearch_namespace_ids` (List of String) The namespaces to index via Elasticsearch if elasticsearch_limit_indexing is enabled.
+- `elasticsearch_namespace_ids` (List of Number) The namespaces to index via Elasticsearch if elasticsearch_limit_indexing is enabled.
 - `elasticsearch_password` (String, Sensitive) The password of your Elasticsearch instance.
-- `elasticsearch_project_ids` (List of String) The projects to index via Elasticsearch if elasticsearch_limit_indexing is enabled.
+- `elasticsearch_project_ids` (List of Number) The projects to index via Elasticsearch if elasticsearch_limit_indexing is enabled.
 - `elasticsearch_search` (Boolean) Enable Elasticsearch search.
 - `elasticsearch_url` (List of String) The URL to use for connecting to Elasticsearch. Use a comma-separated list to support cluster (for example, http://localhost:9200, http://localhost:9201).
 - `elasticsearch_username` (String) The username of your Elasticsearch instance.

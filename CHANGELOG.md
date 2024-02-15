@@ -1,3 +1,23 @@
+## 16.9.0 (2024-02-15)
+
+This release was tested against GitLab 16.7, 16.8, and 16.9 for both CE and EE
+
+IMPROVEMENTS:
+- resource/gitlab_project_variable: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
+- resource/gitlab_group_variable: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
+- resource/gitlab_project: added support for `ci_restrict_pipeline_cancellation_role` ([!1825](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1825))
+- datasource/gitlab_project_variable: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
+- datasource/gitlab_project_variables: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
+- datasource/gitlab_group_variable: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
+- datasource/gitlab_group_variables: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
+- datasource/gitlab_project: added support for `ci_restrict_pipeline_cancellation_role` ([!1825](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1825))
+- datasource/gitlab_projects: added support for `ci_restrict_pipeline_cancellation_role` ([!1825](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1825))
+
+BUG FIXES:
+
+- resource/gitlab_project_protected_environment: Fixed an issue where using characters in the project name that required encoding (such as "/") would cause an error ([!1835](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1835))
+- resource/application_settings: Fixed an issue where elasticsearch namespace and project IDs accepted a list of strings instead of a list of integers. Providing a list of integers would cause a provider error, rendering the attributes unusable. ([!1824](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1824))
+
 ## 16.8.1 (2024-01-24)
 
 This release was tested against GitLab 16.6, 16.7, and 16.8 for both CE and EE

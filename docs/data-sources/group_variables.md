@@ -48,6 +48,7 @@ data "gitlab_group_variables" "staging_vars" {
 
 Read-Only:
 
+- `description` (String)
 - `environment_scope` (String)
 - `group` (String)
 - `key` (String)

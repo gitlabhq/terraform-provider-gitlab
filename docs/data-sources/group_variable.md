@@ -43,6 +43,7 @@ data "gitlab_group_variable" "bar" {
 
 ### Read-Only
 
+- `description` (String) The description of the variable.
 - `id` (String) The ID of this resource.
 - `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.

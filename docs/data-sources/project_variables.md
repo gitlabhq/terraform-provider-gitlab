@@ -48,6 +48,7 @@ data "gitlab_project_variables" "staging_vars" {
 
 Read-Only:
 
+- `description` (String)
 - `environment_scope` (String)
 - `key` (String)
 - `masked` (Boolean)
