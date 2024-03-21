@@ -37,7 +37,7 @@ resource "gitlab_group_ldap_link" "test" {
 - `access_level` (String, Deprecated) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 - `cn` (String) The CN of the LDAP group to link with. Required if `filter` is not provided.
 - `filter` (String) The LDAP filter for the group. Required if `cn` is not provided. Requires GitLab Premium or above.
-- `force` (Boolean) If true, then delete and replace an existing LDAP link if one exists.
+- `force` (Boolean) If true, then delete and replace an existing LDAP link if one exists. Will also remove an LDAP link if the parent group is not found.
 - `group_access` (String) Minimum access level for members of the LDAP group. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
 
 ### Read-Only

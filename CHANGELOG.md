@@ -1,3 +1,30 @@
+## 16.10.0 (2024-03-21)
+
+This release was tested against GitLab 16.8, 16.9, and 16.10 for both CE and EE
+
+NOTES:
+
+- scripts/gitlab.rb has been updated for local development to set the license mode and customer portal URL for testing. If you're using a personal license for local development, you may need to update this file temporarily to run EE locally. ([!1861](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1861))
+
+IMPROVEMENTS:
+- **New Data Source** datasource/gitlab_release: Allows querying a GitLab Release by project and tag name to get release information or assets ([!1851](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1851))
+
+BUG FIXES:
+
+- resources/gitlab_project_level_mr_approvals: fixed a documentation issue with the use of `merge_requests_disable_committers_approval` ([!1864](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1864))
+- resources/gitlab_group_ldap_link: fixed an issue where deleting the group associated to an LDAP link would result in a TF state that required manual intervention. Using a value of `true` with the `force` attribute will now remove the LDAP link from state when the group is deleted. ([!1842](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1842))
+- resources/gitlab_cluster_agent: fixed the example documentation to show the file contents as encoded ([!1852](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1852))
+- resources/gitlab_pipeline_schedule: fixed a potential panic on the provider that could occur when there was an error editing the pipeline schedule ([!1847](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1847))
+
+
+## 16.9.1 (2024-02-15)
+
+This release was tested against GitLab 16.7, 16.8, and 16.9 for both CE and EE
+
+BUG FIXES:
+
+- Fixed a Go version mismatch when using `goreleaser` that prevented v16.9.0 from being published properly ([!1839](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1839))
+
 ## 16.9.0 (2024-02-15)
 
 This release was tested against GitLab 16.7, 16.8, and 16.9 for both CE and EE

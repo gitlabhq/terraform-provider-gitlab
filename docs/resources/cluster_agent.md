@@ -39,16 +39,16 @@ resource "gitlab_cluster_agent" "example" {
 // Optionally, configure the agent as described in
 // https://docs.gitlab.com/ee/user/clusters/agent/install/index.html#create-an-agent-configuration-file
 resource "gitlab_repository_file" "example_agent_config" {
-  project        = gitlab_cluster_agent.example.project
-  branch         = "main" // or use the `default_branch` attribute from a project data source / resource
-  file_path      = ".gitlab/agents/${gitlab_cluster_agent.example.name}"
-  content        = <<CONTENT
-  gitops:
-    ...
+  project   = gitlab_cluster_agent.example.project
+  branch    = "main" // or use the `default_branch` attribute from a project data source / resource
+  file_path = ".gitlab/agents/${gitlab_cluster_agent.example.name}/config.yaml"
+  content = base64encode(<<CONTENT
+# the GitLab Agent for Kubernetes configuration goes here ...
   CONTENT
+  )
   author_email   = "terraform@example.com"
   author_name    = "Terraform"
-  commit_message = "feature: add agent config for ${gitlab_cluster_agent.example.name}"
+  commit_message = "feature: add agent config for ${gitlab_cluster_agent.example.name} [skip ci]"
 }
 ```
 
