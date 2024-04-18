@@ -44,6 +44,7 @@ Read-Only:
 
 - `confidential_issues_events` (Boolean)
 - `confidential_note_events` (Boolean)
+- `custom_webhook_template` (String)
 - `deployment_events` (Boolean)
 - `enable_ssl_verification` (Boolean)
 - `hook_id` (Number)

@@ -1,3 +1,29 @@
+## 16.11.0 (2024-04-18)
+
+This release was tested against GitLab 16.9, 16.10, and 16.11 for both CE and EE
+
+IMPROVEMENTS:
+
+- **New Data Source** data/gitlab_compliance_framework: Allows querying Compliance Frameworks to help retrieve the ID for use in downstream resources ([!1880](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1880))
+- resources/gitlab_project_access_token: Added support for the use of `rotation_configuration` to automatically rotate tokens periodically. ([!1887](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1887))
+- resources/gitlab_project_access_token: Added support for rotating the token by changing the `expires_at` instead of deleting and re-creating the token. ([!1887](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1887))
+- resources/gitlab_group_access_token: Added support for the use of `rotation_configuration` to automatically rotate tokens periodically. ([!1887](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1887))
+- resources/gitlab_group_access_token: Added support for rotating the token by changing the `expires_at` instead of deleting and re-creating the token. ([!1887](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1887))
+- resources/gitlab_project_access_token: Added support for new token scopes related to AI, k8s, and observability ([!1878](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1878))
+- resources/gitlab_group_access_token: Added support for new token scopes related to AI, k8s, and observability ([!1878](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1878))
+- resources/gitlab_project: Added support for `emails_enabled` and deprecated support for `emails_disabled`, which will be removed in 17.0 ([!1881](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1881))
+- resources/gitlab_project_protected_environment: Added support for `group_inheritance_type` ([!1855](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1855))
+- resources/gitlab_group_protected_environment: Added support for `group_inheritance_type` ([!1855](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1855))
+- resources/gitlab_project_hook: Added support for `custom_webhook_template` ([!1862](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1862))
+- resources/gitlab_group_hook: Added support for `custom_webhook_template` ([!1862](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1862))
+- resources/gitlab_group_membership: Added support for `member_role_id`, enabling the use of a custom role when assigning users to a group ([!1809](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1809))
+- data/gitlab_project_hook(s): Added support for `custom_webhook_template` ([!1862](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1862))
+- data/gitlab_group_hook(s): Added support for `custom_webhook_template` ([!1862](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1862))
+
+BUG FIXES:
+
+- resource/gitlab_project_hook: Fixed an issue where changing the `project` value didn't force a new resource ([!1871](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1871))
+
 ## 16.10.0 (2024-03-21)
 
 This release was tested against GitLab 16.8, 16.9, and 16.10 for both CE and EE
@@ -157,7 +183,7 @@ This release was tested against GitLab 16.2, 16.3, and 16.4 for both CE and EE
 
 BREAKING CHANGES:
 
-This breaking change was made early for security reasons. If a configuration relies on the value being non-sensitive, 
+This breaking change was made early for security reasons. If a configuration relies on the value being non-sensitive,
 users can use the [`nonsensitive()`](https://developer.hashicorp.com/terraform/language/functions/nonsensitive) function
 in Terraform.
 

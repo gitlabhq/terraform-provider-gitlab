@@ -57,6 +57,7 @@ resource "gitlab_group_hook" "all_attributes" {
 
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
+- `custom_webhook_template` (String) Set a custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
 - `issues_events` (Boolean) Invoke the hook for issues events.

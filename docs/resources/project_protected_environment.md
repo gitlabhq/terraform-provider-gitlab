@@ -149,6 +149,7 @@ Optional:
 
 - `access_level` (String) Levels of access allowed to approve a deployment to this protected environment. Valid values are `developer`, `maintainer`.
 - `group_id` (Number) The ID of the group allowed to approve a deployment to this protected environment. The project must be shared with the group. This is mutually exclusive with user_id.
+- `group_inheritance_type` (Number) Group inheritance allows deploy access levels to take inherited group membership into account. Valid values are `0`, `1`. `0` => Direct group membership only, `1` => All inherited groups. Default: `0`
 - `required_approvals` (Number) The number of approval required to allow deployment to this protected environment. This is mutually exclusive with user_id.
 - `user_id` (Number) The ID of the user allowed to approve a deployment to this protected environment. The user must be a member of the project. This is mutually exclusive with group_id and required_approvals.
 
@@ -165,6 +166,7 @@ Optional:
 
 - `access_level` (String) Levels of access required to deploy to this protected environment. Valid values are `developer`, `maintainer`.
 - `group_id` (Number) The ID of the group allowed to deploy to this protected environment. The project must be shared with the group.
+- `group_inheritance_type` (Number) Group inheritance allows deploy access levels to take inherited group membership into account. Valid values are `0`, `1`. `0` => Direct group membership only, `1` => All inherited groups. Default: `0`
 - `user_id` (Number) The ID of the user allowed to deploy to this protected environment. The user must be a member of the project.
 
 Read-Only:

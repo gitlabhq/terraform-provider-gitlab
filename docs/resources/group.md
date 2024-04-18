@@ -62,7 +62,8 @@ resource "gitlab_group" "example-two" {
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `default_branch_protection` (Number) See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
 - `description` (String) The group's description.
-- `emails_disabled` (Boolean) Disable email notifications.
+- `emails_disabled` (Boolean, Deprecated) Disable email notifications.
+- `emails_enabled` (Boolean) Enable email notifications.
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
 - `ip_restriction_ranges` (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
 - `lfs_enabled` (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.

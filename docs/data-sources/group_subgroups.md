@@ -60,6 +60,7 @@ Read-Only:
 - `default_branch_protection` (Number)
 - `description` (String)
 - `emails_disabled` (Boolean)
+- `emails_enabled` (Boolean)
 - `file_template_project_id` (Number)
 - `full_name` (String)
 - `full_path` (String)

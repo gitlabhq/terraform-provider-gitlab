@@ -160,7 +160,8 @@ resource "gitlab_project" "import_private" {
 - `container_registry_enabled` (Boolean, Deprecated) Enable container registry for the project.
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
-- `emails_disabled` (Boolean) Disable email notifications.
+- `emails_disabled` (Boolean, Deprecated) Disable email notifications.
+- `emails_enabled` (Boolean) Enable email notifications.
 - `environments_access_level` (String) Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
 - `external_authorization_classification_label` (String) The classification label for the project.
 - `feature_flags_access_level` (String) Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.
