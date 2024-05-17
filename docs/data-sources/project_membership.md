@@ -4,7 +4,7 @@ page_title: "gitlab_project_membership Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_membership data source allows to list and filter all members of a project specified by either its id or full path.
-  -> Note exactly one of projectid or fullpath must be provided.
+  -> Note exactly one of project_id or full_path must be provided.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html#list-all-members-of-a-group-or-project
 ---
 

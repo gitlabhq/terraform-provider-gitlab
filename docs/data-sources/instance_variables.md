@@ -32,6 +32,7 @@ data "gitlab_instance_variables" "vars" {}
 
 Read-Only:
 
+- `description` (String)
 - `key` (String)
 - `masked` (Boolean)
 - `protected` (Boolean)

@@ -19,7 +19,7 @@ The `gitlab_pipeline_schedule` resource allows to manage the lifecycle of a sche
 resource "gitlab_pipeline_schedule" "example" {
   project     = "12345"
   description = "Used to schedule builds"
-  ref         = "master"
+  ref         = "refs/heads/main"
   cron        = "0 1 * * *"
 }
 ```
@@ -32,7 +32,7 @@ resource "gitlab_pipeline_schedule" "example" {
 - `cron` (String) The cron (e.g. `0 1 * * *`).
 - `description` (String) The description of the pipeline schedule.
 - `project` (String) The name or id of the project to add the schedule to.
-- `ref` (String) The branch/tag name to be triggered.
+- `ref` (String) The branch/tag name to be triggered. This must be the full branch reference, for example: `refs/heads/main`, not `main`.
 
 ### Optional
 

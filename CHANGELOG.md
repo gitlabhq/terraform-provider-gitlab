@@ -1,3 +1,58 @@
+## 17.0.0 (2024-05-16)
+
+This release was tested against GitLab 17.0, 16.11, and 16.10 for both CE and EE
+
+KNOWN ISSUES:
+
+- `gitlab_current_user` returns an empty string for `public_email` ([#6305](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/issues/6305))
+
+BREAKING CHANGES:
+
+- resources/project_protected_environment: Removed support for `required_approval_count` field, use `required_approvals` in `approval_rules` or `deploy_access_level` instead ([!1940](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1940))
+- resources/group_protected_environment: Removed support for `required_approval_count` field, use `required_approvals` in `approval_rules` or `deploy_access_level` instead ([!1940](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1940))
+- resources/gitlab_group: Removed a version check related to `commit_committer_check` and `reject_unsigned_commits` that would prevent their use in versions prior to GitLab 16.4. If used with versions earlier than 16.4, these attributes will cause an error instead of being excluded. ([!1937](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1937))
+- resources/gitlab_group: Removed support for `emails_disabled`, use `emails_enabled` instead ([!1929](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1929))
+- resources/gitlab_project: Removed support for `emails_disabled`, use `emails_enabled` instead ([!1929](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1929))
+- resources/gitlab_pipeline_schedule: `ref` now requires the full ref instead of allowing the use of the short ref. If you previously used `main`, you now need to use `refs/heads/main` instead, for example ([!1923](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1923))
+- resources/gitlab_pipeline_trigger: `token` can no longer be imported. ([!1905](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1905))
+- resources/gitlab_pipeline_trigger: Updating the `project` attribute will now force the creation of a new pipeline trigger ([!1905](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1905))
+- data/gitlab_group(s): Removed support for `emails_disabled`, use `emails_enabled` instead ([!1929](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1929))
+- data/gitlab_project(s): Removed support for `emails_disabled`, use `emails_enabled` instead ([!1929](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1929))
+- data/gitlab_project(s): Removed support for `public`, use `visibility` instead ([!1929](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1929))
+- `master` is no longer a valid access level on any resource that supports the use of access levels. This impacts the resources listed below. ([!1903](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1903))
+  - gitlab_group_access_token
+  - gitlab_group_ldap_link
+  - gitlab_group_membership
+  - gitlab_group_share_group
+  - gitlab_project_access_token
+  - gitlab_project_membership
+  - gitlab_project_share_group
+
+IMPROVEMENTS:
+
+- **New Resource** resource/gitlab_integration_jenkins: Allows managing a project Jenkins integration ([!1919](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1919))
+- **New Resource** resource/gitlab_project_push_rules:  Allows managing the lifecycle of push rules on a project ([!1893](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1893))
+- **New Resource** resource/gitlab_project_job_token_scopes: This resource sets a strict list of project job token scopes, and removes any job token scopes not managed by the resource. This can be useful to explicitly deny job token scopes on a project. ([!1907](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1907))
+- resources/gitlab_pipeline_schedule_variable: Added support for the use of `variable_type` ([!1952](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1952))
+- resources/gitlab_group: Added support for the use of `commit_committer_name_check` to the `push_rules` block ([!1937](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1937))
+- resources/gitlab_project: Added support for the use of `commit_committer_name_check` to the `push_rules` block ([!1918](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1918))
+- resources/gitlab_instance_variable: Added support for the use of `description` ([!1950](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1950))
+- resources/gitlab_user_runner: Added example documentation for this resource to make it easier to consume ([!1928](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1928))
+- resources/gitlab_application_settings: Add support for `minimum_password_length` to the resource ([!1917](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1917))
+- resources/gitlab_personal_access_token: Updated the API used to read personal access token data, which improves performance of this resource in situations where many tokens are being maintained, and improves reliability of the resource in high concurrency situations ([!1908](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1908))
+- data/gitlab_instance_variable: Added support for `description` ([!1950](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1950))
+- provider: Added documentation that the use of Project Access Tokens or Group Access Tokens may not work with all resources ([!1928](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1928))
+
+BUG FIXES:
+
+- resources/gitlab_pipeline_schedule: Fixed a provider crash in situations where the scheduled pipeline fails to create ([!1899](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1899))
+- resources/gitlab_group: Fixed a provider error when attempting to create groups with `push_rules` on GitLab CE where `push_rules` are not supported ([!1891](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1891))
+- resources/gitlab_group_access_token: Fixed an issue with token rotation using `rotation_configuration` where tokens wouldn't rotate properly after `expires_at` was stored in state. Added additional debug logging for token rotation. ([!1953](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1953))
+- resources/gitlab_group_access_token: Fixed an issue with token rotation where manually managing expiration using `expires_at` would encounter an error after updating `expires_at` twice ([!1916](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1916))
+- resources/gitlab_project_access_token: Fixed an issue with token rotation using `rotation_configuration` where tokens wouldn't rotate properly after `expires_at` was stored in state. Added additional debug logging for token rotation. ([!1953](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1953))
+- resources/gitlab_project_access_token: Fixed an issue with token rotation where manually managing expiration using `expires_at` would encounter an error after updating `expires_at` twice ([!1916](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1916))
+- resources/gitlab_pipeline_trigger: Fixed a bug where applying TF with different users could corrupt the pipeline trigger `token` [!1905](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1905)
+
 ## 16.11.0 (2024-04-18)
 
 This release was tested against GitLab 16.9, 16.10, and 16.11 for both CE and EE

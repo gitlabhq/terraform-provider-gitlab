@@ -5,11 +5,11 @@ subcategory: ""
 description: |-
   The gitlab_project_approval_rule resource allows to manage the lifecycle of a project-level approval rule.
   -> This resource requires a GitLab Enterprise instance.
-  ~> A project is limited to one "anyapprover" rule at a time, any attempt to create a second rule of type "anyapprover" will fail. As a result, if
-     an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
-     to prevent a common error with this resource.
-  ~> Since a project is limited to one "anyapprover" rule, attempting to add two "anyapprover" rules to the same project in terraform will result in
-     terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
+  ~> A project is limited to one "any_approver" rule at a time, any attempt to create a second rule of type "any_approver" will fail. As a result, if
+  an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
+  to prevent a common error with this resource.
+  ~> Since a project is limited to one "any_approver" rule, attempting to add two "any_approver" rules to the same project in terraform will result in
+  terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/merge_request_approvals.html#project-level-mr-approvals
 ---
 

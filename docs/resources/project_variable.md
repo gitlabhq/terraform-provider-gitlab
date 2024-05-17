@@ -4,7 +4,7 @@ page_title: "gitlab_project_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_variable resource allows to manage the lifecycle of a CI/CD variable for a project.
-  ~> Important: If your GitLab version is older than 13.4, you may see nondeterministic behavior when updating or deleting gitlabprojectvariable resources with non-unique keys, for example if there is another variable with the same key and different environment scope. See this GitLab issue https://gitlab.com/gitlab-org/gitlab/-/issues/9912.
+  ~> Important: If your GitLab version is older than 13.4, you may see nondeterministic behavior when updating or deleting gitlab_project_variable resources with non-unique keys, for example if there is another variable with the same key and different environment scope. See this GitLab issue https://gitlab.com/gitlab-org/gitlab/-/issues/9912.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_level_variables.html
 ---
 

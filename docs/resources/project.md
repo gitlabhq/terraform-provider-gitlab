@@ -160,7 +160,6 @@ resource "gitlab_project" "import_private" {
 - `container_registry_enabled` (Boolean, Deprecated) Enable container registry for the project.
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
-- `emails_disabled` (Boolean, Deprecated) Disable email notifications.
 - `emails_enabled` (Boolean) Enable email notifications.
 - `environments_access_level` (String) Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
 - `external_authorization_classification_label` (String) The classification label for the project.
@@ -270,7 +269,8 @@ Optional:
 - `author_email_regex` (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
 - `branch_name_regex` (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
 - `commit_committer_check` (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
-- `commit_message_negative_regex` (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+- `commit_committer_name_check` (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+- `commit_message_negative_regex` (String) No commit message is allowed to match this regex, e.g. `ssh\:\/\/`.
 - `commit_message_regex` (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
 - `deny_delete_tag` (Boolean) Deny deleting a tag.
 - `file_name_regex` (String) All committed filenames must not match this regex, e.g. `(jar|exe)$`.

@@ -33,8 +33,8 @@ resource "gitlab_project_share_group" "test" {
 
 ### Optional
 
-- `access_level` (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
-- `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`
+- `access_level` (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`
+- `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`
 
 ### Read-Only
 

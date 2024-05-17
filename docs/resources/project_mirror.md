@@ -5,13 +5,13 @@ subcategory: ""
 description: |-
   The gitlab_project_mirror resource allows to manage the lifecycle of a project mirror.
   This is for pushing changes to a remote repository. Pull Mirroring can be configured using a combination of the
-  importurl, mirror, and mirrortriggerbuilds properties on the gitlabproject resource.
+  import_url, mirror, and mirror_trigger_builds properties on the gitlab_project resource.
   -> Warning By default, the provider sets the keep_divergent_refs argument to True.
-     If you manually set keep_divergent_refs to False, GitLab mirroring removes branches in the target that aren't in the source.
-     This action can result in unexpected branch deletions.
+  If you manually set keep_divergent_refs to False, GitLab mirroring removes branches in the target that aren't in the source.
+  This action can result in unexpected branch deletions.
   -> Destroy Behavior GitLab 14.10 introduced an API endpoint to delete a project mirror.
-     Therefore, for GitLab 14.10 and newer the project mirror will be destroyed when the resource is destroyed.
-     For older versions, the mirror will be disabled and the resource will be destroyed.
+  Therefore, for GitLab 14.10 and newer the project mirror will be destroyed when the resource is destroyed.
+  For older versions, the mirror will be disabled and the resource will be destroyed.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/remote_mirrors.html
 ---
 

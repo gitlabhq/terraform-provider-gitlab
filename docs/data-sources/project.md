@@ -55,7 +55,6 @@ data "gitlab_project" "example" {
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
-- `emails_disabled` (Boolean, Deprecated) Disable email notifications.
 - `emails_enabled` (Boolean) Enable email notifications.
 - `empty_repo` (Boolean) Whether the project is empty.
 - `environments_access_level` (String) Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
@@ -126,6 +125,7 @@ Read-Only:
 - `author_email_regex` (String)
 - `branch_name_regex` (String)
 - `commit_committer_check` (Boolean)
+- `commit_committer_name_check` (Boolean)
 - `commit_message_negative_regex` (String)
 - `commit_message_regex` (String)
 - `deny_delete_tag` (Boolean)

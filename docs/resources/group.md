@@ -62,7 +62,6 @@ resource "gitlab_group" "example-two" {
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `default_branch_protection` (Number) See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
 - `description` (String) The group's description.
-- `emails_disabled` (Boolean, Deprecated) Disable email notifications.
 - `emails_enabled` (Boolean) Enable email notifications.
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
 - `ip_restriction_ranges` (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
@@ -100,6 +99,7 @@ Optional:
 - `author_email_regex` (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
 - `branch_name_regex` (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
 - `commit_committer_check` (Boolean) Only commits pushed using verified emails are allowed.  **Note** This attribute is only supported in GitLab versions >= 16.4.
+- `commit_committer_name_check` (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
 - `commit_message_negative_regex` (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
 - `commit_message_regex` (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
 - `deny_delete_tag` (Boolean) Deny deleting a tag.

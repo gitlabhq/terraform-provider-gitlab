@@ -52,7 +52,7 @@ resource "gitlab_group_variable" "example" {
 
 ### Optional
 
-- `access_level` (String) The access level for the group access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`, `master`. Default is `maintainer`.
+- `access_level` (String) The access level for the group access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`. Default is `maintainer`.
 - `expires_at` (String) When the token will expire, YYYY-MM-DD format.
 - `rotation_configuration` (Attributes) The configuration for when to rotate a token automatically. Will not rotate a token until `terraform apply` is run. (see [below for nested schema](#nestedatt--rotation_configuration))
 

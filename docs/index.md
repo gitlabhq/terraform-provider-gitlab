@@ -20,6 +20,10 @@ Use the navigation to the left to read about the valid data sources and resource
 This provider requires at least [Terraform 1.0](https://www.terraform.io/downloads.html).
 A minimum of Terraform 1.4.0 is recommended.
 
+-> Using a Project or Group access token may cause issues with some resources, as those token types don't 
+have full access to every API. This is also true when using a `CI_JOB_TOKEN`. Consider using a dedicated
+Personal Access Token or Service Account if you are experiencing permission errors when adding resources. 
+
 ## Example Usage
 
 ```terraform

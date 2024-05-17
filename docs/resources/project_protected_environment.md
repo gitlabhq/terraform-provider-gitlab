@@ -5,10 +5,10 @@ subcategory: ""
 description: |-
   The gitlab_project_protected_environment resource allows to manage the lifecycle of a protected environment in a project.
   ~> In order to use a user or group in the deploy_access_levels configuration,
-     you need to make sure that users have access to the project and groups must have this project shared.
-     You may use the gitlab_project_membership and gitlab_project_shared_group resources to achieve this.
-     Unfortunately, the GitLab API does not complain about users and groups without access to the project and just ignores those.
-     In case this happens you will get perpetual state diffs.
+  you need to make sure that users have access to the project and groups must have this project shared.
+  You may use the gitlab_project_membership and gitlab_project_shared_group resources to achieve this.
+  Unfortunately, the GitLab API does not complain about users and groups without access to the project and just ignores those.
+  In case this happens you will get perpetual state diffs.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_environments.html
 ---
 
@@ -35,9 +35,8 @@ resource "gitlab_project_environment" "this" {
 
 # Example with deployment access level
 resource "gitlab_project_protected_environment" "example_with_access_level" {
-  project                 = gitlab_project_environment.this.project
-  required_approval_count = 1
-  environment             = gitlab_project_environment.this.name
+  project     = gitlab_project_environment.this.project
+  environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
     access_level = "developer"
@@ -66,9 +65,8 @@ resource "gitlab_project_protected_environment" "example_with_user" {
 
 # Example with multiple deployment access levels
 resource "gitlab_project_protected_environment" "example_with_multiple" {
-  project                 = gitlab_project_environment.this.project
-  required_approval_count = 2
-  environment             = gitlab_project_environment.this.name
+  project     = gitlab_project_environment.this.project
+  environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
     access_level = "developer"
@@ -85,9 +83,8 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 
 # Example with access-level based approval rules
 resource "gitlab_project_protected_environment" "example_with_multiple" {
-  project                 = gitlab_project_environment.this.project
-  required_approval_count = 2
-  environment             = gitlab_project_environment.this.name
+  project     = gitlab_project_environment.this.project
+  environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
     access_level = "developer"
@@ -95,16 +92,16 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 
   approval_rules = [
     {
-      access_level = "developer"
+      access_level       = "developer"
+      required_approvals = 2
     }
   ]
 }
 
 # Example with multiple approval rules, using access level, user, and group
 resource "gitlab_project_protected_environment" "example_with_multiple" {
-  project                 = gitlab_project_environment.this.project
-  required_approval_count = 2
-  environment             = gitlab_project_environment.this.name
+  project     = gitlab_project_environment.this.project
+  environment = gitlab_project_environment.this.name
 
   deploy_access_levels {
     access_level = "developer"
@@ -115,7 +112,8 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
       user_id = 789
     },
     {
-      access_level = "developer"
+      access_level       = "developer"
+      required_approvals = 2
     },
     {
       group_id = 456
@@ -136,7 +134,6 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 
 - `approval_rules` (Attributes List) Array of approval rules to deploy, with each described by a hash. (see [below for nested schema](#nestedatt--approval_rules))
 - `deploy_access_levels` (Block Set) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
-- `required_approval_count` (Number) The number of approvals required to deploy to this environment.
 
 ### Read-Only
 

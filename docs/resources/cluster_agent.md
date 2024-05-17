@@ -5,9 +5,9 @@ subcategory: ""
 description: |-
   The gitlab_cluster_agent resource allows to manage the lifecycle of a GitLab Agent for Kubernetes.
   -> Note that this resource only registers the agent, but doesn't configure it.
-     The configuration needs to be manually added as described in
-     the docs https://docs.gitlab.com/ee/user/clusters/agent/install/index.html#create-an-agent-configuration-file.
-     However, a gitlab_repository_file resource may be used to achieve that.
+  The configuration needs to be manually added as described in
+  the docs https://docs.gitlab.com/ee/user/clusters/agent/install/index.html#create-an-agent-configuration-file.
+  However, a gitlab_repository_file resource may be used to achieve that.
   -> Requires at least maintainer permissions on the project.
   -> Requires at least GitLab 14.10
   Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/cluster_agents.html
