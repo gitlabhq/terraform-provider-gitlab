@@ -1,3 +1,11 @@
+## 17.0.0 (2024-06-07)
+
+This release was tested against GitLab 17.0, 16.11, and 16.10 for both CE and EE
+
+BUG FIXES:
+
+- Fixed an issue where sensitive tokens were not masked properly in debug log files ([!1997](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1997))
+
 ## 17.0.0 (2024-05-16)
 
 This release was tested against GitLab 17.0, 16.11, and 16.10 for both CE and EE
