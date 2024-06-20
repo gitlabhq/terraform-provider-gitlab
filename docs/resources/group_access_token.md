@@ -3,7 +3,7 @@
 page_title: "gitlab_group_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_access_tokenresource allows to manage the lifecycle of a group access token.
+  The gitlab_group_access_token resource allows to manage the lifecycle of a group access token.
   ~> Observability scopes are in beta and may not work on all instances. See more details in the documentation https://docs.gitlab.com/ee/operations/tracing.html
   ~> Use rotation_configuration to automatically rotate tokens instead of using timestamp() as timestamp will cause changes with every plan. terraform apply must still be run to rotate the token.
   ~> Due to Automatic reuse detection https://docs.gitlab.com/ee/api/group_access_tokens.html#automatic-reuse-detection it's possible that a new Group Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
@@ -12,7 +12,7 @@ description: |-
 
 # gitlab_group_access_token (Resource)
 
-The `gitlab_group_access_token`resource allows to manage the lifecycle of a group access token.
+The `gitlab_group_access_token` resource allows to manage the lifecycle of a group access token.
 
 ~> Observability scopes are in beta and may not work on all instances. See more details in [the documentation](https://docs.gitlab.com/ee/operations/tracing.html)
 
@@ -48,7 +48,7 @@ resource "gitlab_group_variable" "example" {
 
 - `group` (String) The ID or full path of the group.
 - `name` (String) The name of the group access token.
-- `scopes` (Set of String) The scopes of the group access token. Valid values are: `api`, `read_api`, `read_user`, `k8s_proxy`, `read_registry`, `write_registry`, `read_repository`, `write_repository`, `create_runner`, `ai_features`, `k8s_proxy`, `read_observability`, `write_observability`
+- `scopes` (Set of String) The scopes of the group access token. Valid values are: `api`, `read_api`, `read_registry`, `write_registry`, `read_repository`, `write_repository`, `create_runner`, `manage_runner`, `ai_features`, `k8s_proxy`, `read_observability`, `write_observability`
 
 ### Optional
 

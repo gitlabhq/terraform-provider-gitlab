@@ -1,4 +1,27 @@
-## 17.0.0 (2024-06-07)
+
+## 17.1.0 (2024-06-20)
+
+This release was tested against GitLab 17.1, 17.0, and 16.11 for both CE and EE
+
+### BUG FIXES (3 changes)
+
+- resource/gitlab_project_job_token_scopes:  [Correct examples for resource project_job_token_scopes](gitlab-org/terraform-provider-gitlab@3027ed1e0861b405ef81f13b3e58fce5aff96ed2) by @heidi.berry ([merge request](gitlab-org/terraform-provider-gitlab!1968)) 
+- resource/gitlab_group_access_token: [Fix an issue where using access tokens with a `time` provider caused segfaults](gitlab-org/terraform-provider-gitlab@de3b98c0881a8aa8a57ca9ea2ac735230b56f8c2) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1999))
+- resource/gitlab_project_access_token: [Fix an issue where using access tokens with a `time` provider caused segfaults](gitlab-org/terraform-provider-gitlab@de3b98c0881a8aa8a57ca9ea2ac735230b56f8c2) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1999))
+
+### IMPROVEMENTS (8 changes)
+
+- **New Resource** resource/gitlab_telegram_integration: [Implement Telegram Integration](gitlab-org/terraform-provider-gitlab@bc5eb7cf0138296aedb6f2559166a95f3f56bf32) by @alxrem ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1963))
+- resource/gitlab_group_saml_link: [Add ability to set custom roles on group SAML links](gitlab-org/terraform-provider-gitlab1cd431c8238fc690e04e9625951208693977e2c0) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1949))
+- resource/gitlab_integration_slack:  [Add confidential_note_channel to slack integration](gitlab-org/terraform-provider-gitlab@38c49916a0d21151a59de518ca103b1fca3c5d6d) by @0oMarko0 ([merge request](gitlab-org/terraform-provider-gitlab!1988)) 
+- resource/gitlab_personal_access_token:  [Implement manage_runner access token scope](gitlab-org/terraform-provider-gitlab@a5a1c711d0d086a51dfd92fcc751814182e526b8) ([merge request](gitlab-org/terraform-provider-gitlab!1986)) 
+- resource/gitlab_personal_access_token:  [Mark `expires_at` attribute as optional](gitlab-org/terraform-provider-gitlab@7be1aa7f6948552eb2e16331b80c83e3f26eb971) by @erezo9 ([merge request](gitlab-org/terraform-provider-gitlab!1983))
+- resource/gitlab_group_access_token: [Fixed several documentation issues with access token resources](gitlab-org/terraform-provider-gitlab@738a1ffb41ad7cfaffa205d0c31f827d9f4e59e8) by @theipster ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2004))
+- resource/gitlab_project_access_token: [Fixed several documentation issues with access token resources](gitlab-org/terraform-provider-gitlab@738a1ffb41ad7cfaffa205d0c31f827d9f4e59e8) by @theipster ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2004))
+- resource/gitlab_project: [Update `initialize_with_readme` to add border case documentation](gitlab-org/terraform-provider-gitlab@247453b3e45362c4ef91fa9f537d6de7cf49cbfc) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1989))
+
+
+## 17.0.1 (2024-06-07)
 
 This release was tested against GitLab 17.0, 16.11, and 16.10 for both CE and EE
 

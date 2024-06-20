@@ -47,6 +47,7 @@ resource "gitlab_service_slack" "slack" {
 - `branches_to_be_notified` (String) Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected".
 - `confidential_issue_channel` (String) The name of the channel to receive confidential issue events notifications.
 - `confidential_issues_events` (Boolean) Enable notifications for confidential issues events.
+- `confidential_note_channel` (String) The name of the channel to receive confidential note events notifications.
 - `confidential_note_events` (Boolean) Enable notifications for confidential note events.
 - `issue_channel` (String) The name of the channel to receive issue events notifications.
 - `issues_events` (Boolean) Enable notifications for issues events.
