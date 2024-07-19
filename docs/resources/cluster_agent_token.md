@@ -84,7 +84,7 @@ resource "helm_release" "gitlab_agent" {
 - `id` (String) The ID of this resource.
 - `last_used_at` (String) The ISO8601 datetime when the token was last used.
 - `status` (String) The status of the token. Valid values are `active`, `revoked`.
-- `token` (String) The secret token for the agent. The `token` is not available in imported resources.
+- `token` (String, Sensitive) The secret token for the agent. The `token` is not available in imported resources.
 - `token_id` (Number) The ID of the token.
 
 ## Import

@@ -3,18 +3,27 @@
 page_title: "gitlab_personal_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_personal_access_token resource allows to manage the lifecycle of a personal access token for a specified user.
+  The gitlab_personal_access_token resource allows to manage the lifecycle of a personal access token.
   -> This resource requires administration privileges.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/personal_access_tokens.html
+  ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
+  ~> Observability scopes are in beta and may not work on all instances. See more details in the documentation https://docs.gitlab.com/ee/operations/tracing.html
+  ~> Due to Automatic reuse detection https://docs.gitlab.com/ee/api/personal_access_tokens.html#automatic-reuse-detection it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
+  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/personal_access_tokens.html
 ---
 
 # gitlab_personal_access_token (Resource)
 
-The `gitlab_personal_access_token` resource allows to manage the lifecycle of a personal access token for a specified user.
+The `gitlab_personal_access_token` resource allows to manage the lifecycle of a personal access token.
 
 -> This resource requires administration privileges.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)
+~> Use of the `timestamp()` function with expires_at will cause the resource to be re-created with every apply, it's recommended to use `plantimestamp()` or a static value instead.
+
+~> Observability scopes are in beta and may not work on all instances. See more details in [the documentation](https://docs.gitlab.com/ee/operations/tracing.html)
+
+~> Due to [Automatic reuse detection](https://docs.gitlab.com/ee/api/personal_access_tokens.html#automatic-reuse-detection) it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
+
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)
 
 ## Example Usage
 
@@ -40,20 +49,20 @@ resource "gitlab_project_variable" "example" {
 ### Required
 
 - `name` (String) The name of the personal access token.
-- `scopes` (Set of String) The scope for the personal access token. It determines the actions which can be performed when authenticating with this token. Valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `sudo`, `admin_mode`, `create_runner`, `manage_runner`.
-- `user_id` (Number) The id of the user.
+- `scopes` (Set of String) The scopes of the personal access token. valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `sudo`, `admin_mode`, `create_runner`, `manage_runner`, `ai_features`, `k8s_proxy`, `read_service_ping`
+- `user_id` (Number) The ID of the user.
 
 ### Optional
 
-- `expires_at` (String) The token expires at midnight UTC on that date. The date must be in the format YYYY-MM-DD.
+- `expires_at` (String) When the token will expire, YYYY-MM-DD format.
 
 ### Read-Only
 
 - `active` (Boolean) True if the token is active.
 - `created_at` (String) Time the token has been created, RFC3339 format.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of the personal access token.
 - `revoked` (Boolean) True if the token is revoked.
-- `token` (String, Sensitive) The personal access token. This is only populated when creating a new personal access token. This attribute is not available for imported resources.
+- `token` (String, Sensitive) The token of the personal access token. **Note**: the token is not available for imported resources.
 
 ## Import
 

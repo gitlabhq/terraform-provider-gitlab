@@ -1,4 +1,24 @@
 
+## 17.2.0 (2024-07-18)
+
+This release was tested against GitLab 17.2, 17.1, and 17.0 for both CE and EE
+
+### BREAKING CHANGES (1 change)
+Note: As a security related change, this breaking change is allowed outside a major release. If a non-sensitive token is required for migration purposes users can use the `nonsensitive()` TF function.
+
+- resource/gitlab_cluster_agent_token: [Mark GitLab cluster agent token as sensitive](gitlab-org/terraform-provider-gitlab@1eec1065723f6393a3e5deb45356a47ec27b575e) by @CarbonCollins ([merge request](gitlab-org/terraform-provider-gitlab!2032)) 
+
+### IMPROVEMENTS (1 change)
+
+- **New Resource** resource/gitlab_project_security_policy_attachment: [Add new resource for associating security policy projects to a project](gitlab-org/terraform-provider-gitlab@3fc5f6c8a9d74f8b034af84a73fb9dcb6d323179) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2009))
+- resource/gitlab_personal_access_token: [Migrate `gitlab_personal_access_token` from SDK to TF Plugin Framework](gitlab-org/terraform-provider-gitlab@24489118da1ce464994cdfcedecbe804edf65490) by @theipster ([merge request](gitlab-org/terraform-provider-gitlab!2005)) 
+- 
+
+### BUG FIXES (4 changes)
+
+- resource/gitlab_deploy_key: [Fix deploy key documentation reference to point to the correct resource for enabling a pre-existing deploy key](gitlab-org/terraform-provider-gitlab@f8718e66a5608c521009d091761b5577a055e904) by @blrz ([merge request](gitlab-org/terraform-provider-gitlab!2024)) 
+- resource/gitlab_user_runner: [Fix an issue with gitlab_user_runner causing inconsistent TF plans](gitlab-org/terraform-provider-gitlab@a5448baf255134f0d0bff5fe16803ee4cf35ce61) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2020)) 
+
 ## 17.1.0 (2024-06-20)
 
 This release was tested against GitLab 17.1, 17.0, and 16.11 for both CE and EE
