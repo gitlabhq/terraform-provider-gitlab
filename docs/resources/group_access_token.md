@@ -27,7 +27,7 @@ The `gitlab_group_access_token` resource allows to manage the lifecycle of a gro
 ```terraform
 resource "gitlab_group_access_token" "example" {
   group        = "25"
-  name         = "Example project access token"
+  name         = "Example group access token"
   expires_at   = "2020-03-14"
   access_level = "developer"
 

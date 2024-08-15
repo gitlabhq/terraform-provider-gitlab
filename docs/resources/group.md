@@ -69,6 +69,7 @@ resource "gitlab_group" "example-two" {
 - `membership_lock` (Boolean) Users cannot be added to projects in this group.
 - `mentions_disabled` (Boolean) Disable the capability of a group from getting mentioned.
 - `parent_id` (Number) Id of the parent group (creates a nested group).
+- `permanently_remove_on_delete` (Boolean) Whether the group should be permanently removed during a `delete` operation. This only works with subgroups. Must be configured via an `apply` before the `destroy` is run.
 - `prevent_forking_outside_group` (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
 - `project_creation_level` (String) Determine if developers can create projects in the group. Valid values are: `noone`, `maintainer`, `developer`
 - `push_rules` (Block List, Max: 1) Push rules for the group. (see [below for nested schema](#nestedblock--push_rules))

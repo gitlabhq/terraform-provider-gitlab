@@ -189,6 +189,7 @@ resource "gitlab_application_settings" "this" {
 - `max_pages_size` (Number) Maximum size of pages repositories in MB.
 - `max_personal_access_token_lifetime` (Number) Maximum allowable lifetime for access tokens in days.
 - `max_ssh_key_lifetime` (Number) Maximum allowable lifetime for SSH keys in days. Introduced in GitLab 14.6.
+- `max_terraform_state_size_bytes` (Number) Maximum size in bytes of the Terraform state files. Set this to 0 for unlimited file size.
 - `metrics_method_call_threshold` (Number) A method call is only tracked when it takes longer than the given amount of milliseconds.
 - `minimum_password_length` (Number) Indicates whether passwords require a minimum length. Introduced in GitLab 15.1. Premium and Ultimate only.
 - `mirror_available` (Boolean) Allow repository mirroring to configured by project Maintainers. If disabled, only Administrators can configure repository mirroring.

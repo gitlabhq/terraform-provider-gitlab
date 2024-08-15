@@ -1,4 +1,26 @@
 
+## 17.3.0 (2024-08-15)
+
+This release was tested against GitLab 17.3, 17.2, and 17.1 for both CE and EE
+
+### IMPROVEMENTS (8 changes)
+
+- **New Resource** resource/gitlab_group_security_policy_attachment: [Add new resource for association security policy projects to a group](gitlab-org/terraform-provider-gitlab@fa00e1ec7636dc47b9b4292d164825bf39af0cef) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2048))
+- **New Datasource** resource/gitlab_group_ids: [Add new datasource retrieving group ID, Full Path, or GraphQL ID based on group ID or Url-encoded path](gitlab-org/terraform-provider-gitlab@e0b0f88070caea6592c1983aa7792a77b27e9b88) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2057))
+- **New Datasource** resource/gitlab_project_ids: [Add new datasource retrieving project ID, Full Path, or GraphQL ID based on project ID or Url-encoded path](gitlab-org/terraform-provider-gitlab@e0b0f88070caea6592c1983aa7792a77b27e9b88) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2057))
+- resource/gitlab_project_job_token_scopes: [Add support for `target_group_ids`, allowing groups to be used in the allow list](gitlab-org/terraform-provider-gitlab@f4246b814952900a5ddfb509ca2c081d47e820e1) by @chapsuK ([merge request](gitlab-org/terraform-provider-gitlab!2040))
+- resource/gitlab_group: [Add support for `permanently_remove_on_delete`, allowing groups to be permanently deleted on destroy instead of entering a waiting period](gitlab-org/terraform-provider-gitlab@a0374ef9b9ff87cc9f93a1523fc3bd0998ab0c6f) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2044))
+- resource/gitlab_application_settings: [Add support for `max_terraform_state_size_bytes`, allowing configuration of terraform state size at an instance level](gitlab-org/terraform-provider-gitlab@d852a3360f034648816969cb3f94e310f6fb74d9) by @christian.affolter ([merge request](gitlab-org/terraform-provider-gitlab!1960))
+- resource/gitlab_project_push_rules: [`gitlab_project_push_rules` will now take over ownership of existing push rules, since a default set is created on project creation](gitlab-org/terraform-provider-gitlab@89e32696080ab4647d49cd077f7ffe0a5675766e) by @mness ([merge request](gitlab-org/terraform-provider-gitlab!2046))
+- resource/gitlab_project_job_token_scopes: [Added support for `project`, allowing the use of the resource by project ID or url-encoded path](gitlab-org/terraform-provider-gitlab@f040983bed1545fe445d41fb56e36f938cee35de) by @heidi.berry ([merge request](gitlab-org/terraform-provider-gitlab!1981))
+
+### BUG FIXES (4 changes)
+
+- resource/gitlab_group_access_token: [Fix example to use the proper resource](gitlab-org/terraform-provider-gitlab@f20836445c6190feb4dc081eca9f02887b39c205) by @blrz ([merge request](gitlab-org/terraform-provider-gitlab!2050)) 
+- resource/gitlab_group_security_policy_attachment: [Fix example to use the proper resource](gitlab-org/terraform-provider-gitlab@0fe493c436fb7bb333d40c8f5aab8da18f1c272c) by @calebw ([merge request](gitlab-org/terraform-provider-gitlab!2054)) 
+- resource/gitlab_project_security_policy_attachment: [Fix example to use the proper resource](gitlab-org/terraform-provider-gitlab@0fe493c436fb7bb333d40c8f5aab8da18f1c272c) by @calebw ([merge request](gitlab-org/terraform-provider-gitlab!2054)) 
+- resource/gitlab_user_runner: [Fix description to remove typo in `group_type`](gitlab-org/terraform-provider-gitlab@f67c731da1f9fcd102053c047de1455043853291) by @clemenschuaccso ([merge request](gitlab-org/terraform-provider-gitlab!2049)) 
+
 ## 17.2.0 (2024-07-18)
 
 This release was tested against GitLab 17.2, 17.1, and 17.0 for both CE and EE
@@ -12,7 +34,6 @@ Note: As a security related change, this breaking change is allowed outside a ma
 
 - **New Resource** resource/gitlab_project_security_policy_attachment: [Add new resource for associating security policy projects to a project](gitlab-org/terraform-provider-gitlab@3fc5f6c8a9d74f8b034af84a73fb9dcb6d323179) by @PatrickRice ([merge request](gitlab-org/terraform-provider-gitlab!2009))
 - resource/gitlab_personal_access_token: [Migrate `gitlab_personal_access_token` from SDK to TF Plugin Framework](gitlab-org/terraform-provider-gitlab@24489118da1ce464994cdfcedecbe804edf65490) by @theipster ([merge request](gitlab-org/terraform-provider-gitlab!2005)) 
-- 
 
 ### BUG FIXES (4 changes)
 
