@@ -132,8 +132,8 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 
 ### Optional
 
-- `approval_rules` (Attributes List) Array of approval rules to deploy, with each described by a hash. (see [below for nested schema](#nestedatt--approval_rules))
-- `deploy_access_levels` (Block Set) Array of access levels allowed to deploy, with each described by a hash. (see [below for nested schema](#nestedblock--deploy_access_levels))
+- `approval_rules` (Attributes List) Array of approval rules to deploy, with each described by a hash. Elements in the `approval_rules` should be one of `user_id`, `group_id` or `access_level`. (see [below for nested schema](#nestedatt--approval_rules))
+- `deploy_access_levels` (Block Set) Array of access levels allowed to deploy, with each described by a hash.  Elements in the `deploy_access_levels` should be one of `user_id`, `group_id` or `access_level`. (see [below for nested schema](#nestedblock--deploy_access_levels))
 
 ### Read-Only
 
@@ -144,11 +144,11 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 
 Optional:
 
-- `access_level` (String) Levels of access allowed to approve a deployment to this protected environment. Valid values are `developer`, `maintainer`.
-- `group_id` (Number) The ID of the group allowed to approve a deployment to this protected environment. The project must be shared with the group. This is mutually exclusive with user_id.
+- `access_level` (String) Levels of access allowed to approve a deployment to this protected environment. Mutually exclusive with `user_id` and `group_id`. Valid values are `developer`, `maintainer`.
+- `group_id` (Number) The ID of the group allowed to approve a deployment to this protected environment. The project must be shared with the group. Mutually exclusive with `access_level` and `user_id`.
 - `group_inheritance_type` (Number) Group inheritance allows deploy access levels to take inherited group membership into account. Valid values are `0`, `1`. `0` => Direct group membership only, `1` => All inherited groups. Default: `0`
 - `required_approvals` (Number) The number of approval required to allow deployment to this protected environment. This is mutually exclusive with user_id.
-- `user_id` (Number) The ID of the user allowed to approve a deployment to this protected environment. The user must be a member of the project. This is mutually exclusive with group_id and required_approvals.
+- `user_id` (Number) The ID of the user allowed to approve a deployment to this protected environment. The user must be a member of the project. Mutually exclusive with `access_level` and `group_id`.
 
 Read-Only:
 
@@ -161,10 +161,10 @@ Read-Only:
 
 Optional:
 
-- `access_level` (String) Levels of access required to deploy to this protected environment. Valid values are `developer`, `maintainer`.
-- `group_id` (Number) The ID of the group allowed to deploy to this protected environment. The project must be shared with the group.
+- `access_level` (String) Levels of access required to deploy to this protected environment. Mutually exclusive with `user_id` and `group_id`. Valid values are `developer`, `maintainer`.
+- `group_id` (Number) The ID of the group allowed to deploy to this protected environment. The project must be shared with the group. Mutually exclusive with `access_level` and `user_id`.
 - `group_inheritance_type` (Number) Group inheritance allows deploy access levels to take inherited group membership into account. Valid values are `0`, `1`. `0` => Direct group membership only, `1` => All inherited groups. Default: `0`
-- `user_id` (Number) The ID of the user allowed to deploy to this protected environment. The user must be a member of the project.
+- `user_id` (Number) The ID of the user allowed to deploy to this protected environment. The user must be a member of the project. Mutually exclusive with `access_level` and `group_id`.
 
 Read-Only:
 

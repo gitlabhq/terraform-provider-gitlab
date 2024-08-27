@@ -1,3 +1,20 @@
+## 17.3.1 (2024-08-27)
+
+This release was tested against GitLab 17.3, 17.2, and 17.1 for both CE and EE
+
+## Improvements (1 change)
+
+- [The provider now uses an exponential backoff when no RateLimit-Reset headers are sent from GitLab]() by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2073))
+
+## Bug Fixes (7 changes)
+
+- resource/gitlab_project_access_token: [Fixed an error when applying an update using a plan file that could cause the ID to return an error when rotating](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d0a63fec70fd01d447091bf81138f76692b59c58) by @PatrickRice ([merge request}(https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2060)])
+- resource/gitlab_project_access_token: [Fixed an error when applying an update using a plan from from a previous day to rotate an access token](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d0a63fec70fd01d447091bf81138f76692b59c58) by @PatrickRice ([merge request}(https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2060)])
+- resource/gitlab_group_access_token: [Fixed an error when applying an update using a plan file that could cause the ID to return an error when rotating](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d0a63fec70fd01d447091bf81138f76692b59c58) by @PatrickRice ([merge request}(https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2060)])
+- resource/gitlab_group_access_token: [Fixed an error when applying an update using a plan from from a previous day to rotate an access token](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d0a63fec70fd01d447091bf81138f76692b59c58) by @PatrickRice ([merge request}(https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2060)])
+- resource/gitlab_group_protected_environment: [Updated documentation for `deploy_access_levels` to be more specific](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0d01e91b32fadd6980e666b11c877fe97c2ee45a) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2072))
+- resource/gitlab_project_protected_environment: [Updated documentation for `deploy_access_levels` to be more specific](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0d01e91b32fadd6980e666b11c877fe97c2ee45a) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2072))
+- resource/gitlab_group_saml_link: [Updated documentation for `access_level` to be more descriptive when using custom roles](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/98d0762153fd4ec01d7df62ce5f991bc5b342d82) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2071))
 
 ## 17.3.0 (2024-08-15)
 

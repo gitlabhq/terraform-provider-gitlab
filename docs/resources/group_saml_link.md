@@ -24,6 +24,8 @@ resource "gitlab_group_saml_link" "test" {
 }
 
 # Example using a Custom Role (Ultimate only)
+# When using the custom role, the `access_level` must match the
+# base role used to create the custom role.
 resource "gitlab_group_saml_link" "test_custom_role" {
   group           = "12345"
   access_level    = "developer"
@@ -43,7 +45,7 @@ resource "gitlab_group_saml_link" "test_custom_role" {
 
 ### Optional
 
-- `member_role_id` (Number) The ID of a custom member role. Only available for Ultimate instances.
+- `member_role_id` (Number) The ID of a custom member role. Only available for Ultimate instances. When using a custom role, the `access_level` must match the base role used to create the custom role.
 
 ### Read-Only
 
