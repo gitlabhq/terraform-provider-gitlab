@@ -39,30 +39,30 @@ resource "gitlab_tag_protection" "TagProtect" {
 
 ### Required
 
-- `create_access_level` (String) Access levels which are allowed to create. Valid values are: `no one`, `developer`, `maintainer`.
 - `project` (String) The id of the project.
 - `tag` (String) Name of the tag or wildcard.
 
 ### Optional
 
-- `allowed_to_create` (Block Set) User or group which are allowed to create. (see [below for nested schema](#nestedblock--allowed_to_create))
+- `allowed_to_create` (Block Set) Array of access levels/user(s)/group(s) allowed to create protected tags. (see [below for nested schema](#nestedblock--allowed_to_create))
+- `create_access_level` (String) Access levels allowed to create. Default value of `maintainer`. The default value is always sent if not provided in the configuration. Valid values are: `no one`, `developer`, `maintainer`.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project-id:tag>`.
 
 <a id="nestedblock--allowed_to_create"></a>
 ### Nested Schema for `allowed_to_create`
 
 Optional:
 
+- `access_level` (String) Access levels allowed to create protected tags. Valid values are: `no one`, `developer`, `maintainer`.
 - `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
 - `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
 
 Read-Only:
 
-- `access_level` (String) Level of access.
-- `access_level_description` (String) Readable description of level of access.
+- `access_level_description` (String) Readable description of access level.
 
 ## Import
 

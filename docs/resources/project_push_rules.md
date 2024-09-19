@@ -65,6 +65,7 @@ resource "gitlab_project_push_rules" "sample" {
 - `max_file_size` (Number) Maximum file size (MB).
 - `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
 - `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
+- `reject_non_dco_commits` (Boolean) Reject commit when it’s not DCO certified.
 - `reject_unsigned_commits` (Boolean) Reject commit when it’s not signed.
 
 ### Read-Only

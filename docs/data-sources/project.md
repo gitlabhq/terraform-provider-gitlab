@@ -133,6 +133,7 @@ Read-Only:
 - `max_file_size` (Number)
 - `member_check` (Boolean)
 - `prevent_secrets` (Boolean)
+- `reject_non_dco_commits` (Boolean)
 - `reject_unsigned_commits` (Boolean)
 
 

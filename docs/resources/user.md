@@ -47,6 +47,8 @@ resource "gitlab_user" "example" {
 ### Optional
 
 - `can_create_group` (Boolean) Boolean, defaults to false. Whether to allow the user to create groups.
+- `extern_uid` (String) String, a specific external authentication provider UID.
+- `external_provider` (String) String, the external provider.
 - `is_admin` (Boolean) Boolean, defaults to false.  Whether to enable administrative privileges
 - `is_external` (Boolean) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
 - `namespace_id` (Number) The ID of the user's namespace. Available since GitLab 14.10.

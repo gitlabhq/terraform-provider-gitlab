@@ -57,21 +57,34 @@ resource "gitlab_application_settings" "this" {
 - `after_sign_up_text` (String) Text shown to the user after signing up.
 - `akismet_api_key` (String, Sensitive) API key for Akismet spam protection.
 - `akismet_enabled` (Boolean) (If enabled, requires: akismet_api_key) Enable or disable Akismet spam protection.
+- `allow_account_deletion` (Boolean) Set to true to allow users to delete their accounts. Premium and Ultimate only.
 - `allow_group_owners_to_manage_ldap` (Boolean) Set to true to allow group owners to manage LDAP.
 - `allow_local_requests_from_system_hooks` (Boolean) Allow requests to the local network from system hooks.
 - `allow_local_requests_from_web_hooks_and_services` (Boolean) Allow requests to the local network from web hooks and services.
+- `allow_project_creation_for_guest_and_below` (Boolean) Indicates whether users assigned up to the Guest role can create groups and personal projects.
+- `allow_runner_registration_token` (Boolean) Allow using a registration token to create a runner.
 - `archive_builds_in_human_readable` (String) Set the duration for which the jobs are considered as old and expired. After that time passes, the jobs are archived and no longer able to be retried. Make it empty to never expire jobs. It has to be no less than 1 day, for example: 15 days, 1 month, 2 years.
+- `asciidoc_max_includes` (Number) Maximum limit of AsciiDoc include directives being processed in any one document. Maximum: 64.
 - `asset_proxy_allowlist` (List of String) Assets that match these domains are not proxied. Wildcards allowed. Your GitLab installation URL is automatically allowlisted. GitLab restart is required to apply changes.
 - `asset_proxy_enabled` (Boolean) (If enabled, requires: asset_proxy_url) Enable proxying of assets. GitLab restart is required to apply changes.
 - `asset_proxy_secret_key` (String, Sensitive) Shared secret with the asset proxy server. GitLab restart is required to apply changes.
 - `asset_proxy_url` (String) URL of the asset proxy server. GitLab restart is required to apply changes.
 - `authorized_keys_enabled` (Boolean) By default, we write to the authorized_keys file to support Git over SSH without additional configuration. GitLab can be optimized to authenticate SSH keys via the database file. Only disable this if you have configured your OpenSSH server to use the AuthorizedKeysCommand.
+- `auto_ban_user_on_excessive_projects_download` (Boolean) When enabled, users will get automatically banned from the application when they download more than the maximum number of unique projects in the time period specified by max_number_of_repository_downloads and max_number_of_repository_downloads_within_time_period respectively. Introduced in GitLab 15.4. Self-managed, Ultimate only.
 - `auto_devops_domain` (String) Specify a domain to use by default for every project’s Auto Review Apps and Auto Deploy stages.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for projects by default. It automatically builds, tests, and deploys applications based on a predefined CI/CD configuration.
 - `automatic_purchased_storage_allocation` (Boolean) Enabling this permits automatic allocation of purchased storage in a namespace.
+- `bulk_import_concurrent_pipeline_batch_limit` (Number) Maximum simultaneous Direct Transfer batches to process.
+- `bulk_import_enabled` (Boolean) Enable migrating GitLab groups by direct transfer. Introduced in GitLab 15.8.
+- `bulk_import_max_download_file_size` (Number) Maximum download file size when importing from source GitLab instances by direct transfer. Introduced in GitLab 16.3.
 - `can_create_group` (Boolean) Indicates whether users can create top-level groups. Introduced in GitLab 15.5.
 - `check_namespace_plan` (Boolean) Enabling this makes only licensed EE features available to projects if the project namespace’s plan includes the feature or if the project is public.
+- `ci_max_includes` (Number) The maximum number of includes per pipeline.
+- `ci_max_total_yaml_size_bytes` (Number) The maximum amount of memory, in bytes, that can be allocated for the pipeline configuration, with all included YAML configuration files.
 - `commit_email_hostname` (String) Custom hostname (for private commit emails).
+- `concurrent_bitbucket_import_jobs_limit` (Number) Maximum number of simultaneous import jobs for the Bitbucket Cloud importer. Introduced in GitLab 16.11.
+- `concurrent_bitbucket_server_import_jobs_limit` (Number) Maximum number of simultaneous import jobs for the Bitbucket Server importer. Introduced in GitLab 16.11.
+- `concurrent_github_import_jobs_limit` (Number) Maximum number of simultaneous import jobs for the GitHub importer. Introduced in GitLab 16.11.
 - `container_expiration_policies_enable_historic_entries` (Boolean) Enable cleanup policies for all projects.
 - `container_registry_cleanup_tags_service_max_list_size` (Number) The maximum number of tags that can be deleted in a single execution of cleanup policies.
 - `container_registry_delete_tags_service_timeout` (Number) The maximum time, in seconds, that the cleanup process can take to delete a batch of tags for cleanup policies.
@@ -79,27 +92,39 @@ resource "gitlab_application_settings" "this" {
 - `container_registry_expiration_policies_worker_capacity` (Number) Number of workers for cleanup policies.
 - `container_registry_token_expire_delay` (Number) Container Registry token duration in minutes.
 - `deactivate_dormant_users` (Boolean) Enable automatic deactivation of dormant users.
+- `deactivate_dormant_users_period` (Number) Length of time (in days) after which a user is considered dormant. Introduced in GitLab 15.3.
+- `decompress_archive_file_timeout` (Number) Default timeout for decompressing archived files, in seconds. Set to 0 to disable timeouts. Introduced in GitLab 16.4.
 - `default_artifacts_expire_in` (String) Set the default expiration time for each job’s artifacts.
 - `default_branch_name` (String) Instance-level custom initial branch name (introduced in GitLab 13.2).
 - `default_branch_protection` (Number) Determine if developers can push to the default branch. Can take: 0 (not protected, both users with the Developer role or Maintainer role can push new commits and force push), 1 (partially protected, users with the Developer role or Maintainer role can push new commits, but cannot force push) or 2 (fully protected, users with the Developer or Maintainer role cannot push new commits, but users with the Developer or Maintainer role can; no one can force push) as a parameter. Default is 2.
+- `default_branch_protection_defaults` (Block List, Max: 1) The default_branch_protection_defaults attribute describes the default branch protection defaults. All parameters are optional. (see [below for nested schema](#nestedblock--default_branch_protection_defaults))
 - `default_ci_config_path` (String) Default CI/CD configuration file and path for new projects (.gitlab-ci.yml if not set).
 - `default_group_visibility` (String) What visibility level new groups receive. Can take private, internal and public as a parameter.
+- `default_preferred_language` (String) Default preferred language for users who are not logged in.
 - `default_project_creation` (Number) Default project creation protection. Can take: 0 (No one), 1 (Maintainers) or 2 (Developers + Maintainers).
 - `default_project_visibility` (String) What visibility level new projects receive. Can take private, internal and public as a parameter.
 - `default_projects_limit` (Number) Project limit per user.
 - `default_snippet_visibility` (String) What visibility level new snippets receive. Can take private, internal and public as a parameter.
+- `default_syntax_highlighting_theme` (Number) Default syntax highlighting theme for users who are new or not signed in. See IDs of available themes (https://gitlab.com/gitlab-org/gitlab/blob/master/lib/gitlab/themes.rb#L16)
 - `delete_inactive_projects` (Boolean) Enable inactive project deletion feature. Introduced in GitLab 14.10. Became operational in GitLab 15.0 (with feature flag inactive_projects_deletion).
+- `delete_unconfirmed_users` (Boolean) Specifies whether users who have not confirmed their email should be deleted. When set to true, unconfirmed users are deleted after unconfirmed_users_delete_after_days days. Introduced in GitLab 16.1. Self-managed, Premium and Ultimate only.
 - `deletion_adjourned_period` (Number) The number of days to wait before deleting a project or group that is marked for deletion. Value must be between 1 and 90.
+- `diagramsnet_enabled` (Boolean) (If enabled, requires diagramsnet_url) Enable Diagrams.net integration.
+- `diagramsnet_url` (String) The Diagrams.net instance URL for integration.
 - `diff_max_files` (Number) Maximum files in a diff.
 - `diff_max_lines` (Number) Maximum lines in a diff.
 - `diff_max_patch_bytes` (Number) Maximum diff patch size, in bytes.
+- `disable_admin_oauth_scopes` (Boolean) Stops administrators from connecting their GitLab accounts to non-trusted OAuth 2.0 applications that have the api, read_api, read_repository, write_repository, read_registry, write_registry, or sudo scopes. Introduced in GitLab 15.6.
 - `disable_feed_token` (Boolean) Disable display of RSS/Atom and calendar feed tokens (introduced in GitLab 13.7).
+- `disable_personal_access_tokens` (Boolean) Disable personal access tokens. Introduced in GitLab 15.7. Self-managed, Premium and Ultimate only. There is no method available to enable a personal access token that’s been disabled through the API. This is a known issue.
 - `disabled_oauth_sign_in_sources` (List of String) Disabled OAuth sign-in sources.
 - `dns_rebinding_protection_enabled` (Boolean) Enforce DNS rebinding attack protection.
 - `domain_allowlist` (List of String) Force people to use only corporate emails for sign-up. Null means there is no restriction.
 - `domain_denylist` (List of String) Users with email addresses that match these domains cannot sign up. Wildcards allowed. Use separate lines for multiple entries. Ex: domain.com, *.domain.com.
 - `domain_denylist_enabled` (Boolean) (If enabled, requires: domain_denylist) Allows blocking sign-ups from emails from specific domains.
+- `downstream_pipeline_trigger_limit_per_project_user_sha` (Number) Maximum downstream pipeline trigger rate. Introduced in GitLab 16.10.
 - `dsa_key_restriction` (Number) The minimum allowed bit length of an uploaded DSA key. 0 means no restriction. -1 disables DSA keys.
+- `duo_features_enabled` (Boolean) Indicates whether GitLab Duo features are enabled for this instance. Introduced in GitLab 16.10. Self-managed, Premium and Ultimate only.
 - `ecdsa_key_restriction` (Number) The minimum allowed curve size (in bits) of an uploaded ECDSA key. 0 means no restriction. -1 disables ECDSA keys.
 - `ecdsa_sk_key_restriction` (Number) The minimum allowed curve size (in bits) of an uploaded ECDSA_SK key. 0 means no restriction. -1 disables ECDSA_SK keys.
 - `ed25519_key_restriction` (Number) The minimum allowed curve size (in bits) of an uploaded ED25519 key. 0 means no restriction. -1 disables ED25519 keys.
@@ -300,3 +325,13 @@ resource "gitlab_application_settings" "this" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--default_branch_protection_defaults"></a>
+### Nested Schema for `default_branch_protection_defaults`
+
+Optional:
+
+- `allow_force_push` (Boolean) Allow force push for all users with push access.
+- `allowed_to_merge` (List of Number) An array of access levels allowed to merge. Supports Developer (30) or Maintainer (40).
+- `allowed_to_push` (List of Number) An array of access levels allowed to push. Supports Developer (30) or Maintainer (40).
+- `developer_can_initial_push` (Boolean) Allow developers to initial push.

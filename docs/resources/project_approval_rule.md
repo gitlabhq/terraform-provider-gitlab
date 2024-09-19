@@ -104,7 +104,8 @@ resource "gitlab_project_approval_rule" "example-four" {
 - `disable_importing_default_any_approver_rule_on_create` (Boolean) When this flag is set, the default `any_approver` rule will not be imported if present.
 - `group_ids` (Set of Number) A list of group IDs whose members can approve of the merge request.
 - `protected_branch_ids` (Set of Number) A list of protected branch IDs (not branch names) for which the rule applies.
-- `rule_type` (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`.
+- `report_type` (String) Report type is required when the rule_type is `report_approver`. Valid values are `code_coverage`.
+- `rule_type` (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`, `report_approver`.
 - `user_ids` (Set of Number) A list of specific User IDs to add to the list of approvers.
 
 ### Read-Only

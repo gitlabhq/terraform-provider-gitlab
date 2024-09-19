@@ -1,5 +1,6 @@
 ---
 page_title: "Terraform GitLab Provider Version 15.7 Upgrade Guide"
+subcategory: "Upgrade Guides"
 ---
 
 # Upgrade to Terraform GitLab Provider Version 15.7

@@ -198,6 +198,7 @@ resource "gitlab_project" "import_private" {
 - `pages_access_level` (String) Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
 - `path` (String) The path of the repository.
 - `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
+- `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
 - `public_builds` (Boolean, Deprecated) If true, jobs can be viewed by non-project members.
 - `public_jobs` (Boolean) If true, jobs can be viewed by non-project members.
@@ -277,6 +278,7 @@ Optional:
 - `max_file_size` (Number) Maximum file size (MB).
 - `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
 - `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
+- `reject_non_dco_commits` (Boolean) Reject commit when it’s not DCO certified.
 - `reject_unsigned_commits` (Boolean) Reject commit when it’s not signed through GPG.
 
 
