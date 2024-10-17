@@ -38,7 +38,7 @@ data "gitlab_pipeline_schedules" "example" {
 
 Required:
 
-- `id` (String) The pipeline schedule id.
+- `id` (Number) The pipeline schedule id.
 
 Optional:
 

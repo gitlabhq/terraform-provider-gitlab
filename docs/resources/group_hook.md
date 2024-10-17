@@ -50,24 +50,24 @@ resource "gitlab_group_hook" "all_attributes" {
 
 ### Required
 
-- `group` (String) The ID or full path of the group.
-- `url` (String) The url of the hook to invoke.
+- `group` (String) The full path or id of the group to add the hook to.
+- `url` (String) The url of the hook to invoke. Forces re-creation to preserve `token`.
 
 ### Optional
 
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
-- `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
-- `custom_webhook_template` (String) Set a custom webhook template.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential note events.
+- `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
-- `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
+- `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
-- `merge_requests_events` (Boolean) Invoke the hook for merge requests.
-- `note_events` (Boolean) Invoke the hook for notes events.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests events.
+- `note_events` (Boolean) Invoke the hook for note events.
 - `pipeline_events` (Boolean) Invoke the hook for pipeline events.
 - `push_events` (Boolean) Invoke the hook for push events.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
-- `releases_events` (Boolean) Invoke the hook for releases events.
+- `releases_events` (Boolean) Invoke the hook for release events.
 - `subgroup_events` (Boolean) Invoke the hook for subgroup events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
@@ -77,7 +77,7 @@ resource "gitlab_group_hook" "all_attributes" {
 
 - `group_id` (Number) The id of the group for the hook.
 - `hook_id` (Number) The id of the group hook.
-- `id` (String) The ID of this resource.
+- `id` (String) The id of the group hook. In the format of "group:hook_id"
 
 ## Import
 

@@ -7,6 +7,7 @@ description: |-
   -> This resource requires administration privileges.
   ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
   ~> Observability scopes are in beta and may not work on all instances. See more details in the documentation https://docs.gitlab.com/ee/operations/tracing.html
+  ~> Use rotation_configuration to automatically rotate tokens instead of using timestamp() as timestamp will cause changes with every plan. terraform apply must still be run to rotate the token.
   ~> Due to Automatic reuse detection https://docs.gitlab.com/ee/api/personal_access_tokens.html#automatic-reuse-detection it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
   Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/personal_access_tokens.html
 ---
@@ -20,6 +21,8 @@ The `gitlab_personal_access_token` resource allows to manage the lifecycle of a 
 ~> Use of the `timestamp()` function with expires_at will cause the resource to be re-created with every apply, it's recommended to use `plantimestamp()` or a static value instead.
 
 ~> Observability scopes are in beta and may not work on all instances. See more details in [the documentation](https://docs.gitlab.com/ee/operations/tracing.html)
+
+~> Use `rotation_configuration` to automatically rotate tokens instead of using `timestamp()` as timestamp will cause changes with every plan. `terraform apply` must still be run to rotate the token.
 
 ~> Due to [Automatic reuse detection](https://docs.gitlab.com/ee/api/personal_access_tokens.html#automatic-reuse-detection) it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
 
@@ -54,7 +57,8 @@ resource "gitlab_project_variable" "example" {
 
 ### Optional
 
-- `expires_at` (String) When the token will expire, YYYY-MM-DD format.
+- `expires_at` (String) When the token will expire, YYYY-MM-DD format. Is automatically set when `rotation_configuration` is used.
+- `rotation_configuration` (Attributes) The configuration for when to rotate a token automatically. Will not rotate a token until `terraform apply` is run. (see [below for nested schema](#nestedatt--rotation_configuration))
 
 ### Read-Only
 
@@ -63,6 +67,14 @@ resource "gitlab_project_variable" "example" {
 - `id` (String) The ID of the personal access token.
 - `revoked` (Boolean) True if the token is revoked.
 - `token` (String, Sensitive) The token of the personal access token. **Note**: the token is not available for imported resources.
+
+<a id="nestedatt--rotation_configuration"></a>
+### Nested Schema for `rotation_configuration`
+
+Required:
+
+- `expiration_days` (Number) The duration (in days) the new token should be valid for.
+- `rotate_before_days` (Number) The duration (in days) before the expiration when the token should be rotated. As an example, if set to 7 days, the token will rotate 7 days before the expiration date, but only when `terraform apply` is run in that timeframe.
 
 ## Import
 

@@ -81,6 +81,7 @@ Read-Only:
 
 - `_links` (Map of String)
 - `allow_merge_on_skipped_pipeline` (Boolean)
+- `allow_pipeline_trigger_approve_deployment` (Boolean)
 - `analytics_access_level` (String)
 - `approvals_before_merge` (Number)
 - `archived` (Boolean)
@@ -136,6 +137,8 @@ Read-Only:
 - `mirror_overwrites_diverged_branches` (Boolean)
 - `mirror_trigger_builds` (Boolean)
 - `mirror_user_id` (Number)
+- `model_experiments_access_level` (String)
+- `model_registry_access_level` (String)
 - `monitor_access_level` (String)
 - `name` (String)
 - `name_with_namespace` (String)

@@ -37,6 +37,7 @@ data "gitlab_group" "foo" {
 
 ### Read-Only
 
+- `default_branch` (String) The default branch of the group.
 - `default_branch_protection` (Number) Whether developers and maintainers can push to the applicable default branch.
 - `description` (String) The description of the group.
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.

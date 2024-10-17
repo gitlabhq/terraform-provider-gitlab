@@ -34,18 +34,18 @@ resource "gitlab_project_hook" "example" {
 ### Optional
 
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
-- `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
-- `custom_webhook_template` (String) Set a custom webhook template.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential note events.
+- `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
-- `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
+- `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
-- `merge_requests_events` (Boolean) Invoke the hook for merge requests.
-- `note_events` (Boolean) Invoke the hook for notes events.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests events.
+- `note_events` (Boolean) Invoke the hook for note events.
 - `pipeline_events` (Boolean) Invoke the hook for pipeline events.
 - `push_events` (Boolean) Invoke the hook for push events.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
-- `releases_events` (Boolean) Invoke the hook for releases events.
+- `releases_events` (Boolean) Invoke the hook for release events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.
@@ -53,7 +53,7 @@ resource "gitlab_project_hook" "example" {
 ### Read-Only
 
 - `hook_id` (Number) The id of the project hook.
-- `id` (String) The ID of this resource.
+- `id` (String) The id of the project hook. In the format of "project:hook_id"
 - `project_id` (Number) The id of the project for the hook.
 
 ## Import
