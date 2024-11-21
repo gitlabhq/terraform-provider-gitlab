@@ -38,7 +38,15 @@ resource "gitlab_pipeline_trigger" "example" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_pipeline_trigger`. For example:
+```terraform
+import {
+  to = gitlab_pipeline_trigger.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab pipeline triggers can be imported using an id made up of `{project_id}:{pipeline_trigger_id}`, e.g.

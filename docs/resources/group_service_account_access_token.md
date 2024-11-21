@@ -5,6 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group_service_account_access_token resource allows to manage the lifecycle of a group service account access token.
   ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
+  ~> Reading the access token status of a service account requires an admin token or a top-level group owner token on gitlab.com. As a result, this resource will ignore permission errors when attempting to read the token status, and will rely on the values in state instead. This can lead to apply-time failures if the token configured for the provider doesn't have permissions to rotate tokens for the service account.
   Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/group_service_accounts.html#create-a-personal-access-token-for-a-service-account-user
 ---
 
@@ -14,27 +15,40 @@ The `gitlab_group_service_account_access_token` resource allows to manage the li
 
 ~> Use of the `timestamp()` function with expires_at will cause the resource to be re-created with every apply, it's recommended to use `plantimestamp()` or a static value instead.
 
+~> Reading the access token status of a service account requires an admin token or a top-level group owner token on gitlab.com. As a result, this resource will ignore permission errors when attempting to read the token status, and will rely on the values in state instead. This can lead to apply-time failures if the token configured for the provider doesn't have permissions to rotate tokens for the service account.
+
 **Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/group_service_accounts.html#create-a-personal-access-token-for-a-service-account-user)
 
 ## Example Usage
 
 ```terraform
+# This must be a top-level group
 resource "gitlab_group" "example" {
   name        = "example"
   path        = "example"
   description = "An example group"
 }
 
-resource "gitlab_group_service_account" "example-sa" {
+# The service account against the top-level group
+resource "gitlab_group_service_account" "example_sa" {
   group    = gitlab_group.example.id
   name     = "example-name"
   username = "example-username"
 }
 
-resource "gitlab_group_service_account_access_token" "example-sa-token" {
+# To assign the service account to a group
+resource "gitlab_group_membership" "example_membership" {
+  group_id     = gitlab_group.example.id
+  user_id      = gitlab_group_service_account.example_sa.service_account_id
+  access_level = "developer"
+  expires_at   = "2020-03-14"
+}
+
+# The service account access token
+resource "gitlab_group_service_account_access_token" "example_sa_token" {
   group      = gitlab_group.example.id
-  user_id    = gitlab_group_service_account.example-sa.id
-  name       = "Example personal access token"
+  user_id    = gitlab_group_service_account.example_sa.service_account_id
+  name       = "Example service account access token"
   expires_at = "2020-03-14"
 
   scopes = ["api"]
@@ -65,7 +79,15 @@ resource "gitlab_group_service_account_access_token" "example-sa-token" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_service_account_access_token`. For example:
+```terraform
+import {
+  to = gitlab_group_service_account_access_token.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # You can import a service account access token using `terraform import <resource> <id>`.  The

@@ -75,7 +75,15 @@ Required:
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_access_token`. For example:
+```terraform
+import {
+  to = gitlab_group_access_token.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # A GitLab Group Access Token can be imported using a key composed of `<group-id>:<token-id>`, e.g.

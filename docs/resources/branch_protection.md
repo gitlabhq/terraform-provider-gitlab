@@ -122,8 +122,9 @@ Read-Only:
 
 Optional:
 
-- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
-- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+- `deploy_key_id` (Number) The ID of a GitLab deploy key allowed to perform the relevant action. Mutually exclusive with `group_id` and `user_id`. This field is read-only until Gitlab 17.5.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `deploy_key_id` and `user_id`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `deploy_key_id` and `group_id`.
 
 Read-Only:
 
@@ -146,7 +147,15 @@ Read-Only:
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_branch_protection`. For example:
+```terraform
+import {
+  to = gitlab_branch_protection.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # Gitlab protected branches can be imported with a key composed of `<project_id>:<branch>`, e.g.

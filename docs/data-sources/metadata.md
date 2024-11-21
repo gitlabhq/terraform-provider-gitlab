@@ -36,5 +36,6 @@ data "gitlab_metadata" "this" {}
 Read-Only:
 
 - `enabled` (Boolean) Indicates whether KAS is enabled.
+- `external_k8s_proxy_url` (String) URL used by the Kubernetes tooling to communicate with the KAS Kubernetes API proxy. It’s null if kas.enabled is false.
 - `external_url` (String) URL used by the agents to communicate with KAS. It’s null if kas.enabled is false.
 - `version` (String) Version of KAS. It’s null if kas.enabled is false.

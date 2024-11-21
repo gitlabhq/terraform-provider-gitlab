@@ -4,12 +4,15 @@ page_title: "gitlab_project_security_policy_attachment Resource - terraform-prov
 subcategory: ""
 description: |-
   The gitlab_project_security_policy_attachment resource allows to attach a security policy project to a project.
+  ~> Policies https://docs.gitlab.com/ee/user/application_security/policies/ are files stored in a policy project as raw YAML, to allow maximum flexibility with support of all kind of policy and all their options. See the examples for how to create a policy project, add a policy, and link it. Use the gitlab_repository_file resource to create policies instead of a specific policy resource. This ensures all policy options are immediately via Terraform once released.
   Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/index.html#mutationsecuritypolicyprojectassign
 ---
 
 # gitlab_project_security_policy_attachment (Resource)
 
 The `gitlab_project_security_policy_attachment` resource allows to attach a security policy project to a project.
+
+~> [Policies](https://docs.gitlab.com/ee/user/application_security/policies/) are files stored in a policy project as raw YAML, to allow maximum flexibility with support of all kind of policy and all their options. See the examples for how to create a policy project, add a policy, and link it. Use the `gitlab_repository_file` resource to create policies instead of a specific policy resource. This ensures all policy options are immediately via Terraform once released.
 
 **Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/index.html#mutationsecuritypolicyprojectassign)
 
@@ -23,7 +26,7 @@ resource "gitlab_project_security_policy_attachment" "foo" {
 }
 
 
-# Or you can use Terraform to create a new project, add a policy to that project,
+# Or Terraform can create a new project, add a policy to that project,
 # then attach that policy project to other projects.
 resource "gitlab_project" "my-policy-project" {
   name = "security-policy-project"
@@ -59,6 +62,7 @@ actions:
 EOT
 }
 
+# Multiple policies can be attached to a single project by repeating this resource or using a `for_each`
 resource "gitlab_project_security_policy_attachment" "my-policy" {
   project        = 1234
   policy_project = gitlab_project.my-policy-project.id
@@ -81,7 +85,15 @@ resource "gitlab_project_security_policy_attachment" "my-policy" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_security_policy_attachment`. For example:
+```terraform
+import {
+  to = gitlab_project_security_policy_attachment.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab project security policy attachments can be imported using an id made up of `project:policy_project_id` where the policy project ID is the project ID of the policy project, e.g.

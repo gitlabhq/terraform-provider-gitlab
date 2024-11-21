@@ -57,7 +57,15 @@ resource "gitlab_global_level_notifications" "foo" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_global_level_notifications`. For example:
+```terraform
+import {
+  to = gitlab_global_level_notifications.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # Note: You can import a global notification state using "gitlab" as the ID.

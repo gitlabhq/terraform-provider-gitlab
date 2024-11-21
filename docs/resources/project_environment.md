@@ -52,8 +52,12 @@ resource "gitlab_project_environment" "this" {
 
 ### Optional
 
+- `cluster_agent_id` (Number) The cluster agent to associate with this environment.
 - `external_url` (String) Place to link to for this environment.
+- `flux_resource_path` (String) The Flux resource path to associate with this environment.
+- `kubernetes_namespace` (String) The Kubernetes namespace to associate with this environment.
 - `stop_before_destroy` (Boolean) Determines whether the environment is attempted to be stopped before the environment is deleted.
+- `tier` (String) The tier of the new environment. Valid values are `production`, `staging`, `testing`, `development`, `other`.
 
 ### Read-Only
 
@@ -65,7 +69,15 @@ resource "gitlab_project_environment" "this" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_environment`. For example:
+```terraform
+import {
+  to = gitlab_project_environment.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab project environments can be imported using an id made up of `projectId:environmenId`, e.g.

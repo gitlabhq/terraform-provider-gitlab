@@ -44,7 +44,15 @@ resource "gitlab_group_label" "fixme" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_label`. For example:
+```terraform
+import {
+  to = gitlab_group_label.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # Gitlab group labels can be imported using an id made up of `{group_id}:{group_label_id}`, e.g.

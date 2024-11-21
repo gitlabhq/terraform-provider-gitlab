@@ -53,7 +53,15 @@ resource "gitlab_topic" "functional_programming" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_topic`. For example:
+```terraform
+import {
+  to = gitlab_topic.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # You can import a topic to terraform state using `terraform import <resource> <id>`.

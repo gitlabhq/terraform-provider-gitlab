@@ -55,7 +55,15 @@ resource "gitlab_release_link" "example" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_release_link`. For example:
+```terraform
+import {
+  to = gitlab_release_link.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # Gitlab release link can be imported with a key composed of `<project>:<tag_name>:<link_id>`, e.g.

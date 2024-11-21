@@ -93,6 +93,7 @@ resource "gitlab_group" "example-five" {
 
 ### Optional
 
+- `allowed_email_domains_list` (List of String) A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
 - `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
@@ -162,7 +163,15 @@ Optional:
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group`. For example:
+```terraform
+import {
+  to = gitlab_group.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # You can import a group state using `terraform import <resource> <id>`.  The

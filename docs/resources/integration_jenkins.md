@@ -54,7 +54,15 @@ resource "gitlab_integration_jenkins" "jenkins" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_jenkins`. For example:
+```terraform
+import {
+  to = gitlab_integration_jenkins.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # You can import a gitlab_integration_jenkins state using `terraform import <resource> <project_id>`:

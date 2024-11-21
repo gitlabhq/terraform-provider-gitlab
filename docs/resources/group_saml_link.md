@@ -53,7 +53,15 @@ resource "gitlab_group_saml_link" "test_custom_role" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_saml_link`. For example:
+```terraform
+import {
+  to = gitlab_group_saml_link.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab group saml links can be imported using an id made up of `group_id:saml_group_name`, e.g.

@@ -54,6 +54,7 @@ output "subgroups" {
 
 Read-Only:
 
+- `allowed_email_domains_list` (String)
 - `auto_devops_enabled` (Boolean)
 - `avatar_url` (String)
 - `created_at` (String)

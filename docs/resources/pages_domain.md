@@ -58,7 +58,15 @@ resource "gitlab_pages_domain" "this" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_pages_domain`. For example:
+```terraform
+import {
+  to = gitlab_pages_domain.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab pages domain can be imported using an id made up of `projectId:domain` _without_ the http protocol, e.g.

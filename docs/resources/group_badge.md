@@ -69,7 +69,15 @@ resource "gitlab_group_badge" "gitlab_release" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_badge`. For example:
+```terraform
+import {
+  to = gitlab_group_badge.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab group badges can be imported using an id made up of `{group_id}:{badge_id}`, e.g.

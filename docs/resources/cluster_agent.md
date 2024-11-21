@@ -69,7 +69,15 @@ resource "gitlab_repository_file" "example_agent_config" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_cluster_agent`. For example:
+```terraform
+import {
+  to = gitlab_cluster_agent.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # GitLab Agent for Kubernetes can be imported with the following command and the id pattern `<project>:<agent-id>`

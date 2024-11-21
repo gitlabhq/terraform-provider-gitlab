@@ -50,6 +50,7 @@ data "gitlab_project" "example" {
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) CI config file path for the project.
+- `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
 - `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Introduced in GitLab 16.8. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (List of Object) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))

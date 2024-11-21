@@ -76,7 +76,15 @@ Read-Only:
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_epic_board`. For example:
+```terraform
+import {
+  to = gitlab_group_epic_board.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # You can import this resource with an id made up of `{group-id}:{epic-board-id}`, e.g.

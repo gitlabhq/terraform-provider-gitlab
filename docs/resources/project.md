@@ -154,6 +154,7 @@ resource "gitlab_project" "import_private" {
 - `ci_config_path` (String) Custom Path to CI config file.
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+- `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
 - `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Introduced in GitLab 16.8. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
@@ -295,7 +296,15 @@ Optional:
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project`. For example:
+```terraform
+import {
+  to = gitlab_project.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # You can import a project state using `terraform import <resource> <id>`.  The

@@ -95,6 +95,7 @@ resource "local_file" "config" {
 - `access_level` (String) The access_level of the runner. Valid values are: `not_protected`, `ref_protected`.
 - `description` (String) The runner's description.
 - `locked` (Boolean) Whether the runner should be locked for current project.
+- `maintenance_note` (String) Free-form maintenance notes for the runner (1024 characters).
 - `maximum_timeout` (Number) Maximum timeout set when this runner handles the job.
 - `paused` (Boolean) Whether the runner should ignore new jobs.
 - `run_untagged` (Boolean) Whether the runner should handle untagged jobs.
@@ -109,7 +110,15 @@ resource "local_file" "config" {
 
 ## Import
 
-Import is supported using the following syntax:
+Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_runner`. For example:
+```terraform
+import {
+  to = gitlab_runner.example
+  id = "see CLI command below for ID"
+}
+```
+
+Import using the CLI is supported using the following syntax:
 
 ```shell
 # A GitLab Runner can be imported using the runner's ID, eg
