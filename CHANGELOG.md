@@ -1,3 +1,16 @@
+## 17.6.1 (2024-11-27)
+
+This release was tested against GitLab 17.6, 17.5, and 17.4 for both CE and EE
+
+### IMPROVEMENTS (1 change)
+
+- resource/gitlab_group_service_account_token: [Add support for `rotation_configuration` with a limited set of attributes](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7bad2a4bf0fd6e777c2d3598b35d46bc287135fc) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2206))
+
+### BUG FIXES (2 changes)
+
+- resource/gitlab_project_compliance_frameworks: [Fixed an issue where project compliance frameworks didn't delete compliance frameworks properly. Fixed a bug where compliance frameworks weren't set properly on a project where they were removed outside of TF](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6fe104b21bf5f07aff62b9751fa3d2d66c5ba175) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2214))
+- resource/gitlab_group: [Fixed an issue where an `allowed_email_domain_list` added outside of TF would be unset when upgrading the provider to 17.6](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4b76021b5a0633054eccb5e0b24435cf8dd64a8c) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2217))
+
 ## 17.6.0 (2024-11-21)
 
 This release was tested against GitLab 17.6, 17.5, and 17.4 for both CE and EE
