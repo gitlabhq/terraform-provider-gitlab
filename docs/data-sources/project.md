@@ -82,6 +82,7 @@ data "gitlab_project" "example" {
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
 - `path` (String) The path of the repository.
 - `pipelines_enabled` (Boolean) Enable pipelines for the project.
+- `prevent_merge_without_jira_issue` (Boolean) Whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
 - `push_rules` (List of Object) Push rules for the project. Push rules are only available on Enterprise plans and if the authenticated has permissions to read them. (see [below for nested schema](#nestedatt--push_rules))
 - `releases_access_level` (String) Set the releases access level. Valid values are `disabled`, `private`, `enabled`.

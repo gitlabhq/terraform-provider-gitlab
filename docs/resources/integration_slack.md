@@ -67,7 +67,7 @@ resource "gitlab_integration_slack" "slack" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `job_events` (Boolean) Enable notifications for job events. **ATTENTION**: This attribute is currently not being submitted to the GitLab API, due to https://github.com/xanzy/go-gitlab/issues/1354.
+- `job_events` (Boolean) Enable notifications for job events. **ATTENTION**: This attribute is currently not being submitted to the GitLab API, due to https://gitlab.com/gitlab-org/api/client-go/issues/1354.
 
 ## Import
 

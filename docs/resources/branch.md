@@ -39,6 +39,10 @@ resource "gitlab_branch" "example" {
 - `project` (String) The ID or full path of the project which the branch is created against.
 - `ref` (String) The ref which the branch is created from.
 
+### Optional
+
+- `keep_on_destroy` (Boolean) Indicates whether the branch is kept once the resource destroyed (must be applied before a destroy).
+
 ### Read-Only
 
 - `can_push` (Boolean) Bool, true if you can push to the branch.
