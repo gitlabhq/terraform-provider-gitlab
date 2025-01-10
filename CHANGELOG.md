@@ -1,3 +1,12 @@
+## 17.7.1 (2025-01-10)
+
+This release was tested against GitLab 17.7, 17.6, and 17.5 for both CE and EE
+
+### BUG FIXES (2 changes)
+
+- resource/gitlab_group_access_token: [Update token deletion logic to include a `revoke` check](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/baccc20ecfea5a137486f6c968d2f2f59ca52240) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2259))
+- resource/gitlab_project_access_token: [Update token deletion logic to include a `revoke` check](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/baccc20ecfea5a137486f6c968d2f2f59ca52240) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2259))
+
 ## 17.7.0 (2024-12-19)
 
 This release was tested against GitLab 17.7, 17.6, and 17.5 for both CE and EE
