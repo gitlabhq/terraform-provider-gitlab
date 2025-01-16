@@ -19,6 +19,8 @@ The `gitlab_project_hook` resource allows to manage the lifecycle of a project h
 resource "gitlab_project_hook" "example" {
   project               = "example/hooked"
   url                   = "https://example.com/hook/example"
+  name                  = "example"
+  description           = "Example hook"
   merge_requests_events = true
 }
 
@@ -57,10 +59,12 @@ resource "gitlab_project_hook" "custom_headers" {
 - `custom_headers` (Attributes List) Custom headers for the project webhook. (see [below for nested schema](#nestedatt--custom_headers))
 - `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `description` (String) Description of the webhook.
 - `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests events.
+- `name` (String) Name of the project webhook.
 - `note_events` (Boolean) Invoke the hook for note events.
 - `pipeline_events` (Boolean) Invoke the hook for pipeline events.
 - `push_events` (Boolean) Invoke the hook for push events.

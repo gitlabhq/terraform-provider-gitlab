@@ -46,6 +46,7 @@ data "gitlab_project_membership" "example" {
 - `inherited` (Boolean) Return all project members including members through ancestor groups
 - `project_id` (Number) The ID of the project.
 - `query` (String) A query string to search for members
+- `user_ids` (Set of Number) List of user ids to filter members by
 
 ### Read-Only
 

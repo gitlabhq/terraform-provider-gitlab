@@ -1,3 +1,26 @@
+## 17.8.0 (2025-01-16)
+
+This release was tested against GitLab 17.8, 17.7, and 17.6 for both CE and EE
+
+### BREAKING CHANGES (1 change)
+
+> Note: While we normally attempt to avoid breaking changes until major releases, this change aligns the `gitlab_project_issues` resource to the upstream API. That means that 
+> if we held off on implementing it, our users could pass in multiple values to several attributes, and the API would ignore all but the first of them. Weighing the breaking change
+> against the bad user experience and potential confusion in user `plan` operations, we determined it was better to accept the small breaking change now than hold off another 4 months for 18.0. 
+
+- datasource/gitlab_project_issues:  [Update several attributes to support a maximum of 1 item in their list to align to the GitLab API](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7e4311674bac77d512098077cf8ed2e7958b26dc) by @gitlab-dependency-update-bot ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2255)) 
+
+### FEATURE (1 change)
+
+- **New Resource** resource/gitlab_value_stream_analytics:  [Adds support managing value stream stages](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/72033f78d1acff93a08a537e0812c68c326c3efe) by @calee1 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2234))
+
+### IMPROVEMENTS (3 changes)
+
+- resource/gitlab_group:  [Add 'owner' support for project creation level](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/910c0ce8275c0f34ec5733c4f3608b1041be44bb) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2253)) 
+- resource/gitlab_group_hook:  [Add a validator to prevent spaces in the URL](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/527fbba6454ef4188a26cffa73e314be61dd219f) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2252)) 
+- resource/gitlab_project_hook: [Add name and description to gitlab_project_hook resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5d24124412b3f55a9bb707292fc9226a43fe8ea9) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2258))
+- datasource/gitlab_project_membership: [Support user_ids attribute](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/45a477ee8f2e20fc2adb9a3fce9dd980021dfd4e) by @timofurrer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2257))
+
 ## 17.7.1 (2025-01-10)
 
 This release was tested against GitLab 17.7, 17.6, and 17.5 for both CE and EE
@@ -13,7 +36,7 @@ This release was tested against GitLab 17.7, 17.6, and 17.5 for both CE and EE
 
 ### FEATURES (1 change)
 
-- resource/gitlab_instance_service_account:  [Allows managing instance-level service accounts](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0da40eceb4272d3fb856139198da777d08960711) by @ipsavitsky234 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2220)) 
+- **New Resource** resource/gitlab_instance_service_account:  [Allows managing instance-level service accounts](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0da40eceb4272d3fb856139198da777d08960711) by @ipsavitsky234 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2220)) 
 
 ### IMPROVEMENTS (2 changes)
 
