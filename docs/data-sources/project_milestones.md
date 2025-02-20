@@ -4,14 +4,14 @@ page_title: "gitlab_project_milestones Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_milestones data source allows get details of a project milestones.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/milestones.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/milestones/
 ---
 
 # gitlab_project_milestones (Data Source)
 
 The `gitlab_project_milestones` data source allows get details of a project milestones.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/milestones/)
 
 ## Example Usage
 
@@ -37,7 +37,7 @@ data "gitlab_project_milestones" "example" {
 ### Optional
 
 - `iids` (List of Number) Return only the milestones having the given `iid` (Note: ignored if `include_parent_milestones` is set as `true`).
-- `include_parent_milestones` (Boolean) Include group milestones from parent group and its ancestors. Introduced in GitLab 13.4.
+- `include_parent_milestones` (Boolean) Include group milestones from parent group and its ancestors.
 - `search` (String) Return only milestones with a title or description matching the provided string.
 - `state` (String) Return only `active` or `closed` milestones.
 - `title` (String) Return only the milestones having the given `title`.

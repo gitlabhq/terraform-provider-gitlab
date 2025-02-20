@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_service_emails_on_push resource allows to manage the lifecycle of a project integration with Emails on Push Service.
   ~> This resource is deprecated. Please use gitlab_integration_emails_on_push instead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#emails-on-push
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#emails-on-push
 ---
 
 # gitlab_service_emails_on_push (Resource)
@@ -14,7 +14,7 @@ The `gitlab_service_emails_on_push` resource allows to manage the lifecycle of a
 
 ~> This resource is deprecated. Please use `gitlab_integration_emails_on_push` instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#emails-on-push)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#emails-on-push)
 
 ## Example Usage
 

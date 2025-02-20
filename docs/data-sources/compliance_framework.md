@@ -4,14 +4,14 @@ page_title: "gitlab_compliance_framework Data Source - terraform-provider-gitlab
 subcategory: ""
 description: |-
   The gitlab_compliance_framework data source allows details of a compliance framework to be retrieved by its name and the namespace it belongs to.
-  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/#querynamespace
+  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/#querynamespace
 ---
 
 # gitlab_compliance_framework (Data Source)
 
 The `gitlab_compliance_framework` data source allows details of a compliance framework to be retrieved by its name and the namespace it belongs to.
 
-**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/#querynamespace)
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/api/graphql/reference/#querynamespace)
 
 ## Example Usage
 

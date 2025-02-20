@@ -4,14 +4,14 @@ page_title: "gitlab_instance_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_instance_variable resource allows to manage the lifecycle of an instance-level CI/CD variable.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/instance_level_ci_variables.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/instance_level_ci_variables/
 ---
 
 # gitlab_instance_variable (Resource)
 
 The `gitlab_instance_variable` resource allows to manage the lifecycle of an instance-level CI/CD variable.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_ci_variables.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/instance_level_ci_variables/)
 
 ## Example Usage
 
@@ -35,7 +35,7 @@ resource "gitlab_instance_variable" "example" {
 ### Optional
 
 - `description` (String) The description of the variable. Maximum of 255 characters.
-- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
 - `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
 - `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.

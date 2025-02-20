@@ -4,14 +4,14 @@ page_title: "gitlab_instance_variables Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_instance_variables data source allows to retrieve all instance-level CI/CD variables.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/instance_level_ci_variables.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/instance_level_ci_variables/
 ---
 
 # gitlab_instance_variables (Data Source)
 
 The `gitlab_instance_variables` data source allows to retrieve all instance-level CI/CD variables.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/instance_level_ci_variables.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/instance_level_ci_variables/)
 
 ## Example Usage
 

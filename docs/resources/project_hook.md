@@ -4,14 +4,14 @@ page_title: "gitlab_project_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_hook resource allows to manage the lifecycle of a project hook.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#hooks
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/projects/#hooks
 ---
 
 # gitlab_project_hook (Resource)
 
 The `gitlab_project_hook` resource allows to manage the lifecycle of a project hook.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#hooks)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/projects/#hooks)
 
 ## Example Usage
 
@@ -70,6 +70,7 @@ resource "gitlab_project_hook" "custom_headers" {
 - `push_events` (Boolean) Invoke the hook for push events.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
 - `releases_events` (Boolean) Invoke the hook for release events.
+- `resource_access_token_events` (Boolean) Invoke the hook for project access token expiry events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

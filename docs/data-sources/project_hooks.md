@@ -4,14 +4,14 @@ page_title: "gitlab_project_hooks Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_hooks data source allows to retrieve details about hooks in a project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#list-project-hooks
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/projects/#list-project-hooks
 ---
 
 # gitlab_project_hooks (Data Source)
 
 The `gitlab_project_hooks` data source allows to retrieve details about hooks in a project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#list-project-hooks)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/projects/#list-project-hooks)
 
 ## Example Usage
 

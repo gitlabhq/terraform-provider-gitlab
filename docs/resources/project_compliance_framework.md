@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_compliance_framework resource allows to manage the lifecycle of a compliance framework on a project.
   -> This resource requires a GitLab Enterprise instance with a Premium license to set the compliance framework on a project.
-  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/#mutationprojectsetcomplianceframework
+  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/#mutationprojectsetcomplianceframework
 ---
 
 # gitlab_project_compliance_framework (Resource)
@@ -14,7 +14,7 @@ The `gitlab_project_compliance_framework` resource allows to manage the lifecycl
 
 -> This resource requires a GitLab Enterprise instance with a Premium license to set the compliance framework on a project.
 
-**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/#mutationprojectsetcomplianceframework)
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/api/graphql/reference/#mutationprojectsetcomplianceframework)
 
 ## Example Usage
 

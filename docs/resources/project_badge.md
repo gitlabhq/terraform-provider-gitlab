@@ -4,14 +4,14 @@ page_title: "gitlab_project_badge Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_badge resource allows to manage the lifecycle of project badges.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/user/project/badges.html#project-badges
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/user/project/badges/#project-badges
 ---
 
 # gitlab_project_badge (Resource)
 
 The `gitlab_project_badge` resource allows to manage the lifecycle of project badges.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/user/project/badges.html#project-badges)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/user/project/badges/#project-badges)
 
 ## Example Usage
 

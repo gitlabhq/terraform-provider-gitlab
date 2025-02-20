@@ -6,11 +6,10 @@ description: |-
   The gitlab_cluster_agent resource allows to manage the lifecycle of a GitLab Agent for Kubernetes.
   -> Note that this resource only registers the agent, but doesn't configure it.
   The configuration needs to be manually added as described in
-  the docs https://docs.gitlab.com/ee/user/clusters/agent/install/index.html#create-an-agent-configuration-file.
+  the docs https://docs.gitlab.com/user/clusters/agent/install/index/#create-an-agent-configuration-file.
   However, a gitlab_repository_file resource may be used to achieve that.
   -> Requires at least maintainer permissions on the project.
-  -> Requires at least GitLab 14.10
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/cluster_agents.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/cluster_agents/
 ---
 
 # gitlab_cluster_agent (Resource)
@@ -19,14 +18,12 @@ The `gitlab_cluster_agent` resource allows to manage the lifecycle of a GitLab A
 
 -> Note that this resource only registers the agent, but doesn't configure it.
    The configuration needs to be manually added as described in
-   [the docs](https://docs.gitlab.com/ee/user/clusters/agent/install/index.html#create-an-agent-configuration-file).
+   [the docs](https://docs.gitlab.com/user/clusters/agent/install/index/#create-an-agent-configuration-file).
    However, a `gitlab_repository_file` resource may be used to achieve that.
 
 -> Requires at least maintainer permissions on the project.
 
--> Requires at least GitLab 14.10
-
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/cluster_agents.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/cluster_agents/)
 
 ## Example Usage
 
@@ -37,7 +34,7 @@ resource "gitlab_cluster_agent" "example" {
 }
 
 // Optionally, configure the agent as described in
-// https://docs.gitlab.com/ee/user/clusters/agent/install/index.html#create-an-agent-configuration-file
+// https://docs.gitlab.com/user/clusters/agent/install/index/#create-an-agent-configuration-file
 resource "gitlab_repository_file" "example_agent_config" {
   project   = gitlab_cluster_agent.example.project
   branch    = "main" // or use the `default_branch` attribute from a project data source / resource

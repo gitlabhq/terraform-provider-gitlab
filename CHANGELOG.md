@@ -1,3 +1,41 @@
+## 17.9.0 (2025-02-20)
+
+This release was tested against GitLab 17.9, 17.8, and 17.7 for both CE and EE
+
+### KNOWN ISSUES (1 change)
+
+- resource/gitlab_integration_jira: `comment_on_event_enabled` isn't persisting properly to the underlying integration. This appears to be an upstream issue, but can be tracked [here](https://gitlab.com/gitlab-org/gitlab/-/issues/520330). This will cause an immediate `plan` after `apply` if that attribute is included in the config. Removing the attribute from the config temporarily will allow it to be modified via the UI until this issue is resolved.
+
+### FEATURES (3 changes)
+
+- resource/gitlab_project_release:  [Add a new resource for managing project releases](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/93b023aa30ef1038eb8c153f601678aa0fc4f7b1) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2277)) 
+- resource/gitlab_wiki_page:  [Add a new wiki page resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/bb77788364f15abd4140766ef6a0bb97011d9839) by @nursultanryskulov1 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2219)) 
+- datasource/gitlab_instance_service_account:  [Add a new instance service account datasource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5630deca25de2f741841ed2b9a94a4d163bf06c1) by @ipsavitsky234 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2271)) 
+
+### IMPROVEMENTS (8 changes)
+
+- resource/gitlab_group_variable:  [Added support for `hidden` variables](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/524765fe53d36fc11ae24bb9dc08c2bbf6f2a077) by @yogeshlonkar ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2237)) 
+- resource/gitlab_member_role:  [Align custom permissions to current API options (adds 5 new permissions to the provider)](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7ce852f435aba9a64025047835003f5da5771386) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2280)) 
+- resource/gitlab_project_job_token_scope:  [Add support for `groupd_id`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/cd6c9e62237794406e1595d127ae7ed5c0dcbc08) by @dc-tec ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2290)) 
+- resource/gitlab_project_hook:  [Add support for `resource_access_token_events`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7a124e9ca25204232f5e2288e3f9c3686fcd2c69) by @dc-tec ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2292)) 
+- resource/gitlab_project_membership:  [Add custom role support to project membership via `member_role_id`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e91dc20a440b699e6ac677397fd398b36f972746) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2272)) 
+- resource/gitlab_instance_service_account:  [Add `gitlab_instance_service_account` documentation](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/136bfbe8e2147f5a0ca97eb12a445013020de64a) by @ipsavitsky234 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2270)) 
+- [Update Documentation Links to align to new API documentation Launch](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8a550b86f57da691125bc1f1669e43a255912391) by @Taucher2003 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2328)) 
+- [Update the CONTRIBUTING.md docs to fix links and provide better development instructions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/74dfef50d5c9118f1e673786d69ee9a5027e066e) by @jtymes ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2274)) 
+
+### BUG FIXES (5 changes)
+
+- resource/gitlab_integration_jira:  [Fix issue where `comment_on_event_enabled` causes a plan after apply when not defined in the config](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7ced3cb22e9d3d2262e6133bc6024e9e8638c658) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2332)) 
+- resource/gitlab_group_service_account_access_token:  [Fix an error when deleting an expired service account access token using a non-admin user](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/026c696d905c03426545398eba6cacf7621aaa92) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2287)) 
+- resource/gitlab_group_service_account_access_token:  [Fix an error when rotating a service account access token that would cause an invalid `id` attribute](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/537004cef0a1c54aa040f7779e98eddfa5a27e44) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2282)) 
+- resource/gitlab_value_stream_analytics:  [Fix an error with label validation, fixed typo in one event name](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8a0918901c28ae809ad3943d302df70e0ed58054) by @calee1 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2289)) 
+- datasource/gitlab_group_service_account:  [Set name and username in group service accounts as read-only to align with API](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/698ffdcaaec2a797edc53299134fa98aeee4190e) by @ipsavitsky234 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2286))
+
+### Maintenance (2 changes)
+
+- [Remove documentation related to very old GitLab versions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9ec88d9245d220438234920ff91458235a152f73) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2311)) 
+- [Update Documentation to include explicit version support policies](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/39f048e4d796574e5e53a809c4c1148d5554fd2f) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2312)) 
+
 ## 17.8.0 (2025-01-16)
 
 This release was tested against GitLab 17.8, 17.7, and 17.6 for both CE and EE

@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_membership data source allows to list and filter all members of a project specified by either its id or full path.
   -> Note exactly one of project_id or full_path must be provided.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html#list-all-members-of-a-group-or-project
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/#list-all-members-of-a-group-or-project
 ---
 
 # gitlab_project_membership (Data Source)
@@ -14,7 +14,7 @@ The `gitlab_project_membership` data source allows to list and filter all member
 
 -> **Note** exactly one of project_id or full_path must be provided.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html#list-all-members-of-a-group-or-project)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/#list-all-members-of-a-group-or-project)
 
 ## Example Usage
 

@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_instance_deploy_keys data source allows to retrieve a list of deploy keys for a GitLab instance.
   -> This data source requires administration privileges.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/deploy_keys.html#list-all-deploy-keys
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/deploy_keys/#list-all-deploy-keys
 ---
 
 # gitlab_instance_deploy_keys (Data Source)
@@ -14,7 +14,7 @@ The `gitlab_instance_deploy_keys` data source allows to retrieve a list of deplo
 
 -> This data source requires administration privileges.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/deploy_keys.html#list-all-deploy-keys)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/deploy_keys/#list-all-deploy-keys)
 
 ## Example Usage
 

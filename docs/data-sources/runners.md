@@ -4,14 +4,14 @@ page_title: "gitlab_runners Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_runners data source retrieves information about all gitlab runners.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/runners.html#list-all-runners
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/runners/#list-all-runners
 ---
 
 # gitlab_runners (Data Source)
 
 The `gitlab_runners` data source retrieves information about all gitlab runners.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/runners.html#list-all-runners)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/runners/#list-all-runners)
 
 ## Example Usage
 

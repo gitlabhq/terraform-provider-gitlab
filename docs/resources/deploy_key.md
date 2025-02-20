@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_deploy_key resource allows to manage the lifecycle of a deploy key.
   -> To enable an already existing deploy key for another project use the gitlab_deploy_key_enable resource.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/deploy_keys.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/deploy_keys/
 ---
 
 # gitlab_deploy_key (Resource)
@@ -14,7 +14,7 @@ The `gitlab_deploy_key` resource allows to manage the lifecycle of a deploy key.
 
 -> To enable an already existing deploy key for another project use the `gitlab_deploy_key_enable` resource.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/deploy_keys.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/deploy_keys/)
 
 ## Example Usage
 

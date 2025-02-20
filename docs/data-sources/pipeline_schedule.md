@@ -4,14 +4,14 @@ page_title: "gitlab_pipeline_schedule Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_pipeline_schedule data source retrieves information about a gitlab pipeline schedule for a project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/pipeline_schedules.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/pipeline_schedules/
 ---
 
 # gitlab_pipeline_schedule (Data Source)
 
 The `gitlab_pipeline_schedule` data source retrieves information about a gitlab pipeline schedule for a project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pipeline_schedules.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/pipeline_schedules/)
 
 ## Example Usage
 

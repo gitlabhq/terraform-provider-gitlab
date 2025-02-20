@@ -4,14 +4,14 @@ page_title: "gitlab_release_links Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_release_links data source allows get details of release links.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/releases/links.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/releases/links/
 ---
 
 # gitlab_release_links (Data Source)
 
 The `gitlab_release_links` data source allows get details of release links.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/releases/links.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/releases/links/)
 
 ## Example Usage
 

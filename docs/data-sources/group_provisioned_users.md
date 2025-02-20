@@ -4,14 +4,14 @@ page_title: "gitlab_group_provisioned_users Data Source - terraform-provider-git
 subcategory: ""
 description: |-
   The gitlab_group_provisioned_users data source allows details of the provisioned users of a given group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#list-provisioned-users
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#list-provisioned-users
 ---
 
 # gitlab_group_provisioned_users (Data Source)
 
 The `gitlab_group_provisioned_users` data source allows details of the provisioned users of a given group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#list-provisioned-users)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#list-provisioned-users)
 
 
 

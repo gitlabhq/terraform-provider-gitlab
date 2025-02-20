@@ -5,8 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_cluster_agent_token resource allows to manage the lifecycle of a token for a GitLab Agent for Kubernetes.
   -> Requires at least maintainer permissions on the project.
-  -> Requires at least GitLab 15.0
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/cluster_agents.html#create-an-agent-token
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/cluster_agents/#create-an-agent-token
 ---
 
 # gitlab_cluster_agent_token (Resource)
@@ -15,9 +14,7 @@ The `gitlab_cluster_agent_token` resource allows to manage the lifecycle of a to
 
 -> Requires at least maintainer permissions on the project.
 
--> Requires at least GitLab 15.0
-
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/cluster_agents.html#create-an-agent-token)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/cluster_agents/#create-an-agent-token)
 
 ## Example Usage
 

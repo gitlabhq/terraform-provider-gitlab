@@ -4,14 +4,14 @@ page_title: "gitlab_user_sshkeys Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_user_sshkeys data source allows a list of SSH keys to be retrieved by either the user ID or username.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html#list-ssh-keys-for-user
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/#list-ssh-keys-for-user
 ---
 
 # gitlab_user_sshkeys (Data Source)
 
 The `gitlab_user_sshkeys` data source allows a list of SSH keys to be retrieved by either the user ID or username.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#list-ssh-keys-for-user)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/users/#list-ssh-keys-for-user)
 
 
 

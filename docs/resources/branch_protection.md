@@ -12,7 +12,7 @@ description: |-
   Having multiple gitlab_branch_protection resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
   This behavior might change in the future.
   ~> The allowed_to_push, allowed_to_merge, allowed_to_unprotect, unprotect_access_level and code_owner_approval_required attributes require a GitLab Enterprise instance.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_branches.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_branches/
 ---
 
 # gitlab_branch_protection (Resource)
@@ -29,7 +29,7 @@ The `gitlab_branch_protection` resource allows to manage the lifecycle of a prot
 
 ~> The `allowed_to_push`, `allowed_to_merge`, `allowed_to_unprotect`, `unprotect_access_level` and `code_owner_approval_required` attributes require a GitLab Enterprise instance.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_branches.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_branches/)
 
 ## Example Usage
 

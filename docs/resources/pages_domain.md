@@ -4,14 +4,14 @@ page_title: "gitlab_pages_domain Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_pages_domain resource allows connecting custom domains and TLS certificates in GitLab Pages.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/pages_domains.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/pages_domains/
 ---
 
 # gitlab_pages_domain (Resource)
 
 The `gitlab_pages_domain` resource allows connecting custom domains and TLS certificates in GitLab Pages.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pages_domains.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/pages_domains/)
 
 ## Example Usage
 
@@ -40,11 +40,11 @@ resource "gitlab_pages_domain" "this" {
 ### Required
 
 - `domain` (String) The custom domain indicated by the user.
-- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/ee/api/index.html#namespaced-path-encoding) owned by the authenticated user.
+- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/api/index/#namespaced-path-encoding) owned by the authenticated user.
 
 ### Optional
 
-- `auto_ssl_enabled` (Boolean) Enables [automatic generation](https://docs.gitlab.com/ee/user/project/pages/custom_domains_ssl_tls_certification/lets_encrypt_integration.html) of SSL certificates issued by Let’s Encrypt for custom domains. When this is set to "true", certificate can't be provided.
+- `auto_ssl_enabled` (Boolean) Enables [automatic generation](https://docs.gitlab.com/user/project/pages/custom_domains_ssl_tls_certification/lets_encrypt_integration/) of SSL certificates issued by Let’s Encrypt for custom domains. When this is set to "true", certificate can't be provided.
 - `certificate` (String) The certificate in PEM format with intermediates following in most specific to least specific order.
 - `expired` (Boolean) Whether the certificate is expired.
 - `key` (String) The certificate key in PEM format.

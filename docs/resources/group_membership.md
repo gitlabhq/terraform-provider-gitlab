@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group_membership resource allows to manage the lifecycle of a users group membership.
   -> If a group should grant membership to another group use the gitlab_group_share_group resource instead.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/
 ---
 
 # gitlab_group_membership (Resource)
@@ -14,13 +14,13 @@ The `gitlab_group_membership` resource allows to manage the lifecycle of a users
 
 -> If a group should grant membership to another group use the `gitlab_group_share_group` resource instead.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/)
 
 ## Example Usage
 
 ```terraform
 resource "gitlab_group_membership" "test" {
-  group_id     = "12345"
+  group_id     = 12345
   user_id      = 1337
   access_level = "guest"
   expires_at   = "2020-12-31"
@@ -33,8 +33,8 @@ resource "gitlab_group_membership" "test" {
 ### Required
 
 - `access_level` (String) Access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`.
-- `group_id` (String) The id of the group.
-- `user_id` (Number) The id of the user.
+- `group_id` (Number) The ID of the group.
+- `user_id` (Number) The ID of the user.
 
 ### Optional
 
@@ -45,7 +45,7 @@ resource "gitlab_group_membership" "test" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of the group membership. In the format of `<group-id:user-id>`.
 
 ## Import
 

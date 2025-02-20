@@ -3,18 +3,15 @@
 page_title: "gitlab_project_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_variable resource allows to manage the lifecycle of a CI/CD variable for a project.
-  ~> Important: If your GitLab version is older than 13.4, you may see nondeterministic behavior when updating or deleting gitlab_project_variable resources with non-unique keys, for example if there is another variable with the same key and different environment scope. See this GitLab issue https://gitlab.com/gitlab-org/gitlab/-/issues/9912.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_level_variables.html
+  The gitlab_project_variable resource allows creating and managing a GitLab project level variable.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_level_variables/
 ---
 
 # gitlab_project_variable (Resource)
 
-The `gitlab_project_variable` resource allows to manage the lifecycle of a CI/CD variable for a project.
+The `gitlab_project_variable` resource allows creating and managing a GitLab project level variable.
 
-~> **Important:** If your GitLab version is older than 13.4, you may see nondeterministic behavior when updating or deleting gitlab_project_variable resources with non-unique keys, for example if there is another variable with the same key and different environment scope. See [this GitLab issue](https://gitlab.com/gitlab-org/gitlab/-/issues/9912).
-
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_level_variables.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_level_variables/)
 
 ## Example Usage
 
@@ -40,14 +37,14 @@ resource "gitlab_project_variable" "example" {
 
 - `description` (String) The description of the variable.
 - `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`). Note that in Community Editions of Gitlab, values other than `*` will cause inconsistent plans.
-- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
-- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-- `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
-- `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
+- `masked` (Boolean) If set to `true`, the value of the variable will be masked in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#mask-a-cicd-variable).
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags.
+- `raw` (Boolean) Whether the variable is treated as a raw string. When true, variables in the value are not expanded.
+- `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>:<key>:<environment_scope>`.
 
 ## Import
 

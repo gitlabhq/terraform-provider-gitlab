@@ -6,7 +6,7 @@ description: |-
   The gitlab_users data source allows details of multiple users to be retrieved given some optional filter criteria.
   -> Some attributes might not be returned depending on if you're an admin or not.
   -> Some available options require administrator privileges.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ce/api/users.html#list-users
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ce/api/users/#list-users
 ---
 
 # gitlab_users (Data Source)
@@ -17,7 +17,7 @@ The `gitlab_users` data source allows details of multiple users to be retrieved 
 
 -> Some available options require administrator privileges.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/users.html#list-users)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/users/#list-users)
 
 ## Example Usage
 

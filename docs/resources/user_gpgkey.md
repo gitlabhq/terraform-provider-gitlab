@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_user_gpgkey resource allows to manage the lifecycle of a GPG key assigned to the current user or a specific user.
   -> Managing GPG keys for arbitrary users requires admin privileges.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html#get-a-specific-gpg-key
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/#get-a-specific-gpg-key
 ---
 
 # gitlab_user_gpgkey (Resource)
@@ -14,7 +14,7 @@ The `gitlab_user_gpgkey` resource allows to manage the lifecycle of a GPG key as
 		
 -> Managing GPG keys for arbitrary users requires admin privileges.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#get-a-specific-gpg-key)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/users/#get-a-specific-gpg-key)
 
 ## Example Usage
 

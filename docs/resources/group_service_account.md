@@ -4,14 +4,14 @@ page_title: "gitlab_group_service_account Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_service_account resource allows creating a GitLab group service account.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/group_service_accounts.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_service_accounts/
 ---
 
 # gitlab_group_service_account (Resource)
 
 The `gitlab_group_service_account` resource allows creating a GitLab group service account.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_service_accounts.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_service_accounts/)
 
 ## Example Usage
 

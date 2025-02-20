@@ -6,10 +6,10 @@ description: |-
   The gitlab_personal_access_token resource allows to manage the lifecycle of a personal access token.
   -> This resource requires administration privileges.
   ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
-  ~> Observability scopes are in beta and may not work on all instances. See more details in the documentation https://docs.gitlab.com/ee/operations/tracing.html
+  ~> Observability scopes are in beta and may not work on all instances. See more details in the documentation https://docs.gitlab.com/operations/tracing/
   ~> Use rotation_configuration to automatically rotate tokens instead of using timestamp() as timestamp will cause changes with every plan. terraform apply must still be run to rotate the token.
-  ~> Due to Automatic reuse detection https://docs.gitlab.com/ee/api/personal_access_tokens.html#automatic-reuse-detection it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
-  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/personal_access_tokens.html
+  ~> Due to Automatic reuse detection https://docs.gitlab.com/api/personal_access_tokens/#automatic-reuse-detection it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
+  Upstream API: GitLab API docs https://docs.gitlab.com/api/personal_access_tokens/
 ---
 
 # gitlab_personal_access_token (Resource)
@@ -20,13 +20,13 @@ The `gitlab_personal_access_token` resource allows to manage the lifecycle of a 
 
 ~> Use of the `timestamp()` function with expires_at will cause the resource to be re-created with every apply, it's recommended to use `plantimestamp()` or a static value instead.
 
-~> Observability scopes are in beta and may not work on all instances. See more details in [the documentation](https://docs.gitlab.com/ee/operations/tracing.html)
+~> Observability scopes are in beta and may not work on all instances. See more details in [the documentation](https://docs.gitlab.com/operations/tracing/)
 
 ~> Use `rotation_configuration` to automatically rotate tokens instead of using `timestamp()` as timestamp will cause changes with every plan. `terraform apply` must still be run to rotate the token.
 
-~> Due to [Automatic reuse detection](https://docs.gitlab.com/ee/api/personal_access_tokens.html#automatic-reuse-detection) it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
+~> Due to [Automatic reuse detection](https://docs.gitlab.com/api/personal_access_tokens/#automatic-reuse-detection) it's possible that a new Personal Access Token will immediately be revoked. Check if an old process using the old token is running if this happens.
 
-**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/personal_access_tokens.html)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/personal_access_tokens/)
 
 ## Example Usage
 

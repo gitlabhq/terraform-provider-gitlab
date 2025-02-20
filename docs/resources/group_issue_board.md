@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group_issue_board resource allows to manage the lifecycle of a issue board in a group.
   ~> Multiple issue boards on one group requires a GitLab Premium or above License.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/group_boards.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_boards/
 ---
 
 # gitlab_group_issue_board (Resource)
@@ -14,7 +14,7 @@ The `gitlab_group_issue_board` resource allows to manage the lifecycle of a issu
 
 ~> Multiple issue boards on one group requires a GitLab Premium or above License.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_boards.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_boards/)
 
 
 

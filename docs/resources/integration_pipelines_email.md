@@ -4,14 +4,14 @@ page_title: "gitlab_integration_pipelines_email Resource - terraform-provider-gi
 subcategory: ""
 description: |-
   The gitlab_integration_pipelines_email resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#pipeline-emails
 ---
 
 # gitlab_integration_pipelines_email (Resource)
 
 The `gitlab_integration_pipelines_email` resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#pipeline-emails)
 
 ## Example Usage
 

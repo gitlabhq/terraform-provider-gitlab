@@ -4,14 +4,14 @@ page_title: "gitlab_project_custom_attribute Resource - terraform-provider-gitla
 subcategory: ""
 description: |-
   The gitlab_project_custom_attribute resource allows to manage custom attributes for a project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/custom_attributes.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/custom_attributes/
 ---
 
 # gitlab_project_custom_attribute (Resource)
 
 The `gitlab_project_custom_attribute` resource allows to manage custom attributes for a project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/custom_attributes.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/custom_attributes/)
 
 ## Example Usage
 

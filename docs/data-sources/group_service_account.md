@@ -4,14 +4,14 @@ page_title: "gitlab_group_service_account Data Source - terraform-provider-gitla
 subcategory: ""
 description: |-
   The gitlab_group_service_account data source retrieves information about a gitlab service account for a group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/group_service_accounts.html#list-service-account-users
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_service_accounts/#list-service-account-users
 ---
 
 # gitlab_group_service_account (Data Source)
 
 The `gitlab_group_service_account` data source retrieves information about a gitlab service account for a group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_service_accounts.html#list-service-account-users)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_service_accounts/#list-service-account-users)
 
 
 
@@ -23,11 +23,8 @@ The `gitlab_group_service_account` data source retrieves information about a git
 - `group` (String) The ID or URL-encoded path of the target group. Must be a top-level group.
 - `service_account_id` (String) The service account id.
 
-### Optional
-
-- `name` (String) The name of the user. If not specified, the default Service account user name is used.
-- `username` (String) The username of the user. If not specified, it's automatically generated.
-
 ### Read-Only
 
 - `id` (String) The ID of this Terraform resource. In the format of `<group>:<service_account_id>`.
+- `name` (String) The name of the user. If not specified, the default Service account user name is used.
+- `username` (String) The username of the user. If not specified, it's automatically generated.

@@ -4,14 +4,14 @@ page_title: "gitlab_pipeline_schedule_variable Resource - terraform-provider-git
 subcategory: ""
 description: |-
   The gitlab_pipeline_schedule_variable resource allows to manage the lifecycle of a variable for a pipeline schedule.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/pipeline_schedules.html#pipeline-schedule-variables
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/pipeline_schedules/#pipeline-schedule-variables
 ---
 
 # gitlab_pipeline_schedule_variable (Resource)
 
 The `gitlab_pipeline_schedule_variable` resource allows to manage the lifecycle of a variable for a pipeline schedule.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/pipeline_schedules.html#pipeline-schedule-variables)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/pipeline_schedules/#pipeline-schedule-variables)
 
 ## Example Usage
 

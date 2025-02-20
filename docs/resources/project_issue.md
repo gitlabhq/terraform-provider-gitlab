@@ -6,7 +6,7 @@ description: |-
   The gitlab_project_issue resource allows to manage the lifecycle of an issue within a project.
   -> During a terraform destroy this resource will close the issue. Set the delete_on_destroy flag to true to delete the issue instead of closing it.
   ~> Experimental While the base functionality of this resource works, it may be subject to minor change.
-  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/issues.html
+  Upstream API: GitLab API docs https://docs.gitlab.com/api/issues/
 ---
 
 # gitlab_project_issue (Resource)
@@ -17,7 +17,7 @@ The `gitlab_project_issue` resource allows to manage the lifecycle of an issue w
 
 ~> **Experimental** While the base functionality of this resource works, it may be subject to minor change.
 
-**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/issues/)
 
 ## Example Usage
 

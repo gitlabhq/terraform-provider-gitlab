@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_integration_github resource allows to manage the lifecycle of a project integration with GitHub.
   -> This resource requires a GitLab Enterprise instance.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#github
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#github
 ---
 
 # gitlab_integration_github (Resource)
@@ -14,7 +14,7 @@ The `gitlab_integration_github` resource allows to manage the lifecycle of a pro
 
 -> This resource requires a GitLab Enterprise instance.
 	
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#github)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#github)
 
 ## Example Usage
 

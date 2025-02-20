@@ -7,7 +7,7 @@ description: |-
   There can be only one default compliance framework. Of all the configured compliance frameworks marked as default, the last one applied will be the default compliance framework.
   -> This resource requires a GitLab Enterprise instance with a Premium license to create the compliance framework.
   -> This resource requires a GitLab Enterprise instance with an Ultimate license to specify a compliance pipeline configuration in the compliance framework.
-  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/#mutationcreatecomplianceframework
+  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/#mutationcreatecomplianceframework
 ---
 
 # gitlab_compliance_framework (Resource)
@@ -20,7 +20,7 @@ There can be only one `default` compliance framework. Of all the configured comp
 
 -> This resource requires a GitLab Enterprise instance with an Ultimate license to specify a compliance pipeline configuration in the compliance framework.
 
-**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/#mutationcreatecomplianceframework)
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/api/graphql/reference/#mutationcreatecomplianceframework)
 
 ## Example Usage
 

@@ -4,14 +4,14 @@ page_title: "gitlab_project_protected_tags Data Source - terraform-provider-gitl
 subcategory: ""
 description: |-
   The gitlab_project_protected_tags data source allows details of the protected tags of a given project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_tags.html#list-protected-tags
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_tags/#list-protected-tags
 ---
 
 # gitlab_project_protected_tags (Data Source)
 
 The `gitlab_project_protected_tags` data source allows details of the protected tags of a given project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_tags.html#list-protected-tags)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_tags/#list-protected-tags)
 
 ## Example Usage
 

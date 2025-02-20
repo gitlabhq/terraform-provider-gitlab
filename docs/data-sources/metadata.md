@@ -4,14 +4,14 @@ page_title: "gitlab_metadata Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_metadata data source retrieves the metadata of the GitLab instance.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/metadata.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/metadata/
 ---
 
 # gitlab_metadata (Data Source)
 
 The `gitlab_metadata` data source retrieves the metadata of the GitLab instance.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/metadata.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/metadata/)
 
 ## Example Usage
 
@@ -24,7 +24,7 @@ data "gitlab_metadata" "this" {}
 
 ### Read-Only
 
-- `enterprise` (Boolean) If the GitLab instance is an enterprise instance or not. Supported for GitLab 15.6 onwards.
+- `enterprise` (Boolean) If the GitLab instance is an enterprise instance or not.
 - `id` (String) The id of the data source. It will always be `1`
 - `kas` (Attributes) Metadata about the GitLab agent server for Kubernetes (KAS). (see [below for nested schema](#nestedatt--kas))
 - `revision` (String) Revision of the GitLab instance.

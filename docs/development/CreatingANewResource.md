@@ -38,7 +38,7 @@ whenever possible. This means that a new resource meets a couple of criteria:
 
 For this example, the [`resource_gitlab_application`](../internal/provider/resource_gitlab_application.go)
 resource will be used as a step-by-step example. This resource aligns to the 
-[Applications API](https://docs.gitlab.com/ee/api/applications.html) exposed by GitLab. When creating
+[Applications API](https://docs.gitlab.com/api/applications/) exposed by GitLab. When creating
 a resource, first ensure that the relevant APIs are present in GitLab. If it's not clear whether an
 api exists for a resource, create an issue on the GitLab Terraform Provider project and ask!
 
@@ -118,7 +118,7 @@ func (r *gitlabApplicationResource) Schema(ctx context.Context, req resource.Sch
 ~> In order to use a user for a user to create an application, they must have admin priviledges at the instance level.
 To create an OIDC application, a scope of "openid".
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/applications.html)`),
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/applications/)`),
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

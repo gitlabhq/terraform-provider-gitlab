@@ -4,14 +4,14 @@ page_title: "gitlab_group_saml_link Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_saml_link resource allows to manage the lifecycle of an SAML integration with a group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#saml-group-links
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#saml-group-links
 ---
 
 # gitlab_group_saml_link (Resource)
 
 The `gitlab_group_saml_link` resource allows to manage the lifecycle of an SAML integration with a group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#saml-group-links)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#saml-group-links)
 
 ## Example Usage
 

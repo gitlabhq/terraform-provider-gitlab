@@ -4,14 +4,14 @@ page_title: "gitlab_project Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project data source allows details of a project to be retrieved by either its ID or its path with namespace.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/projects.html#get-single-project
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/projects/#get-single-project
 ---
 
 # gitlab_project (Data Source)
 
 The `gitlab_project` data source allows details of a project to be retrieved by either its ID or its path with namespace.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/projects.html#get-single-project)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/projects/#get-single-project)
 
 ## Example Usage
 
@@ -51,7 +51,7 @@ data "gitlab_project" "example" {
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) CI config file path for the project.
 - `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
-- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Introduced in GitLab 16.8. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
+- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (List of Object) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
@@ -70,7 +70,7 @@ data "gitlab_project" "example" {
 - `issues_enabled` (Boolean) Enable issue tracking for the project.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
-- `merge_commit_template` (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
+- `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
 - `merge_requests_enabled` (Boolean) Enable merge requests for the project.
@@ -98,7 +98,7 @@ data "gitlab_project" "example" {
 - `shared_with_groups` (List of Object) Describes groups which have access shared to this project. (see [below for nested schema](#nestedatt--shared_with_groups))
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
 - `snippets_enabled` (Boolean) Enable snippets for the project.
-- `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
+- `squash_commit_template` (String) Template used to create squash commit message in merge requests.
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
 - `topics` (Set of String) The list of topics for the project.

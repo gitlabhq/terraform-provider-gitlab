@@ -6,7 +6,7 @@ description: |-
   The gitlab_user resource allows to manage the lifecycle of a user.
   -> the provider needs to be configured with admin-level access for this resource to work.
   -> You must specify either password or reset_password.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/
 ---
 
 # gitlab_user (Resource)
@@ -17,7 +17,7 @@ The `gitlab_user` resource allows to manage the lifecycle of a user.
 
 -> You must specify either password or reset_password.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/users/)
 
 ## Example Usage
 
@@ -51,7 +51,7 @@ resource "gitlab_user" "example" {
 - `external_provider` (String) String, the external provider.
 - `is_admin` (Boolean) Boolean, defaults to false.  Whether to enable administrative privileges
 - `is_external` (Boolean) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
-- `namespace_id` (Number) The ID of the user's namespace. Available since GitLab 14.10.
+- `namespace_id` (Number) The ID of the user's namespace.
 - `note` (String) The note associated to the user.
 - `password` (String, Sensitive) The password of the user.
 - `projects_limit` (Number) Integer, defaults to 0.  Number of projects user can create.

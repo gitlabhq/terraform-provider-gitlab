@@ -4,14 +4,14 @@ page_title: "gitlab_group_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_hook resource allows to manage the lifecycle of a group hook.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#hooks
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#hooks
 ---
 
 # gitlab_group_hook (Resource)
 
 The `gitlab_group_hook` resource allows to manage the lifecycle of a group hook.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#hooks)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#hooks)
 
 ## Example Usage
 

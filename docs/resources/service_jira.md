@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_service_jira resource allows to manage the lifecycle of a project integration with Jira.
   ~> This resource is deprecated. use gitlab_integration_jirainstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#jira
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#jira
 ---
 
 # gitlab_service_jira (Resource)
@@ -14,7 +14,7 @@ The `gitlab_service_jira` resource allows to manage the lifecycle of a project i
 
 ~> This resource is deprecated. use `gitlab_integration_jira`instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#jira)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#jira)
 
 ## Example Usage
 
@@ -52,7 +52,7 @@ resource "gitlab_service_jira" "jira" {
 - `jira_issue_prefix` (String) Prefix to match Jira issue keys.
 - `jira_issue_regex` (String) Regular expression to match Jira issue keys.
 - `jira_issue_transition_automatic` (Boolean) Enable automatic issue transitions. Takes precedence over jira_issue_transition_id if enabled. Defaults to false. This value cannot be imported, and will not perform drift detection if changed outside Terraform.
-- `jira_issue_transition_id` (String) The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2. *Note**: importing this field is only supported since GitLab 15.2.
+- `jira_issue_transition_id` (String) The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2.
 - `merge_requests_events` (Boolean) Enable notifications for merge request events
 - `project_key` (String) The short identifier for your JIRA project, all uppercase, e.g., PROJ.
 - `project_keys` (List of String) Keys of Jira projects. When issues_enabled is true, this setting specifies which Jira projects to view issues from in GitLab.

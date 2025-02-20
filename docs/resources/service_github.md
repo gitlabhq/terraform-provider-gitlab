@@ -6,7 +6,7 @@ description: |-
   The gitlab_service_github resource allows to manage the lifecycle of a project integration with GitHub.
   -> This resource requires a GitLab Enterprise instance.
   ~> This resource is deprecated. use gitlab_integration_githubinstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#github
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#github
 ---
 
 # gitlab_service_github (Resource)
@@ -17,7 +17,7 @@ The `gitlab_service_github` resource allows to manage the lifecycle of a project
 
 ~> This resource is deprecated. use `gitlab_integration_github`instead!
 	
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#github)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#github)
 
 ## Example Usage
 

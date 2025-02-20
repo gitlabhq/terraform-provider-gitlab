@@ -4,14 +4,14 @@ page_title: "gitlab_project_label Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_label resource allows to manage the lifecycle of a project label.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/labels.html#project-labels
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/labels/#project-labels
 ---
 
 # gitlab_project_label (Resource)
 
 The `gitlab_project_label` resource allows to manage the lifecycle of a project label.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/labels.html#project-labels)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/labels/#project-labels)
 
 ## Example Usage
 

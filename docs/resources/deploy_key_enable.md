@@ -4,14 +4,14 @@ page_title: "gitlab_deploy_key_enable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_deploy_key_enable resource allows to enable an already existing deploy key (see gitlab_deploy_key resource) for a specific project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/deploy_keys.html#enable-a-deploy-key
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/deploy_keys/#enable-a-deploy-key
 ---
 
 # gitlab_deploy_key_enable (Resource)
 
 The `gitlab_deploy_key_enable` resource allows to enable an already existing deploy key (see `gitlab_deploy_key resource`) for a specific project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/deploy_keys.html#enable-a-deploy-key)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/deploy_keys/#enable-a-deploy-key)
 
 ## Example Usage
 

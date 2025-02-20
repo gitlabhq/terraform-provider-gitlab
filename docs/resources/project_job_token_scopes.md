@@ -6,7 +6,7 @@ description: |-
   The gitlab_project_job_token_scopes resource allows to manage the CI/CD Job Token scopes in a project.
   Any project not within the defined set in this attribute will be removed, which allows this resource to be used as an explicit deny.
   ~> Conflicts with the use of gitlab_project_job_token_scope when used on the same project. Use one or the other to ensure the desired state.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_job_token_scopes.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_job_token_scopes/
 ---
 
 # gitlab_project_job_token_scopes (Resource)
@@ -16,7 +16,7 @@ Any project not within the defined set in this attribute will be removed, which 
 
 ~> Conflicts with the use of `gitlab_project_job_token_scope` when used on the same project. Use one or the other to ensure the desired state.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_job_token_scopes.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_job_token_scopes/)
 
 ## Example Usage
 

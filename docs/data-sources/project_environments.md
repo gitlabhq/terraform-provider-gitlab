@@ -4,14 +4,14 @@ page_title: "gitlab_project_environments Data Source - terraform-provider-gitlab
 subcategory: ""
 description: |-
   The gitlab_project_environments data source retrieves information about all environments of the given project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/environments.html#list-environments
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/environments/#list-environments
 ---
 
 # gitlab_project_environments (Data Source)
 
 The `gitlab_project_environments` data source retrieves information about all environments of the given project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/environments.html#list-environments)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/environments/#list-environments)
 
 ## Example Usage
 

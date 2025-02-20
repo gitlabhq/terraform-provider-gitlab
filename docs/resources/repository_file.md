@@ -9,7 +9,7 @@ description: |-
   Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
   execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
   changed the repository at the same time.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/repository_files.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/repository_files/
 ---
 
 # gitlab_repository_file (Resource)
@@ -23,7 +23,7 @@ The `gitlab_repository_file` resource allows to manage the lifecycle of a file w
    execution time for some configurations. In addition, retries are performed in case a refresh is required because another application
    changed the repository at the same time.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repository_files.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/repository_files/)
 
 ## Example Usage
 
@@ -90,7 +90,7 @@ resource "gitlab_repository_file" "readme_for_dogs" {
 - `create_commit_message` (String) Create commit message.
 - `delete_commit_message` (String) Delete Commit message.
 - `encoding` (String) The file content encoding. Default value is `base64`. Valid values are: `base64`, `text`.
-- `execute_filemode` (Boolean) Enables or disables the execute flag on the file. **Note**: requires GitLab 14.10 or newer.
+- `execute_filemode` (Boolean) Enables or disables the execute flag on the file.
 - `overwrite_on_create` (Boolean) Enable overwriting existing files, defaults to `false`. This attribute is only used during `create` and must be use carefully. We suggest to use `imports` whenever possible and limit the use of this attribute for when the project was imported on the same `apply`. This attribute is not supported during a resource import.
 - `start_branch` (String) Name of the branch to start the new commit from.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))

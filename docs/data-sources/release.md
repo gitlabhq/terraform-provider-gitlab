@@ -4,14 +4,14 @@ page_title: "gitlab_release Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_release data source retrieves information about a gitlab release for a project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/releases/
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/releases/
 ---
 
 # gitlab_release (Data Source)
 
 The `gitlab_release` data source retrieves information about a gitlab release for a project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/releases/)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/releases/)
 
 ## Example Usage
 

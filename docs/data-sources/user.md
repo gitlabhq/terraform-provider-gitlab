@@ -5,9 +5,8 @@ subcategory: ""
 description: |-
   The gitlab_user data source allows details of a user to be retrieved by either the user ID, username or email address.
   -> Some attributes might not be returned depending on if you're an admin or not.
-  ~> When using the email attribute, an exact match is not guaranteed. The most related match will be returned. Starting with GitLab 16.6,
-  the most related match will prioritize an exact match if one is available.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/users.html#single-user
+  ~> When using the email attribute, an exact match is not guaranteed. The most related match will be returned. The most related match will prioritize an exact match if one is available.
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/#single-user
 ---
 
 # gitlab_user (Data Source)
@@ -16,10 +15,9 @@ The `gitlab_user` data source allows details of a user to be retrieved by either
 
 -> Some attributes might not be returned depending on if you're an admin or not.
 
-~> When using the `email` attribute, an exact match is not guaranteed. The most related match will be returned. Starting with GitLab 16.6,
-the most related match will prioritize an exact match if one is available.
+~> When using the `email` attribute, an exact match is not guaranteed. The most related match will be returned. The most related match will prioritize an exact match if one is available.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/users.html#single-user)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/users/#single-user)
 
 ## Example Usage
 
@@ -41,8 +39,8 @@ data "gitlab_user" "example-two" {
 
 ### Optional
 
-- `email` (String) The public email address of the user. **Note**: before GitLab 14.8 the lookup was based on the users primary email address.
-- `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field. Available since GitLab 14.10.
+- `email` (String) The public email address of the user.
+- `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field.
 - `user_id` (Number) The ID of the user.
 - `username` (String) The username of the user.
 

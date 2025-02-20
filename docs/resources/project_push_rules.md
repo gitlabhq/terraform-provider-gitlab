@@ -9,7 +9,7 @@ description: |-
   It is recommended to define push rules using this resource OR in the gitlab_project resource,
   but not in both as it may result in terraform identifying changes with every "plan" operation.
   -> This resource requires a GitLab Enterprise instance with a Premium license to set the push rules on a project.
-  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/projects.html#push-rules
+  Upstream API: GitLab API docs https://docs.gitlab.com/api/projects/#push-rules
 ---
 
 # gitlab_project_push_rules (Resource)
@@ -23,7 +23,7 @@ The `gitlab_project_push_rules` resource allows to manage the lifecycle of push 
 
 -> This resource requires a GitLab Enterprise instance with a Premium license to set the push rules on a project.
 
-**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/projects.html#push-rules)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/projects/#push-rules)
 
 ## Example Usage
 

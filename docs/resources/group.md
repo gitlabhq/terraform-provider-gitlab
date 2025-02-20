@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group resource allows to manage the lifecycle of a group.
   -> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/
 ---
 
 # gitlab_group (Resource)
@@ -14,7 +14,7 @@ The `gitlab_group` resource allows to manage the lifecycle of a group.
 
 -> On GitLab SaaS, you must use the GitLab UI to create groups without a parent group. You cannot use this provider nor the API to do this.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/)
 
 ## Example Usage
 
@@ -98,7 +98,7 @@ resource "gitlab_group" "example-five" {
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `default_branch` (String) Initial default branch name.
-- `default_branch_protection` (Number, Deprecated) See https://docs.gitlab.com/ee/api/groups.html#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
+- `default_branch_protection` (Number, Deprecated) See https://docs.gitlab.com/api/groups/#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
 - `default_branch_protection_defaults` (Block List, Max: 1) The default branch protection defaults (see [below for nested schema](#nestedblock--default_branch_protection_defaults))
 - `description` (String) The group's description.
 - `emails_enabled` (Boolean) Enable email notifications.
@@ -149,7 +149,7 @@ Optional:
 
 - `author_email_regex` (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
 - `branch_name_regex` (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
-- `commit_committer_check` (Boolean) Only commits pushed using verified emails are allowed.  **Note** This attribute is only supported in GitLab versions >= 16.4.
+- `commit_committer_check` (Boolean) Only commits pushed using verified emails are allowed.
 - `commit_committer_name_check` (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
 - `commit_message_negative_regex` (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
 - `commit_message_regex` (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
@@ -159,7 +159,7 @@ Optional:
 - `member_check` (Boolean) Allows only GitLab users to author commits.
 - `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
 - `reject_non_dco_commits` (Boolean) Reject commit when it’s not DCO certified.
-- `reject_unsigned_commits` (Boolean) Only commits signed through GPG are allowed.  **Note** This attribute is only supported in GitLab versions >= 16.4.
+- `reject_unsigned_commits` (Boolean) Only commits signed through GPG are allowed.
 
 ## Import
 

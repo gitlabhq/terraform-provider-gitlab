@@ -4,14 +4,14 @@ page_title: "gitlab_project_variable Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_variable data source allows to retrieve details about a project-level CI/CD variable.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_level_variables.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_level_variables/
 ---
 
 # gitlab_project_variable (Data Source)
 
 The `gitlab_project_variable` data source allows to retrieve details about a project-level CI/CD variable.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_level_variables.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_level_variables/)
 
 ## Example Usage
 
@@ -45,7 +45,7 @@ data "gitlab_project_variable" "bar" {
 
 - `description` (String) The description of the variable.
 - `id` (String) The ID of this resource.
-- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#masked-variables). Defaults to `false`.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ci/variables/#masked-variables). Defaults to `false`.
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
 - `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
 - `value` (String) The value of the variable.

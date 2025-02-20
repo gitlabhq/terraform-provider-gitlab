@@ -7,7 +7,7 @@ description: |-
   -> During a terraform destroy this resource by default will not attempt to stop the environment first.
   An environment is required to be in a stopped state before a deletetion of the environment can occur.
   Set the stop_before_destroy flag to attempt to automatically stop the environment before deletion.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/environments.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/environments/
 ---
 
 # gitlab_project_environment (Resource)
@@ -18,7 +18,7 @@ The `gitlab_project_environment` resource allows to manage the lifecycle of an e
 An environment is required to be in a stopped state before a deletetion of the environment can occur.
 Set the `stop_before_destroy` flag to attempt to automatically stop the environment before deletion.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/environments.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/environments/)
 
 ## Example Usage
 

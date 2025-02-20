@@ -9,7 +9,7 @@ description: |-
   You may use the gitlab_project_membership and gitlab_project_shared_group resources to achieve this.
   Unfortunately, the GitLab API does not complain about users and groups without access to the project and just ignores those.
   In case this happens you will get perpetual state diffs.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/protected_environments.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_environments/
 ---
 
 # gitlab_project_protected_environment (Resource)
@@ -22,7 +22,7 @@ The `gitlab_project_protected_environment` resource allows to manage the lifecyc
    Unfortunately, the GitLab API does not complain about users and groups without access to the project and just ignores those.
    In case this happens you will get perpetual state diffs.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/protected_environments.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_environments/)
 
 ## Example Usage
 

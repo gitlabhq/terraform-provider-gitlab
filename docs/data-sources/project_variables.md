@@ -4,14 +4,14 @@ page_title: "gitlab_project_variables Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_variables data source allows to retrieve all project-level CI/CD variables.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_level_variables.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_level_variables/
 ---
 
 # gitlab_project_variables (Data Source)
 
 The `gitlab_project_variables` data source allows to retrieve all project-level CI/CD variables.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_level_variables.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_level_variables/)
 
 ## Example Usage
 

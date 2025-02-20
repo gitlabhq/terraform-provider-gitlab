@@ -4,14 +4,14 @@ page_title: "gitlab_group_variables Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_variables data source allows to retrieve all group-level CI/CD variables.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/group_level_variables.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_level_variables/
 ---
 
 # gitlab_group_variables (Data Source)
 
 The `gitlab_group_variables` data source allows to retrieve all group-level CI/CD variables.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_level_variables.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_level_variables/)
 
 ## Example Usage
 
@@ -40,7 +40,7 @@ data "gitlab_group_variables" "staging_vars" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<group>:<service_account_id>`.
 - `variables` (List of Object) The list of variables returned by the search (see [below for nested schema](#nestedatt--variables))
 
 <a id="nestedatt--variables"></a>

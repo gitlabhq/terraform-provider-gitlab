@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_cluster resource allows to manage the lifecycle of a project cluster.
   ~> This is deprecated GitLab feature since 14.5
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/project_clusters.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_clusters/
 ---
 
 # gitlab_project_cluster (Resource)
@@ -14,7 +14,7 @@ The `gitlab_project_cluster` resource allows to manage the lifecycle of a projec
 
 ~> This is deprecated GitLab feature since 14.5
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/project_clusters.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_clusters/)
 
 ## Example Usage
 

@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_service_pipelines_email resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
   ~> This resource is deprecated. use gitlab_integration_pipelines_emailinstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#pipeline-emails
 ---
 
 # gitlab_service_pipelines_email (Resource)
@@ -14,7 +14,7 @@ The `gitlab_service_pipelines_email` resource allows to manage the lifecycle of 
 
 ~> This resource is deprecated. use `gitlab_integration_pipelines_email`instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#pipeline-emails)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#pipeline-emails)
 
 ## Example Usage
 

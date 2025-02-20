@@ -4,14 +4,14 @@ page_title: "gitlab_project_milestone Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_milestone data source allows get details of a project milestone.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/milestones.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/milestones/
 ---
 
 # gitlab_project_milestone (Data Source)
 
 The `gitlab_project_milestone` data source allows get details of a project milestone.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/milestones.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/milestones/)
 
 ## Example Usage
 

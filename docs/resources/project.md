@@ -11,7 +11,7 @@ description: |-
   In the gitlab_project resource, define a local-exec provisioner which invokes
   the /projects/:id/protected_branches/:name API via curl to delete the branch protection on the default
   branch using a DELETE request. Then define the desired branch protection using the gitlab_branch_protection resource.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ce/api/projects.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/ce/api/projects/
 ---
 
 # gitlab_project (Resource)
@@ -27,7 +27,7 @@ In the `gitlab_project` resource, define a `local-exec` provisioner which invoke
 the `/projects/:id/protected_branches/:name` API via curl to delete the branch protection on the default
 branch using a `DELETE` request. Then define the desired branch protection using the `gitlab_branch_protection` resource.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/projects.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ce/api/projects/)
 
 ## Example Usage
 
@@ -155,7 +155,7 @@ resource "gitlab_project" "import_private" {
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
 - `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
-- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Introduced in GitLab 16.8. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
+- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
@@ -180,7 +180,7 @@ resource "gitlab_project" "import_private" {
 - `issues_template` (String) Sets the template for new issues in the project.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
-- `merge_commit_template` (String) Template used to create merge commit message in merge requests. (Introduced in GitLab 14.5.)
+- `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_method` (String) Set the merge method. Valid values are `merge`, `rebase_merge`, `ff`.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
@@ -224,8 +224,8 @@ There is currently no known way to determine if the default branch protection is
 This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
 - `snippets_enabled` (Boolean) Enable snippets for the project.
-- `squash_commit_template` (String) Template used to create squash commit message in merge requests. (Introduced in GitLab 14.6.)
-- `squash_option` (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`. [GitLab >= 14.1]
+- `squash_commit_template` (String) Template used to create squash commit message in merge requests.
+- `squash_option` (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`.
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
 - `tags` (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
 - `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
@@ -233,7 +233,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `topics` (Set of String) The list of topics for the project.
 - `use_custom_template` (Boolean) Use either custom instance or group (with group_with_project_templates_id) project template (enterprise edition).
-		~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting.html#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
+		~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/15.7/ee/user/project/settings/import_export_troubleshooting/#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
 - `visibility_level` (String) Set to `public` to create a public project. Valid values are `private`, `internal`, `public`.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
 - `wiki_enabled` (Boolean) Enable wiki for the project.

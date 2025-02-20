@@ -4,14 +4,14 @@ page_title: "gitlab_project_issues Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_issues data source allows to retrieve details about issues in a project.
-  Upstream API: GitLab API docs https://docs.gitlab.com/ee/api/issues.html
+  Upstream API: GitLab API docs https://docs.gitlab.com/api/issues/
 ---
 
 # gitlab_project_issues (Data Source)
 
 The `gitlab_project_issues` data source allows to retrieve details about issues in a project.
 
-**Upstream API**: [GitLab API docs](https://docs.gitlab.com/ee/api/issues.html)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/issues/)
 
 ## Example Usage
 
@@ -43,7 +43,7 @@ data "gitlab_project_issues" "all_with_foo" {
 - `created_before` (String) Return issues created on or before the given time. Expected in ISO 8601 format (2019-03-15T08:00:00Z)
 - `due_date` (String) Return issues that have no due date, are overdue, or whose due date is this week, this month, or between two weeks ago and next month. Accepts: 0 (no due date), any, today, tomorrow, overdue, week, month, next_month_and_previous_two_weeks.
 - `iids` (List of Number) Return only the issues having the given iid
-- `issue_type` (String) Filter to a given type of issue. Valid values are [issue incident test_case]. (Introduced in GitLab 13.12)
+- `issue_type` (String) Filter to a given type of issue. Valid values are [issue incident test_case].
 - `labels` (List of String) Return issues with labels. Issues must have all labels to be returned. None lists all issues with no labels. Any lists all issues with at least one label. No+Label (Deprecated) lists all issues with no labels. Predefined names are case-insensitive.
 - `milestone` (String) The milestone title. None lists all issues with no milestone. Any lists all issues that have an assigned milestone.
 - `my_reaction_emoji` (String) Return issues reacted by the authenticated user by the given emoji. None returns issues not given a reaction. Any returns issues given at least one reaction.
@@ -59,7 +59,7 @@ data "gitlab_project_issues" "all_with_foo" {
 - `updated_after` (String) Return issues updated on or after the given time. Expected in ISO 8601 format (2019-03-15T08:00:00Z)
 - `updated_before` (String) Return issues updated on or before the given time. Expected in ISO 8601 format (2019-03-15T08:00:00Z)
 - `weight` (Number) Return issues with the specified weight. None returns issues with no weight assigned. Any returns issues with a weight assigned.
-- `with_labels_details` (Boolean) If true, the response returns more details for each label in labels field: :name, :color, :description, :description_html, :text_color. Default is false. description_html was introduced in GitLab 12.7
+- `with_labels_details` (Boolean) If true, the response returns more details for each label in labels field: :name, :color, :description, :description_html, :text_color. Default is false.
 
 ### Read-Only
 

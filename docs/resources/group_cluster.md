@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group_cluster resource allows to manage the lifecycle of a group cluster.
   ~> This is deprecated GitLab feature since 14.5
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/group_clusters.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_clusters/
 ---
 
 # gitlab_group_cluster (Resource)
@@ -14,7 +14,7 @@ The `gitlab_group_cluster` resource allows to manage the lifecycle of a group cl
 
 ~> This is deprecated GitLab feature since 14.5
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/group_clusters.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_clusters/)
 
 ## Example Usage
 

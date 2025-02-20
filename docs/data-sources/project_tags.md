@@ -4,14 +4,14 @@ page_title: "gitlab_project_tags Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_tags data source allows details of project tags to be retrieved by some search criteria.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/tags.html#list-project-repository-tags
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/tags/#list-project-repository-tags
 ---
 
 # gitlab_project_tags (Data Source)
 
 The `gitlab_project_tags` data source allows details of project tags to be retrieved by some search criteria.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/tags.html#list-project-repository-tags)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/tags/#list-project-repository-tags)
 
 ## Example Usage
 

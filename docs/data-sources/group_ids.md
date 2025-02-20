@@ -4,14 +4,14 @@ page_title: "gitlab_group_ids Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_ids data source identification information for a given group, allowing a user to translate a full path or ID into the GraphQL ID of the group.
-  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/#querygroup
+  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/#querygroup
 ---
 
 # gitlab_group_ids (Data Source)
 
 The `gitlab_group_ids` data source identification information for a given group, allowing a user to translate a full path or ID into the GraphQL ID of the group.
 
-**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/#querygroup)
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/api/graphql/reference/#querygroup)
 
 ## Example Usage
 

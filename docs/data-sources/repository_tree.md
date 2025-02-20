@@ -4,14 +4,14 @@ page_title: "gitlab_repository_tree Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_repository_tree data source allows details of directories and files in a repository to be retrieved.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/repositories.html#list-repository-tree
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/repositories/#list-repository-tree
 ---
 
 # gitlab_repository_tree (Data Source)
 
 The `gitlab_repository_tree` data source allows details of directories and files in a repository to be retrieved.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/repositories.html#list-repository-tree)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/repositories/#list-repository-tree)
 
 ## Example Usage
 

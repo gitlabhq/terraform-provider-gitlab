@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_membership resource allows to manage the lifecycle of a users project membership.
   -> If a project should grant membership to an entire group use the gitlab_project_share_group resource instead.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/members.html
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/
 ---
 
 # gitlab_project_membership (Resource)
@@ -14,7 +14,7 @@ The `gitlab_project_membership` resource allows to manage the lifecycle of a use
 
 -> If a project should grant membership to an entire group use the `gitlab_project_share_group` resource instead.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/members.html)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/)
 
 ## Example Usage
 
@@ -45,6 +45,7 @@ resource "gitlab_project_membership" "example" {
 ### Optional
 
 - `expires_at` (String) Expiration date for the project membership. Format: `YYYY-MM-DD`
+- `member_role_id` (Number) The ID of a custom member role. Only available for Ultimate instances.
 
 ### Read-Only
 

@@ -4,14 +4,14 @@ page_title: "gitlab_integration_external_wiki Resource - terraform-provider-gitl
 subcategory: ""
 description: |-
   The gitlab_integration_external_wiki resource allows to manage the lifecycle of a project integration with External Wiki Service.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/integrations.html#external-wiki
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#external-wiki
 ---
 
 # gitlab_integration_external_wiki (Resource)
 
 The `gitlab_integration_external_wiki` resource allows to manage the lifecycle of a project integration with External Wiki Service.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/integrations.html#external-wiki)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#external-wiki)
 
 ## Example Usage
 

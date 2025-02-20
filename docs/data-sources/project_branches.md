@@ -4,14 +4,14 @@ page_title: "gitlab_project_branches Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_branches data source allows details of the branches of a given project to be retrieved.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/branches/#list-repository-branches
 ---
 
 # gitlab_project_branches (Data Source)
 
 The `gitlab_project_branches` data source allows details of the branches of a given project to be retrieved.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/branches.html#list-repository-branches)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/branches/#list-repository-branches)
 
 ## Example Usage
 

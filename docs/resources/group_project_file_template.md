@@ -7,9 +7,9 @@ description: |-
   custom file templates will be loaded. In order to use this resource, the project selected must be a direct child of
   the group selected. After the resource has run, gitlab_project_template.template_project_id is available for use.
   For more information about which file types are available as templates, view
-  GitLab's documentation https://docs.gitlab.com/ee/user/group/custom_project_templates.html
+  GitLab's documentation https://docs.gitlab.com/user/group/custom_project_templates/
   -> This resource requires a GitLab Enterprise instance with a Premium license.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#update-group
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#update-group
 ---
 
 # gitlab_group_project_file_template (Resource)
@@ -18,11 +18,11 @@ The `gitlab_group_project_file_template` resource allows setting a project from 
 custom file templates will be loaded. In order to use this resource, the project selected must be a direct child of
 the group selected. After the resource has run, `gitlab_project_template.template_project_id` is available for use.
 For more information about which file types are available as templates, view 
-[GitLab's documentation](https://docs.gitlab.com/ee/user/group/custom_project_templates.html)
+[GitLab's documentation](https://docs.gitlab.com/user/group/custom_project_templates/)
 
 -> This resource requires a GitLab Enterprise instance with a Premium license.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#update-group)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#update-group)
 
 ## Example Usage
 

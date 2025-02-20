@@ -4,14 +4,14 @@ page_title: "gitlab_group_ldap_link Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_ldap_link resource allows to manage the lifecycle of an LDAP integration with a group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/groups.html#ldap-group-links
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#ldap-group-links
 ---
 
 # gitlab_group_ldap_link (Resource)
 
 The `gitlab_group_ldap_link` resource allows to manage the lifecycle of an LDAP integration with a group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/groups.html#ldap-group-links)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#ldap-group-links)
 
 ## Example Usage
 
@@ -30,7 +30,7 @@ resource "gitlab_group_ldap_link" "test" {
 ### Required
 
 - `group` (String) The ID or URL-encoded path of the group
-- `ldap_provider` (String) The name of the LDAP provider as stored in the GitLab database. Note that this is NOT the value of the `label` attribute as shown in the web UI. In most cases this will be `ldapmain` but you may use the [LDAP check rake task](https://docs.gitlab.com/ee/administration/raketasks/ldap.html#check) for receiving the LDAP server name: `LDAP: ... Server: ldapmain`
+- `ldap_provider` (String) The name of the LDAP provider as stored in the GitLab database. Note that this is NOT the value of the `label` attribute as shown in the web UI. In most cases this will be `ldapmain` but you may use the [LDAP check rake task](https://docs.gitlab.com/administration/raketasks/ldap/#check) for receiving the LDAP server name: `LDAP: ... Server: ldapmain`
 
 ### Optional
 
