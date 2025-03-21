@@ -49,6 +49,8 @@ data "gitlab_project_environments" "this" {
 
 Read-Only:
 
+- `auto_stop_at` (String) Timestamp of when the environment is scheduled to stop, RFC3339 format.
+- `auto_stop_setting` (String) The auto stop setting for the environment.
 - `cluster_agent_id` (Number) The ID of the environments cluster agent or `null` if none is assigned.
 - `created_at` (String) Timestamp of the environment creation, RFC3339 format.
 - `description` (String) The description of the environment.

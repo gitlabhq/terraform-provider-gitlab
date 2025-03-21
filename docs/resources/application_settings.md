@@ -217,6 +217,7 @@ resource "gitlab_application_settings" "this" {
 - `keep_latest_artifact` (Boolean) Prevent the deletion of the artifacts from the most recent successful jobs, regardless of the expiry time.
 - `local_markdown_version` (Number) Increase this value when any cached Markdown should be invalidated.
 - `lock_duo_features_enabled` (Boolean) Indicates whether the GitLab Duo features enabled setting is enforced for all subgroups. Self-managed, Premium and Ultimate only.
+- `lock_memberships_to_ldap` (Boolean) Set to true to lock all memberships to LDAP. Premium and Ultimate only.
 - `mailgun_events_enabled` (Boolean) Enable Mailgun event receiver.
 - `mailgun_signing_key` (String, Sensitive) The Mailgun HTTP webhook signing key for receiving events from webhook.
 - `maintenance_mode` (Boolean) When instance is in maintenance mode, non-administrative users can sign in with read-only access and make read-only API requests.

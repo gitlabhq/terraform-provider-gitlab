@@ -7,7 +7,7 @@ description: |-
   ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
   ~> Reading the access token status of a service account requires an admin token or a top-level group owner token on gitlab.com. As a result, this resource will ignore permission errors when attempting to read the token status, and will rely on the values in state instead. This can lead to apply-time failures if the token configured for the provider doesn't have permissions to rotate tokens for the service account.
   ~> Use rotation_configuration to automatically rotate tokens instead of using timestamp() as timestamp will cause changes with every plan. terraform apply must still be run to rotate the token.
-  ~> Due to a limitation in the API, the rotation_configuration is unable to set the new expiry date. Instead, when the resource is created, it will default the expiry date to 7 days in the future. On each subsequent apply, the new expiry will be 7 days from the date of the apply.
+  ~> Due to a limitation in the API, the rotation_configuration is unable to set the new expiry date before GitLab 17.9. Instead, when the resource is created, it will default the expiry date to 7 days in the future. On each subsequent apply, the new expiry will be 7 days from the date of the apply.
   Upstream API: GitLab API docs https://docs.gitlab.com/api/group_service_accounts/#create-a-personal-access-token-for-a-service-account-user
 ---
 
@@ -21,7 +21,7 @@ The `gitlab_group_service_account_access_token` resource allows to manage the li
 
 ~> Use `rotation_configuration` to automatically rotate tokens instead of using `timestamp()` as timestamp will cause changes with every plan. `terraform apply` must still be run to rotate the token.
 
-~> Due to a limitation in the API, the `rotation_configuration` is unable to set the new expiry date. Instead, when the resource is created, it will default the expiry date to 7 days in the future. On each subsequent apply, the new expiry will be 7 days from the date of the apply. 
+~> Due to a limitation in the API, the `rotation_configuration` is unable to set the new expiry date before GitLab 17.9. Instead, when the resource is created, it will default the expiry date to 7 days in the future. On each subsequent apply, the new expiry will be 7 days from the date of the apply. 
 
 **Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/group_service_accounts/#create-a-personal-access-token-for-a-service-account-user)
 
@@ -103,6 +103,10 @@ resource "gitlab_group_service_account_access_token" "example_sa_token" {
 Required:
 
 - `rotate_before_days` (Number) The duration (in days) before the expiration when the token should be rotated. As an example, if set to 7 days, the token will rotate 7 days before the expiration date, but only when `terraform apply` is run in that timeframe.
+
+Optional:
+
+- `expiration_days` (Number) The duration (in days) the new token should be valid for.
 
 ## Import
 

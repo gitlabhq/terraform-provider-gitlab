@@ -201,6 +201,7 @@ resource "gitlab_project" "import_private" {
 - `packages_enabled` (Boolean) Enable packages repository for the project.
 - `pages_access_level` (String) Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
 - `path` (String) The path of the repository.
+- `permanently_delete_on_destroy` (Boolean) Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
 - `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
 - `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
 - `prevent_merge_without_jira_issue` (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.

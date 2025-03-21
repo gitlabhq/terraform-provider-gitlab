@@ -44,8 +44,10 @@ resource "gitlab_project_mirror" "foo" {
 
 ### Optional
 
+- `auth_method` (String) Determines the mirror authentication method. Valid values are: `ssh_public_key`, `password`.
 - `enabled` (Boolean) Determines if the mirror is enabled.
 - `keep_divergent_refs` (Boolean) Determines if divergent refs are skipped.
+- `mirror_branch_regex` (String) Contains a regular expression. Only branches with names matching the regex are mirrored. Requires only_protected_branches to be disabled. Premium and Ultimate only.
 - `only_protected_branches` (Boolean) Determines if only protected branches are mirrored.
 
 ### Read-Only

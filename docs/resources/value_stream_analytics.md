@@ -68,7 +68,7 @@ resource "gitlab_value_stream_analytics" "group" {
 ### Required
 
 - `name` (String) The name of the value stream
-- `stages` (Attributes Set) Stages of the value stream (see [below for nested schema](#nestedatt--stages))
+- `stages` (Attributes List) Stages of the value stream (see [below for nested schema](#nestedatt--stages))
 
 ### Optional
 

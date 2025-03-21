@@ -37,6 +37,7 @@ resource "gitlab_project_variable" "example" {
 
 - `description` (String) The description of the variable.
 - `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`). Note that in Community Editions of Gitlab, values other than `*` will cause inconsistent plans.
+- `hidden` (Boolean) If set to `true`, the value of the variable will be hidden in the CI/CD User Interface. The value must meet the [hidden requirements](https://docs.gitlab.com/ci/variables/#hide-a-cicd-variable).
 - `masked` (Boolean) If set to `true`, the value of the variable will be masked in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ee/ci/variables/#mask-a-cicd-variable).
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags.
 - `raw` (Boolean) Whether the variable is treated as a raw string. When true, variables in the value are not expanded.

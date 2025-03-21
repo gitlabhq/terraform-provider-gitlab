@@ -5,8 +5,9 @@ subcategory: ""
 description: |-
   The gitlab_project_environment resource allows to manage the lifecycle of an environment in a project.
   -> During a terraform destroy this resource by default will not attempt to stop the environment first.
-  An environment is required to be in a stopped state before a deletetion of the environment can occur.
-  Set the stop_before_destroy flag to attempt to automatically stop the environment before deletion.
+  An environment is required to be in a stopped state before a deletion of the environment can occur.
+  Set the stop_before_destroy flag to attempt to automatically stop the environment before deletion. If the
+  environment's auto_stop_setting is set to with_action, the environment will be force-stopped.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/environments/
 ---
 
@@ -15,8 +16,9 @@ description: |-
 The `gitlab_project_environment` resource allows to manage the lifecycle of an environment in a project.
 
 -> During a terraform destroy this resource by default will not attempt to stop the environment first.
-An environment is required to be in a stopped state before a deletetion of the environment can occur.
-Set the `stop_before_destroy` flag to attempt to automatically stop the environment before deletion.
+An environment is required to be in a stopped state before a deletion of the environment can occur.
+Set the `stop_before_destroy` flag to attempt to automatically stop the environment before deletion. If the 
+environment's `auto_stop_setting` is set to `with_action`, the environment will be force-stopped. 
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/environments/)
 
@@ -52,15 +54,18 @@ resource "gitlab_project_environment" "this" {
 
 ### Optional
 
+- `auto_stop_setting` (String) The auto stop setting for the environment. Allowed values are `always`, `with_action`. If this is set to `with_action` and `stop_before_destroy` is `true`, the environment will be force-stopped.
 - `cluster_agent_id` (Number) The cluster agent to associate with this environment.
+- `description` (String) The description of the environment.
 - `external_url` (String) Place to link to for this environment.
 - `flux_resource_path` (String) The Flux resource path to associate with this environment.
 - `kubernetes_namespace` (String) The Kubernetes namespace to associate with this environment.
-- `stop_before_destroy` (Boolean) Determines whether the environment is attempted to be stopped before the environment is deleted.
+- `stop_before_destroy` (Boolean) Determines whether the environment is attempted to be stopped before the environment is deleted. If `auto_stop_setting` is set to `with_action`, this will perform a force stop.
 - `tier` (String) The tier of the new environment. Valid values are `production`, `staging`, `testing`, `development`, `other`.
 
 ### Read-Only
 
+- `auto_stop_at` (String) The ISO8601 date/time that this environment will be automatically stopped at in UTC.
 - `created_at` (String) The ISO8601 date/time that this environment was created at in UTC.
 - `id` (String) The ID of this resource.
 - `slug` (String) The name of the environment in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.

@@ -4,14 +4,14 @@ page_title: "gitlab_group_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_hook resource allows to manage the lifecycle of a group hook.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#hooks
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_webhooks/
 ---
 
 # gitlab_group_hook (Resource)
 
 The `gitlab_group_hook` resource allows to manage the lifecycle of a group hook.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#hooks)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_webhooks/)
 
 ## Example Usage
 
@@ -19,6 +19,8 @@ The `gitlab_group_hook` resource allows to manage the lifecycle of a group hook.
 resource "gitlab_group_hook" "example" {
   group                 = "example/hooked"
   url                   = "https://example.com/hook/example"
+  name                  = "Example"
+  description           = "Example Group Webhook"
   merge_requests_events = true
 }
 
@@ -26,6 +28,8 @@ resource "gitlab_group_hook" "example" {
 resource "gitlab_group_hook" "all_attributes" {
   group                      = 1
   url                        = "http://example.com"
+  name                       = "Example"
+  description                = "Example Group Webhook"
   token                      = "supersecret"
   enable_ssl_verification    = false
   push_events                = true
@@ -42,6 +46,8 @@ resource "gitlab_group_hook" "all_attributes" {
   deployment_events          = true
   releases_events            = true
   subgroup_events            = true
+  feature_flag_events        = true
+  branch_filter_strategy     = "wildcard"
 }
 
 # Using Custom Headers
@@ -74,15 +80,19 @@ resource "gitlab_group_hook" "all_attributes" {
 
 ### Optional
 
+- `branch_filter_strategy` (String) Filter push events by branch. Valid values are: `wildcard`, `regex`, `all_branches`.
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential note events.
 - `custom_headers` (Attributes List) Custom headers for the project webhook. (see [below for nested schema](#nestedatt--custom_headers))
 - `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `description` (String) Description of the group webhook.
 - `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
+- `feature_flag_events` (Boolean) Invoke the hook for feature flag events.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests events.
+- `name` (String) Name of the group webhook.
 - `note_events` (Boolean) Invoke the hook for note events.
 - `pipeline_events` (Boolean) Invoke the hook for pipeline events.
 - `push_events` (Boolean) Invoke the hook for push events.
@@ -97,7 +107,7 @@ resource "gitlab_group_hook" "all_attributes" {
 
 - `group_id` (Number) The id of the group for the hook.
 - `hook_id` (Number) The id of the group hook.
-- `id` (String) The id of the group hook. In the format of "group:hook_id"
+- `id` (String) The id of the group hook. In the format of `group:hook_id`
 
 <a id="nestedatt--custom_headers"></a>
 ### Nested Schema for `custom_headers`

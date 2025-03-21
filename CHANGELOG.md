@@ -1,3 +1,39 @@
+## 17.10.0 (2025-03-20)
+
+This release was tested against GitLab 17.10, 17.9, and 17.8 for both CE and EE
+
+## KNOWN ISSUES (1 change)
+
+- resource/gitlab_project: `restrict_user_defined_variables` will always be set to `true`, even when configured as `false`. This is an upstream API issue that can be tracked [here](https://gitlab.com/gitlab-org/gitlab/-/issues/526130). This will cause an immediate `plan` after `apply` if that attribute is included in the config. Removing the attribute from the config temporarily will prevent this behavior, and the setting may be configured via the API using `ci_variable_override_restriction` attribute instead.
+
+### FEATURES (4 changes)
+
+- resource/gitlab_integration_harbor:  [Add resource for managing project Harbor integrations](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fb23b2cd01091be1d5527cb795a5ae63909d098e) by @bas.bremer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2371)) 
+- resource/gitlab_project_target_branch_rule: [Add resource for managing defeault branch target rules for merge requests](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9b57d1dd8032e5b59b5263e6a339b508dd6978ed) by @kevineor ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2307)) 
+- datasource/gitlab_project_mirror_public_key:  [Add a new data source for retrieving public keys for project mirrors](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c9738041b2d94286e21ef59c8b59dacf9381d72f) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2373)) 
+- datasource/gitlab_group_access_tokens:  [Add a new data source for retrieving group-level access tokens](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/43fa923d8823deef3d473fa75c0d9c27e3ff28bb) by @jdesnoes ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2341)) 
+
+### IMPROVEMENTS (12 changes)
+
+- resource/gitlab_group_hook:  [Add missing attributes to group_hook resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/42f0718bfd452fa435295b7854ca0628c3061a49) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2363)) 
+- resource/gitlab_group_service_account_access_token:  [Add support for `expiration_days` in `rotation_config`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2c5df5cf607105d0c2feda78056607e37515b5a7) by @pguinoiseau ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2326)) 
+- resource/gitlab_user:  [Add support for `force_random_password`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b12b74b64d5720863e281dc51db5ecef5319186f) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2354)) 
+- resource/gitlab_project_variable: [Add support for `hidden` variables](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/cc9721a2ee3cf126c4038352943c90b08f521005) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2369)) 
+- resource/gitlab_group_share_group:  [Add support for `member_role_id`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9080be31789a63811113654142dc70c53d8ea2e2) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2344)) 
+- resource/gitlab_project_environment:  [Add `auto_stop_setting` to `gitlab_project_environment`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c8669f4ca7e59241f21badbd2be4d99001f9bdd3) by @jtymes ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2300)) 
+- resource/gitlab_project_mirror: [Add support for `mirror_branch_regex`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6fd6a628e8dbf01c93fe26f3359a36ed639def96) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2360)) 
+- resource/gitlab_project_mirror: [Add support for `auth_method`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c9738041b2d94286e21ef59c8b59dacf9381d72f) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2373)) 
+- resource/gitlab_project: [Add support for `permanently_delete_on_destroy`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f3523d96438bfe1712dce19f73ef04801b4f8fa5) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2358)) 
+- resource/gitlab_application_settings: [Add support for `lock_memberships_to_ldap`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c3ab985184d7536d8b34b4bc1a763c058930d3b1) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2359)) 
+- datasource/gitlab_users: [Add support for several new attributes.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fde7c9f221526fb1600548aafa0b748deba8d2e9) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2361)) 
+- datasource/gitlab_project_environment: [Add `auto_stop_setting` as a read-only attribute](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c8669f4ca7e59241f21badbd2be4d99001f9bdd3) by @jtymes ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2300)) 
+
+### BUG FIXES (3 changes)
+
+- resource/gitlab_value_stream_analytics:  [Update `stages` from an unordered list to an ordered list since order matters in the API](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7982745332ad8f4b90d1019e6273317e58326230) by @calee1 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2339)) 
+- resource/gitlab_group_membership:  [Fix group membership resource error when user is removed outside of terraform](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e2ce55c59cf9af30825be8ea8c822097d5716574) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2356))
+- resource/gitlab_group_label:  [Fixed an error encountered when upgrading past version 17.5 where an `UpgradeState` function was missing](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f64becbf07afce3729a31bb05071308a2e1efe3f) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2368)) 
+
 ## 17.9.0 (2025-02-20)
 
 This release was tested against GitLab 17.9, 17.8, and 17.7 for both CE and EE

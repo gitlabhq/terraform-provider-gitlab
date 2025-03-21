@@ -42,11 +42,16 @@ data "gitlab_users" "example-two" {
 - `blocked` (Boolean) Filter users that are blocked.
 - `created_after` (String) Search for users created after a specific date. (Requires administrator privileges)
 - `created_before` (String) Search for users created before a specific date. (Requires administrator privileges)
+- `exclude_external` (Boolean) Filters only non external users.
+- `exclude_internal` (Boolean) Filters only non internal users.
 - `extern_provider` (String) Lookup users by external provider. (Requires administrator privileges)
 - `extern_uid` (String) Lookup users by external UID. (Requires administrator privileges)
+- `external` (Boolean) Filters only external users.
 - `order_by` (String) Order the users' list by `id`, `name`, `username`, `created_at` or `updated_at`. (Requires administrator privileges)
 - `search` (String) Search users by username, name or email.
 - `sort` (String) Sort users' list in asc or desc order. (Requires administrator privileges)
+- `username` (String) Get a single user with a specific username.
+- `without_project_bots` (Boolean) Filters user without project bots.
 
 ### Read-Only
 
