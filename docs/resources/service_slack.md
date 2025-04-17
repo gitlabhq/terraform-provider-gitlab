@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_service_slack resource allows to manage the lifecycle of a project integration with Slack.
   ~> This resource is deprecated. use gitlab_integration_slackinstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#slack-notifications
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#slack-notifications
 ---
 
 # gitlab_service_slack (Resource)
@@ -14,7 +14,7 @@ The `gitlab_service_slack` resource allows to manage the lifecycle of a project 
 
 ~> This resource is deprecated. use `gitlab_integration_slack`instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#slack-notifications)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#slack-notifications)
 
 ## Example Usage
 

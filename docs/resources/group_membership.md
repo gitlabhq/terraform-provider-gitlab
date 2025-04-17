@@ -32,7 +32,7 @@ resource "gitlab_group_membership" "test" {
 
 ### Required
 
-- `access_level` (String) Access level for the member. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`.
+- `access_level` (String) Access level for the member. Valid values are: `no one`, `minimal`, `guest`, `planner`, `reporter`, `developer`, `maintainer`, `owner`.
 - `group_id` (Number) The ID of the group.
 - `user_id` (Number) The ID of the user.
 

@@ -1,3 +1,34 @@
+## 17.11.0 (2025-04-17)
+
+This release was tested against GitLab 17.11, 17.10, and 17.9 for both CE and EE
+
+### FEATURES (1 change)
+
+- resource/gitlab_group_dependency_proxy:  [Adds support for managing the docker hub Group Dependency Proxy](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/cf17cddf5da2310d621db6a7e20a3b9edff21d49) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2418)) 
+
+### IMPROVEMENTS (9 changes)
+
+- resource/gitlab_project_job_token_scopes:  [Add support for `Enabled`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/08856986d33ea1eec8b93d972c4ede3726d7bbd4) by @qa-andreas-grub ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2422)) 
+- resource/gitlab_group_ldap_link: [Add support for `member_role_id` to support custom roles]() by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2430)) 
+- resource/gitlab_project:  [Add support for ci_id_token_sub_claim_components](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7c2ac93acfdbc199ca77421a8004310f52bb30d0) by @bakkerduncan ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2367)) 
+- resource/gitlab_project:  [Add ci_delete_pipelines_in_seconds](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/59cd615f91f3fdd627a0e65026b5c6afb97154b9) by @ztzxt ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2391)) 
+- resource/gitlab_project:  [Improved documentation for `squash_option`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/3899c8601f13dc72e824801d94c231383aad3d8c)  @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2431)) 
+- resource/gitlab_integration_jira: [Added deprecation notice for `project_key`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e1f812e4361e1ca4f1baf1b8d610e4161569f13c) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2426)) 
+- [Add support for new `planner` role to multiple membership resources](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/34d30d81f4a76ddd6089170d0530b87db5148650) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2419)) 
+- [Update documentation URLs for multiple integration resources](gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d9f459c07a26aaf46c40371ab69f2854049f962b) by @@bas.bremer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2411)) 
+- [Add token descriptions to project, group, and personal access tokens](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4b8dd0f9fba392c29a4d9a194562324499f48857) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2416)) 
+
+### BUG FIXES (8 changes)
+
+- resource/gitlab_project_mirror:  [Fixes an issue where `mirror_branch_regex` would cause a perpetual plan](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/255e947781a7096358601f3f79c3b201b75c8596) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2424)) 
+- resource/gitlab_project_variable:  [Fixed an issue where removing project variables outside of TF could break the state file](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8fc8b3fa729322efceed0cacb7145d7947c09bec) by @jonathand2 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2417)) 
+- resource/gitlab_group_variable:  [Fixed an issue where removing group variables outside of TF could break the state file](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8fc8b3fa729322efceed0cacb7145d7947c09bec) by @jonathand2 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2417)) 
+- resource/gitlab_group:  [Fix an issue where `membership_lock` was set to false if not specified in the config](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2d4055b0169b184c4067babe80de9e4cce99c88e) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2406)) 
+- resource/gitlab_group_issue_board:  [Fix an issue with group issue board error handling that would cause the provider to panic](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6a8e6ce3c09814e185eb9d2f3d15194154b1f47c) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2409)) 
+- resource/gitlab_group_issue_board:  [Added error handling to provide earlier error detection and messaging](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/53539a09ca3c9a60ad8b62b5a54c742ce78f6cf1) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2429)) 
+- resource/gitlab_group_membership:  [Fix an error where expires_at and member_role_id were not computed](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/bf0bc0cf79b0568d2531eafd32725a9259afbc88) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2405))
+- resource/gitlab_instance_service_account: [Refactor a system panic that could happen when waiting for delete](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5dfaddb1b4d738610fc9bc62e4f249fc124f5bd2) by @timofurrer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2386)) 
+
 ## 17.10.0 (2025-03-20)
 
 This release was tested against GitLab 17.10, 17.9, and 17.8 for both CE and EE

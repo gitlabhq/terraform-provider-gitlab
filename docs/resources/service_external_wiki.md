@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_service_external_wiki resource allows to manage the lifecycle of a project integration with External Wiki Service.
   ~> This resource is deprecated. use gitlab_integration_external_wikiinstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#external-wiki
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#external-wiki
 ---
 
 # gitlab_service_external_wiki (Resource)
@@ -14,7 +14,7 @@ The `gitlab_service_external_wiki` resource allows to manage the lifecycle of a 
 
 ~> This resource is deprecated. use `gitlab_integration_external_wiki`instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#external-wiki)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#external-wiki)
 
 ## Example Usage
 

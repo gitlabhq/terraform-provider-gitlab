@@ -4,14 +4,14 @@ page_title: "gitlab_group_subgroups Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_subgroups data source allows to get subgroups of a group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#list-a-groups-subgroups
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#list-subgroups
 ---
 
 # gitlab_group_subgroups (Data Source)
 
 The `gitlab_group_subgroups` data source allows to get subgroups of a group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#list-a-groups-subgroups)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#list-subgroups)
 
 ## Example Usage
 

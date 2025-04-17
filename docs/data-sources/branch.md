@@ -45,7 +45,7 @@ data "gitlab_branch" "foo" {
 - `developer_can_merge` (Boolean) Bool, true if developer level access allows to merge branch.
 - `developer_can_push` (Boolean) Bool, true if developer level access allows git push.
 - `id` (String) The ID of this resource.
-- `merged` (Boolean) Bool, true if the branch has been merged into it's parent.
+- `merged` (Boolean) Bool, true if the branch has been merged into its parent.
 - `protected` (Boolean) Bool, true if branch has branch protection.
 - `web_url` (String) The url of the created branch (https.)
 

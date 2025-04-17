@@ -4,14 +4,14 @@ page_title: "gitlab_integration_telegram Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_integration_telegram resource allows to manage the lifecycle of a project integration with Telegram.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#telegram
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#telegram
 ---
 
 # gitlab_integration_telegram (Resource)
 
 The `gitlab_integration_telegram` resource allows to manage the lifecycle of a project integration with Telegram.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#telegram)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#telegram)
 
 ## Example Usage
 

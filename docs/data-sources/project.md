@@ -4,14 +4,14 @@ page_title: "gitlab_project Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project data source allows details of a project to be retrieved by either its ID or its path with namespace.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/projects/#get-single-project
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/projects/#get-a-single-project
 ---
 
 # gitlab_project (Data Source)
 
 The `gitlab_project` data source allows details of a project to be retrieved by either its ID or its path with namespace.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/projects/#get-single-project)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/projects/#get-a-single-project)
 
 ## Example Usage
 
@@ -33,6 +33,7 @@ data "gitlab_project" "example" {
 ### Optional
 
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
+- `ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
 - `id` (String) The integer that uniquely identifies the project within the gitlab install.
 - `path_with_namespace` (String) The path of the repository with namespace.
 - `public_builds` (Boolean) If true, jobs can be viewed by non-project members.
@@ -50,6 +51,7 @@ data "gitlab_project" "example" {
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) CI config file path for the project.
+- `ci_delete_pipelines_in_seconds` (Number) Pipelines older than the configured time are deleted.
 - `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
 - `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.

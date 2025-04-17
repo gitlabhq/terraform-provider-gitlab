@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_service_custom_issue_tracker resource allows to manage the lifecycle of a project integration with Custom Issue Tracker.
   ~> This resource is deprecated. use gitlab_integration_custom_issue_trackerinstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/integrations/#custom-issue-tracker
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#custom-issue-tracker
 ---
 
 # gitlab_service_custom_issue_tracker (Resource)
@@ -14,7 +14,7 @@ The `gitlab_service_custom_issue_tracker` resource allows to manage the lifecycl
 
 ~> This resource is deprecated. use `gitlab_integration_custom_issue_tracker`instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/integrations/#custom-issue-tracker)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#custom-issue-tracker)
 
 ## Example Usage
 

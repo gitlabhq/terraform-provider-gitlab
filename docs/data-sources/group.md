@@ -4,14 +4,14 @@ page_title: "gitlab_group Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group data source allows details of a group to be retrieved by its id or full path.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#details-of-a-group
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#get-a-single-group
 ---
 
 # gitlab_group (Data Source)
 
 The `gitlab_group` data source allows details of a group to be retrieved by its id or full path.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#details-of-a-group)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#get-a-single-group)
 
 ## Example Usage
 

@@ -52,7 +52,8 @@ resource "gitlab_project_variable" "example" {
 
 ### Optional
 
-- `access_level` (String) The access level for the project access token. Valid values are: `no one`, `minimal`, `guest`, `reporter`, `developer`, `maintainer`, `owner`. Default is `maintainer`.
+- `access_level` (String) The access level for the project access token. Valid values are: `no one`, `minimal`, `guest`, `planner`, `reporter`, `developer`, `maintainer`, `owner`. Default is `maintainer`.
+- `description` (String) The description of the project access token.
 - `expires_at` (String) When the token will expire, YYYY-MM-DD format. Is automatically set when `rotation_configuration` is used.
 - `rotation_configuration` (Attributes) The configuration for when to rotate a token automatically. Will not rotate a token until `terraform apply` is run. (see [below for nested schema](#nestedatt--rotation_configuration))
 

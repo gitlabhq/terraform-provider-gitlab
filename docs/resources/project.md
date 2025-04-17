@@ -153,7 +153,9 @@ resource "gitlab_project" "import_private" {
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
 - `ci_config_path` (String) Custom Path to CI config file.
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
+- `ci_delete_pipelines_in_seconds` (Number) Pipelines older than the configured time are deleted.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
+- `ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
 - `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
 - `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
@@ -226,7 +228,7 @@ This attribute is only used during resource creation, thus changes are suppresse
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
 - `snippets_enabled` (Boolean) Enable snippets for the project.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests.
-- `squash_option` (String) Squash commits when merge request. Valid values are `never`, `always`, `default_on`, or `default_off`. The default value is `default_off`.
+- `squash_option` (String) Squash commits when merge request is merged. Valid values are `never` (Do not allow), `always` (Require), `default_on` (Encourage), or `default_off` (Allow). The default value is `default_off` (Allow).
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
 - `tags` (Set of String) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use topics instead.
 - `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.

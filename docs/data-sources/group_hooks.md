@@ -4,14 +4,14 @@ page_title: "gitlab_group_hooks Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_hooks data source allows to retrieve details about hooks in a group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#list-group-hooks
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_webhooks/#list-group-hooks
 ---
 
 # gitlab_group_hooks (Data Source)
 
 The `gitlab_group_hooks` data source allows to retrieve details about hooks in a group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#list-group-hooks)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_webhooks/#list-group-hooks)
 
 ## Example Usage
 
