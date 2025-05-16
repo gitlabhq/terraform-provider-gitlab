@@ -5,7 +5,6 @@ subcategory: ""
 description: |-
   The gitlab_topic resource allows to manage the lifecycle of topics that are then assignable to projects.
   -> Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
-  ~> Deleting a topic was implemented in GitLab 14.9. For older versions of GitLab set soft_destroy = true to empty out a topic instead of deleting it.
   Upstream API: GitLab REST API docs for topics https://docs.gitlab.com/api/topics/
 ---
 
@@ -14,8 +13,6 @@ description: |-
 The `gitlab_topic` resource allows to manage the lifecycle of topics that are then assignable to projects.
 
 -> Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
-
-~> Deleting a topic was implemented in GitLab 14.9. For older versions of GitLab set `soft_destroy = true` to empty out a topic instead of deleting it.
 
 **Upstream API**: [GitLab REST API docs for topics](https://docs.gitlab.com/api/topics/)
 
@@ -37,14 +34,13 @@ resource "gitlab_topic" "functional_programming" {
 ### Required
 
 - `name` (String) The topic's name.
+- `title` (String) The topic's description.
 
 ### Optional
 
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `description` (String) A text describing the topic.
-- `soft_destroy` (Boolean, Deprecated) Empty the topics fields instead of deleting it.
-- `title` (String) The topic's description. Requires at least GitLab 15.0 for which it's a required argument.
 
 ### Read-Only
 

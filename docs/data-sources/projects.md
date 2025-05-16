@@ -191,7 +191,6 @@ Read-Only:
 - `cadence` (String)
 - `enabled` (Boolean)
 - `keep_n` (Number)
-- `name_regex` (String)
 - `name_regex_delete` (String)
 - `name_regex_keep` (String)
 - `next_run_at` (String)

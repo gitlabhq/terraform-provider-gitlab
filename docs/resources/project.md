@@ -147,7 +147,6 @@ resource "gitlab_project" "import_private" {
 - `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
-- `build_coverage_regex` (String, Deprecated) Test coverage parsing for the project. This is deprecated feature in GitLab 15.0.
 - `build_git_strategy` (String) The Git strategy. Defaults to fetch. Valid values are `clone`, `fetch`.
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
@@ -205,7 +204,7 @@ resource "gitlab_project" "import_private" {
 - `path` (String) The path of the repository.
 - `permanently_delete_on_destroy` (Boolean) Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
 - `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls.
-- `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate and at least GitLab 17.3.
+- `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate.
 - `prevent_merge_without_jira_issue` (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
 - `public_builds` (Boolean, Deprecated) If true, jobs can be viewed by non-project members.
@@ -260,7 +259,6 @@ Optional:
 - `cadence` (String) The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
 - `enabled` (Boolean) If true, the policy is enabled.
 - `keep_n` (Number) The number of images to keep.
-- `name_regex` (String, Deprecated) The regular expression to match image names to delete.
 - `name_regex_delete` (String) The regular expression to match image names to delete.
 - `name_regex_keep` (String) The regular expression to match image names to keep.
 - `older_than` (String) The number of days to keep images.

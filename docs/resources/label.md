@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_label resource allows to manage the lifecycle of a project label.
   ~> This resource is deprecated. use gitlab_project_labelinstead!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/labels/#project-labels
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/labels/#get-a-single-project-label
 ---
 
 # gitlab_label (Resource)
@@ -14,7 +14,7 @@ The `gitlab_label` resource allows to manage the lifecycle of a project label.
 
 ~> This resource is deprecated. use `gitlab_project_label`instead!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/labels/#project-labels)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/labels/#get-a-single-project-label)
 
 
 

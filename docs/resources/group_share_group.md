@@ -36,7 +36,7 @@ resource "gitlab_group_share_group" "test" {
 ### Optional
 
 - `expires_at` (String) Share expiration date. Format: `YYYY-MM-DD`
-- `member_role_id` (Number) The ID of a custom member role. Only available for Ultimate instances.
+- `member_role_id` (Number) The ID of a custom member role. Only available for Ultimate instances. If `member_role_id` is removed from the config, the group share will revert to a base role.
 
 ### Read-Only
 

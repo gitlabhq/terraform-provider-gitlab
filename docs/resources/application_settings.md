@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_application_settings resource allows to manage the GitLab application settings.
   ~> This is an experimental resource. By nature it doesn't properly fit into how Terraform resources are meant to work.
-  Feel free to join the discussion https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/957 if you have any
+  Feel free to join the discussion https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/issues/957 if you have any
   ideas or questions regarding this resource.
   ~> All gitlab_application_settings use the same ID gitlab.
   !> This resource does not implement any destroy logic, it's a no-op at this point.
@@ -19,7 +19,7 @@ description: |-
 The `gitlab_application_settings` resource allows to manage the GitLab application settings.
 
 ~> This is an **experimental resource**. By nature it doesn't properly fit into how Terraform resources are meant to work.
-   Feel free to join the [discussion](https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/957) if you have any
+   Feel free to join the [discussion](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/issues/957) if you have any
    ideas or questions regarding this resource.
 
 ~> All `gitlab_application_settings` use the same ID `gitlab`.
@@ -188,20 +188,14 @@ resource "gitlab_application_settings" "this" {
 - `grafana_url` (String) Grafana URL.
 - `gravatar_enabled` (Boolean) Enable Gravatar.
 - `group_owners_can_manage_default_branch_protection` (Boolean) Prevent overrides of default branch protection.
-- `hashed_storage_enabled` (Boolean) Create new projects using hashed storage paths: Enable immutable, hash-based paths and repository names to store repositories on disk. This prevents repositories from having to be moved or renamed when the Project URL changes and may improve disk I/O performance. (Always enabled in GitLab versions 13.0 and later, configuration is scheduled for removal in 14.0).
 - `help_page_hide_commercial_content` (Boolean) Hide marketing-related entries from help.
 - `help_page_support_url` (String) Alternate support URL for help page and help dropdown.
 - `help_page_text` (String) Custom text displayed on the help page.
 - `help_text` (String) GitLab server administrator information.
 - `hide_third_party_offers` (Boolean) Do not display offers from third parties in GitLab.
 - `home_page_url` (String) Redirect to this URL when not logged in.
-- `housekeeping_enabled` (Boolean) Enable or disable Git housekeeping.
-				If enabled, requires either housekeeping_optimize_repository_period OR housekeeping_bitmaps_enabled, housekeeping_full_repack_period, housekeeping_gc_period, and housekeeping_incremental_repack_period.
-				Options housekeeping_bitmaps_enabled, housekeeping_full_repack_period, housekeeping_gc_period, and housekeeping_incremental_repack_period are deprecated. Use housekeeping_optimize_repository_period instead.
-- `housekeeping_full_repack_period` (Number, Deprecated) Number of Git pushes after which an incremental git repack is run.
-- `housekeeping_gc_period` (Number, Deprecated) Number of Git pushes after which git gc is run.
-- `housekeeping_incremental_repack_period` (Number, Deprecated) Number of Git pushes after which an incremental git repack is run.
-- `housekeeping_optimize_repository_period` (Number) Number of Git pushes after which an incremental git repack is run.
+- `housekeeping_enabled` (Boolean) Enable or disable Git housekeeping. If enabled, requires housekeeping_optimize_repository_period.
+- `housekeeping_optimize_repository_period` (Number) Number of Git pushes after which an incremental git-repack is run.
 - `html_emails_enabled` (Boolean) Enable HTML emails.
 - `import_sources` (List of String) Sources to allow project import from. Valid values are: `github`, `bitbucket`, `bitbucket_server`, `fogbugz`, `git`, `gitlab_project`, `gitea`, `manifest`
 - `in_product_marketing_emails_enabled` (Boolean) Enable in-product marketing emails.
@@ -243,7 +237,7 @@ resource "gitlab_application_settings" "this" {
 - `mirror_max_capacity` (Number) Maximum number of mirrors that can be synchronizing at the same time.
 - `mirror_max_delay` (Number) Maximum time (in minutes) between updates that a mirror can have when scheduled to synchronize.
 - `npm_package_requests_forwarding` (Boolean) Use npmjs.org as a default remote repository when the package is not found in the GitLab Package Registry for npm.
-- `nuget_skip_metadata_url_validation` (Boolean) Indicates whether to skip metadata URL validation for the NuGet package. Introduced in GitLab 17.0.
+- `nuget_skip_metadata_url_validation` (Boolean) Indicates whether to skip metadata URL validation for the NuGet package.
 - `outbound_local_requests_whitelist` (List of String) Define a list of trusted domains or IP addresses to which local requests are allowed when local requests for hooks and services are disabled.
 - `package_metadata_purl_types` (List of Number) List of package registry metadata to sync. See the list of the available values (https://gitlab.com/gitlab-org/gitlab/-/blob/ace16c20d5da7c4928dd03fb139692638b557fe3/app/models/concerns/enums/package_metadata.rb#L5). Self-managed, Ultimate only.
 - `package_registry_allow_anyone_to_pull_option` (Boolean) Enable to allow anyone to pull from Package Registry visible and changeable.
@@ -279,8 +273,7 @@ resource "gitlab_application_settings" "this" {
 - `remember_me_enabled` (Boolean) Enable Remember me setting.
 - `repository_checks_enabled` (Boolean) GitLab periodically runs git fsck in all project and wiki repositories to look for silent disk corruption issues.
 - `repository_size_limit` (Number) Size limit per repository (MB).
-- `repository_storages` (List of String) (GitLab 13.0 and earlier) List of names of enabled storage paths, taken from gitlab.yml. New projects are created in one of these stores, chosen at random.
-- `repository_storages_weighted` (Map of Number) (GitLab 13.1 and later) Hash of names of taken from gitlab.yml to weights. New projects are created in one of these stores, chosen by a weighted random selection.
+- `repository_storages_weighted` (Map of Number) Hash of names taken from gitlab.yml to weights. New projects are created in one of these stores, chosen by a weighted random selection.
 - `require_admin_approval_after_user_signup` (Boolean) When enabled, any user that signs up for an account using the registration form is placed under a Pending approval state and has to be explicitly approved by an administrator.
 - `require_admin_two_factor_authentication` (Boolean) Allow administrators to require 2FA for all administrators on the instance.
 - `require_personal_access_token_expiry` (Boolean) When enabled, users must set an expiration date when creating a group or project access token, or a personal access token owned by a non-service account.

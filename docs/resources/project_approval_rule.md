@@ -10,7 +10,7 @@ description: |-
   to prevent a common error with this resource.
   ~> Since a project is limited to one "any_approver" rule, attempting to add two "any_approver" rules to the same project in terraform will result in
   terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/merge_request_approvals/#project-level-mr-approvals
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/merge_request_approvals/#project-approval-rules
 ---
 
 # gitlab_project_approval_rule (Resource)
@@ -26,7 +26,7 @@ The `gitlab_project_approval_rule` resource allows to manage the lifecycle of a 
 ~> Since a project is limited to one "any_approver" rule, attempting to add two "any_approver" rules to the same project in terraform will result in 
    terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/merge_request_approvals/#project-level-mr-approvals)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/merge_request_approvals/#project-approval-rules)
 
 ## Example Usage
 

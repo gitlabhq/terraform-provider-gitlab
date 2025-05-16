@@ -79,6 +79,7 @@ resource "gitlab_repository_file" "readme_for_dogs" {
 
 - `branch` (String) Name of the branch to which to commit to.
 - `content` (String) File content.
+- `encoding` (String) The file content encoding. Valid values are: `base64`, `text`.
 - `file_path` (String) The full path of the file. It must be relative to the root of the project without a leading slash `/` or `./`.
 - `project` (String) The name or ID of the project.
 
@@ -89,7 +90,6 @@ resource "gitlab_repository_file" "readme_for_dogs" {
 - `commit_message` (String) Commit message.
 - `create_commit_message` (String) Create commit message.
 - `delete_commit_message` (String) Delete Commit message.
-- `encoding` (String) The file content encoding. Default value is `base64`. Valid values are: `base64`, `text`.
 - `execute_filemode` (Boolean) Enables or disables the execute flag on the file.
 - `overwrite_on_create` (Boolean) Enable overwriting existing files, defaults to `false`. This attribute is only used during `create` and must be use carefully. We suggest to use `imports` whenever possible and limit the use of this attribute for when the project was imported on the same `apply`. This attribute is not supported during a resource import.
 - `start_branch` (String) Name of the branch to start the new commit from.

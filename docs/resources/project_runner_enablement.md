@@ -4,14 +4,14 @@ page_title: "gitlab_project_runner_enablement Resource - terraform-provider-gitl
 subcategory: ""
 description: |-
   The gitlab_project_runner_enablement resource allows to enable a runner in a project.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/runners/#enable-a-runner-in-project
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/runners/#assign-a-runner-to-project
 ---
 
 # gitlab_project_runner_enablement (Resource)
 
 The `gitlab_project_runner_enablement` resource allows to enable a runner in a project.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/runners/#enable-a-runner-in-project)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/runners/#assign-a-runner-to-project)
 
 ## Example Usage
 

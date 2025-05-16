@@ -4,7 +4,7 @@ page_title: "gitlab_instance_cluster Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_instance_cluster resource allows to manage the lifecycle of an instance cluster.
-  ~> This is deprecated GitLab feature since 14.5
+  ~> This is deprecated, due for removal in GitLab 19.0.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/instance_clusters/
 ---
 
@@ -12,7 +12,7 @@ description: |-
 
 The `gitlab_instance_cluster` resource allows to manage the lifecycle of an instance cluster.
 
-~> This is deprecated GitLab feature since 14.5
+~> This is deprecated, due for removal in GitLab 19.0.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/instance_clusters/)
 

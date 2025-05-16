@@ -69,7 +69,7 @@ resource "gitlab_member_role" "example" {
 
 ### Read-Only
 
-- `created_at` (String) Timestamp of when the member role was created. Only available with GitLab version 17.3 or higher.
+- `created_at` (String) Timestamp of when the member role was created.
 - `edit_path` (String) The Web UI path to edit the member role
 - `id` (String) Globally unique ID of the member role. In the format of `gid://gitlab/MemberRole/1`
 - `iid` (Number) The id integer value extracted from the `id` attribute

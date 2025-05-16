@@ -3,13 +3,13 @@
 page_title: "gitlab_integration_slack Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_slack resource allows to manage the lifecycle of a project integration with Slack.
+  The gitlab_integration_slack resource allows you to manage the lifecycle of a project integration with Slack.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#slack-notifications
 ---
 
 # gitlab_integration_slack (Resource)
 
-The `gitlab_integration_slack` resource allows to manage the lifecycle of a project integration with Slack.
+The `gitlab_integration_slack` resource allows you to manage the lifecycle of a project integration with Slack.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#slack-notifications)
 

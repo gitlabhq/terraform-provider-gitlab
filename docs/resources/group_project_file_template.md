@@ -9,7 +9,7 @@ description: |-
   For more information about which file types are available as templates, view
   GitLab's documentation https://docs.gitlab.com/user/group/custom_project_templates/
   -> This resource requires a GitLab Enterprise instance with a Premium license.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#update-group
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#update-group-attributes
 ---
 
 # gitlab_group_project_file_template (Resource)
@@ -22,7 +22,7 @@ For more information about which file types are available as templates, view
 
 -> This resource requires a GitLab Enterprise instance with a Premium license.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#update-group)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#update-group-attributes)
 
 ## Example Usage
 

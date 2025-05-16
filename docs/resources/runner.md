@@ -58,6 +58,7 @@ resource "gitlab_runner" "protected" {
 
 resource "gitlab_group" "my_custom_group" {
   name        = "my custom runner"
+  path        = "group"
   description = "group that holds the custom runners"
 }
 

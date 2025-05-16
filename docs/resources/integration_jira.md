@@ -51,7 +51,6 @@ resource "gitlab_integration_jira" "jira" {
 - `jira_issue_transition_automatic` (Boolean) Enable automatic issue transitions. Takes precedence over jira_issue_transition_id if enabled. Defaults to false. This value cannot be imported, and will not perform drift detection if changed outside Terraform.
 - `jira_issue_transition_id` (String) The ID of a transition that moves issues to a closed state. You can find this number under the JIRA workflow administration (Administration > Issues > Workflows) by selecting View under Operations of the desired workflow of your project. By default, this ID is set to 2.
 - `merge_requests_events` (Boolean) Enable notifications for merge request events
-- `project_key` (String, Deprecated) The short identifier for your JIRA project. Must be all uppercase. For example, `PROJ`.
 - `project_keys` (List of String) Keys of Jira projects. When issues_enabled is true, this setting specifies which Jira projects to view issues from in GitLab.
 - `use_inherited_settings` (Boolean) Indicates whether or not to inherit default settings. Defaults to false.
 - `username` (String) The email or username to be used with Jira. For Jira Cloud use an email, for Jira Data Center and Jira Server use a username. Required when using Basic authentication (jira_auth_type is 0).
