@@ -1,3 +1,9 @@
+## 18.1.1 (2025-06-20)
+
+### BUG FIXES (1 change)
+
+- resource/gitlab_group_service_account_access_token:  [Fix a bug when using `scopes` with an `unknown` set, resulting in an error message about the provider](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/63e1ef06ab1b63225e0f7ce29c1f2d7f6a2312f7) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2550))
+
 ## 18.1.0 (2025-06-19)
 
 ### FEATURES (3 changes)
