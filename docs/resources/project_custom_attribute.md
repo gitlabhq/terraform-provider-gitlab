@@ -38,7 +38,8 @@ resource "gitlab_project_custom_attribute" "attr" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_custom_attribute`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_custom_attribute`. For example:
+
 ```terraform
 import {
   to = gitlab_project_custom_attribute.example
@@ -46,7 +47,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a project custom attribute using an id made up of `{project-id}:{key}`, e.g.

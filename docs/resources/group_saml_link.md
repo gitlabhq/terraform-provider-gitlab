@@ -39,7 +39,7 @@ resource "gitlab_group_saml_link" "test_custom_role" {
 
 ### Required
 
-- `access_level` (String) Access level for members of the SAML group. Valid values are: `guest`, `reporter`, `developer`, `maintainer`, `owner`.
+- `access_level` (String) Access level for members of the SAML group. Valid values are: `guest`, `planner`, `reporter`, `developer`, `maintainer`, `owner`.
 - `group` (String) The ID or path of the group to add the SAML Group Link to.
 - `saml_group_name` (String) The name of the SAML group.
 
@@ -53,7 +53,8 @@ resource "gitlab_group_saml_link" "test_custom_role" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_saml_link`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_saml_link`. For example:
+
 ```terraform
 import {
   to = gitlab_group_saml_link.example
@@ -61,7 +62,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab group saml links can be imported using an id made up of `group_id:saml_group_name`, e.g.

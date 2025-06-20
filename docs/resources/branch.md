@@ -4,12 +4,15 @@ page_title: "gitlab_branch Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_branch resource allows to manage the lifecycle of a repository branch.
+  !> The ref attribute is only set in state on resource creation. Imports or divergent branches can lead Terraform to destroy and recreate the resource. Use the lifecycle meta-argument to ignore changes to avoid this behavior.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/branches/
 ---
 
 # gitlab_branch (Resource)
 
 The `gitlab_branch` resource allows to manage the lifecycle of a repository branch.
+
+!> The `ref` attribute is only set in state on resource creation. Imports or divergent branches can lead Terraform to destroy and recreate the resource. Use the lifecycle meta-argument to ignore changes to avoid this behavior.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/branches/)
 
@@ -27,6 +30,12 @@ resource "gitlab_branch" "example" {
   name    = "example"
   ref     = "main"
   project = gitlab_project.example.id
+
+  # Recommended for imports and divergent branches
+  # to prevent resource destroy and recreate.
+  lifecycle {
+    ignore_changes = [ref]
+  }
 }
 ```
 
@@ -74,7 +83,8 @@ Read-Only:
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_branch`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_branch`. For example:
+
 ```terraform
 import {
   to = gitlab_branch.example
@@ -82,7 +92,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab branches can be imported with a key composed of `<project_id>:<branch_name>`, e.g.

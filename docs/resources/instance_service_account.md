@@ -63,7 +63,8 @@ Optional:
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_instance_service_account`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_instance_service_account`. For example:
+
 ```terraform
 import {
   to = gitlab_instance_service_account.example
@@ -71,7 +72,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a group service account using `terraform import <resource> <id>`.  The

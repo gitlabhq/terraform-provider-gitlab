@@ -147,7 +147,8 @@ Read-Only:
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_branch_protection`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_branch_protection`. For example:
+
 ```terraform
 import {
   to = gitlab_branch_protection.example
@@ -155,7 +156,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab protected branches can be imported with a key composed of `<project_id>:<branch>`, e.g.

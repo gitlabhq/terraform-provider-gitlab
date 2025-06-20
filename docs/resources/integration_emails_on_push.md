@@ -3,13 +3,16 @@
 page_title: "gitlab_integration_emails_on_push Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_emails_on_push resource allows to manage the lifecycle of a project integration with Emails on Push Service.
+  The gitlab_integration_emails_on_push resource manages the lifecycle of a project integration with the Emails on Push Service.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_emails_on_pushinstead!
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#emails-on-push
 ---
 
 # gitlab_integration_emails_on_push (Resource)
 
-The `gitlab_integration_emails_on_push` resource allows to manage the lifecycle of a project integration with Emails on Push Service.
+The `gitlab_integration_emails_on_push` resource manages the lifecycle of a project integration with the Emails on Push Service.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_emails_on_push`instead!
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#emails-on-push)
 
@@ -55,7 +58,8 @@ resource "gitlab_integration_emails_on_push" "emails" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_emails_on_push`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_emails_on_push`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_emails_on_push.example
@@ -63,7 +67,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_emails_on_push state using the project ID, e.g.

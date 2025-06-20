@@ -3,13 +3,16 @@
 page_title: "gitlab_integration_mattermost Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_mattermost resource allows to manage the lifecycle of a project integration with Mattermost.
+  The gitlab_integration_mattermost resource manages the lifecycle of a project integration with Mattermost.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_mattermostinstead!
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#mattermost-notifications
 ---
 
 # gitlab_integration_mattermost (Resource)
 
-The `gitlab_integration_mattermost` resource allows to manage the lifecycle of a project integration with Mattermost.
+The `gitlab_integration_mattermost` resource manages the lifecycle of a project integration with Mattermost.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_mattermost`instead!
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#mattermost-notifications)
 
@@ -69,7 +72,8 @@ resource "gitlab_integration_mattermost" "mattermost" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_mattermost`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_mattermost`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_mattermost.example
@@ -77,7 +81,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_mattermost.mattermost state using the project ID, e.g.

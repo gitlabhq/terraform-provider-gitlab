@@ -44,7 +44,8 @@ resource "gitlab_group_share_group" "test" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_share_group`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_share_group`. For example:
+
 ```terraform
 import {
   to = gitlab_group_share_group.example
@@ -52,7 +53,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab group shares can be imported using an id made up of `mainGroupId:shareGroupId`, e.g.

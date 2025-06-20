@@ -57,7 +57,8 @@ resource "gitlab_project_milestone" "example" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_milestone`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_milestone`. For example:
+
 ```terraform
 import {
   to = gitlab_project_milestone.example
@@ -65,7 +66,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab project milestone can be imported with a key composed of `<project>:<milestone_id>`, e.g.

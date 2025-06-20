@@ -3,13 +3,13 @@
 page_title: "gitlab_integration_harbor Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_harbor resource allows to manage the lifecycle of a project integration with Harbor.
+  The gitlab_integration_harbor resource manages the lifecycle of a project integration with Harbor.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#harbor
 ---
 
 # gitlab_integration_harbor (Resource)
 
-The `gitlab_integration_harbor` resource allows to manage the lifecycle of a project integration with Harbor.
+The `gitlab_integration_harbor` resource manages the lifecycle of a project integration with Harbor.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#harbor)
 
@@ -51,7 +51,8 @@ resource "gitlab_integration_harbor" "harbor" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_harbor`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_harbor`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_harbor.example
@@ -59,7 +60,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_harbor state using `terraform import <resource> <project_id>`:

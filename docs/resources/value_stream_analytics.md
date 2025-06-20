@@ -101,7 +101,8 @@ Read-Only:
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_value_stream_analytics`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_value_stream_analytics`. For example:
+
 ```terraform
 import {
   to = gitlab_value_stream_analytics.example
@@ -109,7 +110,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab value stream analytics can be imported with a key composed of `<full_path_type>:<full_path>:<value_stream_id>`, e.g.

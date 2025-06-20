@@ -3,13 +3,16 @@
 page_title: "gitlab_integration_microsoft_teams Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_microsoft_teams resource allows you to manage the lifecycle of a project integration with Microsoft Teams.
+  The gitlab_integration_microsoft_teams resource manages the lifecycle of a project integration with Microsoft Teams.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_microsoft_teamsinstead!
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#microsoft-teams-notifications
 ---
 
 # gitlab_integration_microsoft_teams (Resource)
 
-The `gitlab_integration_microsoft_teams` resource allows you to manage the lifecycle of a project integration with Microsoft Teams.
+The `gitlab_integration_microsoft_teams` resource manages the lifecycle of a project integration with Microsoft Teams.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_microsoft_teams`instead!
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#microsoft-teams-notifications)
 
@@ -60,7 +63,8 @@ resource "gitlab_integration_microsoft_teams" "teams" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_microsoft_teams`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_microsoft_teams`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_microsoft_teams.example
@@ -68,7 +72,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_microsoft_teams state using the project ID, e.g.

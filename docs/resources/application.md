@@ -51,7 +51,8 @@ This is only populated when creating a new application. This attribute is not av
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_application`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_application`. For example:
+
 ```terraform
 import {
   to = gitlab_application.example
@@ -59,7 +60,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab applications can be imported with their id, e.g.

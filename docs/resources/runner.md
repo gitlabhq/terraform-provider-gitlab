@@ -111,7 +111,8 @@ resource "local_file" "config" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_runner`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_runner`. For example:
+
 ```terraform
 import {
   to = gitlab_runner.example
@@ -119,7 +120,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # A GitLab Runner can be imported using the runner's ID, eg

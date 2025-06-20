@@ -3,14 +3,14 @@
 page_title: "gitlab_deploy_key Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_deploy_key resource allows to manage the lifecycle of a deploy key.
+  The gitlab_deploy_key resource manages the lifecycle of a project deploy key.
   -> To enable an already existing deploy key for another project use the gitlab_deploy_key_enable resource.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/deploy_keys/
 ---
 
 # gitlab_deploy_key (Resource)
 
-The `gitlab_deploy_key` resource allows to manage the lifecycle of a deploy key.
+The `gitlab_deploy_key` resource manages the lifecycle of a project deploy key.
 
 -> To enable an already existing deploy key for another project use the `gitlab_deploy_key_enable` resource.
 
@@ -19,10 +19,19 @@ The `gitlab_deploy_key` resource allows to manage the lifecycle of a deploy key.
 ## Example Usage
 
 ```terraform
+// No expiry
 resource "gitlab_deploy_key" "example" {
   project = "example/deploying"
   title   = "Example deploy key"
   key     = "ssh-ed25519 AAAA..."
+}
+
+// With expiry
+resource "gitlab_deploy_key" "example_expires" {
+  project    = "example/deploying"
+  title      = "Example deploy key"
+  key        = "ssh-ed25519 AAAA..."
+  expires_at = "2025-01-21T00:00:00Z"
 }
 ```
 
@@ -38,6 +47,7 @@ resource "gitlab_deploy_key" "example" {
 ### Optional
 
 - `can_push` (Boolean) Allow this deploy key to be used to push changes to the project. Defaults to `false`.
+- `expires_at` (String) Expiration date for the deploy key. Does not expire if no value is provided. Expected in RFC3339 format `(2019-03-15T08:00:00Z)`
 
 ### Read-Only
 
@@ -46,7 +56,8 @@ resource "gitlab_deploy_key" "example" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_deploy_key`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_deploy_key`. For example:
+
 ```terraform
 import {
   to = gitlab_deploy_key.example
@@ -54,7 +65,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab deploy keys can be imported using an id made up of `{project_id}:{deploy_key_id}`, e.g.

@@ -57,7 +57,8 @@ resource "gitlab_compliance_framework" "sample" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_compliance_framework`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_compliance_framework`. For example:
+
 ```terraform
 import {
   to = gitlab_compliance_framework.example
@@ -65,7 +66,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab compliance frameworks can be imported with a key composed of `<namespace_path>:<framework_id>`, e.g.

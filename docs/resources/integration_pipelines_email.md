@@ -3,13 +3,16 @@
 page_title: "gitlab_integration_pipelines_email Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_pipelines_email resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
+  The gitlab_integration_pipelines_email resource manages the lifecycle of a project integration with the Pipeline Emails Service.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_pipelines_emailinstead!
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#pipeline-status-emails
 ---
 
 # gitlab_integration_pipelines_email (Resource)
 
-The `gitlab_integration_pipelines_email` resource allows to manage the lifecycle of a project integration with Pipeline Emails Service.
+The `gitlab_integration_pipelines_email` resource manages the lifecycle of a project integration with the Pipeline Emails Service.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_pipelines_email`instead!
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#pipeline-status-emails)
 
@@ -49,7 +52,8 @@ resource "gitlab_integration_pipelines_email" "email" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_pipelines_email`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_pipelines_email`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_pipelines_email.example
@@ -57,7 +61,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_pipelines_email state using the project ID, e.g.

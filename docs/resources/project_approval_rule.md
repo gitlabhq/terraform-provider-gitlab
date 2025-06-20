@@ -114,7 +114,8 @@ resource "gitlab_project_approval_rule" "example-four" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_approval_rule`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_approval_rule`. For example:
+
 ```terraform
 import {
   to = gitlab_project_approval_rule.example
@@ -122,7 +123,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab project approval rules can be imported using a key composed of `<project-id>:<rule-id>`, e.g.

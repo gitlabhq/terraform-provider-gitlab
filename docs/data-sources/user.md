@@ -40,6 +40,7 @@ data "gitlab_user" "example-two" {
 ### Optional
 
 - `email` (String) The public email address of the user.
+- `email_exact_match` (Boolean) (Experimental) If true, returns only an exact match. Otherwise, fuzzy matching might return the closest result. If no exact match is available, the data source returns an error.
 - `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field.
 - `user_id` (Number) The ID of the user.
 - `username` (String) The username of the user.

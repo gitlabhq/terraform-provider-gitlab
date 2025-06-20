@@ -50,8 +50,17 @@ resource "gitlab_group_membership" "example_membership" {
   expires_at   = "2020-03-14"
 }
 
-# The service account access token
-resource "gitlab_group_service_account_access_token" "example_sa_token" {
+# The service account access token with no expiry
+resource "gitlab_group_service_account_access_token" "example_sa_token_no_expiry" {
+  group   = gitlab_group.example.id
+  user_id = gitlab_group_service_account.example_sa.service_account_id
+  name    = "Example service account access token"
+
+  scopes = ["api"]
+}
+
+# The service account access token with expires at
+resource "gitlab_group_service_account_access_token" "example_sa_token_expires_at" {
   group      = gitlab_group.example.id
   user_id    = gitlab_group_service_account.example_sa.service_account_id
   name       = "Example service account access token"
@@ -61,13 +70,14 @@ resource "gitlab_group_service_account_access_token" "example_sa_token" {
 }
 
 # The service account access token with rotation configuration
-resource "gitlab_group_service_account_access_token" "example_sa_token" {
+resource "gitlab_group_service_account_access_token" "example_sa_token_rotation_configuration" {
   group   = gitlab_group.example.id
   user_id = gitlab_group_service_account.example_sa.service_account_id
   name    = "Example service account access token"
 
   rotation_configuration = {
     rotate_before_days = 2
+    expiration_days    = 7
   }
 
   scopes = ["api"]
@@ -81,7 +91,7 @@ resource "gitlab_group_service_account_access_token" "example_sa_token" {
 
 - `group` (String) The ID or URL-encoded path of the group containing the service account. Must be a top level group.
 - `name` (String) The name of the personal access token.
-- `scopes` (Set of String) The scopes of the group service account access token. valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `read_virtual_registry`, `write_virtual_registry`, `sudo`, `admin_mode`, `create_runner`, `manage_runner`, `ai_features`, `k8s_proxy`, `self_rotate`, `read_service_ping`
+- `scopes` (Set of String) The scopes of the group service account access token. Valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `read_virtual_registry`, `write_virtual_registry`, `sudo`, `admin_mode`, `create_runner`, `manage_runner`, `ai_features`, `k8s_proxy`, `self_rotate`, `read_service_ping`. If `self_rotate` is included, you must also provide either `expires_at` or `rotation_configuration`.
 - `user_id` (Number) The ID of a service account user.
 
 ### Optional
@@ -110,7 +120,8 @@ Optional:
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_service_account_access_token`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_service_account_access_token`. For example:
+
 ```terraform
 import {
   to = gitlab_group_service_account_access_token.example
@@ -118,7 +129,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a service account access token using `terraform import <resource> <id>`.  The

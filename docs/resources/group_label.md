@@ -39,12 +39,14 @@ resource "gitlab_group_label" "fixme" {
 
 ### Read-Only
 
+- `color_hex` (String) Read-only, used by the provider to store the API response color. This is always in the 6-digit hex notation with leading '#' sign (e.g. #FFAABB). If `color` contains a color name, this attribute contains the hex notation equivalent. Otherwise, the value of this attribute is the same as `color`.
 - `id` (String) The ID of this Terraform resource. In the format of `<group-id>:<label-id>`.
 - `label_id` (Number) The id of the group label.
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_label`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_group_label`. For example:
+
 ```terraform
 import {
   to = gitlab_group_label.example
@@ -52,7 +54,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # Gitlab group labels can be imported using an id made up of `{group_id}:{group_label_id}`, e.g.

@@ -69,7 +69,8 @@ resource "gitlab_project_job_token_scope" "allowed_group" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_job_token_scope`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_job_token_scope`. For example:
+
 ```terraform
 import {
   to = gitlab_project_job_token_scope.example
@@ -77,7 +78,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab project job token scopes can be imported using an id made up of `projectId:targetProjectId`, e.g.

@@ -38,7 +38,8 @@ resource "gitlab_user_custom_attribute" "attr" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_user_custom_attribute`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_user_custom_attribute`. For example:
+
 ```terraform
 import {
   to = gitlab_user_custom_attribute.example
@@ -46,7 +47,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a user custom attribute using an id made up of `{user-id}:{key}`, e.g.

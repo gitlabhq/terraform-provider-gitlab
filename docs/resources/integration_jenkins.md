@@ -3,13 +3,13 @@
 page_title: "gitlab_integration_jenkins Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_jenkins resource allows to manage the lifecycle of a project integration with Jenkins.
+  The gitlab_integration_jenkins resource manages the lifecycle of a project integration with Jenkins.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#jenkins
 ---
 
 # gitlab_integration_jenkins (Resource)
 
-The `gitlab_integration_jenkins` resource allows to manage the lifecycle of a project integration with Jenkins.
+The `gitlab_integration_jenkins` resource manages the lifecycle of a project integration with Jenkins.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#jenkins)
 
@@ -54,7 +54,8 @@ resource "gitlab_integration_jenkins" "jenkins" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_jenkins`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_jenkins`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_jenkins.example
@@ -62,7 +63,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_jenkins state using `terraform import <resource> <project_id>`:

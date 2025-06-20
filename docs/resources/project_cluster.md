@@ -69,7 +69,8 @@ resource "gitlab_project_cluster" "bar" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_cluster`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_cluster`. For example:
+
 ```terraform
 import {
   to = gitlab_project_cluster.example
@@ -77,7 +78,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab project clusters can be imported using an id made up of `projectid:clusterid`, e.g.

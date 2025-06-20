@@ -74,7 +74,8 @@ resource "gitlab_project_environment" "this" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_environment`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_environment`. For example:
+
 ```terraform
 import {
   to = gitlab_project_environment.example
@@ -82,7 +83,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab project environments can be imported using an id made up of `projectId:environmenId`, e.g.

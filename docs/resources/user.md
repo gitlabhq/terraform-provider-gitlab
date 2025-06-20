@@ -64,7 +64,8 @@ resource "gitlab_user" "example" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_user`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_user`. For example:
+
 ```terraform
 import {
   to = gitlab_user.example
@@ -72,7 +73,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a user to terraform state using `terraform import <resource> <id>`.

@@ -73,7 +73,8 @@ resource "gitlab_project_badge" "gitlab_release" {
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_badge`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_project_badge`. For example:
+
 ```terraform
 import {
   to = gitlab_project_badge.example
@@ -81,7 +82,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # GitLab project badges can be imported using an id made up of `{project_id}:{badge_id}`, e.g.

@@ -3,17 +3,20 @@
 page_title: "gitlab_integration_github Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_integration_github resource allows to manage the lifecycle of a project integration with GitHub.
+  The gitlab_integration_github resource manages the lifecycle of a project integration with GitHub.
   -> This resource requires a GitLab Enterprise instance.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_github instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#github
 ---
 
 # gitlab_integration_github (Resource)
 
-The `gitlab_integration_github` resource allows to manage the lifecycle of a project integration with GitHub.
+The `gitlab_integration_github` resource manages the lifecycle of a project integration with GitHub.
 
 -> This resource requires a GitLab Enterprise instance.
-	
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_github` instead.
+
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#github)
 
 ## Example Usage
@@ -37,25 +40,26 @@ resource "gitlab_integration_github" "github" {
 
 ### Required
 
-- `project` (String) ID of the project you want to activate integration on.
-- `repository_url` (String) The URL of the GitHub repo to integrate with, e,g, https://github.com/gitlabhq/terraform-provider-gitlab.
-- `token` (String, Sensitive) A GitHub personal access token with at least `repo:status` scope.
+- `project` (String) ID of the project you want to activate the integration on.
+- `repository_url` (String) The URL of the GitHub repo to integrate with. For example, https://github.com/gitlabhq/terraform-provider-gitlab.
+- `token` (String, Sensitive) A GitHub personal access token with at least the `repo:status` scope.
 
 ### Optional
 
-- `static_context` (Boolean) Append instance name instead of branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
+- `static_context` (Boolean) Append the instance name instead of the branch to the status. Must enable to set a GitLab status check as _required_ in GitHub. See [Static / dynamic status check names] to learn more.
 
 ### Read-Only
 
 - `active` (Boolean) Whether the integration is active.
-- `created_at` (String) Create time.
+- `created_at` (String) Creation time.
 - `id` (String) The ID of this resource.
-- `title` (String) Title.
+- `title` (String) The title of this resource.
 - `updated_at` (String) Update time.
 
 ## Import
 
-Starting in Terraform v1.5.0 you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_github`. For example:
+Starting in Terraform v1.5.0, you can use an [import block](https://developer.hashicorp.com/terraform/language/import) to import `gitlab_integration_github`. For example:
+
 ```terraform
 import {
   to = gitlab_integration_github.example
@@ -63,7 +67,7 @@ import {
 }
 ```
 
-Import using the CLI is supported using the following syntax:
+Importing using the CLI is supported with the following syntax:
 
 ```shell
 # You can import a gitlab_integration_github state using `terraform import <resource> <project_id>`:
