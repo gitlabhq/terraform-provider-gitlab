@@ -40,6 +40,7 @@ data "gitlab_group_hook" "example" {
 - `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
 - `custom_webhook_template` (String) Set a custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `emoji_events` (Boolean) Invoke the hook for emoji events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
 - `group_id` (Number) The id of the group for the hook.
 - `id` (String) The ID of this resource.

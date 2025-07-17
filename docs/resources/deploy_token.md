@@ -30,6 +30,7 @@ resource "gitlab_deploy_token" "example-two" {
   project    = "12345678"
   name       = "Example deploy token expires in 24h"
   expires_at = timeadd(timestamp(), "24h")
+  scopes     = ["read_repository", "read_registry"]
 }
 
 # Example Usage - Group

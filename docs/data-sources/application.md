@@ -17,7 +17,7 @@ The `gitlab_application` data source retrieves information about a gitlab applic
 
 ```terraform
 data "gitlab_application" "oidc" {
-  application_id = 1
+  id = 1
 }
 ```
 

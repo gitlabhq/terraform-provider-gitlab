@@ -1,3 +1,23 @@
+## 18.2.0 (2025-07-17)
+
+### FEATURES (2 changes)
+
+- datasource/gitlab_project_access_tokens:  [Allows retrieving project access tokens](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/cb2c4c67125ed482d3ef5fda10dadb3d8827a913) by @ruben.aleman ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2575)) 
+- resource/gitlab_project_container_registry_protection:  [Allows managing container registry protections for a project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f5c576a7074339a4f507cde8e1d06173059c1112) by @hristiyan.ivanov ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2481)) 
+
+### IMPROVEMENTS (5 changes)
+
+- resource/gitlab_project:  [Added support for `ci_push_repository_for_job_token_allowed`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ff388fbb53cce1bf4fc117cab0847fa8badc5c73) by @danilobuerger ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2582)) 
+- resource/gitlab_group_hook:  [Add `emoji_events` support](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/14668982ad0ef42998ed991dc6a6eebf5f58b9de) by @lllkq546449541 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2401)) 
+- resource/gitlab_project_protected_environment:  [Create new `deploy_access_levels_attribute` using an object list instead of nested blocks to enable easier operations with other resources. The existing `deploy_access_levels` is deprecated and will be removed in 19.0.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/dc0a666da4563169f3022713c1c7e5cdce86c89f) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2472))
+- resource/gitlab_group_service_account:  [Allow using custom emails with group service accounts](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d7ded4f95405819a64ba23095e1cfb97e08182d9) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2566))
+- resource/gitlab_branch_protection:  [Add `admin` push access level support](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/17d5d6e00e6608b423d57fb1436d86a67ad4fdae) by @netflash ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2558))
+
+### BUG FIXES (2 change)
+
+- resource/gitlab_project_label:  [Fixed a bug that caused a plan operation when a named color was used instead of a hex](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1a3936f31ef889f3dfc373388ba785240708a748) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2571)) 
+- access token resources:  [Fixed a bug where using an `unknown` value for `scopes` caused an error](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5b626dc61ac5f7c60509d109f49d4146ad4b4aa4) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2556)) 
+
 ## 18.1.1 (2025-06-20)
 
 ### BUG FIXES (1 change)

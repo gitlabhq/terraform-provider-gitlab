@@ -39,6 +39,7 @@ resource "gitlab_repository_file" "example_agent_config" {
   project   = gitlab_cluster_agent.example.project
   branch    = "main" // or use the `default_branch` attribute from a project data source / resource
   file_path = ".gitlab/agents/${gitlab_cluster_agent.example.name}/config.yaml"
+  encoding  = "base64"
   content = base64encode(<<CONTENT
 # the GitLab Agent for Kubernetes configuration goes here ...
   CONTENT

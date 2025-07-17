@@ -55,6 +55,7 @@ resource "gitlab_group_membership" "example_membership" {
 
 ### Optional
 
+- `email` (String) User account email. If not specified, generates an email prepended with `service_account_group_`. Custom email addresses require confirmation before the account is active, unless the group has a matching verified domain.
 - `name` (String) The name of the user. If not specified, the default Service account user name is used.
 - `username` (String) The username of the user. If not specified, it’s automatically generated.
 

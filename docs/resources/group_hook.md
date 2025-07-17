@@ -46,6 +46,7 @@ resource "gitlab_group_hook" "all_attributes" {
   deployment_events          = true
   releases_events            = true
   subgroup_events            = true
+  emoji_events               = true
   feature_flag_events        = true
   branch_filter_strategy     = "wildcard"
 }
@@ -87,6 +88,7 @@ resource "gitlab_group_hook" "all_attributes" {
 - `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
 - `description` (String) Description of the group webhook.
+- `emoji_events` (Boolean) Invoke the hook for emoji events.
 - `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
 - `feature_flag_events` (Boolean) Invoke the hook for feature flag events.
 - `issues_events` (Boolean) Invoke the hook for issues events.

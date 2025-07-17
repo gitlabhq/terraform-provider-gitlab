@@ -56,7 +56,7 @@ Optional:
 
 Read-Only:
 
-- `access_level` (String) Access levels allowed to merge to protected branch. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level` (String) Access levels allowed to merge to protected branch. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 - `access_level_description` (String) Readable description of access level.
 
 
@@ -71,5 +71,5 @@ Optional:
 
 Read-Only:
 
-- `access_level` (String) Access levels allowed to push to protected branch. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level` (String) Access levels allowed to push to protected branch. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 - `access_level_description` (String) Readable description of access level.

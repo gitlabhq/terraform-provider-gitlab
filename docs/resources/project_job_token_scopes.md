@@ -37,7 +37,7 @@ resource "gitlab_project_job_token_scopes" "allowed_multiple_project" {
 }
 
 resource "gitlab_project_job_token_scopes" "allowed_multiple_groups" {
-  project_id         = 111
+  project            = 111
   target_project_ids = []
   target_group_ids   = [321, 654]
 }

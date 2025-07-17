@@ -23,6 +23,8 @@ resource "gitlab_project" "awesome_project" {
 }
 
 resource "gitlab_integration_telegram" "default" {
+  project = gitlab_project.awesome_project.id
+
   token = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
   room  = "-1000000000000000"
 

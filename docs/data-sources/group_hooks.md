@@ -46,6 +46,7 @@ Read-Only:
 - `confidential_note_events` (Boolean)
 - `custom_webhook_template` (String)
 - `deployment_events` (Boolean)
+- `emoji_events` (Boolean)
 - `enable_ssl_verification` (Boolean)
 - `group` (String)
 - `group_id` (Number)

@@ -42,6 +42,7 @@ resource "gitlab_repository_file" "this" {
   project        = gitlab_project.this.id
   file_path      = "meow.txt"
   branch         = "main"
+  encoding       = "base64"
   content        = base64encode("Meow goes the cat")
   author_email   = "terraform@example.com"
   author_name    = "Terraform"
@@ -52,6 +53,7 @@ resource "gitlab_repository_file" "readme" {
   project   = gitlab_project.this.id
   file_path = "readme.txt"
   branch    = "main"
+  encoding  = "text"
   // content will be auto base64 encoded
   content        = "Meow goes the cat"
   author_email   = "terraform@example.com"
@@ -63,6 +65,7 @@ resource "gitlab_repository_file" "readme_for_dogs" {
   project        = gitlab_project.this.id
   file_path      = "readme.txt"
   branch         = "main"
+  encoding       = "text"
   content        = "Bark goes the dog"
   author_email   = "terraform@example.com"
   author_name    = "Terraform"

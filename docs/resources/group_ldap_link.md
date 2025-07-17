@@ -17,7 +17,7 @@ The `gitlab_group_ldap_link` resource allows to manage the lifecycle of an LDAP 
 
 ```terraform
 resource "gitlab_group_ldap_link" "test" {
-  group_id      = "12345"
+  group         = "12345"
   cn            = "testuser"
   group_access  = "developer"
   ldap_provider = "ldapmain"

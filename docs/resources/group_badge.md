@@ -18,6 +18,7 @@ The `gitlab_group_badge` resource allows to manage the lifecycle of group badges
 ```terraform
 resource "gitlab_group" "foo" {
   name = "foo-group"
+  path = "foo-path"
 }
 
 resource "gitlab_group_badge" "example" {

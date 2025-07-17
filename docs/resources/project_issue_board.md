@@ -33,7 +33,7 @@ resource "gitlab_user" "example" {
 }
 
 resource "gitlab_project_membership" "example" {
-  project_id   = gitlab_project.example.id
+  project      = gitlab_project.example.id
   user_id      = gitlab_user.example.id
   access_level = "developer"
 }

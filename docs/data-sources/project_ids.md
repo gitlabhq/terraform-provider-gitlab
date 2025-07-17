@@ -17,7 +17,7 @@ The `gitlab_project_ids` data source identification information for a given proj
 
 ```terraform
 resource "gitlab_project" "new_project" {
-  // include required attributes
+  name = "project"
 }
 
 // use project IDs to get additional information, such as the GraphQL ID

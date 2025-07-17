@@ -45,7 +45,7 @@ resource "gitlab_tag_protection" "TagProtect" {
 ### Optional
 
 - `allowed_to_create` (Block Set) Array of access levels/user(s)/group(s) allowed to create protected tags. (see [below for nested schema](#nestedblock--allowed_to_create))
-- `create_access_level` (String) Access levels allowed to create. Default value of `maintainer`. The default value is always sent if not provided in the configuration. Valid values are: `no one`, `developer`, `maintainer`.
+- `create_access_level` (String) Access levels allowed to create. Default value of `maintainer`. The default value is always sent if not provided in the configuration. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 
 ### Read-Only
 
@@ -56,7 +56,7 @@ resource "gitlab_tag_protection" "TagProtect" {
 
 Optional:
 
-- `access_level` (String) Access levels allowed to create protected tags. Valid values are: `no one`, `developer`, `maintainer`.
+- `access_level` (String) Access levels allowed to create protected tags. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 - `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
 - `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
 

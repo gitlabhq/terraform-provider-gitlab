@@ -17,7 +17,9 @@ The `gitlab_group_ids` data source identification information for a given group,
 
 ```terraform
 resource "gitlab_group" "new_group" {
-  // include required attributes
+  name        = "example-group"
+  path        = "example-path"
+  description = "This is an example group"
 }
 
 // use group IDs to get additional information, such as the GraphQL ID
