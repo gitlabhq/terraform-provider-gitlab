@@ -318,7 +318,7 @@ func (r *gitlabApplicationResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Create application
-	application, _, err := r.client.Applications.CreateApplication(options)
+	application, _, err := r.client.Applications.CreateApplication(options, gitlab.WithContext(ctx))
 	if err != nil {
 		resp.Diagnostics.AddError("GitLab API error occurred", fmt.Sprintf("Unable to create application: %s", err.Error()))
 		return
@@ -347,7 +347,7 @@ the input follows terraform best practices.
 will not be passed to the API, and either defaults will be used or the value will not be set by the API.
 4. `if !data.Confidential.IsNull() {...}` checks to see if an optional value is null. If the value is not null, it's added to the `options`
 struct to be passed to the API.
-5. `application, _, err := r.client.Applications.CreateApplication(options)` calls the API with the input options to create the application.
+5. `application, _, err := r.client.Applications.CreateApplication(options, gitlab.WithContext(ctx))` calls the API with the input options to create the application.
 6. Just like in the `Read` func, `r.applicationModelToState(application, data)` sets the newly created application into the data object
 7. Finally, like in the `Read` func, `resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)` sets the data into state.
 

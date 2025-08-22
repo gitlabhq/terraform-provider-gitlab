@@ -63,7 +63,7 @@ resource "gitlab_repository_file" "example_agent_config" {
 - `agent_id` (Number) The ID of the agent.
 - `created_at` (String) The ISO8601 datetime when the agent was created.
 - `created_by_user_id` (Number) The ID of the user who created the agent.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this resource. In the format <project:agent_id>
 
 ## Import
 

@@ -29,9 +29,9 @@ resource "gitlab_project_freeze_period" "schedule" {
 
 ### Required
 
-- `freeze_end` (String) End of the Freeze Period in cron format (e.g. `0 2 * * *`).
-- `freeze_start` (String) Start of the Freeze Period in cron format (e.g. `0 1 * * *`).
-- `project` (String) The ID or URL-encoded path of the project to add the schedule to.
+- `freeze_end` (String) End of the Freeze Period in cron format (for example, `0 2 * * *`).
+- `freeze_start` (String) Start of the Freeze Period in cron format (for example, `0 1 * * *`).
+- `project` (String) The ID or path of the project to add the freeze period to.
 
 ### Optional
 
@@ -39,7 +39,7 @@ resource "gitlab_project_freeze_period" "schedule" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format <project-id:freeze-period-id>.
 
 ## Import
 

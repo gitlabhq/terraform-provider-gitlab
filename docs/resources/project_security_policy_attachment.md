@@ -4,6 +4,7 @@ page_title: "gitlab_project_security_policy_attachment Resource - terraform-prov
 subcategory: ""
 description: |-
   The gitlab_project_security_policy_attachment resource allows to attach a security policy project to a project.
+  This resource requires being an owner on the project that is having the security policy applied.
   ~> Policies https://docs.gitlab.com/user/application_security/policies/ are files stored in a policy project as raw YAML, to allow maximum flexibility with support of all kind of policy and all their options. See the examples for how to create a policy project, add a policy, and link it. Use the gitlab_repository_file resource to create policies instead of a specific policy resource. This ensures all policy options are immediately via Terraform once released.
   Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/index/#mutationsecuritypolicyprojectassign
 ---
@@ -11,6 +12,7 @@ description: |-
 # gitlab_project_security_policy_attachment (Resource)
 
 The `gitlab_project_security_policy_attachment` resource allows to attach a security policy project to a project.
+This resource requires being an owner on the project that is having the security policy applied.
 
 ~> [Policies](https://docs.gitlab.com/user/application_security/policies/) are files stored in a policy project as raw YAML, to allow maximum flexibility with support of all kind of policy and all their options. See the examples for how to create a policy project, add a policy, and link it. Use the `gitlab_repository_file` resource to create policies instead of a specific policy resource. This ensures all policy options are immediately via Terraform once released.
 

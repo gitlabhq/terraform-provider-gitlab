@@ -3,13 +3,13 @@
 page_title: "gitlab_instance_variables Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_instance_variables data source allows to retrieve all instance-level CI/CD variables.
+  The gitlab_instance_variables data source retrieves all instance-level CI/CD variables.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/instance_level_ci_variables/
 ---
 
 # gitlab_instance_variables (Data Source)
 
-The `gitlab_instance_variables` data source allows to retrieve all instance-level CI/CD variables.
+The `gitlab_instance_variables` data source retrieves all instance-level CI/CD variables.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/instance_level_ci_variables/)
 
@@ -24,18 +24,18 @@ data "gitlab_instance_variables" "vars" {}
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `variables` (List of Object) The list of variables returned by the search (see [below for nested schema](#nestedatt--variables))
+- `id` (String) The ID of this datasource. In the hardcoded format `instance_variables`.
+- `variables` (Attributes List) The list of variables returned by the search. (see [below for nested schema](#nestedatt--variables))
 
 <a id="nestedatt--variables"></a>
 ### Nested Schema for `variables`
 
 Read-Only:
 
-- `description` (String)
-- `key` (String)
-- `masked` (Boolean)
-- `protected` (Boolean)
-- `raw` (Boolean)
-- `value` (String)
-- `variable_type` (String)
+- `description` (String) The description of the variable. Maximum of 255 characters.
+- `key` (String) The name of the variable.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs.
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags.
+- `raw` (Boolean) If set to `true`, the variable will be treated as a raw string.
+- `value` (String) The value of the variable.
+- `variable_type` (String) The type of the variable, either `env_var` or `file`.

@@ -20,6 +20,8 @@ We support the following versions:
 
 All other versions are best effort support.
 
+We do not support experimental GitLab features until they are enabled by default or made Generally Available.
+
 -> Note, that the compatibility between a provider release and GitLab itself **cannot** be inferred from the
 release version. New features added to GitLab may not be added to the provider until later versions.
 Equally, features removed or deprecated in GitLab may not be removed or deprecated from the provider until later versions.
@@ -32,9 +34,18 @@ Use the navigation to the left to read about the valid data sources and resource
 This provider requires at least [Terraform 1.0](https://www.terraform.io/downloads.html).
 A minimum of Terraform 1.4.0 is recommended.
 
--> Using a Project or Group access token may cause issues with some resources, as those token types don't 
+-> Using a Project or Group access token may cause issues with some resources, as those token types don't
 have full access to every API. This is also true when using a `CI_JOB_TOKEN`. Consider using a dedicated
-Personal Access Token or Service Account if you are experiencing permission errors when adding resources. 
+Personal Access Token or Service Account if you are experiencing permission errors when adding resources.
+
+## Authentication and Configuration
+
+The configuration for the GitLab Provider can be derived from several sources,
+which are applied in the following order:
+
+1. Attributes in the provider configuration (see Schema section below)
+2. Environment variables (see Schema section below)
+3. (experimental) Configuration file (see https://gitlab.com/gitlab-org/api/client-go#use-the-config-package-experimental)
 
 ## Example Usage
 
@@ -92,7 +103,10 @@ resource "gitlab_project" "sample_group_project" {
 - `cacert_file` (String) This is a file containing the ca cert to verify the gitlab instance. This is available for use when working with GitLab CE or Gitlab Enterprise with a locally-issued or self-signed certificate chain.
 - `client_cert` (String) File path to client certificate when GitLab instance is behind company proxy. File must contain PEM encoded data.
 - `client_key` (String) File path to client key when GitLab instance is behind company proxy. File must contain PEM encoded data. Required when `client_cert` is set.
+- `config_file` (String) The path to the configuration file to use. It may be sourced from the `GITLAB_CONFIG_FILE` environment variable.
+- `context` (String) The context to use for authentication and configuration. The context must exist in the configuration file. It may be sourced from the `GITLAB_CONTEXT` environment variable.
 - `early_auth_check` (Boolean) (Experimental) By default the provider does a dummy request to get the current user in order to verify that the provider configuration is correct and the GitLab API is reachable. Set this to `false` to skip this check. This may be useful if the GitLab instance does not yet exist and is created within the same terraform module. It may be sourced from the `GITLAB_EARLY_AUTH_CHECK`. This is an experimental feature and may change in the future. Please make sure to always keep backups of your state.
+- `enable_auto_ci_support` (Boolean) If automatic CI support should be enabled or not. This only works when not providing a token.
 - `headers` (Map of String) A map of headers to append to all API request to the GitLab instance.
 - `insecure` (Boolean) When set to true this disables SSL verification of the connection to the GitLab instance.
 - `retries` (Number) The number of retries to execute when receiving a 429 Rate Limit error. Each retry will exponentially back off.

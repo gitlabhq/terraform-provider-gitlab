@@ -3,13 +3,13 @@
 page_title: "gitlab_cluster_agents Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_cluster_agents data source allows details of GitLab Agents for Kubernetes in a project.
+  The gitlab_cluster_agents data source retrieves details of GitLab Agents for Kubernetes in a project.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/cluster_agents/
 ---
 
 # gitlab_cluster_agents (Data Source)
 
-The `gitlab_cluster_agents` data source allows details of GitLab Agents for Kubernetes in a project.
+The `gitlab_cluster_agents` data source retrieves details of GitLab Agents for Kubernetes in a project.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/cluster_agents/)
 
@@ -26,20 +26,20 @@ data "gitlab_cluster_agents" "agents" {
 
 ### Required
 
-- `project` (String) The ID or full path of the project owned by the authenticated user.
+- `project` (String) ID or full path of the project maintained by the authenticated user.
 
 ### Read-Only
 
-- `cluster_agents` (List of Object) List of the registered agents. (see [below for nested schema](#nestedatt--cluster_agents))
-- `id` (String) The ID of this resource.
+- `cluster_agents` (Attributes List) List of the registered agents. (see [below for nested schema](#nestedatt--cluster_agents))
+- `id` (String) The ID of this data source. In the format <project>
 
 <a id="nestedatt--cluster_agents"></a>
 ### Nested Schema for `cluster_agents`
 
 Read-Only:
 
-- `agent_id` (Number)
-- `created_at` (String)
-- `created_by_user_id` (Number)
-- `name` (String)
-- `project` (String)
+- `agent_id` (Number) The ID of the agent.
+- `created_at` (String) The ISO8601 datetime when the agent was created.
+- `created_by_user_id` (Number) The ID of the user who created the agent.
+- `name` (String) The Name of the agent.
+- `project` (String) ID or full path of the project maintained by the authenticated user.

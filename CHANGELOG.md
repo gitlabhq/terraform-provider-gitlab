@@ -1,3 +1,29 @@
+## 18.3.0 (2025-08-22)
+
+### FEATURES (3 changes)
+
+- [Add new `gitlab_group_deploy_token` and `gitlab_project_deploy_token` resources. The existing generic `gitlab_deploy_token` resource has now been deprecated.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/888655dc0fe8b5a2733efbf06465164055afbe1c) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2604)) 
+- [Add new `gitlab_group_saml_links` datasource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e17475001ccb12a5bb0588411e74092f7c2f006f) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2584))
+- [Support client-go config file for provider authentication. See more information here: https://gitlab.com/gitlab-org/api/client-go#use-the-config-package-experimental](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/95a83237e7b2a1cb34149591d61a742f1d8ef179) by @timofurrer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2592)) 
+
+### IMPROVEMENTS (6 changes)
+
+- resource/gitlab_project_level_notifications:  [Update to handle unknown value validation](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1bbebb2c0fd8f09f555a88d968c621fed6d662c9) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2600)) 
+- resource/gitlab_group:  [Add support for `administrator` to `project_creation_level`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2813a1a504a3f7bae3cced0cdedf1016f87ee291) by @aldo.salas1 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2601)) 
+- resource/gitlab_group_security_policy_attachments: [This resource now checks permissions prior to adding the policy, and fails with a informative error if permissions are missing](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ce294bfe8a1d1980aeb1179c0b908e2bffc4a75e) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2593)) 
+- resource/gitlab_project_security_policy_attachments: [This resource now checks permissions prior to adding the policy, and fails with a informative error if permissions are missing](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ce294bfe8a1d1980aeb1179c0b908e2bffc4a75e) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2593)) 
+- resource/gitlab_deploy_token: [Add support for previously missing scope options](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/888655dc0fe8b5a2733efbf06465164055afbe1c) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2604)) 
+- resource/gitlab_instance_service_account: [Allow instance service accounts to be created without username and/or name](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/642a9beb08e1248867ac3e0098aa765f65119bdb) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2585)) 
+
+### BUG FIXES (6 changes)
+
+- resource/gitlab_global_level_notifications:  [Update to handle unknown value validation](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d36f740539b2a54490a50cf3bd1a03cab7981cad) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2595)) 
+- resource/gitlab_project_level_notifications:  [Update to handle unknown value validation](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1bbebb2c0fd8f09f555a88d968c621fed6d662c9) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2600)) 
+- resource/gitlab_project_protected_environment:  [Fix error in protected environment using unknown deploy attributes](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ec63e4f688c9cf5a9d1bd6e7ac2999440580dcf1) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2594))
+- resource/gitlab_project_integration_github: [Fix a provider panic that occurs when importing a non-existent integration](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/068405a8b0762ca680bed8943d32763bdafe19dc) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2599))
+- resource/gitlab_group_dependency_proxy: [Fixed a bug where importing using an `import` block caused an immediate replace](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7be6298efafe222e23523554bd660f3a5a43d37a) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2607)) 
+- resource/gitlab_group: [Fixed an issue with `permanently_remove_on_delete` that occurred when deleting groups on GitLab versions later than 18.0](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1a09f11f064069a9e19d26bdf592c5ea608af5b7) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2598)) 
+
 ## 18.2.0 (2025-07-17)
 
 ### FEATURES (2 changes)

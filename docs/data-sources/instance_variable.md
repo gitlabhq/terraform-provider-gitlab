@@ -3,13 +3,13 @@
 page_title: "gitlab_instance_variable Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_instance_variable data source allows to retrieve details about an instance-level CI/CD variable.
+  The gitlab_instance_variable data source retrieves details about an instance-level CI/CD variable.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/instance_level_ci_variables/
 ---
 
 # gitlab_instance_variable (Data Source)
 
-The `gitlab_instance_variable` data source allows to retrieve details about an instance-level CI/CD variable.
+The `gitlab_instance_variable` data source retrieves details about an instance-level CI/CD variable.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/instance_level_ci_variables/)
 
@@ -31,9 +31,9 @@ data "gitlab_instance_variable" "foo" {
 ### Read-Only
 
 - `description` (String) The description of the variable. Maximum of 255 characters.
-- `id` (String) The ID of this resource.
-- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ci/variables/#masked-variables). Defaults to `false`.
-- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags. Defaults to `false`.
-- `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
+- `id` (String) The ID of this datasource. In the format `<key>`.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs.
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags.
+- `raw` (Boolean) If set to `true`, the variable will be treated as a raw string.
 - `value` (String) The value of the variable.
-- `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`. Default is `env_var`.
+- `variable_type` (String) The type of the variable, either `env_var` or `file`.
