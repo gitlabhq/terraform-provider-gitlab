@@ -43,7 +43,7 @@ data "gitlab_group_hook" "example" {
 - `emoji_events` (Boolean) Invoke the hook for emoji events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
 - `group_id` (Number) The id of the group for the hook.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this data source. In the format `<group:hook_id>`.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests.
@@ -54,6 +54,6 @@ data "gitlab_group_hook" "example" {
 - `releases_events` (Boolean) Invoke the hook for releases events.
 - `subgroup_events` (Boolean) Invoke the hook for subgroup events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
-- `token` (String) A token to present when invoking the hook. The token is not available for imported resources.
+- `token` (String, Deprecated) A token to present when invoking the hook. The token is not available in this datasource.
 - `url` (String) The url of the hook to invoke.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

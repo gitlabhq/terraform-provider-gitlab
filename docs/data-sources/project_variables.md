@@ -32,7 +32,7 @@ data "gitlab_project_variables" "staging_vars" {
 
 ### Required
 
-- `project` (String) The name or id of the project.
+- `project` (String) The name or path of the project.
 
 ### Optional
 
@@ -40,20 +40,20 @@ data "gitlab_project_variables" "staging_vars" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `variables` (List of Object) The list of variables returned by the search (see [below for nested schema](#nestedatt--variables))
+- `id` (String) The ID of this datasource. In the format `<project:environment-scope>`.
+- `variables` (Attributes List) The list of variables returned by the search (see [below for nested schema](#nestedatt--variables))
 
 <a id="nestedatt--variables"></a>
 ### Nested Schema for `variables`
 
 Read-Only:
 
-- `description` (String)
-- `environment_scope` (String)
-- `key` (String)
-- `masked` (Boolean)
-- `project` (String)
-- `protected` (Boolean)
-- `raw` (Boolean)
-- `value` (String)
-- `variable_type` (String)
+- `description` (String) The description of the variable. Maximum of 255 characters.
+- `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`).
+- `key` (String) The name of the variable.
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs.
+- `project` (String) The name or path of the project.
+- `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags.
+- `raw` (Boolean) If set to `true`, the variable will be treated as a raw string.
+- `value` (String) The value of the variable.
+- `variable_type` (String) The type of the variable, either `env_var` or `file`.

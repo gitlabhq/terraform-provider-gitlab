@@ -34,25 +34,25 @@ data "gitlab_release_links" "example" {
 
 ### Required
 
-- `project` (String) The ID or full path to the project.
+- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/api/index/#namespaced-path-encoding).
 - `tag_name` (String) The tag associated with the Release.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `release_links` (List of Object) List of release links (see [below for nested schema](#nestedatt--release_links))
+- `id` (String) The ID of this data source.
+- `release_links` (Attributes List) List of release links (see [below for nested schema](#nestedatt--release_links))
 
 <a id="nestedatt--release_links"></a>
 ### Nested Schema for `release_links`
 
 Read-Only:
 
-- `direct_asset_url` (String)
-- `external` (Boolean)
-- `filepath` (String)
-- `link_id` (Number)
-- `link_type` (String)
-- `name` (String)
-- `project` (String)
-- `tag_name` (String)
-- `url` (String)
+- `direct_asset_url` (String) Full path for a [Direct Asset link](https://docs.gitlab.com/user/project/releases/index/#permanent-links-to-release-assets).
+- `external` (Boolean) External or internal link.
+- `filepath` (String) Relative path for a [Direct Asset link](https://docs.gitlab.com/user/project/releases/index/#permanent-links-to-release-assets).
+- `link_id` (Number) The ID of the link.
+- `link_type` (String) The type of the link. Valid values are `other`, `runbook`, `image`, `package`.
+- `name` (String) The name of the link. Link names must be unique within the release.
+- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/api/index/#namespaced-path-encoding).
+- `tag_name` (String) The tag associated with the Release.
+- `url` (String) The URL of the link. Link URLs must be unique within the release.

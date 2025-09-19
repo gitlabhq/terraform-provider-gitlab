@@ -36,30 +36,30 @@ data "gitlab_instance_deploy_keys" "example" {
 
 ### Read-Only
 
-- `deploy_keys` (List of Object) The list of all deploy keys across all projects of the GitLab instance. (see [below for nested schema](#nestedatt--deploy_keys))
-- `id` (String) The ID of this resource.
+- `deploy_keys` (Attributes List) The list of all deploy keys across all projects of the GitLab instance. (see [below for nested schema](#nestedatt--deploy_keys))
+- `id` (String) The ID of this datasource. In the format `<public>`.
 
 <a id="nestedatt--deploy_keys"></a>
 ### Nested Schema for `deploy_keys`
 
 Read-Only:
 
-- `created_at` (String)
-- `fingerprint` (String)
-- `id` (Number)
-- `key` (String)
-- `projects_with_write_access` (List of Object) (see [below for nested schema](#nestedobjatt--deploy_keys--projects_with_write_access))
-- `title` (String)
+- `created_at` (String) The creation date of the deploy key. In RFC3339 format.
+- `fingerprint` (String) The fingerprint of the deploy key.
+- `id` (Number) The ID of the deploy key.
+- `key` (String) The deploy key.
+- `projects_with_write_access` (Attributes List) The list of projects that the deploy key has write access to. (see [below for nested schema](#nestedatt--deploy_keys--projects_with_write_access))
+- `title` (String) The title of the deploy key.
 
-<a id="nestedobjatt--deploy_keys--projects_with_write_access"></a>
+<a id="nestedatt--deploy_keys--projects_with_write_access"></a>
 ### Nested Schema for `deploy_keys.projects_with_write_access`
 
 Read-Only:
 
-- `created_at` (String)
-- `description` (String)
-- `id` (Number)
-- `name` (String)
-- `name_with_namespace` (String)
-- `path` (String)
-- `path_with_namespace` (String)
+- `created_at` (String) The creation date of the project. In RFC3339 format.
+- `description` (String) The description of the project.
+- `id` (Number) The ID of the project.
+- `name` (String) The name of the project.
+- `name_with_namespace` (String) The name of the project with namespace.
+- `path` (String) The path of the project.
+- `path_with_namespace` (String) The path of the project with namespace.

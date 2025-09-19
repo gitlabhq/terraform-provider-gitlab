@@ -3,13 +3,13 @@
 page_title: "gitlab_project_hook Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_hook data source allows to retrieve details about a hook in a project.
+  The gitlab_project_hook data source retrieves details about a hook in a project.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_webhooks/#get-a-project-webhook
 ---
 
 # gitlab_project_hook (Data Source)
 
-The `gitlab_project_hook` data source allows to retrieve details about a hook in a project.
+The `gitlab_project_hook` data source retrieves details about a hook in a project.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_webhooks/#get-a-project-webhook)
 
@@ -41,7 +41,7 @@ data "gitlab_project_hook" "example" {
 - `custom_webhook_template` (String) Set a custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this datasource. In the format `<project>:<hook-id>`.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests.
@@ -52,6 +52,6 @@ data "gitlab_project_hook" "example" {
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
 - `releases_events` (Boolean) Invoke the hook for releases events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
-- `token` (String) A token to present when invoking the hook. The token is not available for imported resources.
+- `token` (String, Sensitive, Deprecated) A token to present when invoking the hook. The token is not available in this datasource.
 - `url` (String) The url of the hook to invoke.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

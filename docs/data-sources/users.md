@@ -47,6 +47,7 @@ data "gitlab_users" "example-two" {
 - `extern_provider` (String) Lookup users by external provider. (Requires administrator privileges)
 - `extern_uid` (String) Lookup users by external UID. (Requires administrator privileges)
 - `external` (Boolean) Filters only external users.
+- `humans` (Boolean) Filters only regular users that are not bot or internal users.
 - `order_by` (String) Order the users' list by `id`, `name`, `username`, `created_at` or `updated_at`. (Requires administrator privileges)
 - `search` (String) Search users by username, name or email.
 - `sort` (String) Sort users' list in asc or desc order. (Requires administrator privileges)
@@ -55,39 +56,39 @@ data "gitlab_users" "example-two" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `users` (List of Object) The list of users. (see [below for nested schema](#nestedatt--users))
+- `id` (String) The ID of this datasource. In the format of a hash taken from the search options.
+- `users` (Attributes List) The list of users. (see [below for nested schema](#nestedatt--users))
 
 <a id="nestedatt--users"></a>
 ### Nested Schema for `users`
 
 Read-Only:
 
-- `avatar_url` (String)
-- `bio` (String)
-- `can_create_group` (Boolean)
-- `can_create_project` (Boolean)
-- `color_scheme_id` (Number)
-- `created_at` (String)
-- `current_sign_in_at` (String)
-- `email` (String)
-- `extern_uid` (String)
-- `external` (Boolean)
-- `id` (Number)
-- `is_admin` (Boolean)
-- `is_bot` (Boolean)
-- `last_sign_in_at` (String)
-- `linkedin` (String)
-- `location` (String)
-- `name` (String)
-- `namespace_id` (Number)
-- `organization` (String)
-- `projects_limit` (Number)
-- `provider` (String)
-- `skype` (String)
-- `state` (String)
-- `theme_id` (Number)
-- `twitter` (String)
-- `two_factor_enabled` (Boolean)
-- `username` (String)
-- `website_url` (String)
+- `avatar_url` (String) The avatar URL of the user.
+- `bio` (String) The bio of the user.
+- `can_create_group` (Boolean) Whether the user can create groups.
+- `can_create_project` (Boolean) Whether the user can create projects.
+- `color_scheme_id` (Number) User's color scheme ID.
+- `created_at` (String) Date the user was created at.
+- `current_sign_in_at` (String) Current user's sign-in date.
+- `email` (String) The public email address of the user.
+- `extern_uid` (String) The external UID of the user.
+- `external` (Boolean) Whether the user is external.
+- `id` (Number) The unique id assigned to the user by the gitlab server.
+- `is_admin` (Boolean) Whether the user is an admin.
+- `is_bot` (Boolean) Whether the user is a bot.
+- `last_sign_in_at` (String) Last user's sign-in date.
+- `linkedin` (String) LinkedIn profile of the user.
+- `location` (String) The location of the user.
+- `name` (String) The name of the user.
+- `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field.
+- `organization` (String) The organization of the user.
+- `projects_limit` (Number) Number of projects the user can create.
+- `provider` (String) The UID provider of the user.
+- `skype` (String) Skype username of the user.
+- `state` (String) Whether the user is active or blocked.
+- `theme_id` (Number) User's theme ID.
+- `twitter` (String) Twitter username of the user.
+- `two_factor_enabled` (Boolean) Whether user's two-factor auth is enabled.
+- `username` (String) The username of the user.
+- `website_url` (String) User's website URL.

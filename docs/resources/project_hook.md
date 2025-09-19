@@ -56,7 +56,7 @@ resource "gitlab_project_hook" "custom_headers" {
 
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential note events.
-- `custom_headers` (Attributes List) Custom headers for the project webhook. (see [below for nested schema](#nestedatt--custom_headers))
+- `custom_headers` (Attributes List) Custom headers for the project webhook. Available from GitLab 17.1 onwards. (see [below for nested schema](#nestedatt--custom_headers))
 - `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
 - `description` (String) Description of the webhook.

@@ -39,16 +39,17 @@ data "gitlab_repository_tree" "this" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `tree` (List of Object) The list of files/directories returned by the search (see [below for nested schema](#nestedatt--tree))
+- `id` (String) The ID of this datasource. A hash of project and ref, with path and recursive if set.
+- `tree` (Attributes List) The list of files/directories returned by the search (see [below for nested schema](#nestedatt--tree))
 
 <a id="nestedatt--tree"></a>
 ### Nested Schema for `tree`
 
 Read-Only:
 
-- `id` (String)
-- `mode` (String)
-- `name` (String)
-- `path` (String)
-- `type` (String)
+- `id` (String, Deprecated) The project ID.
+- `mode` (String) Unix access mode of the file in the repository.
+- `name` (String) Name of the blob or tree in the repository
+- `node_id` (String) The SHA-1 hash of the tree or blob in the repository.
+- `path` (String) Path of the object inside of the repository.
+- `type` (String) Type of object in the repository. Can be either type tree or of type blob

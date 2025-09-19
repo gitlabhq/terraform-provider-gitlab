@@ -34,31 +34,31 @@ data "gitlab_project_hooks" "examples" {
 
 ### Read-Only
 
-- `hooks` (List of Object) The list of hooks. (see [below for nested schema](#nestedatt--hooks))
-- `id` (String) The ID of this resource.
+- `hooks` (Attributes List) The list of hooks. (see [below for nested schema](#nestedatt--hooks))
+- `id` (String) The ID of this datasource. In the format `<project>`.
 
 <a id="nestedatt--hooks"></a>
 ### Nested Schema for `hooks`
 
 Read-Only:
 
-- `confidential_issues_events` (Boolean)
-- `confidential_note_events` (Boolean)
-- `custom_webhook_template` (String)
-- `deployment_events` (Boolean)
-- `enable_ssl_verification` (Boolean)
-- `hook_id` (Number)
-- `issues_events` (Boolean)
-- `job_events` (Boolean)
-- `merge_requests_events` (Boolean)
-- `note_events` (Boolean)
-- `pipeline_events` (Boolean)
-- `project` (String)
-- `project_id` (Number)
-- `push_events` (Boolean)
-- `push_events_branch_filter` (String)
-- `releases_events` (Boolean)
-- `tag_push_events` (Boolean)
-- `token` (String)
-- `url` (String)
-- `wiki_page_events` (Boolean)
+- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
+- `custom_webhook_template` (String) Set a custom webhook template.
+- `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
+- `hook_id` (Number) The id of the project hook.
+- `issues_events` (Boolean) Invoke the hook for issues events.
+- `job_events` (Boolean) Invoke the hook for job events.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests.
+- `note_events` (Boolean) Invoke the hook for notes events.
+- `pipeline_events` (Boolean) Invoke the hook for pipeline events.
+- `project` (String) The name or id of the project to add the hook to.
+- `project_id` (Number) The id of the project for the hook.
+- `push_events` (Boolean) Invoke the hook for push events.
+- `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
+- `releases_events` (Boolean) Invoke the hook for releases events.
+- `tag_push_events` (Boolean) Invoke the hook for tag push events.
+- `token` (String, Sensitive, Deprecated) A token to present when invoking the hook. The token is not available in this datasource.
+- `url` (String) The url of the hook to invoke.
+- `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

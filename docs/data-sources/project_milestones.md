@@ -44,24 +44,24 @@ data "gitlab_project_milestones" "example" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `milestones` (List of Object) List of milestones from a project. (see [below for nested schema](#nestedatt--milestones))
+- `id` (String) The ID of this datasource. In the format `<project:options-hash>`.
+- `milestones` (Attributes List) List of milestones from a project. (see [below for nested schema](#nestedatt--milestones))
 
 <a id="nestedatt--milestones"></a>
 ### Nested Schema for `milestones`
 
 Read-Only:
 
-- `created_at` (String)
-- `description` (String)
-- `due_date` (String)
-- `expired` (Boolean)
-- `iid` (Number)
-- `milestone_id` (Number)
-- `project` (String)
-- `project_id` (Number)
-- `start_date` (String)
-- `state` (String)
-- `title` (String)
-- `updated_at` (String)
-- `web_url` (String)
+- `created_at` (String) The time of creation of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
+- `description` (String) The description of the milestone.
+- `due_date` (String) The due date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
+- `expired` (Boolean) Bool, true if milestone expired.
+- `iid` (Number) The ID of the project's milestone.
+- `milestone_id` (Number) The instance-wide ID of the project's milestone.
+- `project` (String) The ID or URL-encoded path of the project owned by the authenticated user.
+- `project_id` (Number) The project ID of milestone.
+- `start_date` (String) The start date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
+- `state` (String) The state of the milestone. Valid values are: `active`, `closed`.
+- `title` (String) The title of a milestone.
+- `updated_at` (String) The last update time of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
+- `web_url` (String) The web URL of the milestone.

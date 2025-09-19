@@ -41,6 +41,6 @@ data "gitlab_repository_file" "example" {
 - `encoding` (String) The file content encoding.
 - `execute_filemode` (Boolean) Enables or disables the execute flag on the file.
 - `file_name` (String) The filename.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this datasource. In the format `<project:ref:file_path>`.
 - `last_commit_id` (String) The last known commit id.
 - `size` (Number) The file size.

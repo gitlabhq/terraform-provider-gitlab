@@ -3,13 +3,13 @@
 page_title: "gitlab_cluster_agent Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_cluster_agent data source allows to retrieve details about a GitLab Agent for Kubernetes.
+  The gitlab_cluster_agent data source retrieves details about a GitLab Agent for Kubernetes.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/cluster_agents/
 ---
 
 # gitlab_cluster_agent (Data Source)
 
-The `gitlab_cluster_agent` data source allows to retrieve details about a GitLab Agent for Kubernetes.
+The `gitlab_cluster_agent` data source retrieves details about a GitLab Agent for Kubernetes.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/cluster_agents/)
 
@@ -34,5 +34,5 @@ data "gitlab_cluster_agent" "example" {
 
 - `created_at` (String) The ISO8601 datetime when the agent was created.
 - `created_by_user_id` (Number) The ID of the user who created the agent.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this data source. In the format <project:agent_id>
 - `name` (String) The Name of the agent.

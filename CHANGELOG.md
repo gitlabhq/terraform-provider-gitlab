@@ -1,3 +1,19 @@
+## 18.4.0 (2025-09-18)
+
+### FEATURES (2 changes)
+
+- resource/gitlab_group_level_mr_approvals:  [Add group level merge request approvals resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4b8e3977ea9caaef1346ffc63f2a2da2bffadd49) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2588)) 
+- resource/gitlab_project_external_status_check:  [Add new resource for project external status checks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/72fd42ed6093b3a87d1ed22d3d30d34f2194ef43) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2633)) 
+
+### IMPROVEMENTS (1 change)
+
+- resource/gitlab_project_hook:  [Update docs to indicate which version of GitLab is required to use custom headers](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d61ae3b605a28b3535f2d28527e79941b62500e9) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2663)) 
+
+### BUG FIXES (2 changes)
+
+- resource/gitlab_group_service_account:  [Wait for group service account users to be deleted during destroy](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5bccb8f83e4e2994af9e19812428c756ca577da8) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2649)) 
+- resource/gitlab_group_share_group: [Add feature flag information for using custom roles](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/70e1ed298d0f28430bb3d9138f2d49282fcd9b9e) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2667))
+
 ## 18.3.0 (2025-08-22)
 
 ### FEATURES (3 changes)

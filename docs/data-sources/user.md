@@ -56,7 +56,7 @@ data "gitlab_user" "example-two" {
 - `current_sign_in_at` (String) Current user's sign-in date.
 - `extern_uid` (String) The external UID of the user.
 - `external` (Boolean) Whether the user is external.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this datasource. In the format `<user-id>`.
 - `is_admin` (Boolean) Whether the user is an admin.
 - `is_bot` (Boolean) Whether the user is a bot.
 - `last_sign_in_at` (String) Last user's sign-in date.

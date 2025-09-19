@@ -3,16 +3,13 @@
 page_title: "gitlab_project_membership Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_membership data source allows to list and filter all members of a project specified by either its id or full path.
-  -> Note exactly one of project_id or full_path must be provided.
+  The gitlab_project_membership data source allows you to list and filter all members of a project.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/#list-all-members-of-a-group-or-project
 ---
 
 # gitlab_project_membership (Data Source)
 
-The `gitlab_project_membership` data source allows to list and filter all members of a project specified by either its id or full path.
-
--> **Note** exactly one of project_id or full_path must be provided.
+The `gitlab_project_membership` data source allows you to list and filter all members of a project.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/#list-all-members-of-a-group-or-project)
 
@@ -42,27 +39,28 @@ data "gitlab_project_membership" "example" {
 
 ### Optional
 
-- `full_path` (String) The full path of the project.
+- `full_path` (String, Deprecated) The full path of the project.
 - `inherited` (Boolean) Return all project members including members through ancestor groups
-- `project_id` (Number) The ID of the project.
+- `project` (String) The ID or full path of the project.
+- `project_id` (Number, Deprecated) The ID of the project.
 - `query` (String) A query string to search for members
 - `user_ids` (Set of Number) List of user ids to filter members by
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `members` (List of Object) The list of project members. (see [below for nested schema](#nestedatt--members))
+- `id` (String) The ID of this datasource. In the format `<project:query-hash>` if query is set, otherwise `<project>`.
+- `members` (Attributes List) The list of project members. (see [below for nested schema](#nestedatt--members))
 
 <a id="nestedatt--members"></a>
 ### Nested Schema for `members`
 
 Read-Only:
 
-- `access_level` (String)
-- `avatar_url` (String)
-- `expires_at` (String)
-- `id` (Number)
-- `name` (String)
-- `state` (String)
-- `username` (String)
-- `web_url` (String)
+- `access_level` (String) The level of access to the group.
+- `avatar_url` (String) The avatar URL of the user.
+- `expires_at` (String) Expiration date for the group membership.
+- `id` (Number) The unique id assigned to the user by the gitlab server.
+- `name` (String) The name of the user.
+- `state` (String) Whether the user is active or blocked.
+- `username` (String) The username of the user.
+- `web_url` (String) User's website URL.

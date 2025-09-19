@@ -67,7 +67,7 @@ resource "gitlab_project_environment" "this" {
 
 - `auto_stop_at` (String) The ISO8601 date/time that this environment will be automatically stopped at in UTC.
 - `created_at` (String) The ISO8601 date/time that this environment was created at in UTC.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this resource. In the format of `<project-id:environment-id>`
 - `slug` (String) The name of the environment in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
 - `state` (String) State the environment is in. Valid values are `available`, `stopped`.
 - `updated_at` (String) The ISO8601 date/time that this environment was last updated at in UTC.

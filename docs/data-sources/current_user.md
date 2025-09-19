@@ -31,5 +31,5 @@ data "gitlab_current_user" "example" {}
 - `id` (String) ID of the user.
 - `name` (String) Human-readable name of the user. Returns **** if the user is a project bot and the requester does not have permission to view the project.
 - `namespace_id` (String) Personal namespace of the user.
-- `public_email` (String) User’s public email.
+- `public_email` (String) User's public email.
 - `username` (String) Username of the user. Unique within this instance of GitLab.

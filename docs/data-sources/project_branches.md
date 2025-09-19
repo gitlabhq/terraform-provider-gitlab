@@ -34,37 +34,37 @@ data "gitlab_project_branches" "example" {
 
 ### Read-Only
 
-- `branches` (List of Object) The list of branches of the project, as defined below. (see [below for nested schema](#nestedatt--branches))
-- `id` (String) The ID of this resource.
+- `branches` (Attributes List) The list of branches of the project, as defined below. (see [below for nested schema](#nestedatt--branches))
+- `id` (String) The ID of this datasource. In the format `<project>`.
 
 <a id="nestedatt--branches"></a>
 ### Nested Schema for `branches`
 
 Read-Only:
 
-- `can_push` (Boolean)
-- `commit` (Set of Object) (see [below for nested schema](#nestedobjatt--branches--commit))
-- `default` (Boolean)
-- `developers_can_merge` (Boolean)
-- `developers_can_push` (Boolean)
-- `merged` (Boolean)
-- `name` (String)
-- `protected` (Boolean)
-- `web_url` (String)
+- `can_push` (Boolean) Bool, true if you can push to the branch.
+- `commit` (Attributes Set) The commit associated with the branch ref. (see [below for nested schema](#nestedatt--branches--commit))
+- `default` (Boolean) Bool, true if branch is the default branch for the project.
+- `developers_can_merge` (Boolean) Bool, true if developer level access allows to merge branch.
+- `developers_can_push` (Boolean) Bool, true if developer level access allows git push.
+- `merged` (Boolean) Bool, true if the branch has been merged into its parent.
+- `name` (String) The name of the branch.
+- `protected` (Boolean) Bool, true if branch has branch protection.
+- `web_url` (String) URL that can be used to find the branch in a browser.
 
-<a id="nestedobjatt--branches--commit"></a>
+<a id="nestedatt--branches--commit"></a>
 ### Nested Schema for `branches.commit`
 
 Read-Only:
 
-- `author_email` (String)
-- `author_name` (String)
-- `authored_date` (String)
-- `committed_date` (String)
-- `committer_email` (String)
-- `committer_name` (String)
-- `id` (String)
-- `message` (String)
-- `parent_ids` (Set of String)
-- `short_id` (String)
-- `title` (String)
+- `author_email` (String) The email of the author.
+- `author_name` (String) The name of the author.
+- `authored_date` (String) The date which the commit was authored (format: yyyy-MM-ddTHH:mm:ssZ).
+- `committed_date` (String) The date at which the commit was pushed (format: yyyy-MM-ddTHH:mm:ssZ).
+- `committer_email` (String) The email of the user that committed.
+- `committer_name` (String) The name of the user that committed.
+- `id` (String) The unique id assigned to the commit by Gitlab.
+- `message` (String) The commit message
+- `parent_ids` (Set of String) The id of the parents of the commit
+- `short_id` (String) The short id assigned to the commit by Gitlab.
+- `title` (String) The title of the commit
