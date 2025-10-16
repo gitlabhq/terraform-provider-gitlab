@@ -39,10 +39,10 @@ data "gitlab_project_membership" "example" {
 
 ### Optional
 
-- `full_path` (String, Deprecated) The full path of the project.
+- `full_path` (String, Deprecated) The full path of the project. Use `project` instead. Will be removed in 19.0.
 - `inherited` (Boolean) Return all project members including members through ancestor groups
 - `project` (String) The ID or full path of the project.
-- `project_id` (Number, Deprecated) The ID of the project.
+- `project_id` (Number, Deprecated) The ID of the project. Use `project` instead. Will be removed in 19.0.
 - `query` (String) A query string to search for members
 - `user_ids` (Set of Number) List of user ids to filter members by
 

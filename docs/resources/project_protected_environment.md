@@ -133,7 +133,7 @@ resource "gitlab_project_protected_environment" "example_with_multiple" {
 ### Optional
 
 - `approval_rules` (Attributes List) Array of approval rules to deploy, with each described by a hash. Elements in the `approval_rules` should be one of `user_id`, `group_id` or `access_level`. (see [below for nested schema](#nestedatt--approval_rules))
-- `deploy_access_levels` (Block Set, Deprecated) Array of access levels allowed to deploy, with each described by a hash.  Elements in the `deploy_access_levels` should be one of `user_id`, `group_id` or `access_level`. (see [below for nested schema](#nestedblock--deploy_access_levels))
+- `deploy_access_levels` (Block Set, Deprecated) Array of access levels allowed to deploy, with each described by a hash.  Elements in the `deploy_access_levels` should be one of `user_id`, `group_id` or `access_level`. Use `deploy_access_levels_attribute` instead. To be removed in 19.0. (see [below for nested schema](#nestedblock--deploy_access_levels))
 - `deploy_access_levels_attribute` (Attributes Set) Array of access levels allowed to deploy, with each described by a hash.  Elements in the `deploy_access_levels` should be one of `user_id`, `group_id` or `access_level`. (see [below for nested schema](#nestedatt--deploy_access_levels_attribute))
 
 ### Read-Only

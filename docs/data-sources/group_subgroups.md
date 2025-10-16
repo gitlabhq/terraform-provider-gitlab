@@ -46,39 +46,39 @@ output "subgroups" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `subgroups` (List of Object) Subgroups of the parent group. (see [below for nested schema](#nestedatt--subgroups))
+- `id` (String) The ID of this datasource. In the format `<group-id>`.
+- `subgroups` (Attributes List) Subgroups of the parent group. (see [below for nested schema](#nestedatt--subgroups))
 
 <a id="nestedatt--subgroups"></a>
 ### Nested Schema for `subgroups`
 
 Read-Only:
 
-- `allowed_email_domains_list` (String)
-- `auto_devops_enabled` (Boolean)
-- `avatar_url` (String)
-- `created_at` (String)
-- `default_branch_protection` (Number)
-- `description` (String)
-- `emails_enabled` (Boolean)
-- `file_template_project_id` (Number)
-- `full_name` (String)
-- `full_path` (String)
-- `group_id` (Number)
-- `ip_restriction_ranges` (String)
-- `lfs_enabled` (Boolean)
-- `mentions_disabled` (Boolean)
-- `name` (String)
-- `parent_id` (Number)
-- `path` (String)
-- `project_creation_level` (String)
-- `request_access_enabled` (Boolean)
-- `require_two_factor_authentication` (Boolean)
-- `share_with_group_lock` (Boolean)
-- `shared_runners_setting` (String)
-- `statistics` (Map of String)
-- `subgroup_creation_level` (String)
-- `two_factor_grace_period` (Number)
-- `visibility` (String)
-- `web_url` (String)
-- `wiki_access_level` (String)
+- `allowed_email_domains_list` (String) A list of email address domains to allow group access.
+- `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
+- `avatar_url` (String) The URL of the avatar image.
+- `created_at` (String) Group created at date.
+- `default_branch_protection` (Number) Whether developers and maintainers can push to the applicable default branch.
+- `description` (String) The description of the group.
+- `emails_enabled` (Boolean) Enable email notifications.
+- `file_template_project_id` (Number) The ID of the project that will be used for file templates.
+- `full_name` (String) The full name of the group.
+- `full_path` (String) The full path of the group.
+- `group_id` (Number) The ID of the group.
+- `ip_restriction_ranges` (String) A list of IP addresses or subnet masks to restrict group access.
+- `lfs_enabled` (Boolean) Is LFS enabled for projects in this group.
+- `mentions_disabled` (Boolean) Disable the capability of a group from getting mentioned.
+- `name` (String) The name of this group.
+- `parent_id` (Number) ID of the parent group.
+- `path` (String) The path of the group.
+- `project_creation_level` (String) Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`, `administrator`
+- `request_access_enabled` (Boolean) Is request for access enabled to the group.
+- `require_two_factor_authentication` (Boolean) Require all users in this group to setup Two-factor authentication.
+- `share_with_group_lock` (Boolean) Prevent sharing a project with another group within this group.
+- `shared_runners_setting` (String) Enable or disable shared runners for a group's subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+- `statistics` (Map of String) Group statistics.
+- `subgroup_creation_level` (String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
+- `two_factor_grace_period` (Number) Time before Two-factor authentication is enforced (in hours).
+- `visibility` (String) Limited by visibility `public`, `internal`, or `private`.
+- `web_url` (String) Web URL of the group.
+- `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.

@@ -4,12 +4,15 @@ page_title: "gitlab_integration_harbor Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_integration_harbor resource manages the lifecycle of a project integration with Harbor.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_harborinstead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#harbor
 ---
 
 # gitlab_integration_harbor (Resource)
 
 The `gitlab_integration_harbor` resource manages the lifecycle of a project integration with Harbor.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_harbor`instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#harbor)
 

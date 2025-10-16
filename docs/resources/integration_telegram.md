@@ -4,12 +4,15 @@ page_title: "gitlab_integration_telegram Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_integration_telegram resource manages the lifecycle of a project integration with Telegram.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_telegraminstead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#telegram
 ---
 
 # gitlab_integration_telegram (Resource)
 
 The `gitlab_integration_telegram` resource manages the lifecycle of a project integration with Telegram.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_telegram`instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#telegram)
 

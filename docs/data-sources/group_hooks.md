@@ -3,13 +3,13 @@
 page_title: "gitlab_group_hooks Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_hooks data source allows to retrieve details about hooks in a group.
+  The gitlab_group_hooks data source retrieves details about hooks in a group.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_webhooks/#list-group-hooks
 ---
 
 # gitlab_group_hooks (Data Source)
 
-The `gitlab_group_hooks` data source allows to retrieve details about hooks in a group.
+The `gitlab_group_hooks` data source retrieves details about hooks in a group.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_webhooks/#list-group-hooks)
 
@@ -34,33 +34,33 @@ data "gitlab_group_hooks" "examples" {
 
 ### Read-Only
 
-- `hooks` (List of Object) The list of hooks. (see [below for nested schema](#nestedatt--hooks))
-- `id` (String) The ID of this resource.
+- `hooks` (Attributes List) The list of hooks. (see [below for nested schema](#nestedatt--hooks))
+- `id` (String) The ID of this data source. In the format `<group>`.
 
 <a id="nestedatt--hooks"></a>
 ### Nested Schema for `hooks`
 
 Read-Only:
 
-- `confidential_issues_events` (Boolean)
-- `confidential_note_events` (Boolean)
-- `custom_webhook_template` (String)
-- `deployment_events` (Boolean)
-- `emoji_events` (Boolean)
-- `enable_ssl_verification` (Boolean)
-- `group` (String)
-- `group_id` (Number)
-- `hook_id` (Number)
-- `issues_events` (Boolean)
-- `job_events` (Boolean)
-- `merge_requests_events` (Boolean)
-- `note_events` (Boolean)
-- `pipeline_events` (Boolean)
-- `push_events` (Boolean)
-- `push_events_branch_filter` (String)
-- `releases_events` (Boolean)
-- `subgroup_events` (Boolean)
-- `tag_push_events` (Boolean)
-- `token` (String)
-- `url` (String)
-- `wiki_page_events` (Boolean)
+- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
+- `custom_webhook_template` (String) Set a custom webhook template.
+- `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `emoji_events` (Boolean) Invoke the hook for emoji events.
+- `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
+- `group` (String) The ID or full path of the group.
+- `group_id` (Number) The id of the group for the hook.
+- `hook_id` (Number) The id of the group hook.
+- `issues_events` (Boolean) Invoke the hook for issues events.
+- `job_events` (Boolean) Invoke the hook for job events.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests.
+- `note_events` (Boolean) Invoke the hook for notes events.
+- `pipeline_events` (Boolean) Invoke the hook for pipeline events.
+- `push_events` (Boolean) Invoke the hook for push events.
+- `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
+- `releases_events` (Boolean) Invoke the hook for releases events.
+- `subgroup_events` (Boolean) Invoke the hook for subgroup events.
+- `tag_push_events` (Boolean) Invoke the hook for tag push events.
+- `token` (String, Deprecated) A token to present when invoking the hook. The token is only available on resource creation, not in this datasource. It will always be blank. To be removed in 19.0.
+- `url` (String) The url of the hook to invoke.
+- `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

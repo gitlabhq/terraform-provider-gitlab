@@ -70,7 +70,7 @@ resource "gitlab_project_job_token_scopes" "allow_all" {
 
 - `enabled` (Boolean) Enable the given inbound allowlist. If false, will allow any project or group regardless of the values in `target_project_ids` or `target_group_ids`. Deleting the associated `gitlab_project_job_token_scopes` resource will reset `Enabled` on the group to `true`.
 - `project` (String) The ID or full path of the project.
-- `project_id` (Number, Deprecated) The ID of the project.
+- `project_id` (Number, Deprecated) The ID of the project. Use `project` instead. To be removed in 19.0.
 - `target_group_ids` (Set of Number) A set of group IDs that are in the CI/CD job token inbound allowlist.
 - `target_project_ids` (Set of Number) A set of project IDs that are in the CI/CD job token inbound allowlist.
 

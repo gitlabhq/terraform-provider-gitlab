@@ -52,6 +52,6 @@ data "gitlab_project_hook" "example" {
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
 - `releases_events` (Boolean) Invoke the hook for releases events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
-- `token` (String, Sensitive, Deprecated) A token to present when invoking the hook. The token is not available in this datasource.
+- `token` (String, Sensitive, Deprecated) A token to present when invoking the hook. The token is only available on resource creation, not in this datasource. It will always be blank.
 - `url` (String) The url of the hook to invoke.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

@@ -44,27 +44,27 @@ data "gitlab_groups" "example-two" {
 
 ### Read-Only
 
-- `groups` (List of Object) The list of groups. (see [below for nested schema](#nestedatt--groups))
-- `id` (String) The ID of this resource.
+- `groups` (Attributes List) The list of groups. (see [below for nested schema](#nestedatt--groups))
+- `id` (String) The ID of this datasource. In the format of a hash of the provided search attributes.
 
 <a id="nestedatt--groups"></a>
 ### Nested Schema for `groups`
 
 Read-Only:
 
-- `default_branch_protection` (Number)
-- `description` (String)
-- `full_name` (String)
-- `full_path` (String)
-- `group_id` (Number)
-- `lfs_enabled` (Boolean)
-- `name` (String)
-- `parent_id` (Number)
-- `path` (String)
-- `prevent_forking_outside_group` (Boolean)
-- `request_access_enabled` (Boolean)
-- `runners_token` (String)
-- `shared_runners_setting` (String)
-- `visibility_level` (String)
-- `web_url` (String)
-- `wiki_access_level` (String)
+- `default_branch_protection` (Number, Deprecated) Whether developers and maintainers can push to the applicable default branch. Will be removed in 19.0.
+- `description` (String) The description of the group.
+- `full_name` (String) The full name of the group.
+- `full_path` (String) The full path of the group.
+- `group_id` (Number) The ID of the group.
+- `lfs_enabled` (Boolean) Is LFS enabled for projects in this group.
+- `name` (String) The name of this group.
+- `parent_id` (Number) ID of the parent group.
+- `path` (String) The path of the group.
+- `prevent_forking_outside_group` (Boolean) When enabled, users can not fork projects from this group to external namespaces.
+- `request_access_enabled` (Boolean) Is request for access enabled to the group.
+- `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
+- `shared_runners_setting` (String) Enable or disable shared runners for a group's subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
+- `visibility_level` (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.
+- `web_url` (String) Web URL of the group.
+- `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.

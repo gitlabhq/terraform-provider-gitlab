@@ -98,6 +98,7 @@ resource "gitlab_group_service_account_access_token" "example_sa_token_rotation_
 
 - `expires_at` (String) The service account access token expiry date. When left blank, the token follows the standard rule of expiry for personal access tokens.
 - `rotation_configuration` (Attributes) The configuration for when to rotate a token automatically. Will not rotate a token until `terraform apply` is run. (see [below for nested schema](#nestedatt--rotation_configuration))
+- `validate_past_expiration_date` (Boolean) Wether to validate if the expiration date is in the future.
 
 ### Read-Only
 

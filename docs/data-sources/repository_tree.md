@@ -47,7 +47,7 @@ data "gitlab_repository_tree" "this" {
 
 Read-Only:
 
-- `id` (String, Deprecated) The project ID.
+- `id` (String, Deprecated) The project ID. Use `node_id` instead. To be removed in 19.0.
 - `mode` (String) Unix access mode of the file in the repository.
 - `name` (String) Name of the blob or tree in the repository
 - `node_id` (String) The SHA-1 hash of the tree or blob in the repository.

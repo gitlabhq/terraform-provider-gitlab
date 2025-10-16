@@ -36,6 +36,10 @@ resource "gitlab_user_impersonation_token" "this" {
 - `scopes` (Set of String) Array of scopes of the impersonation token. valid values are: `api`, `read_user`, `read_api`, `read_repository`, `write_repository`, `read_registry`, `write_registry`, `read_virtual_registry`, `write_virtual_registry`, `sudo`, `admin_mode`, `create_runner`, `manage_runner`, `ai_features`, `k8s_proxy`, `self_rotate`, `read_service_ping`
 - `user_id` (Number) The ID of the user.
 
+### Optional
+
+- `validate_past_expiration_date` (Boolean) Wether to validate if the expiration date is in the future.
+
 ### Read-Only
 
 - `active` (Boolean) True if the token is active.

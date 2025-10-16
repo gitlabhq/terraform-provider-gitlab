@@ -1,3 +1,26 @@
+## 18.5.0 (2025-10-14)
+
+### FEATURES (2 changes)
+
+- datasource/gitlab_project_approval_rules:  [Add New Data Source for GitLab Project Approval Rules](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/93fe466255fcbf41bc19e1faf708bb9f3e704df6) by @markwork ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2624)) 
+- resource/gitlab_group_service_account:  [Add support for custom timeouts to `gitlab_group_service_account`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1e57cac88865beed668edfefb8293a79d4d77036) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2689)) 
+
+### IMPROVEMENTS (2 changes)
+
+- datasource/gitlab_projects:  [Deprecate datasource gitlab_projects._links](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/55e58137) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2744))
+- resource/gitlab_project:  [Add project resource group default process mode](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ed55f6f4974dc5ef1f68f6f341ed77eb690b0269) by @n.h.long.9697 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2692))
+
+### DOCUMENTATION (2 changes)
+
+- [Add missing deprecation notices to some resources and datasources](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2cd6b09d) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2745))
+- [Ensure deprecation notices properly display in the docs](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6c7f8b79) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2743))
+
+### BUG FIXES (3 changes)
+
+- resource/gitlab_application_settings:  [Fix mapping package_metadata_purl_types in update](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b57143a3) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2729))
+- resource/gitlab_project_membership:  [`expires_at` now validates that the date is not in the past, which previously caused an API error](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/311bc16f3aee383284025ce7ffdb9a01fa30ec5b) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2712)) 
+- resource/gitlab_project_membership,resource/gitlab_group_membership:  [`member_role_id` will now be removed if not specified in the config, allowing users to revert to base roles](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b503771e5f56d03645ffab646ea7e72ef3911a8a) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2713)) 
+
 ## 18.4.1 (2025-09-23)
 
 ### IMPROVEMENTS (1 change)
@@ -97,6 +120,11 @@
 - resource/gitlab_project_job_token_scopes:  [The `enabled` attribute will now attempt to check the instance `enforce_ci_inbound_job_token_scope_enabled` prior to allowing a user to set the value to `false`, and will fail at plan time instead of apply time if the `enabled` setting conflicts with instance settings.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f7d11df913b3e6fa59f3b67219561250f4658703) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2530))
 - datasource/gitlab_user:  [Add experimental support for `email_exact_match`, which will always return an exact match on the email. This will override the fuzzy matching of the GitLab search API when no users match the given email.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2dd44a088abaeda3494c24fd5f8b939dff1a8d73) by @ricardo.bartels ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2362))
 - multiple resources:  [Add missing examples to resources](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d853ffe687699c313bf421cdf595b415c821d3bb) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2519))
+
+### DOCUMENTATION (2 changes)
+
+- [Add missing deprecation notices](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2cd6b09d) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2745))
+- [Ensure deprecation notices come out in the docs](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6c7f8b79) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2743))
 
 ### BUG FIXES (3 changes)
 
@@ -205,6 +233,11 @@ This release was tested against GitLab 17.10, 17.9, and 17.8 for both CE and EE
 - resource/gitlab_application_settings: [Add support for `lock_memberships_to_ldap`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c3ab985184d7536d8b34b4bc1a763c058930d3b1) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2359))
 - datasource/gitlab_users: [Add support for several new attributes.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fde7c9f221526fb1600548aafa0b748deba8d2e9) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2361))
 - datasource/gitlab_project_environment: [Add `auto_stop_setting` as a read-only attribute](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c8669f4ca7e59241f21badbd2be4d99001f9bdd3) by @jtymes ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2300))
+
+### DOCUMENTATION (2 changes)
+
+- [Add missing deprecation notices](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2cd6b09d) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2745))
+- [Ensure deprecation notices come out in the docs](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6c7f8b79) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2743))
 
 ### BUG FIXES (3 changes)
 
@@ -481,6 +514,11 @@ Note: As a security related change, this breaking change is allowed outside a ma
 ## 17.1.0 (2024-06-20)
 
 This release was tested against GitLab 17.1, 17.0, and 16.11 for both CE and EE
+
+### DOCUMENTATION (2 changes)
+
+- [Add missing deprecation notices](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2cd6b09d) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2745))
+- [Ensure deprecation notices come out in the docs](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6c7f8b79) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2743))
 
 ### BUG FIXES (3 changes)
 

@@ -4,6 +4,7 @@ page_title: "gitlab_integration_redmine Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_integration_redmine resource manages the lifecycle of a project integration with Redmine.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_redmineinstead.
   ~> Using Redmine requires that GitLab internal issue tracking is disabled for the project.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#redmine
 ---
@@ -12,6 +13,7 @@ description: |-
 
 The `gitlab_integration_redmine` resource manages the lifecycle of a project integration with Redmine.
 
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_redmine`instead.
 ~> Using Redmine requires that GitLab internal issue tracking is disabled for the project.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#redmine)

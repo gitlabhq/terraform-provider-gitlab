@@ -60,6 +60,7 @@ resource "gitlab_project_variable" "example" {
 - `description` (String) The description of the personal access token.
 - `expires_at` (String) When the token will expire, YYYY-MM-DD format. Is automatically set when `rotation_configuration` is used.
 - `rotation_configuration` (Attributes) The configuration for when to rotate a token automatically. Will not rotate a token until `terraform apply` is run. (see [below for nested schema](#nestedatt--rotation_configuration))
+- `validate_past_expiration_date` (Boolean) Wether to validate if the expiration date is in the future.
 
 ### Read-Only
 

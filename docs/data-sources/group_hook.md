@@ -54,6 +54,6 @@ data "gitlab_group_hook" "example" {
 - `releases_events` (Boolean) Invoke the hook for releases events.
 - `subgroup_events` (Boolean) Invoke the hook for subgroup events.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
-- `token` (String, Deprecated) A token to present when invoking the hook. The token is not available in this datasource.
+- `token` (String, Deprecated) A token to present when invoking the hook. The token is only available on resource creation, not in this datasource. It will always be blank. To be removed in 19.0.
 - `url` (String) The url of the hook to invoke.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events.

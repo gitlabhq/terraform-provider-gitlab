@@ -55,7 +55,7 @@ data "gitlab_project" "example" {
 - `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
 - `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
-- `container_expiration_policy` (List of Object) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))
+- `container_expiration_policy` (Attributes List) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
@@ -69,13 +69,13 @@ data "gitlab_project" "example" {
 - `import_url` (String) URL the project was imported from.
 - `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
-- `issues_enabled` (Boolean) Enable issue tracking for the project.
+- `issues_enabled` (Boolean, Deprecated) Enable issue tracking for the project. Use `issues_access_level` instead. This attribute will be removed in 19.0.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
 - `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
-- `merge_requests_enabled` (Boolean) Enable merge requests for the project.
+- `merge_requests_enabled` (Boolean, Deprecated) Enable merge requests for the project. Use `merge_requests_access_level` instead. This attribute will be removed in 19.0.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains.
 - `model_experiments_access_level` (String) The visibility of machine learning model experiments.
 - `model_registry_access_level` (String) The visibility of machine learning model registry.
@@ -83,10 +83,10 @@ data "gitlab_project" "example" {
 - `name` (String) The name of the project.
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
 - `path` (String) The path of the repository.
-- `pipelines_enabled` (Boolean) Enable pipelines for the project.
+- `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. Use `pipelines_access_level` instead. This attribute will be removed in 19.0.
 - `prevent_merge_without_jira_issue` (Boolean) Whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
-- `push_rules` (List of Object) Push rules for the project. Push rules are only available on Enterprise plans and if the authenticated has permissions to read them. (see [below for nested schema](#nestedatt--push_rules))
+- `push_rules` (Attributes List) Push rules for the project. Push rules are only available on Enterprise plans and if the authenticated has permissions to read them. (see [below for nested schema](#nestedatt--push_rules))
 - `releases_access_level` (String) Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
 - `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests
 - `repository_access_level` (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
@@ -94,12 +94,12 @@ data "gitlab_project" "example" {
 - `request_access_enabled` (Boolean) Allow users to request member access.
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
-- `restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
+- `restrict_user_defined_variables` (Boolean, Deprecated) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline. Use `ci_restrict_pipeline_variables_role` instead. This attribute will be removed in 19.0.
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
-- `shared_with_groups` (List of Object) Describes groups which have access shared to this project. (see [below for nested schema](#nestedatt--shared_with_groups))
+- `shared_with_groups` (Attributes List) Describes groups which have access shared to this project. (see [below for nested schema](#nestedatt--shared_with_groups))
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
-- `snippets_enabled` (Boolean) Enable snippets for the project.
+- `snippets_enabled` (Boolean, Deprecated) Enable snippets for the project. Use `snippets_access_level` instead. This attribute will be removed in 19.0.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests.
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
@@ -107,20 +107,20 @@ data "gitlab_project" "example" {
 - `visibility_level` (String) Repositories are created as private by default.
 - `web_url` (String) URL that can be used to find the project in a browser.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
-- `wiki_enabled` (Boolean) Enable wiki for the project.
+- `wiki_enabled` (Boolean, Deprecated) Enable wiki for the project. Use `wiki_access_level` instead. This attribute will be removed in 19.0.
 
 <a id="nestedatt--container_expiration_policy"></a>
 ### Nested Schema for `container_expiration_policy`
 
 Read-Only:
 
-- `cadence` (String)
-- `enabled` (Boolean)
-- `keep_n` (Number)
-- `name_regex_delete` (String)
-- `name_regex_keep` (String)
-- `next_run_at` (String)
-- `older_than` (String)
+- `cadence` (String) The cadence of the policy. Valid values are: `1d`, `7d`, `14d`, `1month`, `3month`.
+- `enabled` (Boolean) If true, the policy is enabled.
+- `keep_n` (Number) The number of images to keep.
+- `name_regex_delete` (String) The regular expression to match image names to delete.
+- `name_regex_keep` (String) The regular expression to match image names to keep.
+- `next_run_at` (String) The next time the policy will run.
+- `older_than` (String) The number of days to keep images.
 
 
 <a id="nestedatt--push_rules"></a>
@@ -128,19 +128,19 @@ Read-Only:
 
 Read-Only:
 
-- `author_email_regex` (String)
-- `branch_name_regex` (String)
-- `commit_committer_check` (Boolean)
-- `commit_committer_name_check` (Boolean)
-- `commit_message_negative_regex` (String)
-- `commit_message_regex` (String)
-- `deny_delete_tag` (Boolean)
-- `file_name_regex` (String)
-- `max_file_size` (Number)
-- `member_check` (Boolean)
-- `prevent_secrets` (Boolean)
-- `reject_non_dco_commits` (Boolean)
-- `reject_unsigned_commits` (Boolean)
+- `author_email_regex` (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
+- `branch_name_regex` (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+- `commit_committer_check` (Boolean) Users can only push commits to this repository that were committed with one of their own verified emails.
+- `commit_committer_name_check` (Boolean) Users can only push commits to this repository if the commit author name is consistent with their GitLab account name.
+- `commit_message_negative_regex` (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+- `commit_message_regex` (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+- `deny_delete_tag` (Boolean) Deny deleting a tag.
+- `file_name_regex` (String) All committed filenames must not match this regex, e.g. `(jar|exe)$`.
+- `max_file_size` (Number) Maximum file size (MB).
+- `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
+- `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
+- `reject_non_dco_commits` (Boolean) Reject commit when it's not DCO certified.
+- `reject_unsigned_commits` (Boolean) Reject commit when it's not signed through GPG.
 
 
 <a id="nestedatt--shared_with_groups"></a>
@@ -148,7 +148,7 @@ Read-Only:
 
 Read-Only:
 
-- `group_access_level` (Number)
-- `group_full_path` (String)
-- `group_id` (Number)
-- `group_name` (String)
+- `group_access_level` (Number) The access_level permission level of the shared group.
+- `group_full_path` (String) The full path of the group shared with.
+- `group_id` (Number) The ID of the group shared with.
+- `group_name` (String) The name of the group shared with.

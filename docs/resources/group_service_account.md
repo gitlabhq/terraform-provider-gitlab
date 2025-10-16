@@ -57,12 +57,20 @@ resource "gitlab_group_membership" "example_membership" {
 
 - `email` (String) User account email. If not specified, generates an email prepended with `service_account_group_`. Custom email addresses require confirmation before the account is active, unless the group has a matching verified domain.
 - `name` (String) The name of the user. If not specified, the default Service account user name is used.
+- `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
 - `username` (String) The username of the user. If not specified, it’s automatically generated.
 
 ### Read-Only
 
 - `id` (String) The ID of this Terraform resource. In the format of `<group>:<service_account_id>`.
 - `service_account_id` (String) The service account id.
+
+<a id="nestedatt--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `delete` (String) How long to wait for the service account to be fully deleted. Defaults to 10 minutes.
 
 ## Import
 

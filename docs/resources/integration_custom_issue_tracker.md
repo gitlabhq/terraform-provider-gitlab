@@ -4,12 +4,15 @@ page_title: "gitlab_integration_custom_issue_tracker Resource - terraform-provid
 subcategory: ""
 description: |-
   The gitlab_integration_custom_issue_tracker resource manages the lifecycle of a project integration with a Custom Issue Tracker.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_custom_issue_trackerinstead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#custom-issue-tracker
 ---
 
 # gitlab_integration_custom_issue_tracker (Resource)
 
 The `gitlab_integration_custom_issue_tracker` resource manages the lifecycle of a project integration with a Custom Issue Tracker.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_custom_issue_tracker`instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#custom-issue-tracker)
 

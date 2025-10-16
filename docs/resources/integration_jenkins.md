@@ -4,12 +4,15 @@ page_title: "gitlab_integration_jenkins Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_integration_jenkins resource manages the lifecycle of a project integration with Jenkins.
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_jenkinsinstead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#jenkins
 ---
 
 # gitlab_integration_jenkins (Resource)
 
 The `gitlab_integration_jenkins` resource manages the lifecycle of a project integration with Jenkins.
+
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_jenkins`instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#jenkins)
 

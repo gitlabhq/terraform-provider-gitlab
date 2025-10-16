@@ -47,6 +47,7 @@ resource "gitlab_project_deploy_token" "example-two" {
 
 - `expires_at` (String) Time the token expires in RFC3339 format. Not set by default.
 - `username` (String) A username for the deploy token. Default is `gitlab+deploy-token-{n}`.
+- `validate_past_expiration_date` (Boolean) Wether to validate if the expiration date is in the future.
 
 ### Read-Only
 
