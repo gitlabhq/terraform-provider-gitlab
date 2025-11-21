@@ -1,9 +1,28 @@
+## 18.6.0 (2025-11-20)
+
+### FEATURES (2 changes)
+
+- datasource/gitlab_artifact_file:  [Add gitlab_artifact_file data source](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/daa9e77111ff0704f0866ad7bda017fb1326eead) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2721))
+- datasource/gitlab_member_role:  [Add new datasource for retrieving member role](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9ecffc646679b557418d61703e604b5975bcf26b) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2709))
+
+### IMPROVEMENTS (3 changes)
+
+- resource/gitlab_project_protected_environment:  [chore: improved the docs gitlab-project-protected-environment docs](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/512468d86eac2f95aa231ec5222072345b231481) by @bas.bremer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2762))
+- resource/gitlab_deploy_key_enable:  [Migrate gitlab_deploy_key_enable from SDK to framework plugin](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2b1425916bb5b18717dbe544a1a3e089097eb8f0) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2757))
+- datasource/gitlab_project_protected_branch:  [Harden the protected branch test](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9f2e1729bc0f952d40055b3b25e5abf428b1ea9f) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2754))
+
+### BUGS (3 changes)
+
+- resource/gitlab_group:  [Update logging statement when retrieving push rules to be DEBUG instead of ERROR to prevent confusion](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fdcf38d1f8326cc450875d69c5d90adf63ec5d96) by @qerub ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2781))
+- resource/gitlab_group_access_token, resource/gitlab_group_service_account_token, resource/gitlab_personal_access_token, resource/gitlab_project_access_token, resource/gitlab_user_impersonation_token, resource/gitlab_project_membership [Fix an issue where nil `expiry_date` could cause a problem when refreshing tokens](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/384118d321de48389d960e662da0381655398170) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2722))
+- resource/gitlab_project_access_token, resource/gitlab_group_access_token, resource/gitlab_personal_access_token, resource/gitlab_group_service_account_access_token:  [fix(tokens): Update Access Token Validation Logic to only update token when expiry_date changes](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/a22cb35a10b793cfaaae8a97eb6f2652dc865cf2) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2759))
+
 ## 18.5.0 (2025-10-14)
 
 ### FEATURES (2 changes)
 
-- datasource/gitlab_project_approval_rules:  [Add New Data Source for GitLab Project Approval Rules](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/93fe466255fcbf41bc19e1faf708bb9f3e704df6) by @markwork ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2624)) 
-- resource/gitlab_group_service_account:  [Add support for custom timeouts to `gitlab_group_service_account`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1e57cac88865beed668edfefb8293a79d4d77036) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2689)) 
+- datasource/gitlab_project_approval_rules:  [Add New Data Source for GitLab Project Approval Rules](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/93fe466255fcbf41bc19e1faf708bb9f3e704df6) by @markwork ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2624))
+- resource/gitlab_group_service_account:  [Add support for custom timeouts to `gitlab_group_service_account`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1e57cac88865beed668edfefb8293a79d4d77036) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2689))
 
 ### IMPROVEMENTS (2 changes)
 
@@ -18,8 +37,8 @@
 ### BUG FIXES (3 changes)
 
 - resource/gitlab_application_settings:  [Fix mapping package_metadata_purl_types in update](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b57143a3) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2729))
-- resource/gitlab_project_membership:  [`expires_at` now validates that the date is not in the past, which previously caused an API error](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/311bc16f3aee383284025ce7ffdb9a01fa30ec5b) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2712)) 
-- resource/gitlab_project_membership,resource/gitlab_group_membership:  [`member_role_id` will now be removed if not specified in the config, allowing users to revert to base roles](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b503771e5f56d03645ffab646ea7e72ef3911a8a) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2713)) 
+- resource/gitlab_project_membership:  [`expires_at` now validates that the date is not in the past, which previously caused an API error](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/311bc16f3aee383284025ce7ffdb9a01fa30ec5b) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2712))
+- resource/gitlab_project_membership,resource/gitlab_group_membership:  [`member_role_id` will now be removed if not specified in the config, allowing users to revert to base roles](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b503771e5f56d03645ffab646ea7e72ef3911a8a) by @elC0mpa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2713))
 
 ## 18.4.1 (2025-09-23)
 
@@ -154,7 +173,7 @@
 - resource/gitlab_project:  [Remove build_coverage_regex, simplify squash_option and secret push protection logic](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7ec1c6828da76b0c691b81184ee06da46f351594) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2441))
 - [Remove resource `gitlab_service_custom_issue_tracker`. Use...](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ea6c3dafc62d7b2000f78efd9a55f2275449a05b) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2456))
 - [Remove resource `gitlab_project_compliance_framework`. Use...](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/82de7911526c740c4e93ecb326364a579db9e652) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2457))
-- [Remove resource `gitlab_service_microsoft_teams. Use `gitlab_integration_microsoft_teams\` instead.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9bb5c48a668e5720f7c5d2a481dbb45672368732) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2452))
+- [Remove resource `gitlab_service_microsoft_teams. Use`gitlab_integration_microsoft_teams\` instead.](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9bb5c48a668e5720f7c5d2a481dbb45672368732) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2452))
 - [Breaking change, remove deprecated gitlab_service_slack](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/137e1209ffff8f7e1bafea15a1b2304aec7cc11c) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2454))
 
 ### FEATURES (1 change)
@@ -380,7 +399,6 @@ This release was tested against GitLab 17.6, 17.5, and 17.4 for both CE and EE
 - resource/gitlab_service_account_access_token:  [Improve example documentation and include better information on required permissions for gitlab.com](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/38b3c7e8b9ad27dd8b9ba452ceb6fd179801e550) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2201))
 - resource/gitlab_member_role: [Add documentation examples and import examples](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/93ceb96da2be4e75c15fb5e552106c1aad5c5407) by @john.shimmin ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2186))
 
-
 ### BUG FIXES (8 changes)
 
 - resource/gitlab_group_label:  [Fix an issue where `apply` fails when changing the `name` attribute](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b6dd163bb62c52c8cad432b92e638220687887a4) by @krzywykrzych ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2200))
@@ -445,12 +463,10 @@ This release was tested against GitLab 17.4, 17.3, and 17.2 for both CE and EE
 - resource/gitlab_user: [Add support for `extern_uid` and `external_provider`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/bc13a7dd9052e18e8c14beae56eece2dcec13b80) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2097))
 - docs/use-case-tech-lead-bootstrapping-small-team: [Added new documentation to the provider with an example of creating a small team using GitLab](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f90a66f2d288e6556b6174a0f62b35cfb8e2a764) by @Jitsusama ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2112))
 
-
 ### BUG FIXES (2 changes)
 
 - resource/gitlab_user_runner: [Fix an issue where managing an imported runner would fail with an error that `token` was unknown](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e126dbb7307e2b907b6fd62932d72b33ad788b81) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2114))
 - resource/gitlab_personal_access_token: [Fix an issue where tokens with no expiration date encountered a provider error](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/142ce83b0eea8a829c6c7ef04b1bd6b687c0a616) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2104))
-
 
 ## 17.3.1 (2024-08-27)
 
@@ -497,6 +513,7 @@ This release was tested against GitLab 17.3, 17.2, and 17.1 for both CE and EE
 This release was tested against GitLab 17.2, 17.1, and 17.0 for both CE and EE
 
 ### BREAKING CHANGES (1 change)
+
 Note: As a security related change, this breaking change is allowed outside a major release. If a non-sensitive token is required for migration purposes users can use the `nonsensitive()` TF function.
 
 - resource/gitlab_cluster_agent_token: [Mark GitLab cluster agent token as sensitive](gitlab-org/terraform-provider-gitlab@1eec1065723f6393a3e5deb45356a47ec27b575e) by @CarbonCollins ([merge request](gitlab-org/terraform-provider-gitlab!2032))
@@ -536,7 +553,6 @@ This release was tested against GitLab 17.1, 17.0, and 16.11 for both CE and EE
 - resource/gitlab_group_access_token: [Fixed several documentation issues with access token resources](gitlab-org/terraform-provider-gitlab@738a1ffb41ad7cfaffa205d0c31f827d9f4e59e8) by @theipster ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2004))
 - resource/gitlab_project_access_token: [Fixed several documentation issues with access token resources](gitlab-org/terraform-provider-gitlab@738a1ffb41ad7cfaffa205d0c31f827d9f4e59e8) by @theipster ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2004))
 - resource/gitlab_project: [Update `initialize_with_readme` to add border case documentation](gitlab-org/terraform-provider-gitlab@247453b3e45362c4ef91fa9f537d6de7cf49cbfc) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1989))
-
 
 ## 17.0.1 (2024-06-07)
 
@@ -636,6 +652,7 @@ NOTES:
 - scripts/gitlab.rb has been updated for local development to set the license mode and customer portal URL for testing. If you're using a personal license for local development, you may need to update this file temporarily to run EE locally. ([!1861](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1861))
 
 IMPROVEMENTS:
+
 - **New Data Source** datasource/gitlab_release: Allows querying a GitLab Release by project and tag name to get release information or assets ([!1851](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1851))
 
 BUG FIXES:
@@ -644,7 +661,6 @@ BUG FIXES:
 - resources/gitlab_group_ldap_link: fixed an issue where deleting the group associated to an LDAP link would result in a TF state that required manual intervention. Using a value of `true` with the `force` attribute will now remove the LDAP link from state when the group is deleted. ([!1842](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1842))
 - resources/gitlab_cluster_agent: fixed the example documentation to show the file contents as encoded ([!1852](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1852))
 - resources/gitlab_pipeline_schedule: fixed a potential panic on the provider that could occur when there was an error editing the pipeline schedule ([!1847](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1847))
-
 
 ## 16.9.1 (2024-02-15)
 
@@ -659,6 +675,7 @@ BUG FIXES:
 This release was tested against GitLab 16.7, 16.8, and 16.9 for both CE and EE
 
 IMPROVEMENTS:
+
 - resource/gitlab_project_variable: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
 - resource/gitlab_group_variable: added support for `description` ([!1827](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1827))
 - resource/gitlab_project: added support for `ci_restrict_pipeline_cancellation_role` ([!1825](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1825))
@@ -747,7 +764,6 @@ BUG FIXES:
 - resource/gitlab_user_runner: Fixed an issue where not including `maximum_timeout` could cause an issue when updating the runner ([!1758](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1758))
 - datasource/gitlab_user: When using `email`, the the data source will now return the first user returned from the API instead of encountering an error when more than one is identified. When used with GitLab 16.6.0, this will always be the exact match if an exact match is available. ([!1743](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1743))
 
-
 ## 16.5.0 (2023-10-22)
 
 This release was tested against GitLab 16.3, 16.4, and 16.5 for both CE and EE
@@ -822,14 +838,12 @@ IMPROVEMENTS:
 - datasource/gitlab_group: Add support for `wiki_access_level` ([!1656](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1656))
 - datasource/gitlab_groups: Add support for `wiki_access_level` ([!1656](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1656))
 
-
 BUG FIXES:
 
 - resource/gitlab_group_access_token: Require the `expires_at` attribute ([!1661](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1661))
 - resource/gitlab_personal_access_token: Require the `expires_at` attribute ([!1661](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1661))
 - resource/gitlab_project_access_token: Require the `expires_at` attribute ([!1661](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1661))
 - resource/gitlab_pipeline_schedule_variable: Fix several spelling errors in the documentation that would make examples non-functional ([!1647](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1647))
-
 
 ## 16.2.0 (2023-07-22)
 
@@ -997,7 +1011,6 @@ BUG FIXES:
 - resource/gitlab_project: Fix waiting when `skip_wait_for_default_branch_protection` is disabled ([!1489](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1489))
 - resource/gitlab_group_ldap_link: Fix re-creating LDAP link if it was removed out of bounds ([!1495](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1495))
 - resource/gitlab_runner: Fix plan for `tags` attribute to make it order independent ([!1492](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/1492))
-
 
 ## 15.10.0 (2023-03-22)
 
