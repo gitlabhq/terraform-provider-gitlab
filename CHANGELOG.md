@@ -1,3 +1,9 @@
+## 18.6.1 (2025-11-21)
+
+### BUG FIXES (1 change)
+
+- docs: [Clear old version of GitHub docs before copying new version in](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c483add6ead058010c38d832d52039ca20f1da8f) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2786))
+
 ## 18.6.0 (2025-11-20)
 
 ### FEATURES (2 changes)
