@@ -40,7 +40,7 @@ resource "gitlab_pages_domain" "this" {
 ### Required
 
 - `domain` (String) The custom domain indicated by the user.
-- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/api/index/#namespaced-path-encoding) owned by the authenticated user.
+- `project` (String) The ID or Namespace path of the project owned by the authenticated user.
 
 ### Optional
 

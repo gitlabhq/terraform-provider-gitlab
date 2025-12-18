@@ -7,7 +7,7 @@ description: |-
   -> You must be an administrator!
   ~> When using the email attribute, an exact match is not guaranteed. The most related match will be returned. Starting with GitLab 16.6,
   the most related match will prioritize an exact match if one is available.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/#list-memberships-for-a-billable-member-of-a-group
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_members/#list-all-billable-members-of-a-group
 ---
 
 # gitlab_group_billable_member_memberships (Data Source)
@@ -19,7 +19,7 @@ The `gitlab_group_billable_member_memberships` data source allows (sub)group- an
 ~> When using the `email` attribute, an exact match is not guaranteed. The most related match will be returned. Starting with GitLab 16.6,
 the most related match will prioritize an exact match if one is available.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/#list-memberships-for-a-billable-member-of-a-group)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_members/#list-all-billable-members-of-a-group)
 
 ## Example Usage
 
@@ -48,7 +48,7 @@ data "gitlab_group_billable_member_memberships" "test_user_membership" {
 
 Read-Only:
 
-- `access_level` (String) Access-level of the member. For details see: https://docs.gitlab.com/api/access_requests/#valid-access-levels
+- `access_level` (String) Access-level of the member. For details see: https://docs.gitlab.com/user/permissions/#default-roles
 - `created_at` (String) Datetime when the membership was first added.
 - `expires_at` (String) Date when the membership will end.
 - `id` (Number) The id of the membership.

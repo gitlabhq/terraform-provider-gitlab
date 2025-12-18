@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group_membership resource allows to manage the lifecycle of a users group membership.
   -> If a group should grant membership to another group use the gitlab_group_share_group resource instead.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_members/
 ---
 
 # gitlab_group_membership (Resource)
@@ -14,7 +14,7 @@ The `gitlab_group_membership` resource allows to manage the lifecycle of a users
 
 -> If a group should grant membership to another group use the `gitlab_group_share_group` resource instead.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_members/)
 
 ## Example Usage
 

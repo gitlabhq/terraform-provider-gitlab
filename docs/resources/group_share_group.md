@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_group_share_group resource allows managing the lifecycle of a group shared with another group.
   ~> Note that member_role_id requires a feature flag enabled, see this feature issue https://gitlab.com/gitlab-org/gitlab/-/issues/443369 for details.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#share-groups-with-groups
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/#invite-groups
 ---
 
 # gitlab_group_share_group (Resource)
@@ -14,7 +14,7 @@ The `gitlab_group_share_group` resource allows managing the lifecycle of a group
 
 ~> Note that `member_role_id` requires a feature flag enabled, see [this feature issue](https://gitlab.com/gitlab-org/gitlab/-/issues/443369) for details.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#share-groups-with-groups)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/groups/#invite-groups)
 
 ## Example Usage
 

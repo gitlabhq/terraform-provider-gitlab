@@ -37,14 +37,14 @@ data "gitlab_release_link" "example" {
 ### Required
 
 - `link_id` (Number) The ID of the link.
-- `project` (String) The ID or [URL-encoded path of the project](https://docs.gitlab.com/api/index/#namespaced-path-encoding).
+- `project` (String) The ID or Namespace path of the project.
 - `tag_name` (String) The tag associated with the Release.
 
 ### Read-Only
 
-- `direct_asset_url` (String) Full path for a [Direct Asset link](https://docs.gitlab.com/user/project/releases/index/#permanent-links-to-release-assets).
+- `direct_asset_url` (String) Full path for a [Direct Asset link](https://docs.gitlab.com/user/project/releases/release_fields/#permanent-links-to-latest-release-assets).
 - `external` (Boolean) External or internal link.
-- `filepath` (String) Relative path for a [Direct Asset link](https://docs.gitlab.com/user/project/releases/index/#permanent-links-to-release-assets).
+- `filepath` (String) Relative path for a [Direct Asset link](https://docs.gitlab.com/user/project/releases/release_fields/#permanent-links-to-latest-release-assets).
 - `id` (String) The ID of this data source.
 - `link_type` (String) The type of the link. Valid values are `other`, `runbook`, `image`, `package`.
 - `name` (String) The name of the link. Link names must be unique within the release.

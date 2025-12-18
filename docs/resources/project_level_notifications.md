@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_level_notifications resource manages notifications for a project.
   ~> While the API supports both groups and projects, this resource only supports projects currently.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/notification_settings/#group--project-level-notification-settings
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/notification_settings/#get-group-or-project-notification-settings
 ---
 
 # gitlab_project_level_notifications (Resource)
@@ -14,7 +14,7 @@ The `gitlab_project_level_notifications` resource manages notifications for a pr
 
 ~> While the API supports both groups and projects, this resource only supports projects currently.
 		
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/notification_settings/#group--project-level-notification-settings)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/notification_settings/#get-group-or-project-notification-settings)
 
 ## Example Usage
 

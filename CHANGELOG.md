@@ -1,3 +1,25 @@
+## 18.7.0 (2025-12-18)
+
+### FEATURES (5 changes)
+
+- resource/gitlab_user_avatar:  [Add a new resource for managing avatars on project, group, and service account users](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0fa637212011a84affdebc670635ed1640611ad1) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2766)) 
+- data/gitlab_security_policy_document:  [Add a datasource to generate policy file YAML using native HCL](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b6c56dce8045af6c78fe4558040a0591a45d0eac) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2811)) 
+- data/gitlab_group_service_account_access_tokens:  [Add new data source for reading group service account access token metadata](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6236eaa47aef6f0ca58456e15a610ab4b53562e0) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2805)) 
+- data/gitlab_secure_file:  [Add new data source for reading secure files](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d39194ac07762e2b7492286ffcd68a174d1445f5) by @jack1902 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2803)) 
+- data/gitlab_project_issue_label_events:  [Add new data source for users to retrieve label events for an issue](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ec7fd6b906f3cc4cc640b8d36e1ac0d397ca0b40) by @chanmickyyun ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2783)) 
+
+### IMPROVEMENTS (3 changes)
+
+- resource/gitlab_group:  [Validate group name and stub at plan-time instead of apply-time](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/36ed196dad2392fecd542ad7f1a259aea519f65a) by @SinaMoghaddas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2778)) 
+- data/gitlab_project:  [Add support for merge_trains_skip_train_allowed](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/928e2780e204b108c011558bf675a0af1a5a9efa) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2817)) 
+- resource/gitlab_member_role:  [Add missing permissions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8244cac7a52536514cafe06c0c9e63ce684f009b) by @u.kilianpaquier ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2785))
+
+### BUG FIXES (3 changes)
+
+- resource/gitlab_branch:  [Fixed an issue where updating branch name caused "Invalid resource ID format"](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2912a2cd29f43e0e1a88fa5b8bcc2b6b6e7a3eee) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2825)) 
+- resource/gitlab_group_service_account:  [Fixed an issue where read error caused service accounts to be flagged as deleted](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1ca9337d420ac99baefeb45a4697ea1949636912) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2814)) 
+- docs:  [Fixed broken or redirected documentation links](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1c80354fa10ea590036ee44b0d55ef49098fff47) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2827)) 
+
 ## 18.6.1 (2025-11-21)
 
 ### BUG FIXES (1 change)

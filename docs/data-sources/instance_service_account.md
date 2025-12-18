@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_instance_service_account data source retrieves information about a gitlab service account.
   ~> In order for a user to create a user account, they must have admin privileges at the instance level. This makes this feature unavailable on gitlab.com
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/user_service_accounts/
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/service_accounts/#instance-service-accounts
 ---
 
 # gitlab_instance_service_account (Data Source)
@@ -14,7 +14,7 @@ The `gitlab_instance_service_account` data source retrieves information about a 
 
 ~> In order for a user to create a user account, they must have admin privileges at the instance level. This makes this feature unavailable on `gitlab.com`
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/user_service_accounts/)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/service_accounts/#instance-service-accounts)
 
 ## Example Usage
 

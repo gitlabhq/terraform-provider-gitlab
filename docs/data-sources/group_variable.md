@@ -45,7 +45,7 @@ data "gitlab_group_variable" "bar" {
 
 - `description` (String) The description of the variable.
 - `id` (String) The ID of this Terraform resource. In the format of `<group>:<key>:<environment_scope>`.
-- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ci/variables/#masked-variables).
+- `masked` (Boolean) If set to `true`, the value of the variable will be hidden in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ci/variables/#mask-a-cicd-variable).
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags
 - `raw` (Boolean) Whether the variable is treated as a raw string. Default: false. When true, variables in the value are not expanded.
 - `value` (String) The value of the variable.

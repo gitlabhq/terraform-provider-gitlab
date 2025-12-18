@@ -4,14 +4,14 @@ page_title: "gitlab_group_membership Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_membership data source allows to list and filter all members of a group specified by either its id or full path.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/#list-all-members-of-a-group-or-project
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_members/#list-all-members-of-a-group
 ---
 
 # gitlab_group_membership (Data Source)
 
 The `gitlab_group_membership` data source allows to list and filter all members of a group specified by either its id or full path.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/#list-all-members-of-a-group-or-project)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_members/#list-all-members-of-a-group)
 
 ## Example Usage
 

@@ -4,14 +4,14 @@ page_title: "gitlab_group_service_account Data Source - terraform-provider-gitla
 subcategory: ""
 description: |-
   The gitlab_group_service_account data source retrieves information about a GitLab service account in a group.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_service_accounts/#list-service-account-users
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/service_accounts/#list-all-group-service-accounts
 ---
 
 # gitlab_group_service_account (Data Source)
 
 The `gitlab_group_service_account` data source retrieves information about a GitLab service account in a group.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_service_accounts/#list-service-account-users)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/service_accounts/#list-all-group-service-accounts)
 
 ## Example Usage
 

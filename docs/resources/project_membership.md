@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_membership resource allows to manage the lifecycle of a users project membership.
   -> If a project should grant membership to an entire group use the gitlab_project_share_group resource instead.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/members/
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_members/
 ---
 
 # gitlab_project_membership (Resource)
@@ -14,7 +14,7 @@ The `gitlab_project_membership` resource allows to manage the lifecycle of a use
 
 -> If a project should grant membership to an entire group use the `gitlab_project_share_group` resource instead.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/members/)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_members/)
 
 ## Example Usage
 

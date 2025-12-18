@@ -4,14 +4,14 @@ page_title: "gitlab_user_sshkey Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_user_sshkey resource allows to manage the lifecycle of an SSH key assigned to a user.
-  Upstream API: GitLab API docs https://docs.gitlab.com/api/users/#single-ssh-key
+  Upstream API: GitLab API docs https://docs.gitlab.com/api/user_keys/#get-an-ssh-key-for-a-user
 ---
 
 # gitlab_user_sshkey (Resource)
 
 The `gitlab_user_sshkey` resource allows to manage the lifecycle of an SSH key assigned to a user.
 
-**Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/users/#single-ssh-key)
+**Upstream API**: [GitLab API docs](https://docs.gitlab.com/api/user_keys/#get-an-ssh-key-for-a-user)
 
 ## Example Usage
 

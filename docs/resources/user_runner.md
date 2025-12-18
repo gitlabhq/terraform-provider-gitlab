@@ -4,14 +4,14 @@ page_title: "gitlab_user_runner Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_user_runner resource allows creating a GitLab runner using the new GitLab Runner Registration Flow https://docs.gitlab.com/ci/runners/new_creation_workflow/.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/#create-a-runner
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/#create-a-runner-linked-to-a-user
 ---
 
 # gitlab_user_runner (Resource)
 
 The `gitlab_user_runner` resource allows creating a GitLab runner using the new [GitLab Runner Registration Flow](https://docs.gitlab.com/ci/runners/new_creation_workflow/).
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/users/#create-a-runner)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/users/#create-a-runner-linked-to-a-user)
 
 ## Example Usage
 

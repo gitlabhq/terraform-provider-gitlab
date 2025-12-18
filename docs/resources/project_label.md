@@ -41,7 +41,7 @@ resource "gitlab_project_label" "devops_create" {
 
 ### Required
 
-- `color` (String) The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#Color_keywords).
+- `color` (String) The color of the label given in 6-digit hex notation with leading '#' sign (e.g. #FFAABB) or one of the [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value#Color_keywords).
 - `name` (String) The name of the label.
 - `project` (String) The name or id of the project to add the label to.
 
@@ -52,7 +52,7 @@ resource "gitlab_project_label" "devops_create" {
 ### Read-Only
 
 - `color_hex` (String) Read-only, used by the provider to store the API response color. This is always in the 6-digit hex notation with leading '#' sign (e.g. #FFAABB). If `color` contains a color name, this attribute contains the hex notation equivalent. Otherwise, the value of this attribute is the same as `color`.
-- `id` (String) The ID of this Terraform resource. In the format of `<project-id>:<label-name>`.
+- `id` (String) The ID of this Terraform resource. In the format of `<project-id>:<label-id>`.
 - `label_id` (Number) The id of the project label.
 
 ## Import
@@ -69,6 +69,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# Gitlab Project labels can be imported using an id made up of `{project_id}:{label_name}`, e.g.
-terraform import gitlab_project_label.example 12345:fixme
+# Gitlab Project labels can be imported using an id made up of `{project_id}:{label_id}`, e.g.
+terraform import gitlab_project_label.example 12345:101010
 ```

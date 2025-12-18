@@ -41,12 +41,12 @@ resource "gitlab_system_hook" "example" {
 - `push_events` (Boolean) When true, the hook fires on push events.
 - `repository_update_events` (Boolean) Trigger hook on repository update events.
 - `tag_push_events` (Boolean) When true, the hook fires on new tags being pushed.
-- `token` (String, Sensitive) Secret token to validate received payloads; this isn’t returned in the response. This attribute is not available for imported resources.
+- `token` (String, Sensitive) Secret token to validate received payloads; this isn't returned in the response. This attribute is not available for imported resources.
 
 ### Read-Only
 
 - `created_at` (String) The date and time the hook was created in ISO8601 format.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this terraform resource. In the format `<hook-id>`.
 
 ## Import
 

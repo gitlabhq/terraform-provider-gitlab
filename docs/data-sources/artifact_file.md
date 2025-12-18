@@ -4,13 +4,13 @@ page_title: "gitlab_artifact_file Data Source - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_artifact_file data source allows downloading a single artifact file from a specific job in the latest successful pipeline for a given reference (branch, tag, or commit).
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/ee/api/job_artifacts.html#download-a-single-artifact-file-from-specific-tag-or-branch
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/job_artifacts/#download-a-single-artifact-file-by-reference-name
 ---
 
 # gitlab_artifact_file (Data Source)
 
 The `gitlab_artifact_file` data source allows downloading a single artifact file from a specific job in the latest successful pipeline for a given reference (branch, tag, or commit).
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/ee/api/job_artifacts.html#download-a-single-artifact-file-from-specific-tag-or-branch)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/job_artifacts/#download-a-single-artifact-file-by-reference-name)
 
 ## Example Usage
 

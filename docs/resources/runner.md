@@ -9,7 +9,7 @@ description: |-
   The runner will be registered at a group level if the token used is from a group, or at an instance level if the token used is for the instance.
   ~> Using this resource will register a runner using the deprecated registration_token flow. To use the new authentication_token flow instead,
   use the gitlab_user_runner resource!
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/runners/#register-a-new-runner
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/runners/
 ---
 
 # gitlab_runner (Resource)
@@ -24,7 +24,7 @@ The runner will be registered at a group level if the token used is from a group
 ~> Using this resource will register a runner using the deprecated `registration_token` flow. To use the new `authentication_token` flow instead,
 use the `gitlab_user_runner` resource!
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/runners/#register-a-new-runner)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/runners/)
 
 ## Example Usage
 

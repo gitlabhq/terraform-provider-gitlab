@@ -4,14 +4,14 @@ page_title: "gitlab_project_protected_tag Data Source - terraform-provider-gitla
 subcategory: ""
 description: |-
   The gitlab_project_protected_tag data source allows details of a protected tag to be retrieved by its name and the project it belongs to.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_tags/#get-a-single-protected-tag-or-wildcard-protected-tag
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_tags/#get-a-protected-tag-or-wildcard-protected-tag
 ---
 
 # gitlab_project_protected_tag (Data Source)
 
 The `gitlab_project_protected_tag` data source allows details of a protected tag to be retrieved by its name and the project it belongs to.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_tags/#get-a-single-protected-tag-or-wildcard-protected-tag)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_tags/#get-a-protected-tag-or-wildcard-protected-tag)
 
 ## Example Usage
 

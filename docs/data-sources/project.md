@@ -77,6 +77,7 @@ data "gitlab_project" "example" {
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
 - `merge_requests_enabled` (Boolean, Deprecated) Enable merge requests for the project. Use `merge_requests_access_level` instead. This attribute will be removed in 19.0.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains.
+- `merge_trains_skip_train_allowed` (Boolean) Allows merge train merge requests to be merged without waiting for pipelines to finish.
 - `model_experiments_access_level` (String) The visibility of machine learning model experiments.
 - `model_registry_access_level` (String) The visibility of machine learning model registry.
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
