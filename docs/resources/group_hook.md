@@ -4,12 +4,15 @@ page_title: "gitlab_group_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_group_hook resource allows to manage the lifecycle of a group hook.
+  ~> Note that push_events defaults to true.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_webhooks/
 ---
 
 # gitlab_group_hook (Resource)
 
 The `gitlab_group_hook` resource allows to manage the lifecycle of a group hook.
+
+~> Note that `push_events` defaults to `true`.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/group_webhooks/)
 
@@ -22,6 +25,9 @@ resource "gitlab_group_hook" "example" {
   name                  = "Example"
   description           = "Example Group Webhook"
   merge_requests_events = true
+
+  # Set to false to avoid default true value
+  push_events = false
 }
 
 # Setting all attributes
@@ -82,28 +88,28 @@ resource "gitlab_group_hook" "all_attributes" {
 ### Optional
 
 - `branch_filter_strategy` (String) Filter push events by branch. Valid values are: `wildcard`, `regex`, `all_branches`.
-- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
-- `confidential_note_events` (Boolean) Invoke the hook for confidential note events.
+- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events. Defaults to `false`.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential note events. Defaults to `false`.
 - `custom_headers` (Attributes List) Custom headers for the project webhook. (see [below for nested schema](#nestedatt--custom_headers))
 - `custom_webhook_template` (String) Custom webhook template.
-- `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `deployment_events` (Boolean) Invoke the hook for deployment events. Defaults to `false`.
 - `description` (String) Description of the group webhook.
-- `emoji_events` (Boolean) Invoke the hook for emoji events.
-- `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
-- `feature_flag_events` (Boolean) Invoke the hook for feature flag events.
-- `issues_events` (Boolean) Invoke the hook for issues events.
-- `job_events` (Boolean) Invoke the hook for job events.
-- `merge_requests_events` (Boolean) Invoke the hook for merge requests events.
+- `emoji_events` (Boolean) Invoke the hook for emoji events. Defaults to `false`.
+- `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook. Defaults to `true`.
+- `feature_flag_events` (Boolean) Invoke the hook for feature flag events. Defaults to `false`.
+- `issues_events` (Boolean) Invoke the hook for issues events. Defaults to `false`.
+- `job_events` (Boolean) Invoke the hook for job events. Defaults to `false`.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests events. Defaults to `false`.
 - `name` (String) Name of the group webhook.
-- `note_events` (Boolean) Invoke the hook for note events.
-- `pipeline_events` (Boolean) Invoke the hook for pipeline events.
-- `push_events` (Boolean) Invoke the hook for push events.
+- `note_events` (Boolean) Invoke the hook for note events. Defaults to `false`.
+- `pipeline_events` (Boolean) Invoke the hook for pipeline events. Defaults to `false`.
+- `push_events` (Boolean) Invoke the hook for push events. Defaults to `true`.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
-- `releases_events` (Boolean) Invoke the hook for release events.
-- `subgroup_events` (Boolean) Invoke the hook for subgroup events.
-- `tag_push_events` (Boolean) Invoke the hook for tag push events.
+- `releases_events` (Boolean) Invoke the hook for release events. Defaults to `false`.
+- `subgroup_events` (Boolean) Invoke the hook for subgroup events. Defaults to `false`.
+- `tag_push_events` (Boolean) Invoke the hook for tag push events. Defaults to `false`.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
-- `wiki_page_events` (Boolean) Invoke the hook for wiki page events.
+- `wiki_page_events` (Boolean) Invoke the hook for wiki page events. Defaults to `false`.
 
 ### Read-Only
 

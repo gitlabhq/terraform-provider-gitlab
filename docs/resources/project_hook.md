@@ -4,12 +4,15 @@ page_title: "gitlab_project_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_project_hook resource allows to manage the lifecycle of a project hook.
+  ~> Note that push_events defaults to true.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_webhooks/
 ---
 
 # gitlab_project_hook (Resource)
 
 The `gitlab_project_hook` resource allows to manage the lifecycle of a project hook.
+
+~> Note that `push_events` defaults to `true`.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_webhooks/)
 
@@ -22,6 +25,9 @@ resource "gitlab_project_hook" "example" {
   name                  = "example"
   description           = "Example hook"
   merge_requests_events = true
+
+  # Set to false to avoid default true value
+  push_events = false
 }
 
 # Using Custom Headers
@@ -54,26 +60,26 @@ resource "gitlab_project_hook" "custom_headers" {
 
 ### Optional
 
-- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
-- `confidential_note_events` (Boolean) Invoke the hook for confidential note events.
+- `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events. Defaults to `false`.
+- `confidential_note_events` (Boolean) Invoke the hook for confidential note events. Defaults to `false`.
 - `custom_headers` (Attributes List) Custom headers for the project webhook. Available from GitLab 17.1 onwards. (see [below for nested schema](#nestedatt--custom_headers))
 - `custom_webhook_template` (String) Custom webhook template.
-- `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `deployment_events` (Boolean) Invoke the hook for deployment events. Defaults to `false`.
 - `description` (String) Description of the webhook.
-- `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook.
-- `issues_events` (Boolean) Invoke the hook for issues events.
-- `job_events` (Boolean) Invoke the hook for job events.
-- `merge_requests_events` (Boolean) Invoke the hook for merge requests events.
+- `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook. Defaults to `true`.
+- `issues_events` (Boolean) Invoke the hook for issues events. Defaults to `false`.
+- `job_events` (Boolean) Invoke the hook for job events. Defaults to `false`.
+- `merge_requests_events` (Boolean) Invoke the hook for merge requests events. Defaults to `false`.
 - `name` (String) Name of the project webhook.
-- `note_events` (Boolean) Invoke the hook for note events.
-- `pipeline_events` (Boolean) Invoke the hook for pipeline events.
-- `push_events` (Boolean) Invoke the hook for push events.
+- `note_events` (Boolean) Invoke the hook for note events. Defaults to `false`.
+- `pipeline_events` (Boolean) Invoke the hook for pipeline events. Defaults to `false`.
+- `push_events` (Boolean) Invoke the hook for push events. Defaults to `true`.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
-- `releases_events` (Boolean) Invoke the hook for release events.
-- `resource_access_token_events` (Boolean) Invoke the hook for project access token expiry events.
-- `tag_push_events` (Boolean) Invoke the hook for tag push events.
+- `releases_events` (Boolean) Invoke the hook for release events. Defaults to `false`.
+- `resource_access_token_events` (Boolean) Invoke the hook for project access token expiry events. Defaults to `false`.
+- `tag_push_events` (Boolean) Invoke the hook for tag push events. Defaults to `false`.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
-- `wiki_page_events` (Boolean) Invoke the hook for wiki page events.
+- `wiki_page_events` (Boolean) Invoke the hook for wiki page events. Defaults to `false`.
 
 ### Read-Only
 

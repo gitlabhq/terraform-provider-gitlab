@@ -50,8 +50,18 @@ Read-Only:
 - `access_level` (String) The level of access to the group.
 - `avatar_url` (String) The avatar URL of the user.
 - `expires_at` (String) Expiration date for the group membership.
+- `group_saml_identity` (Attributes) SAML identity linked to the group member. (see [below for nested schema](#nestedatt--members--group_saml_identity))
 - `id` (Number) The unique id assigned to the user by the gitlab server.
 - `name` (String) The name of the user.
 - `state` (String) Whether the user is active or blocked.
 - `username` (String) The username of the user.
 - `web_url` (String) User's website URL.
+
+<a id="nestedatt--members--group_saml_identity"></a>
+### Nested Schema for `members.group_saml_identity`
+
+Read-Only:
+
+- `extern_uid` (String) The external UID of the group SAML identity.
+- `provider` (String) The provider of the SAML identity.
+- `saml_provider_id` (Number) The ID of the SAML provider.

@@ -93,6 +93,7 @@ resource "gitlab_group" "example-five" {
 
 ### Optional
 
+- `allow_merge_on_skipped_pipeline` (Boolean) Allow merging merge requests when the pipeline is skipped. Only applies when only_allow_merge_if_pipeline_succeeds is true. Premium and Ultimate only.
 - `allowed_email_domains_list` (List of String) A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
 - `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
@@ -103,10 +104,12 @@ resource "gitlab_group" "example-five" {
 - `description` (String) The group's description.
 - `emails_enabled` (Boolean) Enable email notifications.
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
-- `ip_restriction_ranges` (List of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
+- `ip_restriction_ranges` (Set of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
 - `lfs_enabled` (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
 - `membership_lock` (Boolean) Users cannot be added to projects in this group.
 - `mentions_disabled` (Boolean) Disable the capability of a group from getting mentioned.
+- `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Only allow merging merge requests when all discussions are resolved. When enabled for a group, applies to all projects in the group. Premium and Ultimate only.
+- `only_allow_merge_if_pipeline_succeeds` (Boolean) Only allow merging merge requests if the pipeline succeeds. When enabled for a group, applies to all projects in the group. Premium and Ultimate only.
 - `parent_id` (Number) Id of the parent group (creates a nested group).
 - `permanently_remove_on_delete` (Boolean) Whether the group should be permanently removed during a `delete` operation. This only works with subgroups. Must be configured via an `apply` before the `destroy` is run.
 - `prevent_forking_outside_group` (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.

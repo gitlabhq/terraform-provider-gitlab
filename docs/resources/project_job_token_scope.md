@@ -65,7 +65,7 @@ resource "gitlab_project_job_token_scope" "allowed_group" {
 
 ### Read-Only
 
-- `id` (String) The ID of this Terraform resource. In the format of `<project>:<target-project-id>`.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>:<type>:<target-id>` where `type` is either `project` or `group`.
 
 ## Import
 
@@ -81,6 +81,11 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab project job token scopes can be imported using an id made up of `projectId:targetProjectId`, e.g.
-terraform import gitlab_project_job_token_scope.bar 123:321
+# GitLab project job token scopes can be imported using an id made up of `projectId:type:targetId`, e.g.
+
+# For target_project_id:
+terraform import gitlab_project_job_token_scope.bar 123:project:321
+
+# For target_group_id:
+terraform import gitlab_project_job_token_scope.bar 123:group:321
 ```
