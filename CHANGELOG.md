@@ -1,3 +1,16 @@
+## 18.8.1 (2026-01-18)
+
+### IMPROVEMENTS (2 change)
+
+- resource/gitlab_project_hook:  [Support vulnerability events in gitlab project hooks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/edb664b932f0cd4d54e0e7503be8081864274e7d) by @nopejs ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2875)) 
+- resource/gitlab_group_hook:  [Support vulnerability events in gitlab group hooks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/edb664b932f0cd4d54e0e7503be8081864274e7d) by @nopejs ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2875)) 
+
+### BUG FIXES (2 change)
+
+- resource/gitlab_group_service_account_access_token:  [Fix a bug where service accounts with more than 20 access tokens could show a replace operation when one was not needed](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0ecf2f4f0216e4f2b5e837bb197d7305f3e2f2fc) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2872))
+- resource/gitlab_group_service_account_access_token:  [Fix a bug where group full namespace values caused errors when used with `group` instead of the ID](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0ecf2f4f0216e4f2b5e837bb197d7305f3e2f2fc) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2872))
+
+
 ## 18.8.0 (2026-01-15)
 
 ### FEATURES (5 changes)

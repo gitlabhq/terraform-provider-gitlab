@@ -23,8 +23,13 @@ resource "gitlab_project" "awesome_project" {
 }
 
 resource "gitlab_project_integration_emails_on_push" "emails" {
-  project    = gitlab_project.awesome_project.id
-  recipients = "myrecipient@example.com myotherrecipient@example.com"
+  project                   = gitlab_project.awesome_project.id
+  recipients                = "myrecipient@example.com myotherrecipient@example.com"
+  disable_diffs             = false
+  send_from_committer_email = false
+  push_events               = true
+  tag_push_events           = true
+  branches_to_be_notified   = "all"
 }
 ```
 
@@ -48,7 +53,7 @@ resource "gitlab_project_integration_emails_on_push" "emails" {
 
 - `active` (Boolean) Whether the integration is active.
 - `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
 - `slug` (String) The name of the integration in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
 - `title` (String) Title of the integration.
 - `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.

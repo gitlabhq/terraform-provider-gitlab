@@ -4,7 +4,7 @@ page_title: "gitlab_integration_emails_on_push Resource - terraform-provider-git
 subcategory: ""
 description: |-
   The gitlab_integration_emails_on_push resource manages the lifecycle of a project integration with the Emails on Push Service.
-  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_emails_on_pushinstead!
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_emails_on_pushinstead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#emails-on-push
 ---
 
@@ -12,13 +12,15 @@ description: |-
 
 The `gitlab_integration_emails_on_push` resource manages the lifecycle of a project integration with the Emails on Push Service.
 
-~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_emails_on_push`instead!
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_emails_on_push`instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#emails-on-push)
 
 ## Example Usage
 
 ```terraform
+# This resource is deprecated and will be removed in version 19.0. Use gitlab_project_integration_emails_on_push instead.
+
 resource "gitlab_project" "awesome_project" {
   name             = "awesome_project"
   description      = "My awesome project."
@@ -51,7 +53,7 @@ resource "gitlab_integration_emails_on_push" "emails" {
 
 - `active` (Boolean) Whether the integration is active.
 - `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
 - `slug` (String) The name of the integration in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
 - `title` (String) Title of the integration.
 - `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.

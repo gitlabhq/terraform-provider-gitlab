@@ -79,6 +79,7 @@ resource "gitlab_project_hook" "custom_headers" {
 - `resource_access_token_events` (Boolean) Invoke the hook for project access token expiry events. Defaults to `false`.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events. Defaults to `false`.
 - `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
+- `vulnerability_events` (Boolean) Invoke the hook for vulnerability events. Defaults to `false`.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events. Defaults to `false`.
 
 ### Read-Only
