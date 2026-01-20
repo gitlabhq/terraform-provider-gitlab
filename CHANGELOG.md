@@ -1,3 +1,9 @@
+## 18.8.2 (2026-01-20)
+
+### BUG FIXES (1 change)
+
+- resource/gitlab_project:  [Fix a bug that causes perpetual planned changes when using `gitlab_project_pull_mirror` with `gitlab_project`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ef8a8f3541518cfc92580e3cc69aa7274774f0f0) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2882))
+
 ## 18.8.1 (2026-01-18)
 
 ### IMPROVEMENTS (2 change)

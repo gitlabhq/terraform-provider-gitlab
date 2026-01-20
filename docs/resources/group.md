@@ -113,6 +113,7 @@ resource "gitlab_group" "example-five" {
 - `parent_id` (Number) Id of the parent group (creates a nested group).
 - `permanently_remove_on_delete` (Boolean) Whether the group should be permanently removed during a `delete` operation. This only works with subgroups. Must be configured via an `apply` before the `destroy` is run.
 - `prevent_forking_outside_group` (Boolean) Defaults to false. When enabled, users can not fork projects from this group to external namespaces.
+- `prevent_sharing_groups_outside_hierarchy` (Boolean) Defaults to false. When enabled, users cannot invite other groups outside of the top-level group’s hierarchy. This option is only available for top-level groups.
 - `project_creation_level` (String) Determine if developers can create projects in the group. Valid values are: `noone`, `owner`, `maintainer`, `developer`, `administrator`
 - `push_rules` (Block List, Max: 1) Push rules for the group. (see [below for nested schema](#nestedblock--push_rules))
 - `request_access_enabled` (Boolean) Allow users to request member access.

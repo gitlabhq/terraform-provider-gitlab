@@ -62,6 +62,7 @@ Read-Only:
 - `parent_id` (Number) ID of the parent group.
 - `path` (String) The path of the group.
 - `prevent_forking_outside_group` (Boolean) When enabled, users can not fork projects from this group to external namespaces.
+- `prevent_sharing_groups_outside_hierarchy` (Boolean) When enabled, users cannot invite other groups outside of the top-level group’s hierarchy. This option is only available for top-level groups.
 - `request_access_enabled` (Boolean) Is request for access enabled to the group.
 - `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
 - `shared_runners_setting` (String) Enable or disable shared runners for a group's subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
