@@ -3,7 +3,7 @@
 page_title: "gitlab_group_protected_environment Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_protected_environment resource allows to manage the lifecycle of a protected environment in a group.
+  The gitlab_group_protected_environment resource manages the lifecycle of a protected environment in a group.
   ~> In order to use a user_id in the deploy_access_levels configuration,
   you need to make sure that users have access to the group with Maintainer role or higher.
   In order to use a group_id in the deploy_access_levels configuration,
@@ -13,7 +13,7 @@ description: |-
 
 # gitlab_group_protected_environment (Resource)
 
-The `gitlab_group_protected_environment` resource allows to manage the lifecycle of a protected environment in a group.
+The `gitlab_group_protected_environment` resource manages the lifecycle of a protected environment in a group.
 
 ~> In order to use a user_id in the `deploy_access_levels` configuration,
    you need to make sure that users have access to the group with Maintainer role or higher.

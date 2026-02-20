@@ -3,7 +3,7 @@
 page_title: "gitlab_personal_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_personal_access_token resource allows to manage the lifecycle of a personal access token.
+  The gitlab_personal_access_token resource manages the lifecycle of a personal access token.
   -> This resource requires administration privileges.
   ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
   ~> Observability scopes are in beta and may not work on all instances. See more details in the documentation https://docs.gitlab.com/development/tracing/
@@ -14,7 +14,7 @@ description: |-
 
 # gitlab_personal_access_token (Resource)
 
-The `gitlab_personal_access_token` resource allows to manage the lifecycle of a personal access token.
+The `gitlab_personal_access_token` resource manages the lifecycle of a personal access token.
 
 -> This resource requires administration privileges.
 

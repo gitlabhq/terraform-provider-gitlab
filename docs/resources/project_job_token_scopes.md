@@ -3,7 +3,7 @@
 page_title: "gitlab_project_job_token_scopes Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_job_token_scopes resource allows to manage the CI/CD Job Token scopes in a project.
+  The gitlab_project_job_token_scopes resource manages the CI/CD Job Token scopes in a project.
   Any project or group not within the defined set of target_project_ids or target_group_ids, respectively, will be removed,
   which allows this resource to be used as an explicit deny.
   ~> Conflicts with the use of gitlab_project_job_token_scope when used on the same project. Use one or the other to ensure the desired state.
@@ -13,7 +13,7 @@ description: |-
 
 # gitlab_project_job_token_scopes (Resource)
 
-The `gitlab_project_job_token_scopes` resource allows to manage the CI/CD Job Token scopes in a project.
+The `gitlab_project_job_token_scopes` resource manages the CI/CD Job Token scopes in a project.
 Any project or group not within the defined set of `target_project_ids` or `target_group_ids`, respectively, will be removed,
 which allows this resource to be used as an explicit deny.
 

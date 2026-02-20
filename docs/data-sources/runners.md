@@ -35,9 +35,9 @@ data "gitlab_runners" "this" {
 ### Optional
 
 - `paused` (Boolean) Filters for runners with the given paused value
-- `status` (String) Filters for runners with the given status. Valid Values are `online`, `offline`, `stale`, and `never_contacted`.
+- `status` (String) Filters for runners with the given status. Valid Values are `online`, `offline`, `stale`, `never_contacted`.
 - `tag_list` (Set of String) Filters for runners with all of the given tags
-- `type` (String) The type of runner to return. Valid values are `instance_type`, `group_type` and `project_type`
+- `type` (String) The type of runner to return. Valid values are `instance_type`, `group_type`, `project_type`.
 
 ### Read-Only
 

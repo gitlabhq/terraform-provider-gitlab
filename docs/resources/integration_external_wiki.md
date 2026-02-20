@@ -4,7 +4,7 @@ page_title: "gitlab_integration_external_wiki Resource - terraform-provider-gitl
 subcategory: ""
 description: |-
   The gitlab_integration_external_wiki resource manages the lifecycle of a project integration with the External Wiki Service.
-  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_external_wikiinstead!
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_external_wiki instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#external-wiki
 ---
 
@@ -12,7 +12,7 @@ description: |-
 
 The `gitlab_integration_external_wiki` resource manages the lifecycle of a project integration with the External Wiki Service.
 
-~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_external_wiki`instead!
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_external_wiki` instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#external-wiki)
 
@@ -43,7 +43,7 @@ resource "gitlab_integration_external_wiki" "wiki" {
 
 - `active` (Boolean) Whether the integration is active.
 - `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
 - `slug` (String) The name of the integration in lowercase, shortened to 63 bytes, and with everything except 0-9 and a-z replaced with -. No leading / trailing -. Use in URLs, host names and domain names.
 - `title` (String) Title of the integration.
 - `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.

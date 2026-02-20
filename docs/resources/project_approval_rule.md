@@ -3,7 +3,7 @@
 page_title: "gitlab_project_approval_rule Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_approval_rule resource allows to manage the lifecycle of a project-level approval rule.
+  The gitlab_project_approval_rule resource manages the lifecycle of a project-level approval rule.
   -> This resource requires a GitLab Enterprise instance.
   ~> A project is limited to one "any_approver" rule at a time, any attempt to create a second rule of type "any_approver" will fail. As a result, if
   an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
@@ -15,7 +15,7 @@ description: |-
 
 # gitlab_project_approval_rule (Resource)
 
-The `gitlab_project_approval_rule` resource allows to manage the lifecycle of a project-level approval rule.
+The `gitlab_project_approval_rule` resource manages the lifecycle of a project-level approval rule.
 
 -> This resource requires a GitLab Enterprise instance.
 

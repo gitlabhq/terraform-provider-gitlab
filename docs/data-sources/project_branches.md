@@ -32,6 +32,11 @@ data "gitlab_project_branches" "example" {
 
 - `project` (String) ID or URL-encoded path of the project owned by the authenticated user.
 
+### Optional
+
+- `regex` (String) Regex pattern to filter the returned branches by name.
+- `search` (String) A search string to filter branches by name.
+
 ### Read-Only
 
 - `branches` (Attributes List) The list of branches of the project, as defined below. (see [below for nested schema](#nestedatt--branches))

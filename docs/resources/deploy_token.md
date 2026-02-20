@@ -3,14 +3,14 @@
 page_title: "gitlab_deploy_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_deploy_token resource allows to manage the lifecycle of group and project deploy tokens.
+  The gitlab_deploy_token resource manages the lifecycle of group and project deploy tokens.
   ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_deploy_token or gitlab_group_deploy_token instead!
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/deploy_tokens/
 ---
 
 # gitlab_deploy_token (Resource)
 
-The `gitlab_deploy_token` resource allows to manage the lifecycle of group and project deploy tokens.
+The `gitlab_deploy_token` resource manages the lifecycle of group and project deploy tokens.
 
 ~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_deploy_token` or `gitlab_group_deploy_token` instead!
 

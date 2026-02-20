@@ -3,14 +3,14 @@
 page_title: "gitlab_group_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_hook resource allows to manage the lifecycle of a group hook.
+  The gitlab_group_hook resource manages the lifecycle of a group hook.
   ~> Note that push_events defaults to true.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_webhooks/
 ---
 
 # gitlab_group_hook (Resource)
 
-The `gitlab_group_hook` resource allows to manage the lifecycle of a group hook.
+The `gitlab_group_hook` resource manages the lifecycle of a group hook.
 
 ~> Note that `push_events` defaults to `true`.
 

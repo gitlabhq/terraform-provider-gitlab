@@ -3,14 +3,14 @@
 page_title: "gitlab_group_epic_board Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_epic_board resource allows to manage the lifecycle of a epic board in a group.
+  The gitlab_group_epic_board resource manages the lifecycle of a epic board in a group.
   ~> Multiple epic boards on one group requires a GitLab Premium or above License.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/group_boards/
 ---
 
 # gitlab_group_epic_board (Resource)
 
-The `gitlab_group_epic_board` resource allows to manage the lifecycle of a epic board in a group.
+The `gitlab_group_epic_board` resource manages the lifecycle of a epic board in a group.
 
 ~> Multiple epic boards on one group requires a GitLab Premium or above License.
 

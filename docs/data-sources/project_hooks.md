@@ -42,10 +42,12 @@ data "gitlab_project_hooks" "examples" {
 
 Read-Only:
 
+- `branch_filter_strategy` (String) Filter push events by branch.
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
 - `custom_webhook_template` (String) Set a custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `emoji_events` (Boolean) Invoke the hook for emoji events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
 - `hook_id` (Number) The id of the project hook.
 - `issues_events` (Boolean) Invoke the hook for issues events.

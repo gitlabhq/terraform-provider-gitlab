@@ -3,7 +3,7 @@
 page_title: "gitlab_project Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project resource allows to manage the lifecycle of a project.
+  The gitlab_project resource manages the lifecycle of a project.
   A project can either be created in a group or user namespace.
   -> Default Branch Protection Workaround Projects are created with default branch protection.
   Since this default branch protection is not currently managed via Terraform, to workaround this limitation,
@@ -16,7 +16,7 @@ description: |-
 
 # gitlab_project (Resource)
 
-The `gitlab_project` resource allows to manage the lifecycle of a project.
+The `gitlab_project` resource manages the lifecycle of a project.
 
 A project can either be created in a group or user namespace.
 
@@ -69,7 +69,7 @@ resource "gitlab_project" "fork" {
   forked_from_project_id = gitlab_project.example.id
 }
 
-# Fork a project and setup a pull mirror
+# Fork a project and setup a pull mirror (Deprecated, use gitlab_project_pull_mirror instead)
 resource "gitlab_project" "fork" {
   name                   = "my-fork"
   description            = "This is a fork"
@@ -84,7 +84,7 @@ resource "gitlab_project" "import_public" {
   import_url = "https://gitlab.example.com/repo.git"
 }
 
-# Create a project by importing it from a public project and setup the pull mirror
+# Create a project by importing it from a public project and setup the pull mirror (Deprecated, use gitlab_project_pull_mirror instead)
 resource "gitlab_project" "import_public_with_mirror" {
   name       = "import-from-public-project"
   import_url = "https://gitlab.example.com/repo.git"
@@ -99,7 +99,7 @@ resource "gitlab_project" "import_private" {
   import_url_password = "pass"
 }
 
-# Create a project by importing it from a private project and setup the pull mirror
+# Create a project by importing it from a private project and setup the pull mirror (Deprecated, use gitlab_project_pull_mirror instead)
 resource "gitlab_project" "import_private_with_mirror" {
   name                = "import-from-public-project"
   import_url          = "https://gitlab.example.com/repo.git"
@@ -138,7 +138,7 @@ resource "gitlab_project" "import_private" {
 - `approvals_before_merge` (Number, Deprecated) Number of merge request approvals required for merging. Default is 0. This field **does not** work well in combination with the `gitlab_project_approval_rule` resource. We recommend you do not use this deprecated field and use `gitlab_project_approval_rule` instead. To be removed in 19.0.
 - `archive_on_destroy` (Boolean) Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
 - `archived` (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
-- `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn’t a boolean, but enabled/disabled.
+- `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn't a boolean, but enabled/disabled.
 - `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
 - `auto_duo_code_review_enabled` (Boolean) Enable automatic reviews by GitLab Duo on merge requests. Ultimate only. Automatic reviews only work with the GitLab Duo Enterprise add-on.
@@ -172,7 +172,7 @@ resource "gitlab_project" "import_private" {
 - `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
 - `group_runners_enabled` (Boolean) Enable group runners for this project.
 - `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
-- `import_url` (String) Git URL to a repository to be imported. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. They can also not be imported using `terraform import`. See the examples section for how to properly use it.
+- `import_url` (String) Git URL to a repository to be imported. Use with creating a mirror is deprecated - use `gitlab_project_pull_mirror` instead. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. They can also not be imported using `terraform import`. See the examples section for how to properly use it.
 - `import_url_password` (String, Sensitive) The password for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. This field cannot be imported using `terraform import`. See the examples section for how to properly use it.
 - `import_url_username` (String) The username for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. This field cannot be imported using `terraform import`.  See the examples section for how to properly use it.
 - `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
@@ -182,6 +182,7 @@ resource "gitlab_project" "import_private" {
 - `issues_template` (String) Sets the template for new issues in the project.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
+- `max_artifacts_size` (Number) The maximum file size in megabytes for individual job artifacts.
 - `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_method` (String) Set the merge method. Valid values are `merge`, `rebase_merge`, `ff`.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
@@ -190,9 +191,9 @@ resource "gitlab_project" "import_private" {
 - `merge_requests_template` (String) Sets the template for new merge requests in the project.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
 - `merge_trains_skip_train_allowed` (Boolean) Allows merge train merge requests to be merged without waiting for pipelines to finish. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
-- `mirror` (Boolean) Enable project pull mirror.
-- `mirror_overwrites_diverged_branches` (Boolean) Enable overwrite diverged branches for a mirrored project.
-- `mirror_trigger_builds` (Boolean) Enable trigger builds on pushes for a mirrored project.
+- `mirror` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror` instead. Enable project pull mirror.
+- `mirror_overwrites_diverged_branches` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror.mirror_overwrites_diverged_branches` instead. Enable overwrite diverged branches for a mirrored project.
+- `mirror_trigger_builds` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror.mirror_trigger_builds` instead. Enable trigger builds on pushes for a mirrored project.
 - `model_experiments_access_level` (String) Set visibility of machine learning model experiments. Valid values are `disabled`, `private`, `enabled`.
 - `model_registry_access_level` (String) Set visibility of machine learning model registry. Valid values are `disabled`, `private`, `enabled`.
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
@@ -200,7 +201,7 @@ resource "gitlab_project" "import_private" {
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
 - `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Set to true if you want allow merges only if all discussions are resolved.
 - `only_allow_merge_if_pipeline_succeeds` (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
-- `only_mirror_protected_branches` (Boolean) Enable only mirror protected branches for a mirrored project.
+- `only_mirror_protected_branches` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror.only_mirror_protected_branches` instead. Enable only mirror protected branches for a mirrored project.
 - `packages_enabled` (Boolean) Enable packages repository for the project.
 - `pages_access_level` (String) Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
 - `path` (String) The path of the repository.
@@ -287,8 +288,8 @@ Optional:
 - `max_file_size` (Number) Maximum file size (MB).
 - `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
 - `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
-- `reject_non_dco_commits` (Boolean) Reject commit when it’s not DCO certified.
-- `reject_unsigned_commits` (Boolean) Reject commit when it’s not signed through GPG.
+- `reject_non_dco_commits` (Boolean) Reject commit when it's not DCO certified.
+- `reject_unsigned_commits` (Boolean) Reject commit when it's not signed through GPG.
 
 
 <a id="nestedblock--timeouts"></a>

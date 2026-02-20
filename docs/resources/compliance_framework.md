@@ -3,7 +3,7 @@
 page_title: "gitlab_compliance_framework Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_compliance_framework resource allows to manage the lifecycle of a compliance framework on top-level groups.
+  The gitlab_compliance_framework resource manages the lifecycle of a compliance framework on top-level groups.
   There can be only one default compliance framework. Of all the configured compliance frameworks marked as default, the last one applied will be the default compliance framework.
   -> This resource requires a GitLab Enterprise instance with a Premium license to create the compliance framework.
   -> This resource requires a GitLab Enterprise instance with an Ultimate license to specify a compliance pipeline configuration in the compliance framework.
@@ -12,7 +12,7 @@ description: |-
 
 # gitlab_compliance_framework (Resource)
 
-The `gitlab_compliance_framework` resource allows to manage the lifecycle of a compliance framework on top-level groups.
+The `gitlab_compliance_framework` resource manages the lifecycle of a compliance framework on top-level groups.
 
 There can be only one `default` compliance framework. Of all the configured compliance frameworks marked as default, the last one applied will be the default compliance framework.
 

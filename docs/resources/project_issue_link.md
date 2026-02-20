@@ -3,13 +3,13 @@
 page_title: "gitlab_project_issue_link Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_issue_link resource allows to manage the lifecycle of project issue links.
+  The gitlab_project_issue_link resource manages the lifecycle of project issue links.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/issue_links/
 ---
 
 # gitlab_project_issue_link (Resource)
 
-The `gitlab_project_issue_link` resource allows to manage the lifecycle of project issue links.
+The `gitlab_project_issue_link` resource manages the lifecycle of project issue links.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/issue_links/)
 

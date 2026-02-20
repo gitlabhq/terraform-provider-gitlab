@@ -3,13 +3,13 @@
 page_title: "gitlab_pipeline_schedule Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_pipeline_schedule resource allows to manage the lifecycle of a scheduled pipeline.
+  The gitlab_pipeline_schedule resource manages the lifecycle of a scheduled pipeline.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/pipeline_schedules/
 ---
 
 # gitlab_pipeline_schedule (Resource)
 
-The `gitlab_pipeline_schedule` resource allows to manage the lifecycle of a scheduled pipeline.
+The `gitlab_pipeline_schedule` resource manages the lifecycle of a scheduled pipeline.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/pipeline_schedules/)
 

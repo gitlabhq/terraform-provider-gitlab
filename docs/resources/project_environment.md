@@ -3,7 +3,7 @@
 page_title: "gitlab_project_environment Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_environment resource allows to manage the lifecycle of an environment in a project.
+  The gitlab_project_environment resource manages the lifecycle of an environment in a project.
   -> During a terraform destroy this resource by default will not attempt to stop the environment first.
   An environment is required to be in a stopped state before a deletion of the environment can occur.
   Set the stop_before_destroy flag to attempt to automatically stop the environment before deletion. If the
@@ -13,7 +13,7 @@ description: |-
 
 # gitlab_project_environment (Resource)
 
-The `gitlab_project_environment` resource allows to manage the lifecycle of an environment in a project.
+The `gitlab_project_environment` resource manages the lifecycle of an environment in a project.
 
 -> During a terraform destroy this resource by default will not attempt to stop the environment first.
 An environment is required to be in a stopped state before a deletion of the environment can occur.

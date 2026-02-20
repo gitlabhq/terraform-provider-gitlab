@@ -3,7 +3,7 @@
 page_title: "gitlab_branch_protection Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_branch_protection resource allows to manage the lifecycle of a protected branch of a repository.
+  The gitlab_branch_protection resource manages the lifecycle of a protected branch of a repository.
   ~> Branch Protection Behavior for the default branch
   Depending on the GitLab instance, group or project setting the default branch of a project is created automatically by GitLab behind the scenes.
   Due to some https://gitlab.com/gitlab-org/terraform-provider-gitlab/issues/792 limitations https://discuss.hashicorp.com/t/ignore-the-order-of-a-complex-typed-list/42242 in the Terraform Provider SDK and the GitLab API,
@@ -17,7 +17,7 @@ description: |-
 
 # gitlab_branch_protection (Resource)
 
-The `gitlab_branch_protection` resource allows to manage the lifecycle of a protected branch of a repository.
+The `gitlab_branch_protection` resource manages the lifecycle of a protected branch of a repository.
 
 ~> **Branch Protection Behavior for the default branch**
    Depending on the GitLab instance, group or project setting the default branch of a project is created automatically by GitLab behind the scenes.

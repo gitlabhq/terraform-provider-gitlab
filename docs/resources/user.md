@@ -3,7 +3,7 @@
 page_title: "gitlab_user Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_user resource allows to manage the lifecycle of a user.
+  The gitlab_user resource manages the lifecycle of a user.
   -> the provider needs to be configured with admin-level access for this resource to work.
   -> You must specify either password or reset_password.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/users/
@@ -11,7 +11,7 @@ description: |-
 
 # gitlab_user (Resource)
 
-The `gitlab_user` resource allows to manage the lifecycle of a user.
+The `gitlab_user` resource manages the lifecycle of a user.
 
 -> the provider needs to be configured with admin-level access for this resource to work.
 

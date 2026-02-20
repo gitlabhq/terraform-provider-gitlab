@@ -3,7 +3,7 @@
 page_title: "gitlab_repository_file Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_repository_file resource allows to manage the lifecycle of a file within a repository.
+  The gitlab_repository_file resource manages the lifecycle of a file within a repository.
   -> Timeouts Default timeout for Create, Update and Delete is one minute and can be configured in the timeouts block.
   -> Implementation Detail GitLab is unable to handle concurrent calls to the GitLab repository files API for the same project.
   Therefore, this resource queues every call to the repository files API no matter of the project, which may slow down the terraform
@@ -14,7 +14,7 @@ description: |-
 
 # gitlab_repository_file (Resource)
 
-The `gitlab_repository_file` resource allows to manage the lifecycle of a file within a repository.
+The `gitlab_repository_file` resource manages the lifecycle of a file within a repository.
 
 -> **Timeouts** Default timeout for *Create*, *Update* and *Delete* is one minute and can be configured in the `timeouts` block.
 

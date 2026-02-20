@@ -3,14 +3,14 @@
 page_title: "gitlab_project_issue_board Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_issue_board resource allows to manage the lifecycle of a Project Issue Board.
+  The gitlab_project_issue_board resource manages the lifecycle of a Project Issue Board.
   ~> NOTE: If the board lists are changed all lists will be recreated.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/boards/
 ---
 
 # gitlab_project_issue_board (Resource)
 
-The `gitlab_project_issue_board` resource allows to manage the lifecycle of a Project Issue Board.
+The `gitlab_project_issue_board` resource manages the lifecycle of a Project Issue Board.
 
 ~> **NOTE:** If the board lists are changed all lists will be recreated.
 

@@ -1,3 +1,32 @@
+## 18.9.0 (2026-02-19)
+
+### FEATURES (5 changes)
+
+- datasource/gitlab_project_label, datasource/gitlab_project_labels:  [Gitlab project label/labels datasource implementation](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/73c1b8219f2dc96fd0d368b1bde6b7c77dc503eb) by @bastian82 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2890))
+- resource/gitlab_application_settings:  [Add notify_on_unknown_sign_in in Application Settings](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/15675826d1aa5589e9ace5972314da36bc5abcdd) by @12bodickyn ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2928))
+- resource/gitlab_group_integration_mattermost:  [Add gitlab_group_integration_mattermost resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/85e2c3a5377657536ac35ce10791d4c237fb58d7) by @HamzaHassanain ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2909))
+- resource/gitlab_project_hook, datasource/gitlab_project_hook, datasource/gitlab_project_hooks:  [Add emoji_events support to gitlab_project_hook resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8568dbd04e316fb1cc10fd1bd1baa7d01b002c3a) by @yugannkt ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2902))
+- resource/gitlab_project, resource/gitlab_group:  [Add max_artifacts_size attribute to group and project resources](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fb8b39f98e8f8049d09d2466fc849a3de36cb98c) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2883))
+
+### IMPROVEMENTS (10 changes)
+
+- resource/gitlab_project_integration_github:  [refactor: migrate github integration to framework](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e2897f502ea89dffcd678a4e7d612e8512dbd4f1) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2936))
+- [Fix `make testacc-up`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4df1a31f55d73b9682d3f47fd13702903d60c2db) by @SinaMoghaddas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2911))
+- resource/gitlab_group_ldap_link:  [Improve error message when gitlab_group_ldap_link.id is invalid](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/054a186ca3ec4232667bb1439de5d6d92016db9f) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2914))
+- data/gitlab_project_branches:  [Add regex/search filters](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fa0ae4f3ff3ac6e07975c1584da5d933d8e00e41) by @SinaMoghaddas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2780))
+- resource/gitlab_project:  [Deprecate old `gitlab_project` mirror fields](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6c9e08e7c9577e52bcd56b3bc49113a224fa4089) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2906))
+- [Fix grammar in resource descriptions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5231d8844491d7325679cc786dcf35847946380b) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2905))
+- resource/gitlab_tag_protection:  [Add deploy_key_id support to gitlab_tag_protection resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ef81cd2f5141162463c0f0be23cff9a0d069d1b6) by @yugannkt ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2900))
+- resource/gitlab_project_milestone:  [refactor: migrate gitlab_project_milestone to Framework](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/10ee006128a0f3ed5c3bbc9d2bd3c72c427d0f4c) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2880))
+- [Update 19.0 Migration guide for state move info](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ffdf35843d7b7d2da18e974d0730699fe3fdb147) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2893))
+- resource/gitlab_project_integration_external_wiki:  [refactor: migrate external_wiki to framework](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b9eb1d2889fcbd8cc11ca24c8c2ff452eaee455d) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2878))
+
+### BUG FIXES (2 changes)
+
+- resource/gitlab_deploy_token, resource/gitlab_project_deploy_token:  [Add support to `gitlab_project_deploy_token` for cross-resource state move actions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/67c654503eeb2351ddc00a4e61db01fe1b8d3a21) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2892))
+- resource/gitlab_project_deploy_token:  [Gracefully delete project deploy token if project was moved](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e55ac48b440ba283dbffbe4ce642eaf5a1463447) by @timofurrer ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2885))
+- resource/gitlab_release:  [Fix ability to create releases with milestones](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5695232cc088f706d75200953df769e21be094fa) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2939))
+
 ## 18.8.2 (2026-01-20)
 
 ### BUG FIXES (1 change)
@@ -8,60 +37,59 @@
 
 ### IMPROVEMENTS (2 change)
 
-- resource/gitlab_project_hook:  [Support vulnerability events in gitlab project hooks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/edb664b932f0cd4d54e0e7503be8081864274e7d) by @nopejs ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2875)) 
-- resource/gitlab_group_hook:  [Support vulnerability events in gitlab group hooks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/edb664b932f0cd4d54e0e7503be8081864274e7d) by @nopejs ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2875)) 
+- resource/gitlab_project_hook:  [Support vulnerability events in gitlab project hooks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/edb664b932f0cd4d54e0e7503be8081864274e7d) by @nopejs ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2875))
+- resource/gitlab_group_hook:  [Support vulnerability events in gitlab group hooks](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/edb664b932f0cd4d54e0e7503be8081864274e7d) by @nopejs ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2875))
 
 ### BUG FIXES (2 change)
 
 - resource/gitlab_group_service_account_access_token:  [Fix a bug where service accounts with more than 20 access tokens could show a replace operation when one was not needed](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0ecf2f4f0216e4f2b5e837bb197d7305f3e2f2fc) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2872))
 - resource/gitlab_group_service_account_access_token:  [Fix a bug where group full namespace values caused errors when used with `group` instead of the ID](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0ecf2f4f0216e4f2b5e837bb197d7305f3e2f2fc) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2872))
 
-
 ## 18.8.0 (2026-01-15)
 
 ### FEATURES (5 changes)
 
-- resource/gitlab_secure_file:  [Add new resource for managing secure files on a project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/12f6ebd1caf472d41868a5ee4766a18484390d54) by @jack1902 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2767)) 
-- resource/gitlab_project_issue_link:  [Add new resource for managing project issue links](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c8b967125c02ec4ecaf18838df69c28e87ff93fe) by @aishahsofea ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2840)) 
-- resource/gitlab_project_package_dependency_proxy:  [Add new resource for managing package dependency proxy settings for a project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/18be21512a78d3a6dfbb08d50ef5f7aff714abe3) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2802)) 
-- resource/gitlab_project_cicd_catalog:  [Add new resource for registering a project in the CI/CD catalog](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/bf0fcfa20c00ceba641dcc12029054c0385db338) by @n.h.long.9697 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2816)) 
-- resource/gitlab_project_pull_mirror:  [Add new resource for managing pull mirror configurations](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/156aea857ab9d896fc8b0b56902f80ecfc9ceac0) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2790)) 
+- resource/gitlab_secure_file:  [Add new resource for managing secure files on a project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/12f6ebd1caf472d41868a5ee4766a18484390d54) by @jack1902 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2767))
+- resource/gitlab_project_issue_link:  [Add new resource for managing project issue links](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c8b967125c02ec4ecaf18838df69c28e87ff93fe) by @aishahsofea ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2840))
+- resource/gitlab_project_package_dependency_proxy:  [Add new resource for managing package dependency proxy settings for a project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/18be21512a78d3a6dfbb08d50ef5f7aff714abe3) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2802))
+- resource/gitlab_project_cicd_catalog:  [Add new resource for registering a project in the CI/CD catalog](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/bf0fcfa20c00ceba641dcc12029054c0385db338) by @n.h.long.9697 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2816))
+- resource/gitlab_project_pull_mirror:  [Add new resource for managing pull mirror configurations](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/156aea857ab9d896fc8b0b56902f80ecfc9ceac0) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2790))
 
 ### IMPROVEMENTS (4 changes)
 
-- resource/gitlab_group:  [Add allow merge missing options to group resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7fdfaafa40c820507d0c38f5226350064b72d435) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2862)) 
-- resource/gitlab_group_share_group:  [Don't fetch projects when reading group shares to increase performance in...](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/90b8bebe9f430135db36b62ad8ca0d64f4325485) by @mdroessler ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2819)) 
-- resource/gitlab_project_tag:  [refactor: migrate gitlab_project_tag to Framework](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/349c4613ff4d87005a0ae78886f1d9267e1b1d7d) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2846)) 
-- data/gitlab_group_membership:  [Add support for `group_saml_identity`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2b56ed9e3bc5c4e5cb42b6bbc58953237a5d6346) by @hamzahassanain067 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2852)) 
+- resource/gitlab_group:  [Add allow merge missing options to group resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7fdfaafa40c820507d0c38f5226350064b72d435) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2862))
+- resource/gitlab_group_share_group:  [Don't fetch projects when reading group shares to increase performance in...](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/90b8bebe9f430135db36b62ad8ca0d64f4325485) by @mdroessler ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2819))
+- resource/gitlab_project_tag:  [refactor: migrate gitlab_project_tag to Framework](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/349c4613ff4d87005a0ae78886f1d9267e1b1d7d) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2846))
+- data/gitlab_group_membership:  [Add support for `group_saml_identity`](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2b56ed9e3bc5c4e5cb42b6bbc58953237a5d6346) by @hamzahassanain067 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2852))
 
 ### BUG FIXES (4 changes)
 
-- resource/gitlab_project_variable && resource/gitlab_group_variable:  [Fix `hidden` causing project_variable and group_variable to force replacement when not configured](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b626c5dbeff491a7f7f2230b4ae6ffed749f5341) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2838)) 
+- resource/gitlab_project_variable && resource/gitlab_group_variable:  [Fix `hidden` causing project_variable and group_variable to force replacement when not configured](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b626c5dbeff491a7f7f2230b4ae6ffed749f5341) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2838))
 - resource/gitlab_project_access_token, resource/gitlab_personal_access_token, resource/gitlab_group_service_account_access_token, resource/gitlab_group_access_token:  [fix: inconsistent result on token rotation](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/468c9d219b55e876e12c1b10178c59c2a28eb2a5) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2841))
-- resource/gitlab_group:  [Switch gitlab_group.ip_restriction_ranges to set to prevent endless diff](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/af42fe4fcc519d74e7b8e2e497c80f08d9433990) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2832)) 
+- resource/gitlab_group:  [Switch gitlab_group.ip_restriction_ranges to set to prevent endless diff](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/af42fe4fcc519d74e7b8e2e497c80f08d9433990) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2832))
 - resource/gitlab_group_service_account_access_token:  [fix: user dedicated API to handle Group service account tokens](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/9253647dccf20d0379dbf21867838eaeb85d315f) by @jeremy.tellaa ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2793))
 
 ## 18.7.0 (2025-12-18)
 
 ### FEATURES (5 changes)
 
-- resource/gitlab_user_avatar:  [Add a new resource for managing avatars on project, group, and service account users](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0fa637212011a84affdebc670635ed1640611ad1) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2766)) 
-- data/gitlab_security_policy_document:  [Add a datasource to generate policy file YAML using native HCL](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b6c56dce8045af6c78fe4558040a0591a45d0eac) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2811)) 
-- data/gitlab_group_service_account_access_tokens:  [Add new data source for reading group service account access token metadata](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6236eaa47aef6f0ca58456e15a610ab4b53562e0) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2805)) 
-- data/gitlab_secure_file:  [Add new data source for reading secure files](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d39194ac07762e2b7492286ffcd68a174d1445f5) by @jack1902 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2803)) 
-- data/gitlab_project_issue_label_events:  [Add new data source for users to retrieve label events for an issue](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ec7fd6b906f3cc4cc640b8d36e1ac0d397ca0b40) by @chanmickyyun ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2783)) 
+- resource/gitlab_user_avatar:  [Add a new resource for managing avatars on project, group, and service account users](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0fa637212011a84affdebc670635ed1640611ad1) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2766))
+- data/gitlab_security_policy_document:  [Add a datasource to generate policy file YAML using native HCL](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/b6c56dce8045af6c78fe4558040a0591a45d0eac) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2811))
+- data/gitlab_group_service_account_access_tokens:  [Add new data source for reading group service account access token metadata](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6236eaa47aef6f0ca58456e15a610ab4b53562e0) by @vijeta004 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2805))
+- data/gitlab_secure_file:  [Add new data source for reading secure files](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/d39194ac07762e2b7492286ffcd68a174d1445f5) by @jack1902 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2803))
+- data/gitlab_project_issue_label_events:  [Add new data source for users to retrieve label events for an issue](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/ec7fd6b906f3cc4cc640b8d36e1ac0d397ca0b40) by @chanmickyyun ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2783))
 
 ### IMPROVEMENTS (3 changes)
 
-- resource/gitlab_group:  [Validate group name and stub at plan-time instead of apply-time](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/36ed196dad2392fecd542ad7f1a259aea519f65a) by @SinaMoghaddas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2778)) 
-- data/gitlab_project:  [Add support for merge_trains_skip_train_allowed](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/928e2780e204b108c011558bf675a0af1a5a9efa) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2817)) 
+- resource/gitlab_group:  [Validate group name and stub at plan-time instead of apply-time](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/36ed196dad2392fecd542ad7f1a259aea519f65a) by @SinaMoghaddas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2778))
+- data/gitlab_project:  [Add support for merge_trains_skip_train_allowed](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/928e2780e204b108c011558bf675a0af1a5a9efa) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2817))
 - resource/gitlab_member_role:  [Add missing permissions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8244cac7a52536514cafe06c0c9e63ce684f009b) by @u.kilianpaquier ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2785))
 
 ### BUG FIXES (3 changes)
 
-- resource/gitlab_branch:  [Fixed an issue where updating branch name caused "Invalid resource ID format"](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2912a2cd29f43e0e1a88fa5b8bcc2b6b6e7a3eee) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2825)) 
-- resource/gitlab_group_service_account:  [Fixed an issue where read error caused service accounts to be flagged as deleted](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1ca9337d420ac99baefeb45a4697ea1949636912) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2814)) 
-- docs:  [Fixed broken or redirected documentation links](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1c80354fa10ea590036ee44b0d55ef49098fff47) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2827)) 
+- resource/gitlab_branch:  [Fixed an issue where updating branch name caused "Invalid resource ID format"](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2912a2cd29f43e0e1a88fa5b8bcc2b6b6e7a3eee) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2825))
+- resource/gitlab_group_service_account:  [Fixed an issue where read error caused service accounts to be flagged as deleted](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1ca9337d420ac99baefeb45a4697ea1949636912) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2814))
+- docs:  [Fixed broken or redirected documentation links](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1c80354fa10ea590036ee44b0d55ef49098fff47) ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2827))
 
 ## 18.6.1 (2025-11-21)
 

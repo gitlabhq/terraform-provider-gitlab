@@ -3,13 +3,13 @@
 page_title: "gitlab_instance_variable Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_instance_variable resource allows to manage the lifecycle of an instance-level CI/CD variable.
+  The gitlab_instance_variable resource manages the lifecycle of an instance-level CI/CD variable.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/instance_level_ci_variables/
 ---
 
 # gitlab_instance_variable (Resource)
 
-The `gitlab_instance_variable` resource allows to manage the lifecycle of an instance-level CI/CD variable.
+The `gitlab_instance_variable` resource manages the lifecycle of an instance-level CI/CD variable.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/instance_level_ci_variables/)
 

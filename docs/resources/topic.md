@@ -3,14 +3,14 @@
 page_title: "gitlab_topic Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_topic resource allows to manage the lifecycle of topics that are then assignable to projects.
+  The gitlab_topic resource manages the lifecycle of topics that are then assignable to projects.
   -> Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
   Upstream API: GitLab REST API docs for topics https://docs.gitlab.com/api/topics/
 ---
 
 # gitlab_topic (Resource)
 
-The `gitlab_topic` resource allows to manage the lifecycle of topics that are then assignable to projects.
+The `gitlab_topic` resource manages the lifecycle of topics that are then assignable to projects.
 
 -> Topics are the successors for project tags. Aside from avoiding terminology collisions with Git tags, they are more descriptive and better searchable.
 

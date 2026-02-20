@@ -3,14 +3,14 @@
 page_title: "gitlab_group Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group resource allows to manage the lifecycle of a group.
+  The gitlab_group resource manages the lifecycle of a group.
   -> On GitLab.com, you cannot use the gitlab_group resource to create a top-level group https://docs.gitlab.com/user/group/#group-hierarchy. Instead, you must create a group https://docs.gitlab.com/user/group/#create-a-group in the UI, then import the group into your Terraform configuration. From here, you can manage the group using the Terraform Provider.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/groups/
 ---
 
 # gitlab_group (Resource)
 
-The `gitlab_group` resource allows to manage the lifecycle of a group.
+The `gitlab_group` resource manages the lifecycle of a group.
 
 -> On GitLab.com, you cannot use the `gitlab_group` resource to create a [top-level group](https://docs.gitlab.com/user/group/#group-hierarchy). Instead, you must [create a group](https://docs.gitlab.com/user/group/#create-a-group) in the UI, then import the group into your Terraform configuration. From here, you can manage the group using the Terraform Provider.
 
@@ -106,6 +106,7 @@ resource "gitlab_group" "example-five" {
 - `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
 - `ip_restriction_ranges` (Set of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
 - `lfs_enabled` (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
+- `max_artifacts_size` (Number) The maximum file size in megabytes for individual job artifacts.
 - `membership_lock` (Boolean) Users cannot be added to projects in this group.
 - `mentions_disabled` (Boolean) Disable the capability of a group from getting mentioned.
 - `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Only allow merging merge requests when all discussions are resolved. When enabled for a group, applies to all projects in the group. Premium and Ultimate only.

@@ -3,13 +3,13 @@
 page_title: "gitlab_system_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_system_hook resource allows to manage the lifecycle of a system hook.
+  The gitlab_system_hook resource manages the lifecycle of a system hook.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/system_hooks/
 ---
 
 # gitlab_system_hook (Resource)
 
-The `gitlab_system_hook` resource allows to manage the lifecycle of a system hook.
+The `gitlab_system_hook` resource manages the lifecycle of a system hook.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/system_hooks/)
 

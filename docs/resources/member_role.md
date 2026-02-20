@@ -3,8 +3,8 @@
 page_title: "gitlab_member_role Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_member_role resource allows to manage the lifecycle of a custom member role.
-  Custom roles allow an organization to create user roles with the precise privileges and permissions required for that organization’s needs.
+  The gitlab_member_role resource manages the lifecycle of a custom member role.
+  Custom roles allow an organization to create user roles with the precise privileges and permissions required for that organization's needs.
   -> This resource requires an Ultimate license.
   -> Most custom roles are considered billable users that use a seat. Custom roles billing and seat usage https://docs.gitlab.com/user/custom_roles/
   -> There can be only 10 custom roles on your instance or namespace. See issue 450929 https://gitlab.com/gitlab-org/gitlab/-/issues/450929 for more details.
@@ -13,9 +13,9 @@ description: |-
 
 # gitlab_member_role (Resource)
 
-The `gitlab_member_role` resource allows to manage the lifecycle of a custom member role.
+The `gitlab_member_role` resource manages the lifecycle of a custom member role.
 
-Custom roles allow an organization to create user roles with the precise privileges and permissions required for that organization’s needs.
+Custom roles allow an organization to create user roles with the precise privileges and permissions required for that organization's needs.
 
 -> This resource requires an Ultimate license.
 

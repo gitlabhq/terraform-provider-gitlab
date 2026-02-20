@@ -3,14 +3,14 @@
 page_title: "gitlab_cluster_agent_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_cluster_agent_token resource allows to manage the lifecycle of a token for a GitLab Agent for Kubernetes.
+  The gitlab_cluster_agent_token resource manages the lifecycle of a token for a GitLab Agent for Kubernetes.
   -> Requires at least maintainer permissions on the project.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/cluster_agents/#create-an-agent-token
 ---
 
 # gitlab_cluster_agent_token (Resource)
 
-The `gitlab_cluster_agent_token` resource allows to manage the lifecycle of a token for a GitLab Agent for Kubernetes.
+The `gitlab_cluster_agent_token` resource manages the lifecycle of a token for a GitLab Agent for Kubernetes.
 
 -> Requires at least maintainer permissions on the project.
 

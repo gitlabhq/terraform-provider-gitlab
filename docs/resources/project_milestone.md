@@ -3,13 +3,13 @@
 page_title: "gitlab_project_milestone Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_milestone resource allows to manage the lifecycle of a project milestone.
+  The gitlab_project_milestone resource manages the lifecycle of a project milestone.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/milestones/
 ---
 
 # gitlab_project_milestone (Resource)
 
-The `gitlab_project_milestone` resource allows to manage the lifecycle of a project milestone.
+The `gitlab_project_milestone` resource manages the lifecycle of a project milestone.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/milestones/)
 
@@ -23,9 +23,20 @@ resource "gitlab_project" "example" {
   namespace_id = gitlab_group.example.id
 }
 
+# Basic milestone with required fields only
 resource "gitlab_project_milestone" "example" {
   project = gitlab_project.example.id
   title   = "example"
+}
+
+# Comprehensive milestone with all optional fields
+resource "gitlab_project_milestone" "comprehensive" {
+  project     = gitlab_project.example.id
+  title       = "Q4 2024 Release"
+  description = "Major release for Q4 2024"
+  start_date  = "2024-01-01"
+  due_date    = "2024-12-31"
+  state       = "active"
 }
 ```
 
@@ -40,17 +51,17 @@ resource "gitlab_project_milestone" "example" {
 ### Optional
 
 - `description` (String) The description of the milestone.
-- `due_date` (String) The due date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
-- `start_date` (String) The start date of the milestone. Date time string in the format YYYY-MM-DD, for example 2016-03-11.
+- `due_date` (String) The due date of the milestone. Date string in the format YYYY-MM-DD, for example 2016-03-11.
+- `start_date` (String) The start date of the milestone. Date string in the format YYYY-MM-DD, for example 2016-03-11.
 - `state` (String) The state of the milestone. Valid values are: `active`, `closed`.
 
 ### Read-Only
 
 - `created_at` (String) The time of creation of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
 - `expired` (Boolean) Bool, true if milestone expired.
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>:<milestone_id>`.
 - `iid` (Number) The ID of the project's milestone.
-- `milestone_id` (Number) The instance-wide ID of the project’s milestone.
+- `milestone_id` (Number) The instance-wide ID of the project's milestone.
 - `project_id` (Number) The project ID of milestone.
 - `updated_at` (String) The last update time of the milestone. Date time string, ISO 8601 formatted, for example 2016-03-11T03:45:40Z.
 - `web_url` (String) The web URL of the milestone.

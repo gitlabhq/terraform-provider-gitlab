@@ -3,14 +3,14 @@
 page_title: "gitlab_user_gpgkey Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_user_gpgkey resource allows to manage the lifecycle of a GPG key assigned to the current user or a specific user.
+  The gitlab_user_gpgkey resource manages the lifecycle of a GPG key assigned to the current user or a specific user.
   -> Managing GPG keys for arbitrary users requires admin privileges.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/user_keys/#get-a-gpg-key-for-a-user
 ---
 
 # gitlab_user_gpgkey (Resource)
 
-The `gitlab_user_gpgkey` resource allows to manage the lifecycle of a GPG key assigned to the current user or a specific user.
+The `gitlab_user_gpgkey` resource manages the lifecycle of a GPG key assigned to the current user or a specific user.
 		
 -> Managing GPG keys for arbitrary users requires admin privileges.
 

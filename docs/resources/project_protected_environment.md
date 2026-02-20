@@ -3,7 +3,7 @@
 page_title: "gitlab_project_protected_environment Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_protected_environment resource allows to manage the lifecycle of a protected environment in a project.
+  The gitlab_project_protected_environment resource manages the lifecycle of a protected environment in a project.
   ~> In order to use a user or group in the deploy_access_levels configuration,
   you need to make sure that users have access to the project and groups must have this project shared.
   You may use the gitlab_project_membership and gitlab_project_shared_group resources to achieve this.
@@ -14,7 +14,7 @@ description: |-
 
 # gitlab_project_protected_environment (Resource)
 
-The `gitlab_project_protected_environment` resource allows to manage the lifecycle of a protected environment in a project.
+The `gitlab_project_protected_environment` resource manages the lifecycle of a protected environment in a project.
 
 ~> In order to use a user or group in the `deploy_access_levels` configuration,
    you need to make sure that users have access to the project and groups must have this project shared.

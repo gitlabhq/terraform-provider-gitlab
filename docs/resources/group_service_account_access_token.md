@@ -3,7 +3,7 @@
 page_title: "gitlab_group_service_account_access_token Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_group_service_account_access_token resource allows to manage the lifecycle of a group service account access token.
+  The gitlab_group_service_account_access_token resource manages the lifecycle of a group service account access token.
   ~> Use of the timestamp() function with expires_at will cause the resource to be re-created with every apply, it's recommended to use plantimestamp() or a static value instead.
   ~> Reading the access token status of a service account requires an admin token or a top-level group owner token on gitlab.com. As a result, this resource will ignore permission errors when attempting to read the token status, and will rely on the values in state instead. This can lead to apply-time failures if the token configured for the provider doesn't have permissions to rotate tokens for the service account.
   ~> Use rotation_configuration to automatically rotate tokens instead of using timestamp() as timestamp will cause changes with every plan. terraform apply must still be run to rotate the token.
@@ -13,7 +13,7 @@ description: |-
 
 # gitlab_group_service_account_access_token (Resource)
 
-The `gitlab_group_service_account_access_token` resource allows to manage the lifecycle of a group service account access token.
+The `gitlab_group_service_account_access_token` resource manages the lifecycle of a group service account access token.
 
 ~> Use of the `timestamp()` function with expires_at will cause the resource to be re-created with every apply, it's recommended to use `plantimestamp()` or a static value instead.
 

@@ -3,13 +3,13 @@
 page_title: "gitlab_user_custom_attribute Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_user_custom_attribute resource allows to manage custom attributes for a user.
+  The gitlab_user_custom_attribute resource manages custom attributes for a user.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/custom_attributes/
 ---
 
 # gitlab_user_custom_attribute (Resource)
 
-The `gitlab_user_custom_attribute` resource allows to manage custom attributes for a user.
+The `gitlab_user_custom_attribute` resource manages custom attributes for a user.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/custom_attributes/)
 

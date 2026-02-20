@@ -3,13 +3,13 @@
 page_title: "gitlab_pipeline_trigger Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_pipeline_trigger resource allows to manage the lifecycle of a pipeline trigger.
+  The gitlab_pipeline_trigger resource manages the lifecycle of a pipeline trigger.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/pipeline_triggers/
 ---
 
 # gitlab_pipeline_trigger (Resource)
 
-The `gitlab_pipeline_trigger` resource allows to manage the lifecycle of a pipeline trigger.
+The `gitlab_pipeline_trigger` resource manages the lifecycle of a pipeline trigger.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/pipeline_triggers/)
 

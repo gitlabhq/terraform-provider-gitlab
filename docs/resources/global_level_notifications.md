@@ -3,13 +3,13 @@
 page_title: "gitlab_global_level_notifications Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_global_level_notifications resource allows to manage global notifications.
+  The gitlab_global_level_notifications resource manages global notifications.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/notification_settings/#get-group-or-project-notification-settings
 ---
 
 # gitlab_global_level_notifications (Resource)
 
-The `gitlab_global_level_notifications` resource allows to manage global notifications.
+The `gitlab_global_level_notifications` resource manages global notifications.
 		
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/notification_settings/#get-group-or-project-notification-settings)
 

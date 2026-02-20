@@ -3,13 +3,13 @@
 page_title: "gitlab_release Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_release resource allows to manage the lifecycle of releases in gitlab.
+  The gitlab_release resource manages the lifecycle of releases in gitlab.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/releases/
 ---
 
 # gitlab_release (Resource)
 
-The `gitlab_release` resource allows to manage the lifecycle of releases in gitlab.
+The `gitlab_release` resource manages the lifecycle of releases in gitlab.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/releases/)
 

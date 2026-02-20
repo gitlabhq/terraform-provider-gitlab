@@ -3,14 +3,14 @@
 page_title: "gitlab_project_hook Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_hook resource allows to manage the lifecycle of a project hook.
+  The gitlab_project_hook resource manages the lifecycle of a project hook.
   ~> Note that push_events defaults to true.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_webhooks/
 ---
 
 # gitlab_project_hook (Resource)
 
-The `gitlab_project_hook` resource allows to manage the lifecycle of a project hook.
+The `gitlab_project_hook` resource manages the lifecycle of a project hook.
 
 ~> Note that `push_events` defaults to `true`.
 
@@ -60,12 +60,14 @@ resource "gitlab_project_hook" "custom_headers" {
 
 ### Optional
 
+- `branch_filter_strategy` (String) Filter push events by branch. Valid values are: `wildcard`, `regex`, `all_branches`.
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events. Defaults to `false`.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential note events. Defaults to `false`.
 - `custom_headers` (Attributes List) Custom headers for the project webhook. Available from GitLab 17.1 onwards. (see [below for nested schema](#nestedatt--custom_headers))
 - `custom_webhook_template` (String) Custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events. Defaults to `false`.
 - `description` (String) Description of the webhook.
+- `emoji_events` (Boolean) Invoke the hook for emoji events. Defaults to `false`.
 - `enable_ssl_verification` (Boolean) Enable SSL verification when invoking the hook. Defaults to `true`.
 - `issues_events` (Boolean) Invoke the hook for issues events. Defaults to `false`.
 - `job_events` (Boolean) Invoke the hook for job events. Defaults to `false`.

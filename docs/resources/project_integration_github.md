@@ -13,7 +13,7 @@ description: |-
 The `gitlab_project_integration_github` resource manages the lifecycle of a project integration with GitHub.
 
 -> This resource requires a GitLab Enterprise instance.
-	
+
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#github)
 
 ## Example Usage
@@ -48,10 +48,10 @@ resource "gitlab_project_integration_github" "github" {
 ### Read-Only
 
 - `active` (Boolean) Whether the integration is active.
-- `created_at` (String) Creation time.
-- `id` (String) The ID of this resource.
-- `title` (String) The title of this resource.
-- `updated_at` (String) Update time.
+- `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
+- `title` (String) Title of the integration.
+- `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.
 
 ## Import
 

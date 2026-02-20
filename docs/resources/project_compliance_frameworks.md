@@ -3,14 +3,14 @@
 page_title: "gitlab_project_compliance_frameworks Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_compliance_frameworks resource allows to manage the lifecycle of compliance frameworks on a project.
+  The gitlab_project_compliance_frameworks resource manages the lifecycle of compliance frameworks on a project.
   -> This resource requires a GitLab Enterprise instance with a Premium license to set the compliance frameworks on a project.
   Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/#mutationprojectupdatecomplianceframeworks
 ---
 
 # gitlab_project_compliance_frameworks (Resource)
 
-The `gitlab_project_compliance_frameworks` resource allows to manage the lifecycle of compliance frameworks on a project.
+The `gitlab_project_compliance_frameworks` resource manages the lifecycle of compliance frameworks on a project.
 
 -> This resource requires a GitLab Enterprise instance with a Premium license to set the compliance frameworks on a project.
 

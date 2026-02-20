@@ -3,14 +3,14 @@
 page_title: "gitlab_project_level_mr_approvals Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_project_level_mr_approval_rule resource allows to manage the lifecycle of a Merge Request-level approval rule.
+  The gitlab_project_level_mr_approval_rule resource manages the lifecycle of a Merge Request-level approval rule.
   -> This resource requires a GitLab Enterprise instance.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/merge_request_approvals/#approval-rules-for-a-merge-request
 ---
 
 # gitlab_project_level_mr_approvals (Resource)
 
-The `gitlab_project_level_mr_approval_rule` resource allows to manage the lifecycle of a Merge Request-level approval rule.
+The `gitlab_project_level_mr_approval_rule` resource manages the lifecycle of a Merge Request-level approval rule.
 
 -> This resource requires a GitLab Enterprise instance.
 		

@@ -3,7 +3,7 @@
 page_title: "gitlab_cluster_agent Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
-  The gitlab_cluster_agent resource allows to manage the lifecycle of a GitLab Agent for Kubernetes.
+  The gitlab_cluster_agent resource manages the lifecycle of a GitLab Agent for Kubernetes.
   -> Note that this resource only registers the agent, but doesn't configure it.
   The configuration needs to be manually added as described in
   the docs https://docs.gitlab.com/user/clusters/agent/install/index/#create-an-agent-configuration-file.
@@ -14,7 +14,7 @@ description: |-
 
 # gitlab_cluster_agent (Resource)
 
-The `gitlab_cluster_agent` resource allows to manage the lifecycle of a GitLab Agent for Kubernetes.
+The `gitlab_cluster_agent` resource manages the lifecycle of a GitLab Agent for Kubernetes.
 
 -> Note that this resource only registers the agent, but doesn't configure it.
    The configuration needs to be manually added as described in
