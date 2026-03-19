@@ -41,12 +41,22 @@ data "gitlab_pipeline_schedule" "example" {
 - `cron` (String) The cron (e.g. `0 1 * * *`).
 - `description` (String) The description of the pipeline schedule.
 - `id` (String) The ID of this Terraform resource. In the format of `<project-id>:<pipeline-schedule-id>`.
+- `inputs` (Attributes List) List of pipeline schedule inputs. Each element has `name` and `value`. (see [below for nested schema](#nestedatt--inputs))
 - `last_pipeline` (Attributes) The details of the last pipeline run by the schedule. (see [below for nested schema](#nestedatt--last_pipeline))
 - `next_run_at` (String) The datetime of when the schedule will next run.
 - `owner` (Attributes) The details of the pipeline schedule owner. (see [below for nested schema](#nestedatt--owner))
 - `ref` (String) The branch/tag name to be triggered. This will be the full branch reference, for example: `refs/heads/main`, not `main`.
 - `updated_at` (String) The datetime of when the schedule was last updated.
 - `variables` (Attributes List) The list of the pipeline schedule variables. (see [below for nested schema](#nestedatt--variables))
+
+<a id="nestedatt--inputs"></a>
+### Nested Schema for `inputs`
+
+Read-Only:
+
+- `name` (String) The name of the input.
+- `value` (String) The value of the input.
+
 
 <a id="nestedatt--last_pipeline"></a>
 ### Nested Schema for `last_pipeline`

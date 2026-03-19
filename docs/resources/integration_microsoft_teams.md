@@ -4,7 +4,7 @@ page_title: "gitlab_integration_microsoft_teams Resource - terraform-provider-gi
 subcategory: ""
 description: |-
   The gitlab_integration_microsoft_teams resource manages the lifecycle of a project integration with Microsoft Teams.
-  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_microsoft_teamsinstead!
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_microsoft_teams instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#microsoft-teams-notifications
 ---
 
@@ -12,7 +12,7 @@ description: |-
 
 The `gitlab_integration_microsoft_teams` resource manages the lifecycle of a project integration with Microsoft Teams.
 
-~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_microsoft_teams`instead!
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_microsoft_teams` instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#microsoft-teams-notifications)
 
@@ -37,29 +37,29 @@ resource "gitlab_integration_microsoft_teams" "teams" {
 
 ### Required
 
-- `project` (String) ID of the project you want to activate integration on.
-- `webhook` (String) The Microsoft Teams webhook (Example, https://outlook.office.com/webhook/...). This value cannot be imported.
+- `project` (String) ID of the project you want to activate the integration on.
+- `webhook` (String, Sensitive) The Microsoft Teams webhook (Example, https://outlook.office.com/webhook/...). This value cannot be imported.
 
 ### Optional
 
-- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are “all”, “default”, “protected”, and “default_and_protected”. The default value is “default”
-- `confidential_issues_events` (Boolean) Enable notifications for confidential issue events
-- `confidential_note_events` (Boolean) Enable notifications for confidential note events
-- `issues_events` (Boolean) Enable notifications for issue events
-- `merge_requests_events` (Boolean) Enable notifications for merge request events
-- `note_events` (Boolean) Enable notifications for note events
-- `notify_only_broken_pipelines` (Boolean) Send notifications for broken pipelines
-- `pipeline_events` (Boolean) Enable notifications for pipeline events
-- `push_events` (Boolean) Enable notifications for push events
-- `tag_push_events` (Boolean) Enable notifications for tag push events
-- `wiki_page_events` (Boolean) Enable notifications for wiki page events
+- `branches_to_be_notified` (String) Branches to send notifications for. Valid values are: `all`, `default`, `protected`, `default_and_protected`
+- `confidential_issues_events` (Boolean) Enable notifications for confidential issue events.
+- `confidential_note_events` (Boolean) Enable notifications for confidential note events.
+- `issues_events` (Boolean) Enable notifications for issue events.
+- `merge_requests_events` (Boolean) Enable notifications for merge request events.
+- `note_events` (Boolean) Enable notifications for note events.
+- `notify_only_broken_pipelines` (Boolean) Send notifications for broken pipelines.
+- `pipeline_events` (Boolean) Enable notifications for pipeline events.
+- `push_events` (Boolean) Enable notifications for push events.
+- `tag_push_events` (Boolean) Enable notifications for tag push events.
+- `wiki_page_events` (Boolean) Enable notifications for wiki page events.
 
 ### Read-Only
 
 - `active` (Boolean) Whether the integration is active.
-- `created_at` (String) Create time.
-- `id` (String) The ID of this resource.
-- `updated_at` (String) Update time.
+- `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
+- `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.
 
 ## Import
 

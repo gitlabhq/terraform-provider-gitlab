@@ -40,7 +40,7 @@ data "gitlab_group" "foo" {
 - `default_branch` (String) The default branch of the group.
 - `default_branch_protection` (Number) Whether developers and maintainers can push to the applicable default branch.
 - `description` (String) The description of the group.
-- `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
+- `extra_shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Additional CI/CD minutes for this group.
 - `full_name` (String) The full name of the group.
 - `id` (String) The ID of this datasource. In the format `<group-id>`.
 - `lfs_enabled` (Boolean) Boolean, is LFS enabled for projects in this group.
@@ -52,7 +52,7 @@ data "gitlab_group" "foo" {
 - `prevent_sharing_groups_outside_hierarchy` (Boolean) When enabled, users cannot invite other groups outside of the top-level group’s hierarchy. This option is only available for top-level groups.
 - `request_access_enabled` (Boolean) Boolean, is request for access enabled to the group.
 - `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
-- `shared_runners_minutes_limit` (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+- `shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
 - `shared_runners_setting` (String) Enable or disable shared runners for a group's subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
 - `shared_with_groups` (Attributes List) Describes groups which have access shared to this group. (see [below for nested schema](#nestedatt--shared_with_groups))
 - `visibility_level` (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.

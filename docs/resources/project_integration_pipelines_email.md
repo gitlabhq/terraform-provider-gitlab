@@ -36,16 +36,16 @@ resource "gitlab_project_integration_pipelines_email" "email" {
 ### Required
 
 - `project` (String) ID of the project you want to activate integration on.
-- `recipients` (Set of String) ) email addresses where notifications are sent.
+- `recipients` (Set of String) Email addresses where notifications are sent.
 
 ### Optional
 
-- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are `all`, `default`, `protected`, and `default_and_protected`. Default is `default`
+- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are `all`, `default`, `protected`, `default_and_protected`. Default is `default`.
 - `notify_only_broken_pipelines` (Boolean) Notify only broken pipelines. Default is true.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
 
 ## Import
 

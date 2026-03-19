@@ -99,6 +99,7 @@ resource "gitlab_group_hook" "all_attributes" {
 - `feature_flag_events` (Boolean) Invoke the hook for feature flag events. Defaults to `false`.
 - `issues_events` (Boolean) Invoke the hook for issues events. Defaults to `false`.
 - `job_events` (Boolean) Invoke the hook for job events. Defaults to `false`.
+- `member_events` (Boolean) Invoke the hook for member events. Defaults to `false`.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests events. Defaults to `false`.
 - `name` (String) Name of the group webhook.
 - `note_events` (Boolean) Invoke the hook for note events. Defaults to `false`.

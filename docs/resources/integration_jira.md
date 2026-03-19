@@ -4,7 +4,7 @@ page_title: "gitlab_integration_jira Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_integration_jira resource manages the lifecycle of a project integration with Jira.
-  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_jirainstead!
+  ~> This resource is deprecated and will be removed in 19.0. Use gitlab_project_integration_jira instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_integrations/#jira-issues
 ---
 
@@ -12,8 +12,7 @@ description: |-
 
 The `gitlab_integration_jira` resource manages the lifecycle of a project integration with Jira.
 
-~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_jira`instead!
-
+~> This resource is deprecated and will be removed in 19.0. Use `gitlab_project_integration_jira` instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_integrations/#jira-issues)
 
@@ -62,10 +61,10 @@ resource "gitlab_integration_jira" "jira" {
 ### Read-Only
 
 - `active` (Boolean) Whether the integration is active.
-- `created_at` (String) Create time.
-- `id` (String) The ID of this resource.
-- `title` (String) Title.
-- `updated_at` (String) Update time.
+- `created_at` (String) The ISO8601 date/time that this integration was activated at in UTC.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
+- `title` (String) Title of the integration.
+- `updated_at` (String) The ISO8601 date/time that this integration was last updated at in UTC.
 
 ## Import
 

@@ -497,7 +497,7 @@ Key items to notice about the above example include:
 1. the `Steps` attribute of the `TestCase` include a slice of `TestStep`. The first step (and any non-import steps) includes a `Config`
 attribute that specifies what the terraform configuration is. This will run a `terraform apply` to create that resource.
 2. The `Check` attribute includes a set of `CheckFunc`, and the `resource` package provides a set of implementations that can be used
-for checking things like values, or to check that an attribute is set without checking its value.
+for checking things like values, or to check that an attribute is set without checking its value. These are usually only required for fields that cannot be verified through the `ImportState` described in the next point.
 3. In the second `TestStep`, the `ImportState` attribute is set to true. This will run `terraform import` and import the resource
 specified in the `ResourceName` attribute. If any attributes don't match the value returned from the import commany, this `TestStep`
 will return an error. Since the `secret` and `scopes` values are not returned from the API, those cannot be imported, so those two

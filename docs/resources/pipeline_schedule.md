@@ -21,6 +21,16 @@ resource "gitlab_pipeline_schedule" "example" {
   description = "Used to schedule builds"
   ref         = "refs/heads/main"
   cron        = "0 1 * * *"
+  inputs = [
+    {
+      name  = "deploy_strategy"
+      value = "rolling"
+    },
+    {
+      name  = "environment"
+      value = "production"
+    }
+  ]
 }
 ```
 
@@ -38,6 +48,7 @@ resource "gitlab_pipeline_schedule" "example" {
 
 - `active` (Boolean) The activation of pipeline schedule. If false is set, the pipeline schedule will deactivated initially.
 - `cron_timezone` (String) The timezone.
+- `inputs` (Attributes Set) List of pipeline schedule inputs. Each element in `inputs` has `name` and `value`. Maximum of 20 inputs allowed. (see [below for nested schema](#nestedatt--inputs))
 - `take_ownership` (Boolean) When set to `true`, the user represented by the token running Terraform will take ownership of the scheduled pipeline prior to editing it. This can help when managing scheduled pipeline drift when other users are making changes outside Terraform.
 
 ### Read-Only
@@ -45,6 +56,14 @@ resource "gitlab_pipeline_schedule" "example" {
 - `id` (String) The ID of this Terraform resource. In the format of `<project-id>:<pipeline-schedule-id>`.
 - `owner` (Number) The ID of the user that owns the pipeline schedule.
 - `pipeline_schedule_id` (Number) The pipeline schedule id.
+
+<a id="nestedatt--inputs"></a>
+### Nested Schema for `inputs`
+
+Required:
+
+- `name` (String) The name of the input.
+- `value` (String) The value of the input.
 
 ## Import
 

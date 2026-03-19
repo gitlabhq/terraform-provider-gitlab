@@ -39,7 +39,7 @@ data "gitlab_user" "example-two" {
 
 ### Optional
 
-- `email` (String) The public email address of the user.
+- `email` (String) The email address of the user.
 - `email_exact_match` (Boolean) (Experimental) If true, returns only an exact match. Otherwise, fuzzy matching might return the closest result. If no exact match is available, the data source returns an error.
 - `namespace_id` (Number) The ID of the user's namespace. Requires admin token to access this field.
 - `user_id` (Number) The ID of the user.
@@ -66,6 +66,7 @@ data "gitlab_user" "example-two" {
 - `note` (String) Admin notes for this user.
 - `organization` (String) The organization of the user.
 - `projects_limit` (Number) Number of projects the user can create.
+- `public_email` (String) The public email address of the user.
 - `skype` (String) Skype username of the user.
 - `state` (String) Whether the user is active or blocked.
 - `theme_id` (Number) User's theme ID.

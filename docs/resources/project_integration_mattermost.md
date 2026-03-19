@@ -37,11 +37,11 @@ resource "gitlab_project_integration_mattermost" "mattermost" {
 ### Required
 
 - `project` (String) ID of the project you want to activate integration on.
-- `webhook` (String) Webhook URL (Example, https://mattermost.yourdomain.com/hooks/...). This value cannot be imported.
+- `webhook` (String, Sensitive) Webhook URL (Example, https://mattermost.yourdomain.com/hooks/...). This value cannot be imported.
 
 ### Optional
 
-- `branches_to_be_notified` (String) Branches to send notifications for. Valid options are "all", "default", "protected", and "default_and_protected".
+- `branches_to_be_notified` (String) Branches to send notifications for. Valid values are `all`, `default`, `protected`, `default_and_protected`.
 - `confidential_issue_channel` (String) The name of the channel to receive confidential issue events notifications.
 - `confidential_issues_events` (Boolean) Enable notifications for confidential issues events.
 - `confidential_note_channel` (String) The name of the channel to receive confidential note events notifications.
@@ -65,7 +65,7 @@ resource "gitlab_project_integration_mattermost" "mattermost" {
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format of `<project>`.
 
 ## Import
 

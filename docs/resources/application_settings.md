@@ -79,6 +79,7 @@ resource "gitlab_application_settings" "this" {
 - `bulk_import_max_download_file_size` (Number) Maximum download file size when importing from source GitLab instances by direct transfer.
 - `can_create_group` (Boolean) Indicates whether users can create top-level groups.
 - `check_namespace_plan` (Boolean) Enabling this makes only licensed EE features available to projects if the project namespace’s plan includes the feature or if the project is public.
+- `ci_job_live_trace_enabled` (Boolean) Turns on incremental logging for job logs. When turned on, archived job logs are incrementally uploaded to object storage. Object storage must be configured.
 - `ci_max_includes` (Number) The maximum number of includes per pipeline.
 - `ci_max_total_yaml_size_bytes` (Number) The maximum amount of memory, in bytes, that can be allocated for the pipeline configuration, with all included YAML configuration files.
 - `commit_email_hostname` (String) Custom hostname (for private commit emails).
@@ -116,6 +117,7 @@ resource "gitlab_application_settings" "this" {
 - `diff_max_patch_bytes` (Number) Maximum diff patch size, in bytes.
 - `disable_admin_oauth_scopes` (Boolean) Stops administrators from connecting their GitLab accounts to non-trusted OAuth 2.0 applications that have the api, read_api, read_repository, write_repository, read_registry, write_registry, or sudo scopes.
 - `disable_feed_token` (Boolean) Disable display of RSS/Atom and calendar feed tokens.
+- `disable_overriding_approvers_per_merge_request` (Boolean) Prevent editing approval rules in projects and merge requests.
 - `disable_personal_access_tokens` (Boolean) Disable personal access tokens. Self-managed, Premium and Ultimate only. There is no method available to enable a personal access token that’s been disabled through the API. This is a known issue.
 - `disabled_oauth_sign_in_sources` (List of String) Disabled OAuth sign-in sources.
 - `dns_rebinding_protection_enabled` (Boolean) Enforce DNS rebinding attack protection.
@@ -202,6 +204,7 @@ resource "gitlab_application_settings" "this" {
 - `inactive_projects_delete_after_months` (Number) If delete_inactive_projects is true, the time (in months) to wait before deleting inactive projects.
 - `inactive_projects_min_size_mb` (Number) If delete_inactive_projects is true, the minimum repository size for projects to be checked for inactivity.
 - `inactive_projects_send_warning_email_after_months` (Number) If delete_inactive_projects is true, sets the time (in months) to wait before emailing maintainers that the project is scheduled be deleted because it is inactive.
+- `inactive_resource_access_tokens_delete_after_days` (Number) Specifies retention period for inactive project and group access tokens. Default is 30.
 - `include_optional_metrics_in_service_ping` (Boolean) Whether or not optional metrics are enabled in Service Ping.
 - `invisible_captcha_enabled` (Boolean) Enable Invisible CAPTCHA spam detection during sign-up.
 - `issues_create_limit` (Number) Max number of issue creation requests per minute per user.
@@ -212,6 +215,7 @@ resource "gitlab_application_settings" "this" {
 - `local_markdown_version` (Number) Increase this value when any cached Markdown should be invalidated.
 - `lock_duo_features_enabled` (Boolean) Indicates whether the GitLab Duo features enabled setting is enforced for all subgroups. Self-managed, Premium and Ultimate only.
 - `lock_memberships_to_ldap` (Boolean) Set to true to lock all memberships to LDAP. Premium and Ultimate only.
+- `lock_memberships_to_saml` (Boolean) Set to true to lock all memberships to SAML. Premium and Ultimate only.
 - `mailgun_events_enabled` (Boolean) Enable Mailgun event receiver.
 - `mailgun_signing_key` (String, Sensitive) The Mailgun HTTP webhook signing key for receiving events from webhook.
 - `maintenance_mode` (Boolean) When instance is in maintenance mode, non-administrative users can sign in with read-only access and make read-only API requests.
@@ -256,6 +260,8 @@ resource "gitlab_application_settings" "this" {
 - `plantuml_enabled` (Boolean) (If enabled, requires: plantuml_url) Enable PlantUML integration.
 - `plantuml_url` (String) The PlantUML instance URL for integration.
 - `polling_interval_multiplier` (Number) Interval multiplier used by endpoints that perform polling. Set to 0 to disable polling.
+- `prevent_merge_requests_author_approval` (Boolean) Prevent approval by merge request creator (author).
+- `prevent_merge_requests_committers_approval` (Boolean) Prevent approval by committers to merge requests.
 - `project_export_enabled` (Boolean) Enable project export.
 - `project_jobs_api_rate_limit` (Number) Maximum authenticated requests to /project/:id/jobs per minute.
 - `projects_api_rate_limit_unauthenticated` (Number) Max number of requests per 10 minutes per IP address for unauthenticated requests to the list all projects API. To disable throttling set to 0.
@@ -374,4 +380,5 @@ Optional:
 - `allow_force_push` (Boolean) Allow force push for all users with push access.
 - `allowed_to_merge` (List of Number) An array of access levels allowed to merge. Supports Developer (30) or Maintainer (40).
 - `allowed_to_push` (List of Number) An array of access levels allowed to push. Supports Developer (30) or Maintainer (40).
+- `code_owner_approval_required` (Boolean) Require code owner approval before merging.
 - `developer_can_initial_push` (Boolean) Allow developers to initial push.

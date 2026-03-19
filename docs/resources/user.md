@@ -57,10 +57,18 @@ resource "gitlab_user" "example" {
 - `reset_password` (Boolean) Boolean, defaults to false. Send user password reset link.
 - `skip_confirmation` (Boolean) Boolean, defaults to true. Whether to skip confirmation.
 - `state` (String) String, defaults to 'active'. The state of the user account. Valid values are `active`, `deactivated`, `blocked`.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `delete` (String)
 
 ## Import
 

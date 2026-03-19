@@ -103,7 +103,7 @@ resource "gitlab_group" "example-five" {
 - `default_branch_protection_defaults` (Block List, Max: 1) The default branch protection defaults (see [below for nested schema](#nestedblock--default_branch_protection_defaults))
 - `description` (String) The group's description.
 - `emails_enabled` (Boolean) Enable email notifications.
-- `extra_shared_runners_minutes_limit` (Number) Can be set by administrators only. Additional CI/CD minutes for this group.
+- `extra_shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Additional CI/CD minutes for this group.
 - `ip_restriction_ranges` (Set of String) A list of IP addresses or subnet masks to restrict group access. Will be concatenated together into a comma separated string. Only allowed on top level groups.
 - `lfs_enabled` (Boolean) Enable/disable Large File Storage (LFS) for the projects in this group.
 - `max_artifacts_size` (Number) The maximum file size in megabytes for individual job artifacts.
@@ -120,7 +120,7 @@ resource "gitlab_group" "example-five" {
 - `request_access_enabled` (Boolean) Allow users to request member access.
 - `require_two_factor_authentication` (Boolean) Require all users in this group to setup Two-factor authentication.
 - `share_with_group_lock` (Boolean) Prevent sharing a project with another group within this group.
-- `shared_runners_minutes_limit` (Number) Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
+- `shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
 - `shared_runners_setting` (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
 - `subgroup_creation_level` (String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
 - `two_factor_grace_period` (Number) Defaults to 48. Time before Two-factor authentication is enforced (in hours).
@@ -144,6 +144,7 @@ Optional:
 - `allow_force_push` (Boolean) Allow force push for all users with push access.
 - `allowed_to_merge` (List of String) An array of access levels allowed to merge. Valid values are: `developer`, `maintainer`, `no one`.
 - `allowed_to_push` (List of String) An array of access levels allowed to push. Valid values are: `developer`, `maintainer`, `no one`.
+- `code_owner_approval_required` (Boolean) Require code owner approval before merging.
 - `developer_can_initial_push` (Boolean) Allow developers to initial push.
 
 

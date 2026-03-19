@@ -41,7 +41,7 @@ resource "gitlab_project_mirror" "foo" {
 ### Required
 
 - `project` (String) The id of the project.
-- `url` (String, Sensitive) The URL of the remote repository to be mirrored.
+- `url` (String, Sensitive) The URL of the remote repository to be mirrored. Note that URLs with credentials will not import properly, and will require a replace on the first apply.
 
 ### Optional
 

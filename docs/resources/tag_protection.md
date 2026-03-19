@@ -4,17 +4,12 @@ page_title: "gitlab_tag_protection Resource - terraform-provider-gitlab"
 subcategory: ""
 description: |-
   The gitlab_tag_protection resource manages the lifecycle of a tag protection.
-  ~> As tag protections cannot be updated, they are deleted and recreated when a change is requested. This means that if the deletion succeeds but the creation fails, tags will be left unprotected.
-  If this is a potential issue for you, please use the create_before_destroy meta-argument: https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_tags/
 ---
 
 # gitlab_tag_protection (Resource)
 
 The `gitlab_tag_protection` resource manages the lifecycle of a tag protection.
-
-~> As tag protections cannot be updated, they are deleted and recreated when a change is requested. This means that if the deletion succeeds but the creation fails, tags will be left unprotected.
-If this is a potential issue for you, please use the `create_before_destroy` meta-argument: https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_tags/)
 
