@@ -1,5 +1,9 @@
-<a href="https://terraform.io">
-    <img src=".github/terraform_logo.svg" alt="Terraform logo" title="Terraform" align="right" height="50" />
+ <a href="https://terraform.io" aria-label="Terraform">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/terraform-logo-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset=".github/terraform-logo-light.svg">
+      <img  align="right" alt="Terraform logo" height="50" src=".github/terraform-logo-light.svg">
+    </picture>
 </a>
 
 # Terraform Provider for GitLab
