@@ -212,6 +212,9 @@ resource "gitlab_application_settings" "this" {
 - `jira_connect_proxy_url` (String) URL of the GitLab instance used as a proxy for the GitLab for Jira Cloud app.
 - `jira_connect_public_key_storage_enabled` (Boolean) Enable public key storage for the GitLab for Jira Cloud app.
 - `keep_latest_artifact` (Boolean) Prevent the deletion of the artifacts from the most recent successful jobs, regardless of the expiry time.
+- `kroki_enabled` (Boolean) (If enabled, requires: kroki_url) Enable Kroki integration.
+- `kroki_formats` (Map of Boolean) Configuration for formats supported by the Kroki instance.
+- `kroki_url` (String) The Kroki instance URL for integration.
 - `local_markdown_version` (Number) Increase this value when any cached Markdown should be invalidated.
 - `lock_duo_features_enabled` (Boolean) Indicates whether the GitLab Duo features enabled setting is enforced for all subgroups. Self-managed, Premium and Ultimate only.
 - `lock_memberships_to_ldap` (Boolean) Set to true to lock all memberships to LDAP. Premium and Ultimate only.
@@ -330,6 +333,9 @@ resource "gitlab_application_settings" "this" {
 - `throttle_authenticated_api_enabled` (Boolean) (If enabled, requires: throttle_authenticated_api_period_in_seconds and throttle_authenticated_api_requests_per_period) Enable authenticated API request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots).
 - `throttle_authenticated_api_period_in_seconds` (Number) Rate limit period (in seconds).
 - `throttle_authenticated_api_requests_per_period` (Number) Maximum requests per period per user.
+- `throttle_authenticated_git_lfs_enabled` (Boolean) Enable authenticated Git LFS request rate limit.
+- `throttle_authenticated_git_lfs_period_in_seconds` (Number) Rate limit period (in seconds).
+- `throttle_authenticated_git_lfs_requests_per_period` (Number) Maximum requests per period per user.
 - `throttle_authenticated_packages_api_enabled` (Boolean) (If enabled, requires: throttle_authenticated_packages_api_period_in_seconds and throttle_authenticated_packages_api_requests_per_period) Enable authenticated API request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots). View Package Registry rate limits for more details.
 - `throttle_authenticated_packages_api_period_in_seconds` (Number) Rate limit period (in seconds). View Package Registry rate limits for more details.
 - `throttle_authenticated_packages_api_requests_per_period` (Number) Maximum requests per period per user. View Package Registry rate limits for more details.
@@ -352,6 +358,7 @@ resource "gitlab_application_settings" "this" {
 - `unique_ips_limit_per_user` (Number) Maximum number of IPs per user.
 - `unique_ips_limit_time_window` (Number) How many seconds an IP is counted towards the limit.
 - `update_runner_versions_enabled` (Boolean) Fetch GitLab Runner release version data from GitLab.com.
+- `updating_name_disabled_for_users` (Boolean) Disable user profile name changes.
 - `usage_ping_enabled` (Boolean) Every week GitLab reports license usage back to GitLab, Inc.
 - `use_clickhouse_for_analytics` (Boolean) Enables ClickHouse as a data source for analytics reports. ClickHouse must be configured for this setting to take effect. Available on Premium and Ultimate only.
 - `user_deactivation_emails_enabled` (Boolean) Send an email to users upon account deactivation.

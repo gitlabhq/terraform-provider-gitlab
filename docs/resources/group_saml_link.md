@@ -65,6 +65,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab group saml links can be imported using an id made up of `group_id:saml_group_name`, e.g.
+# GitLab group saml links can be imported using an id made up of `group_id:saml_group_name`, for example:
 terraform import gitlab_group_saml_link.test "12345:samlgroupname1"
 ```

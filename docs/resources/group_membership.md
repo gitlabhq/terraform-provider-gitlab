@@ -61,6 +61,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab group membership can be imported using an id made up of `group_id:user_id`, e.g.
+# GitLab group membership can be imported using an id made up of `group_id:user_id`, for example:
 terraform import gitlab_group_membership.test "12345:1337"
 ```

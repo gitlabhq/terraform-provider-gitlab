@@ -104,6 +104,7 @@ resource "gitlab_group_hook" "all_attributes" {
 - `name` (String) Name of the group webhook.
 - `note_events` (Boolean) Invoke the hook for note events. Defaults to `false`.
 - `pipeline_events` (Boolean) Invoke the hook for pipeline events. Defaults to `false`.
+- `project_events` (Boolean) Invoke the hook for project events. Defaults to `false`.
 - `push_events` (Boolean) Invoke the hook for push events. Defaults to `true`.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
 - `releases_events` (Boolean) Invoke the hook for release events. Defaults to `false`.
@@ -141,7 +142,7 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# A GitLab Group Hook can be imported using a key composed of `<group-id>:<hook-id>`, e.g.
+# A GitLab Group Hook can be imported using a key composed of `<group-id>:<hook-id>`, for example:
 terraform import gitlab_group_hook.example "12345:1"
 
 # NOTE: the `token` resource attribute is not available for imported resources as this information cannot be read from the GitLab API.

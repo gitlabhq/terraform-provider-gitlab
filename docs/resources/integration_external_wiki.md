@@ -62,6 +62,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# You can import a gitlab_integration_external_wiki state using the project ID, e.g.
+# You can import a gitlab_integration_external_wiki state using the project ID, for example:
 terraform import gitlab_integration_external_wiki.wiki 1
 ```

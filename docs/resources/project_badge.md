@@ -85,6 +85,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab project badges can be imported using an id made up of `{project_id}:{badge_id}`, e.g.
+# GitLab project badges can be imported using an id made up of `{project_id}:{badge_id}`, for example:
 terraform import gitlab_project_badge.foo 1:3
 ```

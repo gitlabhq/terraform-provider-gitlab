@@ -83,6 +83,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# You can import a gitlab_integration_slack.slack state using the project ID, e.g.
+# You can import a gitlab_integration_slack.slack state using the project ID, for example:
 terraform import gitlab_integration_slack.slack 1
 ```

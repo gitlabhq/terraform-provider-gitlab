@@ -66,9 +66,9 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# You can import a GPG key for a specific user using an id made up of `{user-id}:{key}`, e.g.
+# You can import a GPG key for a specific user using an id made up of `{user-id}:{key}`, for example:
 terraform import gitlab_user_gpgkey.example 42:1
 
-# Alternatively, you can import a GPG key for the current user using an id made up of `{key}`, e.g.
+# Alternatively, you can import a GPG key for the current user using an id made up of `{key}`, for example:
 terraform import gitlab_user_gpgkey.example_user 1
 ```

@@ -1,3 +1,22 @@
+## 18.11.0 (2026-04-16)
+
+### FEATURES (4 changes)
+
+- resource/gitlab_group_hook:  [Add project_events attribute to gitlab_group_hook resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/103e03288e41e99baa79b6716d6e530891ba0535) by @hhubert14 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3022)) 
+- resource/gitlab_application_settings:  [Kroki application settings](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/75a0c99da25e0c55bdeee32e015ef446bdd05515) by @dobybaxter127 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3012)) 
+- resource/gitlab_project_container_tag_protection:  [add container tag protection resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fae588caaaf487421eb882c80fbc954bad40bf4a) by @koken.sha ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2958)) 
+- resource/gitlab_application_settings:  [Add GitLab throttle authenticated lfs Application Settings](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4d99aecf0e78804e63e7b723fee20a878cd730bf) by @12bodickyn ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/2968)) 
+
+### IMPROVEMENTS (1 change)
+
+- resource/gitlab_project_pipeline_trigger:  [refactor: migrate pipeline_trigger to Framework](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/72ee527c824f4dab8c117202d256fb7231634e8d) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3011)) 
+
+### BUG FIXES (3 changes)
+
+- resource/gitlab_pipeline_schedule:  [Update pipeline schedule implementation to be type sensitive](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/5682325658850769bbab4b6e2d4ab9a7671e5ac2) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3018)) 
+- resource/gitlab_project_security_policy_attachment:  [Unable to attach policy to project in same apply that creates project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1cef08c61715d1b161191649892fa7e468c9c30d) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3009)) 
+- resource/gitlab_personal_access_token (multiple):  [Fix parse error when expiresAt is null for access tokens](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fec7de2c324380bd456241ba0ec8eef41f3ba056) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3000))
+
 ## 18.10.0 (2026-03-19)
 
 ### FEATURES (9 changes)

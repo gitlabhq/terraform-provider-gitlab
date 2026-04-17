@@ -10,7 +10,6 @@ description: |-
   when creating a new project and trying to manage the branch protection setting for its default branch the gitlab_branch_protection resource will
   automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
   Having multiple gitlab_branch_protection resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
-  This behavior might change in the future.
   ~> The allowed_to_push, allowed_to_merge, allowed_to_unprotect, unprotect_access_level and code_owner_approval_required attributes require a GitLab Enterprise instance.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_branches/
 ---
@@ -25,7 +24,6 @@ The `gitlab_branch_protection` resource manages the lifecycle of a protected bra
    when creating a new project and trying to manage the branch protection setting for its default branch the `gitlab_branch_protection` resource will
    automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
    Having multiple `gitlab_branch_protection` resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
-   This behavior might change in the future.
 
 ~> The `allowed_to_push`, `allowed_to_merge`, `allowed_to_unprotect`, `unprotect_access_level` and `code_owner_approval_required` attributes require a GitLab Enterprise instance.
 
@@ -168,6 +166,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# Gitlab protected branches can be imported with a key composed of `<project_id>:<branch>`, e.g.
+# Gitlab protected branches can be imported with a key composed of `<project_id>:<branch>`, for example:
 terraform import gitlab_branch_protection.BranchProtect "12345:main"
 ```

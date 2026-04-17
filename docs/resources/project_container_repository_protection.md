@@ -40,8 +40,8 @@ resource "gitlab_project_container_repository_protection" "this" {
 
 ### Optional
 
-- `minimum_access_level_for_delete` (String) Minimum GitLab access level required to delete container images in the container registry. For example maintainer, owner, admin. Must be provided when `minimum_access_level_for_push` is not set.
-- `minimum_access_level_for_push` (String) Minimum GitLab access level required to push container images to the container registry. For example maintainer, owner or admin. Must be provided when `minimum_access_level_for_delete` is not set.
+- `minimum_access_level_for_delete` (String) Minimum GitLab access level required to delete container images in the container registry. Valid values are: `maintainer`, `owner`, `admin`. Must be provided when `minimum_access_level_for_push` is not set.
+- `minimum_access_level_for_push` (String) Minimum GitLab access level required to push container images to the container registry. Valid values are: `maintainer`, `owner`, `admin`. Must be provided when `minimum_access_level_for_delete` is not set.
 
 ### Read-Only
 
@@ -62,6 +62,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab project container repository protection rules can be imported using an id made up of `<project_id>:<protection_rule_id>`, e.g.
+# GitLab project container repository protection rules can be imported using an id made up of `<project_id>:<protection_rule_id>`, for example:
 terraform import gitlab_project_container_repository_protection.this 123:321
 ```

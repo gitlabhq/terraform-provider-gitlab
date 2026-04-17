@@ -81,7 +81,7 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab project job token scopes can be imported using an id made up of `projectId:type:targetId`, e.g.
+# GitLab project job token scopes can be imported using an id made up of `projectId:type:targetId`, for example:
 
 # For target_project_id:
 terraform import gitlab_project_job_token_scope.bar 123:project:321

@@ -55,6 +55,6 @@ import {
 Importing using the CLI is supported with the following syntax:
 
 ```shell
-# GitLab project freeze periods can be imported using an id made up of `project_id:freeze_period_id`, e.g.
+# GitLab project freeze periods can be imported using an id made up of `project_id:freeze_period_id`, for example:
 terraform import gitlab_project_freeze_period.schedule "12345:1337"
 ```

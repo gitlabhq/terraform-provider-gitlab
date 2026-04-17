@@ -186,6 +186,8 @@ resource "gitlab_project" "import_private" {
 - `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_method` (String) Set the merge method. Valid values are `merge`, `rebase_merge`, `ff`.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
+- `merge_request_title_regex` (String) Set the regex pattern that merge request titles must match. Use `merge_request_title_regex_description` to provide a hint to the user.
+- `merge_request_title_regex_description` (String) Set the description shown to users when a merge request title does not match `merge_request_title_regex`.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
 - `merge_requests_enabled` (Boolean, Deprecated) Enable merge requests for the project. Use `merge_requests_access_level` instead. To be removed in 19.0.
 - `merge_requests_template` (String) Sets the template for new merge requests in the project.
