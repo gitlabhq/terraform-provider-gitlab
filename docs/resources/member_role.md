@@ -44,7 +44,7 @@ resource "gitlab_member_role" "example" {
 
 resource "gitlab_member_role" "example" {
   name              = "Enhanced Developer"
-  description       = "This role gives the developers additonal access to manage CI/CD variables and vulnerabilities"
+  description       = "This role gives the developers additional access to manage CI/CD variables and vulnerabilities"
   base_access_level = "DEVELOPER"
   enabled_permissions = [
     "ADMIN_CICD_VARIABLES",

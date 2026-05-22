@@ -179,7 +179,7 @@ Terraform will automatically call the correct function based on the terraform pl
 - If a resource is labelled as `destroy`, the `Delete` function will be called.
 - The `Read` function is called any time terraform `refresh` is called, either by a `plan`, an `apply`, or an explicit `refresh`.
 
-Creating a CRUD funcion involves reading the attributes from the terraform configuration, then passing them to the API call necessary to manipulate the resource in GitLab.
+Creating a CRUD function involves reading the attributes from the terraform configuration, then passing them to the API call necessary to manipulate the resource in GitLab.
 This document will demonstrate a `Read` and `Create` function; other functions can be read from the `gitlab_application_settings.go` file.
 
 First, creating the `Read` function:

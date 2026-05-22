@@ -28,14 +28,13 @@ resource "gitlab_project_share_group" "test" {
 
 ### Required
 
+- `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `planner`, `reporter`, `developer`, `maintainer`, `owner`
 - `group_id` (Number) The id of the group.
 - `project` (String) The ID or URL-encoded path of the project.
 
 ### Optional
 
-- `access_level` (String, Deprecated) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `planner`, `reporter`, `developer`, `maintainer`, `owner`
 - `expires_at` (String) Share expiration date. Format: `YYYY-MM-DD`
-- `group_access` (String) The access level to grant the group for the project. Valid values are: `no one`, `minimal`, `guest`, `planner`, `reporter`, `developer`, `maintainer`, `owner`
 
 ### Read-Only
 

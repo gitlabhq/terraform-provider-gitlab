@@ -5,8 +5,6 @@ subcategory: "Upgrade Guides"
 
 # Upgrade to Terraform GitLab Provider Version 19.0
 
-~> This is a draft and is subject to change.
-
 The GitLab 19.0 major milestone introduced some breaking changes that this release addresses.
 The provider also has some breaking changes which may require actions on the users side.
 These are described below:
@@ -107,8 +105,66 @@ This can be directly replaced with no other changes required.
   - If `restrict_user_defined_variables` was `true`, set `ci_pipeline_variables_minimum_override_role` to `maintainer`.
 - `tags` switch to `topics`
   - Can be directly replaced with no other changes required.
+
+### Datasource gitlab_project
+
+- For all of the following, `true` becomes `enabled` and `false` becomes `disabled`:
+  - `issues_enabled` switch to `issues_access_level`
+  - `merge_requests_enabled` switch to `merge_requests_access_level`
+  - `pipelines_enabled` switch to `builds_access_level`
+  - `wiki_enabled` switch to `wiki_access_level`
+  - `snippets_enabled` switch to `snippets_access_level`
+- `restrict_user_defined_variables` switch to `ci_pipeline_variables_minimum_override_role`
+  - If `restrict_user_defined_variables` was `false`, `ci_pipeline_variables_minimum_override_role` becomes `developer`.
+  - If `restrict_user_defined_variables` was `true`, `ci_pipeline_variables_minimum_override_role` becomes `maintainer`.
 - `public_builds` switch to `public_jobs`
   - Can be directly replaced with no other changes required.
+
+### Datasource gitlab_project_membership
+
+If you were previously using `project_id` or `full_path`, they should be directly replaced with `project`.
+
+### Datasource gitlab_repository_tree
+
+If you were previously using `tree.id`, replace with `tree.node_id`.
+
+### Resource gitlab_project_protected_environment
+
+The `deploy_access_levels` attribute should be replaced by the `deploy_access_levels_attribute` attribute.
+
+For example:
+
+```hcl
+  resource "gitlab_project_protected_environment" "this" {
+    project     = 123
+    environment = "production"
+
+    deploy_access_levels {
+      group_id = 456
+    }
+
+    deploy_access_levels {
+      access_level = "developer"
+    }
+  }
+```
+
+Becomes:
+
+```hcl
+  resource "gitlab_project_protected_environment" "this" {
+    project     = 123
+    environment = "production"
+
+    deploy_access_levels_attribute = [
+      {
+        group_id = 456
+      },
+      {
+        access_level = "developer"
+      }
+  }
+```
 
 ### Resource gitlab_application_settings
 
@@ -154,6 +210,94 @@ As a rough guide:
       allow_force_push = false
   }
   ```
+
+### Datasource gitlab_project_protected_branch
+
+The `gitlab_project_protected_branch.merge_access_levels` and `gitlab_project_protected_branch.push_access_levels`
+attributes have been migrated from a Block Set to an Attributes List and are now read-only.
+
+### Datasource gitlab_project_protected_branches
+
+The `gitlab_project_protected_branches.protected_branches` attribute has been migrated from a Block List
+to an Attributes List and is read-only.
+
+The `gitlab_project_protected_branch.protected_branches.merge_access_levels` and
+`gitlab_project_protected_branch.protected_branches.push_access_levels` attributes
+have been migrated from a Block Set to an Attributes List and are now read-only.
+
+## Resource gitlab_branch_protection overhaul
+
+The `gitlab_branch_protection` resource has been reworked to have separate attributes for CE and EE licenses.  This will cause existing
+configurations to break.
+
+CE users will continue to use the `gitlab_branch_protection.push_access_level` and `gitlab_branch_protection.merge_access_level` attributes.
+
+For EE users, the `gitlab_branch_protection.push_access_level`, `gitlab_branch_protection.merge_access_level`, and
+`gitlab_branch_protection.unprotect_access_level` attributes have been removed.  Their usage should be replaced with
+`gitlab_branch_protection.allowed_to_push`, `gitlab_branch_protection.allowed_to_merge`, and
+`gitlab_branch_protection.allowed_to_unprotect` attributes.
+
+Example old EE config:
+
+```hcl
+resource "gitlab_branch_protection" "branchA" {
+  project                      = "12345"
+  branch                       = "branchA"
+  push_access_level            = "developer"
+  merge_access_level           = "developer"
+  unprotect_access_level       = "developer"
+  allow_force_push             = true
+  code_owner_approval_required = true
+
+  allowed_to_push {
+    user_id = 5
+  }
+  allowed_to_merge {
+    user_id = 37
+  }
+  allowed_to_unprotect {
+    group_id = 42
+  }
+}
+```
+
+Example new EE config:
+
+```hcl
+resource "gitlab_branch_protection" "branchA" {
+  project                      = "12345"
+  branch                       = "branchA"
+  allow_force_push             = true
+  code_owner_approval_required = true
+
+  allowed_to_push = [
+    {
+      user_id = 5
+    },
+    {
+      access_level = "developer"
+    }
+  ]
+
+  allowed_to_merge = [
+    {
+      user_id = 37
+    },
+    {
+      access_level = "developer"
+    }
+  ]
+
+  allowed_to_unprotect = [
+    {
+      group_id = 42
+    },
+    {
+      access_level = "developer"
+    }
+  ]
+}
+```
 
 ## Resource gitlab_project.approvals_before_merge Replacement
 
@@ -247,11 +391,6 @@ resource "gitlab_project_pull_mirror" "mirror" {
   - As there is a relationship between the two resources, the `gitlab_project` resource will apply first. This will temporarily remove the mirror.
   - Then the new pull mirror resource will apply and add the mirror back in.
 
-## Resources removed
+## Any problems upgrading?
 
-These resources are for long deprecated features of GitLab.
-The functionality will no longer be available in GitLab 19.0, so these resources will also be removed.
-
-- `gitlab_group_cluster`
-- `gitlab_instance_cluster`
-- `gitlab_project_cluster`
+Please [fill out an issue](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/work_items) in this project's issue tracker and someone from the community will respond as soon as they are available to help you.

@@ -97,7 +97,6 @@ resource "gitlab_application_settings" "this" {
 - `decompress_archive_file_timeout` (Number) Default timeout for decompressing archived files, in seconds. Set to 0 to disable timeouts.
 - `default_artifacts_expire_in` (String) Set the default expiration time for each job’s artifacts.
 - `default_branch_name` (String) Instance-level custom initial branch name
-- `default_branch_protection` (Number, Deprecated) Determine if developers can push to the default branch. Can take: 0 (not protected, both users with the Developer role or Maintainer role can push new commits and force push), 1 (partially protected, users with the Developer role or Maintainer role can push new commits, but cannot force push) or 2 (fully protected, users with the Developer or Maintainer role cannot push new commits, but users with the Developer or Maintainer role can; no one can force push) as a parameter. Default is 2. Use `default_branch_protection_defaults` instead. To be removed in 19.0.
 - `default_branch_protection_defaults` (Block List, Max: 1) The default_branch_protection_defaults attribute describes the default branch protection defaults. All parameters are optional. (see [below for nested schema](#nestedblock--default_branch_protection_defaults))
 - `default_ci_config_path` (String) Default CI/CD configuration file and path for new projects (.gitlab-ci.yml if not set).
 - `default_group_visibility` (String) What visibility level new groups receive. Can take private, internal and public as a parameter.
@@ -118,6 +117,7 @@ resource "gitlab_application_settings" "this" {
 - `disable_admin_oauth_scopes` (Boolean) Stops administrators from connecting their GitLab accounts to non-trusted OAuth 2.0 applications that have the api, read_api, read_repository, write_repository, read_registry, write_registry, or sudo scopes.
 - `disable_feed_token` (Boolean) Disable display of RSS/Atom and calendar feed tokens.
 - `disable_overriding_approvers_per_merge_request` (Boolean) Prevent editing approval rules in projects and merge requests.
+- `disable_password_authentication_for_users_with_sso_identities` (Boolean) Disable password authentication in the web interface for users with an SSO identity. This does not affect Git operations over HTTP(S).
 - `disable_personal_access_tokens` (Boolean) Disable personal access tokens. Self-managed, Premium and Ultimate only. There is no method available to enable a personal access token that’s been disabled through the API. This is a known issue.
 - `disabled_oauth_sign_in_sources` (List of String) Disabled OAuth sign-in sources.
 - `dns_rebinding_protection_enabled` (Boolean) Enforce DNS rebinding attack protection.
@@ -251,6 +251,7 @@ resource "gitlab_application_settings" "this" {
 - `package_registry_allow_anyone_to_pull_option` (Boolean) Enable to allow anyone to pull from Package Registry visible and changeable.
 - `package_registry_cleanup_policies_worker_capacity` (Number) Number of workers assigned to the packages cleanup policies.
 - `pages_domain_verification_enabled` (Boolean) Require users to prove ownership of custom domains. Domain verification is an essential security measure for public GitLab sites. Users are required to demonstrate they control a domain before it is enabled.
+- `pages_unique_domain_default_enabled` (Boolean) Enable unique domains by default for Pages sites to avoid cookie sharing between sites under a given namespace.
 - `password_authentication_enabled_for_git` (Boolean) Enable authentication for Git over HTTP(S) via a GitLab account password.
 - `password_authentication_enabled_for_web` (Boolean) Enable authentication for the web interface via a GitLab account password.
 - `password_lowercase_required` (Boolean) Indicates whether passwords require at least one lowercase letter.
@@ -298,6 +299,7 @@ resource "gitlab_application_settings" "this" {
 - `send_user_confirmation_email` (Boolean) Send confirmation email on sign-up.
 - `service_access_tokens_expiration_enforced` (Boolean) Flag to indicate if token expiry date can be optional for service account users
 - `session_expire_delay` (Number) Session duration in minutes. GitLab restart is required to apply changes.
+- `session_expire_from_init` (Boolean) Whether sessions expire from the moment of initial sign-in (true) or after inactivity (false).
 - `shared_runners_enabled` (Boolean) (If enabled, requires: shared_runners_text and shared_runners_minutes) Enable shared runners for new projects.
 - `shared_runners_minutes` (Number) Set the maximum number of CI/CD minutes that a group can use on shared runners per month.
 - `shared_runners_text` (String) Shared runners text.

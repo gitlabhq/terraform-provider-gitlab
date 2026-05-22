@@ -44,6 +44,7 @@ resource "gitlab_project_push_mirror" "foo" {
 
 - `auth_method` (String) Determines the mirror authentication method. Valid values are: `ssh_public_key`, `password`.
 - `enabled` (Boolean) Determines if the mirror is enabled.
+- `host_keys` (Set of String) SSH host keys in bare format (`ssh-ed25519 AAAA...`) or full known_hosts format (`hostname ssh-ed25519 AAAA...`). Bare keys use the hostname from the mirror URL. This is a write-only attribute; the API converts host keys to the internal `ssh_known_hosts` representation and does not return them.
 - `keep_divergent_refs` (Boolean) Determines if divergent refs are skipped.
 - `mirror_branch_regex` (String) Contains a regular expression. Only branches with names matching the regex are mirrored. Requires only_protected_branches to be disabled. Premium and Ultimate only.
 - `only_protected_branches` (Boolean) Determines if only protected branches are mirrored.

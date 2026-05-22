@@ -135,7 +135,6 @@ resource "gitlab_project" "import_private" {
 - `allow_merge_on_skipped_pipeline` (Boolean) Set to true if you want to treat skipped pipelines as if they finished with success.
 - `allow_pipeline_trigger_approve_deployment` (Boolean) Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
 - `analytics_access_level` (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
-- `approvals_before_merge` (Number, Deprecated) Number of merge request approvals required for merging. Default is 0. This field **does not** work well in combination with the `gitlab_project_approval_rule` resource. We recommend you do not use this deprecated field and use `gitlab_project_approval_rule` instead. To be removed in 19.0.
 - `archive_on_destroy` (Boolean) Set to `true` to archive the project instead of deleting on destroy. If set to `true` it will entire omit the `DELETE` operation.
 - `archived` (Boolean) Whether the project is in read-only mode (archived). Repositories can be archived/unarchived by toggling this parameter.
 - `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn't a boolean, but enabled/disabled.
@@ -161,7 +160,6 @@ resource "gitlab_project" "import_private" {
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
-- `container_registry_enabled` (Boolean, Deprecated) Enable container registry for the project. Use `container_registry_access_level` instead. To be removed in 19.0.
 - `default_branch` (String) The default branch for the project.
 - `description` (String) A description of the project.
 - `emails_enabled` (Boolean) Enable email notifications.
@@ -172,13 +170,12 @@ resource "gitlab_project" "import_private" {
 - `forking_access_level` (String) Set the forking access level. Valid values are `disabled`, `private`, `enabled`.
 - `group_runners_enabled` (Boolean) Enable group runners for this project.
 - `group_with_project_templates_id` (Number) For group-level custom templates, specifies ID of group from which all the custom project templates are sourced. Leave empty for instance-level templates. Requires use_custom_template to be true (enterprise edition).
-- `import_url` (String) Git URL to a repository to be imported. Use with creating a mirror is deprecated - use `gitlab_project_pull_mirror` instead. Together with `mirror = true` it will setup a Pull Mirror. This can also be used together with `forked_from_project_id` to setup a Pull Mirror for a fork. The fork takes precedence over the import. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. They can also not be imported using `terraform import`. See the examples section for how to properly use it.
+- `import_url` (String) Git URL to a repository to be imported. Make sure to provide the credentials in `import_url_username` and `import_url_password`. GitLab never returns the credentials, thus the provider cannot detect configuration drift in the credentials. They can also not be imported using `terraform import`. See the examples section for how to properly use it.
 - `import_url_password` (String, Sensitive) The password for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. This field cannot be imported using `terraform import`. See the examples section for how to properly use it.
 - `import_url_username` (String) The username for the `import_url`. The value of this field is used to construct a valid `import_url` and is only related to the provider. This field cannot be imported using `terraform import`.  See the examples section for how to properly use it.
 - `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
 - `initialize_with_readme` (Boolean) Create main branch with first commit containing a README.md file. Must be set to `true` if importing an uninitialized project with a different `default_branch`.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
-- `issues_enabled` (Boolean, Deprecated) Enable issue tracking for the project. Use `issues_access_level` instead. To be removed in 19.0.
 - `issues_template` (String) Sets the template for new issues in the project.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
@@ -189,13 +186,9 @@ resource "gitlab_project" "import_private" {
 - `merge_request_title_regex` (String) Set the regex pattern that merge request titles must match. Use `merge_request_title_regex_description` to provide a hint to the user.
 - `merge_request_title_regex_description` (String) Set the description shown to users when a merge request title does not match `merge_request_title_regex`.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
-- `merge_requests_enabled` (Boolean, Deprecated) Enable merge requests for the project. Use `merge_requests_access_level` instead. To be removed in 19.0.
 - `merge_requests_template` (String) Sets the template for new merge requests in the project.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
 - `merge_trains_skip_train_allowed` (Boolean) Allows merge train merge requests to be merged without waiting for pipelines to finish. Requires `merge_pipelines_enabled` to be set to `true` to take effect.
-- `mirror` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror` instead. Enable project pull mirror.
-- `mirror_overwrites_diverged_branches` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror.mirror_overwrites_diverged_branches` instead. Enable overwrite diverged branches for a mirrored project.
-- `mirror_trigger_builds` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror.mirror_trigger_builds` instead. Enable trigger builds on pushes for a mirrored project.
 - `model_experiments_access_level` (String) Set visibility of machine learning model experiments. Valid values are `disabled`, `private`, `enabled`.
 - `model_registry_access_level` (String) Set visibility of machine learning model registry. Valid values are `disabled`, `private`, `enabled`.
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
@@ -203,12 +196,11 @@ resource "gitlab_project" "import_private" {
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
 - `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Set to true if you want allow merges only if all discussions are resolved.
 - `only_allow_merge_if_pipeline_succeeds` (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
-- `only_mirror_protected_branches` (Boolean, Deprecated) Deprecated: to be removed in 19.0. Use `gitlab_project_pull_mirror.only_mirror_protected_branches` instead. Enable only mirror protected branches for a mirrored project.
+- `package_registry_access_level` (String) Set visibility of the package registry. Valid values are `disabled`, `private`, `enabled`, `public`.
 - `packages_enabled` (Boolean) Enable packages repository for the project.
 - `pages_access_level` (String) Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
 - `path` (String) The path of the repository.
 - `permanently_delete_on_destroy` (Boolean) Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
-- `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. The `pipelines_enabled` field is being sent as `jobs_enabled` in the GitLab API calls. Use `builds_access_level` instead. To be removed in 19.0.
 - `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate.
 - `prevent_merge_without_jira_issue` (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
@@ -223,7 +215,6 @@ resource "gitlab_project" "import_private" {
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
 - `resource_group_default_process_mode` (String) The default resource group process mode for the project.
-- `restrict_user_defined_variables` (Boolean, Deprecated) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline. Use `ci_pipeline_variables_minimum_override_role` instead. To be removed in 19.0.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
 - `shared_runners_enabled` (Boolean) Enable shared runners for this project.
 - `skip_wait_for_default_branch_protection` (Boolean) If `true`, the default behavior to wait for the default branch protection to be created is skipped.
@@ -231,11 +222,9 @@ This is necessary if the current user is not an admin and the default branch pro
 There is currently no known way to determine if the default branch protection is disabled on an instance-level for non-admin users.
 This attribute is only used during resource creation, thus changes are suppressed and the attribute cannot be imported.
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
-- `snippets_enabled` (Boolean, Deprecated) Enable snippets for the project. Use `snippets_access_level` instead. To be removed in 19.0.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests.
 - `squash_option` (String) Squash commits when merge request is merged. Valid values are `never` (Do not allow), `always` (Require), `default_on` (Encourage), or `default_off` (Allow). The default value is `default_off` (Allow).
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
-- `tags` (Set of String, Deprecated) The list of tags for a project; put array of tags, that should be finally assigned to a project. Use `topics` instead. To be removed in 19.0.
 - `template_name` (String) When used without use_custom_template, name of a built-in project template. When used with use_custom_template, name of a custom project template. This option is mutually exclusive with `template_project_id`.
 - `template_project_id` (Number) When used with use_custom_template, project ID of a custom project template. This is preferable to using template_name since template_name may be ambiguous (enterprise edition). This option is mutually exclusive with `template_name`. See `gitlab_group_project_file_template` to set a project as a template project. If a project has not been set as a template, using it here will result in an error.
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
@@ -244,7 +233,6 @@ This attribute is only used during resource creation, thus changes are suppresse
 		~> When using a custom template, [Group Tokens won't work](https://docs.gitlab.com/user/project/settings/import_export_troubleshooting/#import-using-the-rest-api-fails-when-using-a-group-access-token). You must use a real user's Personal Access Token.
 - `visibility_level` (String) Set to `public` to create a public project. Valid values are `private`, `internal`, `public`.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
-- `wiki_enabled` (Boolean, Deprecated) Enable wiki for the project. Use `wiki_access_level` instead. To be removed in 19.0.
 
 ### Read-Only
 

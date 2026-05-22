@@ -40,7 +40,7 @@ resource "gitlab_project_merge_request_note" "example" {
 
 ### Optional
 
-- `created_at` (String) The creation date of the merge request note. Using this field requires the token used with the provider to either be an Admin, or hava a Project or Group Owner role.
+- `created_at` (String) The creation date of the merge request note. Using this field requires the token used with the provider to either be an Admin, or have a Project or Group Owner role.
 - `internal` (Boolean) Indicates if the merge request note is internal.
 - `merge_request_diff_head_sha` (String) The diff head SHA of the merge request when the note was created.
 

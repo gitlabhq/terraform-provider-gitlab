@@ -38,7 +38,7 @@ resource "gitlab_user_impersonation_token" "this" {
 
 ### Optional
 
-- `validate_past_expiration_date` (Boolean) Wether to validate if the expiration date is in the future.
+- `validate_past_expiration_date` (Boolean) Whether to validate if the expiration date is in the future.
 
 ### Read-Only
 

@@ -10,7 +10,8 @@ description: |-
   when creating a new project and trying to manage the branch protection setting for its default branch the gitlab_branch_protection resource will
   automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
   Having multiple gitlab_branch_protection resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
-  ~> The allowed_to_push, allowed_to_merge, allowed_to_unprotect, unprotect_access_level and code_owner_approval_required attributes require a GitLab Enterprise instance.
+  ~> The allowed_to_push, allowed_to_merge, allowed_to_unprotect and code_owner_approval_required attributes require a GitLab Enterprise instance.
+  ~> The merge_access_level and push_access_level attributes are not available for GitLab Enterprise.  Use allowed_to_merge and allowed_to_push instead.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/protected_branches/
 ---
 
@@ -25,64 +26,90 @@ The `gitlab_branch_protection` resource manages the lifecycle of a protected bra
    automatically take ownership of the default branch without an explicit import by unprotecting and properly protecting it again.
    Having multiple `gitlab_branch_protection` resources for the same project and default branch will result in them overriding each other - make sure to only have a single one.
 
-~> The `allowed_to_push`, `allowed_to_merge`, `allowed_to_unprotect`, `unprotect_access_level` and `code_owner_approval_required` attributes require a GitLab Enterprise instance.
+~> The `allowed_to_push`, `allowed_to_merge`, `allowed_to_unprotect` and `code_owner_approval_required` attributes require a GitLab Enterprise instance.
+
+~> The `merge_access_level` and `push_access_level` attributes are not available for GitLab Enterprise.  Use `allowed_to_merge` and `allowed_to_push` instead.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/protected_branches/)
 
 ## Example Usage
 
 ```terraform
-resource "gitlab_branch_protection" "BranchProtect" {
+# CE example
+resource "gitlab_branch_protection" "ce_branch" {
+  project            = "12345"
+  branch             = "BranchProtected"
+  push_access_level  = "developer"
+  merge_access_level = "developer"
+  allow_force_push   = true
+}
+
+# EE example
+resource "gitlab_branch_protection" "ee_branch" {
   project                      = "12345"
   branch                       = "BranchProtected"
-  push_access_level            = "developer"
-  merge_access_level           = "developer"
-  unprotect_access_level       = "developer"
   allow_force_push             = true
   code_owner_approval_required = true
-  allowed_to_push {
-    user_id = 5
-  }
-  allowed_to_push {
-    user_id = 521
-  }
-  allowed_to_merge {
-    user_id = 15
-  }
-  allowed_to_merge {
-    user_id = 37
-  }
-  allowed_to_unprotect {
-    user_id = 15
-  }
-  allowed_to_unprotect {
-    group_id = 42
-  }
-}
 
-# Example using dynamic block
-resource "gitlab_branch_protection" "main" {
-  project                = "12345"
-  branch                 = "main"
-  push_access_level      = "maintainer"
-  merge_access_level     = "maintainer"
-  unprotect_access_level = "maintainer"
-
-  dynamic "allowed_to_push" {
-    for_each = [50, 55, 60]
-    content {
-      user_id = allowed_to_push.value
+  allowed_to_push = [
+    {
+      user_id = 5
+    },
+    {
+      user_id = 521
+    },
+    {
+      access_level = "no one"
     }
-  }
+  ]
+
+  allowed_to_merge = [
+    {
+      user_id = 15
+    },
+    {
+      user_id = 37
+    },
+    {
+      access_level = "maintainer"
+    }
+  ]
+
+  allowed_to_unprotect = [
+    {
+      user_id = 15
+    },
+    {
+      group_id = 42
+    },
+    {
+      access_level = "maintainer"
+    }
+  ]
 }
 
-# Example with admin push access level
+# EE example with admin push access level
 resource "gitlab_branch_protection" "admin_push" {
-  project                = "12345"
-  branch                 = "admin-protected"
-  push_access_level      = "admin"
-  merge_access_level     = "maintainer"
-  unprotect_access_level = "maintainer"
+  project = "12345"
+  branch  = "admin-protected"
+
+  allowed_to_push = [
+    {
+      access_level = "admin"
+    }
+  ]
+
+  allowed_to_merge = [
+    {
+      access_level = "maintainer"
+    }
+  ]
+
+  allowed_to_unprotect = [
+    {
+      access_level = "maintainer"
+    }
+  ]
 }
 ```
 
@@ -97,59 +124,58 @@ resource "gitlab_branch_protection" "admin_push" {
 ### Optional
 
 - `allow_force_push` (Boolean) Can be set to true to allow users with push access to force push.
-- `allowed_to_merge` (Block Set) Array of access levels and user(s)/group(s) allowed to merge to protected branch. (see [below for nested schema](#nestedblock--allowed_to_merge))
-- `allowed_to_push` (Block Set) Array of access levels and user(s)/group(s) allowed to push to protected branch. (see [below for nested schema](#nestedblock--allowed_to_push))
-- `allowed_to_unprotect` (Block Set) Array of access levels and user(s)/group(s) allowed to unprotect push to protected branch. (see [below for nested schema](#nestedblock--allowed_to_unprotect))
+- `allowed_to_merge` (Attributes Set) Array of merge access levels/users/groups allowed for the protected branch. Only available for Premium and Ultimate instances. (see [below for nested schema](#nestedatt--allowed_to_merge))
+- `allowed_to_push` (Attributes Set) Array of push access levels/users/groups/deploy keys allowed for the protected branch. Only available for Premium and Ultimate instances. (see [below for nested schema](#nestedatt--allowed_to_push))
+- `allowed_to_unprotect` (Attributes Set) Array of unprotect access levels/users/groups allowed for the protected branch. Only available for Premium and Ultimate instances. (see [below for nested schema](#nestedatt--allowed_to_unprotect))
 - `code_owner_approval_required` (Boolean) Can be set to true to require code owner approval before merging. Only available for Premium and Ultimate instances.
-- `merge_access_level` (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
-- `push_access_level` (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
-- `unprotect_access_level` (String) Access levels allowed to unprotect. Valid values are: `developer`, `maintainer`, `admin`.
+- `merge_access_level` (String) Access levels allowed to merge. Valid values are: `no one`, `developer`, `maintainer`, `admin`. Only available for CE instances.
+- `push_access_level` (String) Access levels allowed to push. Valid values are: `no one`, `developer`, `maintainer`, `admin`. Only available for CE instances.
 
 ### Read-Only
 
 - `branch_protection_id` (Number) The ID of the branch protection (not the branch name).
 - `id` (String) The ID of this Terraform resource. In the format of `<project-id:branch>`.
 
-<a id="nestedblock--allowed_to_merge"></a>
+<a id="nestedatt--allowed_to_merge"></a>
 ### Nested Schema for `allowed_to_merge`
 
 Optional:
 
-- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
-- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+- `access_level` (String) Access level allowed to perform the relevant action. Mutually exclusive with `group_id` and `user_id`. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id` and `access_level`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id` and `access_level`.
 
 Read-Only:
 
-- `access_level` (String) Access levels allowed to merge to protected branch. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 - `access_level_description` (String) Readable description of access level.
 
 
-<a id="nestedblock--allowed_to_push"></a>
+<a id="nestedatt--allowed_to_push"></a>
 ### Nested Schema for `allowed_to_push`
 
 Optional:
 
-- `deploy_key_id` (Number) The ID of a GitLab deploy key allowed to perform the relevant action. Mutually exclusive with `group_id` and `user_id`. This field is read-only until Gitlab 17.5.
-- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `deploy_key_id` and `user_id`.
-- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `deploy_key_id` and `group_id`.
+- `access_level` (String) Access level allowed to perform the relevant action. Mutually exclusive with `deploy_key_id`, `group_id`, and `user_id`. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
+- `deploy_key_id` (Number) The ID of a GitLab deploy key allowed to perform the relevant action. Mutually exclusive with `user_id`, `group_id`, and `access_level`. This field is read-only until Gitlab 17.5.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `deploy_key_id`, `user_id`, and `access_level`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `deploy_key_id`, `group_id`, and `access_level`.
 
 Read-Only:
 
-- `access_level` (String) Access levels allowed to push to protected branch. Valid values are: `no one`, `developer`, `maintainer`, `admin`.
 - `access_level_description` (String) Readable description of access level.
 
 
-<a id="nestedblock--allowed_to_unprotect"></a>
+<a id="nestedatt--allowed_to_unprotect"></a>
 ### Nested Schema for `allowed_to_unprotect`
 
 Optional:
 
-- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id`.
-- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id`.
+- `access_level` (String) Access level allowed to perform the relevant action. Mutually exclusive with `group_id` and `user_id`. Valid values are: `developer`, `maintainer`, `admin`.
+- `group_id` (Number) The ID of a GitLab group allowed to perform the relevant action. Mutually exclusive with `user_id` and `access_level`.
+- `user_id` (Number) The ID of a GitLab user allowed to perform the relevant action. Mutually exclusive with `group_id` and `access_level`.
 
 Read-Only:
 
-- `access_level` (String) Access levels allowed to unprotect push to protected branch. Valid values are: `developer`, `maintainer`, `admin`.
 - `access_level_description` (String) Readable description of access level.
 
 ## Import

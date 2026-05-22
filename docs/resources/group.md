@@ -95,6 +95,7 @@ resource "gitlab_group" "example-five" {
 
 - `allow_merge_on_skipped_pipeline` (Boolean) Allow merging merge requests when the pipeline is skipped. Only applies when only_allow_merge_if_pipeline_succeeds is true. Premium and Ultimate only.
 - `allowed_email_domains_list` (List of String) A list of email address domains to allow group access. Will be concatenated together into a comma separated string.
+- `archive_on_destroy` (Boolean) Set to `true` to archive the group instead of deleting on destroy. If set to `true` it will entirely omit the `DELETE` operation.
 - `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.

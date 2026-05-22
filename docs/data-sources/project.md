@@ -36,7 +36,7 @@ data "gitlab_project" "example" {
 - `ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
 - `id` (String) The integer that uniquely identifies the project within the gitlab install.
 - `path_with_namespace` (String) The path of the repository with namespace.
-- `public_builds` (Boolean) If true, jobs can be viewed by non-project members.
+- `public_jobs` (Boolean) If true, jobs can be viewed by non-project members.
 
 ### Read-Only
 
@@ -69,13 +69,11 @@ data "gitlab_project" "example" {
 - `import_url` (String) URL the project was imported from.
 - `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
-- `issues_enabled` (Boolean, Deprecated) Enable issue tracking for the project. Use `issues_access_level` instead. This attribute will be removed in 19.0.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
 - `lfs_enabled` (Boolean) Enable LFS for the project.
 - `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
-- `merge_requests_enabled` (Boolean, Deprecated) Enable merge requests for the project. Use `merge_requests_access_level` instead. This attribute will be removed in 19.0.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains.
 - `merge_trains_skip_train_allowed` (Boolean) Allows merge train merge requests to be merged without waiting for pipelines to finish.
 - `model_experiments_access_level` (String) The visibility of machine learning model experiments.
@@ -83,8 +81,8 @@ data "gitlab_project" "example" {
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
 - `name` (String) The name of the project.
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
+- `package_registry_access_level` (String) The visibility of the package registry.
 - `path` (String) The path of the repository.
-- `pipelines_enabled` (Boolean, Deprecated) Enable pipelines for the project. Use `pipelines_access_level` instead. This attribute will be removed in 19.0.
 - `prevent_merge_without_jira_issue` (Boolean) Whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
 - `push_rules` (Attributes List) Push rules for the project. Push rules are only available on Enterprise plans and if the authenticated has permissions to read them. (see [below for nested schema](#nestedatt--push_rules))
@@ -95,12 +93,10 @@ data "gitlab_project" "example" {
 - `request_access_enabled` (Boolean) Allow users to request member access.
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
-- `restrict_user_defined_variables` (Boolean, Deprecated) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline. Use `ci_restrict_pipeline_variables_role` instead. This attribute will be removed in 19.0.
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
 - `shared_with_groups` (Attributes List) Describes groups which have access shared to this project. (see [below for nested schema](#nestedatt--shared_with_groups))
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
-- `snippets_enabled` (Boolean, Deprecated) Enable snippets for the project. Use `snippets_access_level` instead. This attribute will be removed in 19.0.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests.
 - `ssh_url_to_repo` (String) URL that can be provided to `git clone` to clone the
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
@@ -108,7 +104,6 @@ data "gitlab_project" "example" {
 - `visibility_level` (String) Repositories are created as private by default.
 - `web_url` (String) URL that can be used to find the project in a browser.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
-- `wiki_enabled` (Boolean, Deprecated) Enable wiki for the project. Use `wiki_access_level` instead. This attribute will be removed in 19.0.
 
 <a id="nestedatt--container_expiration_policy"></a>
 ### Nested Schema for `container_expiration_policy`

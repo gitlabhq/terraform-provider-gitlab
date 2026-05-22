@@ -53,7 +53,6 @@ resource "gitlab_integration_slack" "slack" {
 - `note_channel` (String) The name of the channel to receive note events notifications.
 - `note_events` (Boolean) Enable notifications for note events.
 - `notify_only_broken_pipelines` (Boolean) Send notifications for broken pipelines.
-- `notify_only_default_branch` (Boolean, Deprecated) This parameter has been replaced with `branches_to_be_notified`.
 - `pipeline_channel` (String) The name of the channel to receive pipeline events notifications.
 - `pipeline_events` (Boolean) Enable notifications for pipeline events.
 - `push_channel` (String) The name of the channel to receive push events notifications.
