@@ -293,6 +293,7 @@ resource "gitlab_application_settings" "this" {
 - `rsa_key_restriction` (Number) The minimum allowed bit length of an uploaded RSA key. 0 means no restriction. -1 disables RSA keys.
 - `search_rate_limit` (Number) Max number of requests per minute for performing a search while authenticated. To disable throttling set to 0.
 - `search_rate_limit_unauthenticated` (Number) Max number of requests per minute for performing a search while unauthenticated. To disable throttling set to 0.
+- `secret_push_protection_available` (Boolean) Allow projects to enable secret push protection. This does not enable secret push protection. Ultimate only.
 - `security_approval_policies_limit` (Number) Maximum number of active merge request approval policies per security policy project. Maximum: 20
 - `security_policy_global_group_approvers_enabled` (Boolean) Whether to look up merge request approval policy approval groups globally or within project hierarchies.
 - `security_txt_content` (String) Public security contact information.

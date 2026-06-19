@@ -36,10 +36,13 @@ resource "gitlab_system_hook" "example" {
 
 ### Optional
 
+- `description` (String) Description of the hook.
 - `enable_ssl_verification` (Boolean) Do SSL verification when triggering the hook.
 - `merge_requests_events` (Boolean) Trigger hook on merge requests events.
+- `name` (String) Name of the hook.
 - `push_events` (Boolean) When true, the hook fires on push events.
 - `repository_update_events` (Boolean) Trigger hook on repository update events.
+- `signing_token` (String, Sensitive) Secret used to sign webhook payloads (HMAC-SHA256, sent as the `X-Gitlab-Signature` header). Requires GitLab 19.0 or later (feature flag `webhook_signing_token`, on by default). Write-only — the value is never returned by the API and is not available for imported resources.
 - `tag_push_events` (Boolean) When true, the hook fires on new tags being pushed.
 - `token` (String, Sensitive) Secret token to validate received payloads; this isn't returned in the response. This attribute is not available for imported resources.
 
@@ -47,6 +50,7 @@ resource "gitlab_system_hook" "example" {
 
 - `created_at` (String) The date and time the hook was created in ISO8601 format.
 - `id` (String) The ID of this terraform resource. In the format `<hook-id>`.
+- `signing_token_present` (Boolean) Whether a `signing_token` is configured server-side. Reflects the value returned by the GitLab API.
 
 ## Import
 

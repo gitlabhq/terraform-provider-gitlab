@@ -42,17 +42,22 @@ data "gitlab_project_hooks" "examples" {
 
 Read-Only:
 
+- `alert_status` (String) Lifecycle status of the webhook. Values include `executable` and `disabled`.
 - `branch_filter_strategy` (String) Filter push events by branch.
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential notes events.
+- `created_at` (String) The date and time the hook was created in ISO8601 format.
 - `custom_webhook_template` (String) Set a custom webhook template.
 - `deployment_events` (Boolean) Invoke the hook for deployment events.
+- `disabled_until` (String) Time until the webhook is re-enabled after being automatically disabled due to failures, in ISO8601 format. Null when the webhook is enabled.
 - `emoji_events` (Boolean) Invoke the hook for emoji events.
 - `enable_ssl_verification` (Boolean) Enable ssl verification when invoking the hook.
+- `feature_flag_events` (Boolean) Invoke the hook for feature flag events.
 - `hook_id` (Number) The id of the project hook.
 - `issues_events` (Boolean) Invoke the hook for issues events.
 - `job_events` (Boolean) Invoke the hook for job events.
 - `merge_requests_events` (Boolean) Invoke the hook for merge requests.
+- `milestone_events` (Boolean) Invoke the hook for milestone events.
 - `note_events` (Boolean) Invoke the hook for notes events.
 - `pipeline_events` (Boolean) Invoke the hook for pipeline events.
 - `project` (String) The name or id of the project to add the hook to.
@@ -60,6 +65,10 @@ Read-Only:
 - `push_events` (Boolean) Invoke the hook for push events.
 - `push_events_branch_filter` (String) Invoke the hook for push events on matching branches only.
 - `releases_events` (Boolean) Invoke the hook for releases events.
+- `repository_update_events` (Boolean) Invoke the hook for repository update events.
+- `resource_access_token_events` (Boolean) Invoke the hook for project access token expiry events.
+- `resource_deploy_token_events` (Boolean) Invoke the hook for resource deploy token events.
+- `signing_token_present` (Boolean) Whether a `signing_token` is configured server-side. Reflects the value returned by the GitLab API.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events.
 - `url` (String) The url of the hook to invoke.
 - `vulnerability_events` (Boolean) Invoke the hook for vulnerability events.

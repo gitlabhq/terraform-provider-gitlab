@@ -35,17 +35,17 @@ resource "gitlab_project_integration_jira" "jira" {
 
 ### Required
 
-- `password` (String, Sensitive) The Jira API token, password, or personal access token to be used with Jira. When your authentication method is basic (jira_auth_type is 0), use an API token for Jira Cloud or a password for Jira Data Center or Jira Server. When your authentication method is a Jira personal access token (jira_auth_type is 1), use the personal access token.
+- `password` (String, Sensitive) The Jira API token, password, or personal access token to be used with Jira. When your authentication method is basic (jira_auth_type is 0), use an API token for Jira Cloud or a password for Jira Data Center or Jira Server. When your authentication method is a Jira personal access token (jira_auth_type is 1), use the personal access token. When your authentication method is a Jira Cloud Service Account, use an API token.
 - `project` (String) ID of the project you want to activate integration on.
 - `url` (String) The URL to the JIRA project which is being linked to this GitLab project. For example, https://jira.example.com.
 
 ### Optional
 
-- `api_url` (String) The base URL to the Jira instance API. Web URL value is used if not set. For example, https://jira-api.example.com.
+- `api_url` (String) The base URL to the Jira instance API. Web URL value is used if not set. For example, https://jira-api.example.com. Required if jira_auth_type is 2.
 - `comment_on_event_enabled` (Boolean) Enable comments inside Jira issues on each GitLab event (commit / merge request)
 - `commit_events` (Boolean) Enable notifications for commit events
 - `issues_enabled` (Boolean) Enable viewing Jira issues in GitLab.
-- `jira_auth_type` (Number) The authentication method to be used with Jira. 0 means Basic Authentication. 1 means Jira personal access token. Defaults to 0.
+- `jira_auth_type` (Number) The authentication method to be used with Jira. 0 means Basic Authentication. 1 means Jira personal access token. 2 means Jira Cloud service accounts. Defaults to 0.
 - `jira_issue_prefix` (String) Prefix to match Jira issue keys.
 - `jira_issue_regex` (String) Regular expression to match Jira issue keys.
 - `jira_issue_transition_automatic` (Boolean) Enable automatic issue transitions. Takes precedence over jira_issue_transition_id if enabled. Defaults to false. This value cannot be imported, and will not perform drift detection if changed outside Terraform.
@@ -53,7 +53,7 @@ resource "gitlab_project_integration_jira" "jira" {
 - `merge_requests_events` (Boolean) Enable notifications for merge request events
 - `project_keys` (List of String) Keys of Jira projects. When issues_enabled is true, this setting specifies which Jira projects to view issues from in GitLab.
 - `use_inherited_settings` (Boolean) Indicates whether or not to inherit default settings. Defaults to false.
-- `username` (String) The email or username to be used with Jira. For Jira Cloud use an email, for Jira Data Center and Jira Server use a username. Required when using Basic authentication (jira_auth_type is 0).
+- `username` (String) The email or username to be used with Jira. For Jira Cloud use an email, for Jira Data Center and Jira Server use a username. Required when using Basic authentication (jira_auth_type is 0). Should not be provided when using a Jira Cloud Service Account
 
 ### Read-Only
 

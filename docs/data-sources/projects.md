@@ -46,6 +46,7 @@ data "gitlab_projects" "projects" {
 
 ### Optional
 
+- `active` (Boolean) Limit by projects that are not archived and not marked for deletion. If `false`, return only projects that are archived or marked for deletion.
 - `archived` (Boolean) Limit by archived status.
 - `group_id` (Number) The ID of the group owned by the authenticated user to look projects for within. Cannot be used with `min_access_level`, `with_programming_language` or `statistics`.
 - `include_subgroups` (Boolean) Include projects in subgroups of this group. Default is `false`. Needs `group_id`.
@@ -79,38 +80,50 @@ data "gitlab_projects" "projects" {
 
 Read-Only:
 
-- `allow_merge_on_skipped_pipeline` (Boolean) Whether allow_merge_on_skipped_pipeline is enabled for the project.
+- `allow_merge_on_skipped_pipeline` (Boolean) Whether `allow_merge_on_skipped_pipeline` is enabled for the project.
 - `allow_pipeline_trigger_approve_deployment` (Boolean) Set whether or not a pipeline triggerer is allowed to approve deployments. Premium and Ultimate only.
 - `analytics_access_level` (String) Set the analytics access level. Valid values are `disabled`, `private`, `enabled`.
-- `approvals_before_merge` (Number) The numbers of approvals needed in a merge requests.
-- `archived` (Boolean) Whether the project is archived.
-- `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn't a boolean, but enabled/disabled.
+- `approvals_before_merge` (Number, Deprecated) The number of approvals needed in a merge request.
+- `archived` (Boolean) Whether the project is in read-only mode (archived).
+- `auto_cancel_pending_pipelines` (String) Auto-cancel pending pipelines. This isn't a boolean, but `enabled`/`disabled`.
 - `auto_devops_deploy_strategy` (String) Auto Deploy strategy. Valid values are `continuous`, `manual`, `timed_incremental`.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
+- `auto_duo_code_review_enabled` (Boolean) Whether GitLab Duo code review is enabled for the project.
 - `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
-- `avatar_url` (String) The avatar url of the project.
+- `avatar_url` (String) The avatar URL of the project.
 - `build_coverage_regex` (String) Build coverage regex for the project.
-- `build_git_strategy` (String) The Git strategy. Defaults to fetch.
+- `build_git_strategy` (String) The Git strategy. Defaults to `fetch`.
 - `build_timeout` (Number) The maximum amount of time, in seconds, that a job can run.
 - `builds_access_level` (String) Set the builds access level. Valid values are `disabled`, `private`, `enabled`.
+- `can_create_merge_request_in` (Boolean) Whether the calling user can create merge requests in this project.
+- `ci_allow_fork_pipelines_to_run_in_parent_project` (Boolean) Whether pipelines triggered from merge requests opened from forks may run in the parent project.
 - `ci_config_path` (String) CI config file path for the project.
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
 - `ci_delete_pipelines_in_seconds` (Number) Pipelines older than the configured time are deleted.
+- `ci_display_pipeline_variables` (Boolean) Whether pipeline variables are displayed in the UI.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
 - `ci_forward_deployment_rollback_allowed` (Boolean) Allow job retries even if the deployment job is outdated.
-- `ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
-- `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
-- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
-- `container_expiration_policy` (Attributes List) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedatt--projects--container_expiration_policy))
-- `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
-- `container_registry_enabled` (Boolean) Whether the container registry is enabled for the project.
+- `ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with `project_path`. The array might also include `ref_type` and `ref`. Defaults to `["project_path", "ref_type", "ref"]`. Introduced in GitLab 17.10.
+- `ci_job_token_scope_enabled` (Boolean) Whether the CI/CD job token access scope is enabled (limits which projects can be accessed using the job token).
+- `ci_opt_in_jwt` (Boolean) Whether the project must explicitly opt in to receive ID tokens in CI jobs.
+- `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`.
+- `ci_push_repository_for_job_token_allowed` (Boolean) Whether pushes to the repository using the CI/CD job token are allowed.
+- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no_one`.
+- `ci_separated_caches` (Boolean) Use separate caches for protected branches.
+- `compliance_frameworks` (Set of String) Compliance frameworks applied to the project. Premium and Ultimate only.
+- `container_expiration_policy` (Attributes List) The image cleanup policy for this project. (see [below for nested schema](#nestedatt--projects--container_expiration_policy))
+- `container_registry_access_level` (String) Set visibility of container registry for this project. Valid values are `disabled`, `private`, `enabled`.
+- `container_registry_enabled` (Boolean, Deprecated) Whether the container registry is enabled for the project.
+- `container_registry_image_prefix` (String) The image prefix used by the container registry for this project.
 - `created_at` (String) Creation time for the project.
 - `creator_id` (Number) Creator ID for the project.
 - `custom_attributes` (List of Map of String) Custom attributes for the project.
 - `default_branch` (String) The default branch name of the project.
-- `description` (String) The description of the project.
+- `description` (String) A description of the project.
+- `emails_disabled` (Boolean) Whether email notifications are disabled for the project.
 - `emails_enabled` (Boolean) Enable email notifications.
 - `empty_repo` (Boolean) Whether the project is empty.
+- `enforce_auth_checks_on_uploads` (Boolean) Whether authentication checks are enforced when uploading to the project.
 - `environments_access_level` (String) Set the environments access level. Valid values are `disabled`, `private`, `enabled`.
 - `external_authorization_classification_label` (String) The classification label for the project.
 - `feature_flags_access_level` (String) Set the feature flags access level. Valid values are `disabled`, `private`, `enabled`.
@@ -122,69 +135,99 @@ Read-Only:
 - `id` (Number) The ID of the project.
 - `import_error` (String) The import error, if it exists, for the project.
 - `import_status` (String) The import status of the project.
+- `import_type` (String) The type of import used to create the project (for example `github`, `bitbucket`).
 - `import_url` (String) URL the project was imported from.
 - `infrastructure_access_level` (String) Set the infrastructure access level. Valid values are `disabled`, `private`, `enabled`.
+- `issue_branch_template` (String) Template used to suggest a branch name when creating one from an issue.
 - `issues_access_level` (String) Set the issues access level. Valid values are `disabled`, `private`, `enabled`.
-- `issues_enabled` (Boolean) Whether issues are enabled for the project.
-- `jobs_enabled` (Boolean) Whether pipelines are enabled for the project.
+- `issues_enabled` (Boolean, Deprecated) Whether issues are enabled for the project.
+- `issues_template` (String) Default description template for new issues.
+- `jobs_enabled` (Boolean, Deprecated) Whether jobs are enabled for the project.
 - `keep_latest_artifact` (Boolean) Disable or enable the ability to keep the latest artifact for this project.
-- `last_activity_at` (String) Last activirty time for the project.
+- `last_activity_at` (String) Last activity time for the project.
 - `lfs_enabled` (Boolean) Whether LFS (large file storage) is enabled for the project.
+- `license` (Attributes List) Information about the project's license, if one is detected. (see [below for nested schema](#nestedatt--projects--license))
+- `license_url` (String) URL of the project's license file.
 - `links` (Map of String) Links for the project.
+- `marked_for_deletion` (Boolean) Whether the project is marked for deletion.
+- `marked_for_deletion_at` (String, Deprecated) Timestamp at which the project was marked for deletion. Premium and Ultimate only.
+- `marked_for_deletion_on` (String) Timestamp at which the project was marked for deletion. Premium and Ultimate only.
+- `max_artifacts_size` (Number) Maximum artifacts size, in MB, for the project. Overrides the instance-wide setting when set.
 - `merge_commit_template` (String) Template used to create merge commit message in merge requests.
 - `merge_method` (String) Merge method for the project.
 - `merge_pipelines_enabled` (Boolean) Enable or disable merge pipelines.
+- `merge_request_title_regex` (String) Regular expression that merge request titles must match.
+- `merge_request_title_regex_description` (String) Human-readable description of `merge_request_title_regex`.
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
-- `merge_requests_enabled` (Boolean) Whether merge requests are enabled for the project.
+- `merge_requests_enabled` (Boolean, Deprecated) Whether merge requests are enabled for the project.
+- `merge_requests_template` (String) Default description template for new merge requests.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains.
-- `mirror` (Boolean) Whether the pull mirroring is enabled for the project.
-- `mirror_overwrites_diverged_branches` (Boolean) Whether mirror_overwrites_diverged_branches is enabled for the project.
+- `merge_trains_skip_train_allowed` (Boolean) Allows merge train merge requests to be merged without waiting for pipelines to finish.
+- `mirror` (Boolean) Whether pull mirroring is enabled for the project.
+- `mirror_overwrites_diverged_branches` (Boolean) Whether `mirror_overwrites_diverged_branches` is enabled for the project.
 - `mirror_trigger_builds` (Boolean) Whether pull mirroring triggers builds for the project.
 - `mirror_user_id` (Number) The mirror user ID for the project.
 - `model_experiments_access_level` (String) The visibility of machine learning model experiments.
 - `model_registry_access_level` (String) The visibility of machine learning model registry.
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
+- `mr_default_target_self` (Boolean) For forks, whether merge requests target the fork itself rather than the upstream project by default.
 - `name` (String) The name of the project.
 - `name_with_namespace` (String) In `group / subgroup / project` or `user / project` format.
 - `namespace` (Attributes List) Namespace of the project (parent group/s). (see [below for nested schema](#nestedatt--projects--namespace))
-- `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Whether only_allow_merge_if_all_discussions_are_resolved is enabled for the project.
-- `only_allow_merge_if_pipeline_succeeds` (Boolean) Whether only_allow_merge_if_pipeline_succeeds is enabled for the project.
-- `only_mirror_protected_branches` (Boolean) Whether only_mirror_protected_branches is enabled for the project.
-- `open_issues_count` (Number) The number of open issies for the project.
-- `owner` (Attributes List) The owner of the project, due to Terraform aggregate types limitations, this field's attributes are accessed with the `owner.0` prefix. Structure is documented below. (see [below for nested schema](#nestedatt--projects--owner))
+- `namespace_id` (Number, Deprecated) The namespace (group or user) ID of the project. Alias for `namespace[0].id`.
+- `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Whether `only_allow_merge_if_all_discussions_are_resolved` is enabled for the project.
+- `only_allow_merge_if_pipeline_succeeds` (Boolean) Whether `only_allow_merge_if_pipeline_succeeds` is enabled for the project.
+- `only_mirror_protected_branches` (Boolean) Whether `only_mirror_protected_branches` is enabled for the project.
+- `open_issues_count` (Number) The number of open issues for the project.
+- `operations_access_level` (String) Set the operations access level. Valid values are `disabled`, `private`, `enabled`.
+- `owner` (Attributes List) The owner of the project. Only populated when the calling token has administrator scope. (see [below for nested schema](#nestedatt--projects--owner))
 - `package_registry_access_level` (String) The visibility of the package registry.
-- `packages_enabled` (Boolean) Whether packages are enabled for the project.
+- `packages_enabled` (Boolean, Deprecated) Whether packages are enabled for the project.
+- `pages_access_level` (String) Set the GitLab Pages access level. Valid values are `disabled`, `private`, `enabled`.
 - `path` (String) The path of the project.
 - `path_with_namespace` (String) In `group/subgroup/project` or `user/project` format.
 - `permissions` (Attributes List) Permissions for the project. (see [below for nested schema](#nestedatt--projects--permissions))
+- `pre_receive_secret_detection_enabled` (Boolean) Whether pre-receive secret detection is enabled for the project.
 - `prevent_merge_without_jira_issue` (Boolean) Whether merge requests require an associated issue from Jira. Premium and Ultimate only.
-- `public_builds` (Boolean) Whether public builds are enabled for the project.
-- `readme_url` (String) The remote url of the project.
+- `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line.
+- `protect_merge_request_pipelines` (Boolean) Whether pipelines triggered for merge requests run with project secrets and protected variables, instead of the contributor's lower-privileged context.
+- `public_builds` (Boolean, Deprecated) If true, jobs can be viewed by non-project members. Alias for `public_jobs`.
+- `public_jobs` (Boolean) If true, jobs can be viewed by non-project members.
+- `readme_url` (String) The URL of the project README.
 - `releases_access_level` (String) Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
+- `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests.
 - `repository_access_level` (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.
 - `repository_storage` (String) Which storage shard the repository is on. (administrator only)
 - `request_access_enabled` (Boolean) Whether requesting access is enabled for the project.
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
-- `resolve_outdated_diff_discussions` (Boolean) Whether resolve_outdated_diff_discussions is enabled for the project
+- `requirements_enabled` (Boolean) Whether the requirements feature is enabled. Premium and Ultimate only.
+- `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
 - `resource_group_default_process_mode` (String) The default resource group process mode for the project.
-- `restrict_user_defined_variables` (Boolean) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
-- `runners_token` (String, Sensitive) The runners token for the project.
+- `restrict_user_defined_variables` (Boolean, Deprecated) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
+- `runner_token_expiration_interval` (Number) Runner token expiration interval, in seconds.
+- `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
+- `security_and_compliance_enabled` (Boolean) Whether the security and compliance feature is enabled.
+- `service_desk_address` (String) The Service Desk email address for the project.
+- `service_desk_enabled` (Boolean) Whether Service Desk is enabled for the project.
 - `shared_runners_enabled` (Boolean) Whether shared runners are enabled for the project.
-- `shared_with_groups` (Attributes List) Groups the the project is shared with. (see [below for nested schema](#nestedatt--projects--shared_with_groups))
+- `shared_with_groups` (Attributes List) Describes groups which have access shared to this project. (see [below for nested schema](#nestedatt--projects--shared_with_groups))
 - `snippets_access_level` (String) Set the snippets access level. Valid values are `disabled`, `private`, `enabled`.
-- `snippets_enabled` (Boolean) Whether snippets are enabled for the project.
+- `snippets_enabled` (Boolean, Deprecated) Whether snippets are enabled for the project.
 - `squash_commit_template` (String) Template used to create squash commit message in merge requests.
+- `squash_option` (String) The project's squash option for merge requests (`never`, `always`, `default_on`, `default_off`).
 - `ssh_url_to_repo` (String) The SSH clone URL of the project.
 - `star_count` (Number) The number of stars on the project.
 - `statistics` (Map of Number) Statistics for the project.
 - `suggestion_commit_message` (String) The commit message used to apply merge request suggestions.
-- `tag_list` (Set of String) A set of the project topics (formerly called "project tags").
+- `tag_list` (Set of String, Deprecated) The list of project topics (formerly project tags).
 - `topics` (Set of String) The list of topics for the project.
-- `visibility` (String) The visibility of the project.
-- `web_url` (String) The web url of the project.
+- `updated_at` (String) The time the project was last updated.
+- `visibility` (String) The visibility of the project (`private`, `internal`, `public`).
+- `visibility_level` (String, Deprecated) The visibility of the project. Alias for `visibility`.
+- `web_url` (String) URL that can be used to find the project in a browser.
 - `wiki_access_level` (String) Set the wiki access level. Valid values are `disabled`, `private`, `enabled`.
-- `wiki_enabled` (Boolean) Whether wiki is enabled for the project.
+- `wiki_enabled` (Boolean, Deprecated) Whether wiki is enabled for the project.
 
 <a id="nestedatt--projects--container_expiration_policy"></a>
 ### Nested Schema for `projects.container_expiration_policy`
@@ -211,7 +254,19 @@ Read-Only:
 - `name_with_namespace` (String) In `group / subgroup / project` or `user / project` format.
 - `path` (String) The path of the upstream project.
 - `path_with_namespace` (String) In `group/subgroup/project` or `user/project` format.
-- `web_url` (String) The web url of the upstream project.
+- `web_url` (String) The web URL of the upstream project.
+
+
+<a id="nestedatt--projects--license"></a>
+### Nested Schema for `projects.license`
+
+Read-Only:
+
+- `html_url` (String) URL to the license's human-readable description.
+- `key` (String) The license key (e.g. `mit`).
+- `name` (String) The license name (e.g. `MIT License`).
+- `nickname` (String) The license nickname.
+- `source_url` (String) URL to the license source text.
 
 
 <a id="nestedatt--projects--namespace"></a>
@@ -231,12 +286,12 @@ Read-Only:
 
 Read-Only:
 
-- `avatar_url` (String) The avatar url of the owner.
+- `avatar_url` (String) The avatar URL of the owner.
 - `id` (Number) The ID of the owner.
 - `name` (String) The name of the owner.
 - `state` (String) The state of the owner.
 - `username` (String) The username of the owner.
-- `website_url` (String) The website url of the owner.
+- `website_url` (String) The website URL of the owner.
 
 
 <a id="nestedatt--projects--permissions"></a>
@@ -253,6 +308,8 @@ Read-Only:
 
 Read-Only:
 
-- `group_access_level` (String) The group access level.
-- `group_id` (Number) The group ID.
-- `group_name` (String) The group name.
+- `group_access_level` (Number) The access level (integer) of the shared group. Matches the upstream GitLab API. See `group_access_level_name` for the human-readable string form.
+- `group_access_level_name` (String, Deprecated) The human-readable access level name of the shared group (e.g. `developer`, `maintainer`). Computed from `group_access_level`.
+- `group_full_path` (String) The full path of the group shared with.
+- `group_id` (Number) The ID of the group shared with.
+- `group_name` (String) The name of the group shared with.

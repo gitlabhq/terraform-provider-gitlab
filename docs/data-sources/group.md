@@ -37,27 +37,101 @@ data "gitlab_group" "foo" {
 
 ### Read-Only
 
+- `allow_merge_on_skipped_pipeline` (Boolean) Default to allowing merge on a skipped pipeline for new projects in the group.
+- `allowed_email_domains_list` (String) Comma-separated list of email address domains allowed to be added as group members.
+- `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
+- `avatar_url` (String) URL of the group avatar.
+- `created_at` (String) Timestamp at which the group was created.
+- `custom_attributes` (List of Map of String) Custom attributes attached to the group. Each entry is a map with `key` and `value`. Requires administrator privileges to read.
 - `default_branch` (String) The default branch of the group.
-- `default_branch_protection` (Number) Whether developers and maintainers can push to the applicable default branch.
+- `default_branch_protection` (Number, Deprecated) Whether developers and maintainers can push to the applicable default branch. Use `default_branch_protection_defaults` instead, to be removed in 19.0.
+- `default_branch_protection_defaults` (Attributes List) Default protection settings applied to the default branch of new projects in this group. (see [below for nested schema](#nestedatt--default_branch_protection_defaults))
 - `description` (String) The description of the group.
+- `emails_disabled` (Boolean, Deprecated) Whether email notifications are disabled for this group. Use `emails_enabled` instead, to be removed in 19.0.
+- `emails_enabled` (Boolean) Whether email notifications are enabled for this group.
 - `extra_shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Additional CI/CD minutes for this group.
+- `file_template_project_id` (Number) The ID of the project used to load custom file templates.
 - `full_name` (String) The full name of the group.
 - `id` (String) The ID of this datasource. In the format `<group-id>`.
+- `ip_restriction_ranges` (String) Comma-separated list of IP addresses or subnet masks that restrict access to the group.
+- `ldap_access` (Number) Default access level for members synced from LDAP.
+- `ldap_cn` (String) LDAP common name used to sync members from an LDAP group.
 - `lfs_enabled` (Boolean) Boolean, is LFS enabled for projects in this group.
+- `marked_for_deletion_on` (String) Date on which the group was marked for deletion.
+- `max_artifacts_size` (Number) Maximum artifacts size for the group, in MB.
 - `membership_lock` (Boolean) Users cannot be added to projects in this group.
+- `mentions_disabled` (Boolean) Whether mentions are disabled for this group.
 - `name` (String) The name of this group.
+- `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Default to only allowing merge if all discussions are resolved for new projects in the group.
+- `only_allow_merge_if_pipeline_succeeds` (Boolean) Default to only allowing merge if the pipeline succeeds for new projects in the group.
 - `parent_id` (Number) Integer, ID of the parent group.
 - `path` (String) The path of the group.
 - `prevent_forking_outside_group` (Boolean) When enabled, users can not fork projects from this group to external namespaces.
-- `prevent_sharing_groups_outside_hierarchy` (Boolean) When enabled, users cannot invite other groups outside of the top-level group’s hierarchy. This option is only available for top-level groups.
+- `prevent_sharing_groups_outside_hierarchy` (Boolean) When enabled, users cannot invite other groups outside of the top-level group's hierarchy. This option is only available for top-level groups.
+- `project_creation_level` (String) Determine which roles can create projects in the group. Possible values are `noone`, `maintainer`, `developer`, `owner`, `administrator`.
+- `push_rules` (Attributes List) Push rules for the group. Push rules are only available on Premium and Ultimate plans, and only if the authenticated user has permission to read them. (see [below for nested schema](#nestedatt--push_rules))
+- `repository_storage` (String) Repository storage shard the group's projects use. (admin only)
 - `request_access_enabled` (Boolean) Boolean, is request for access enabled to the group.
+- `require_two_factor_authentication` (Boolean) Require all users in this group to set up two-factor authentication.
 - `runners_token` (String, Sensitive) The group level registration token to use during runner setup.
+- `share_with_group_lock` (Boolean) Prevent sharing a project with another group within this group.
 - `shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
 - `shared_runners_setting` (String) Enable or disable shared runners for a group's subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
 - `shared_with_groups` (Attributes List) Describes groups which have access shared to this group. (see [below for nested schema](#nestedatt--shared_with_groups))
+- `statistics` (Map of Number) Statistics for the group. Keys: `commit_count`, `storage_size`, `repository_size`, `wiki_size`, `lfs_objects_size`, `job_artifacts_size`, `pipeline_artifacts_size`, `packages_size`, `snippets_size`, `uploads_size`, `container_registry_size`.
+- `subgroup_creation_level` (String) Determine which roles can create subgroups in the group. Possible values are `owner`, `maintainer`.
+- `two_factor_grace_period` (Number) Grace period, in hours, before enforcing two-factor authentication on group members.
 - `visibility_level` (String) Visibility level of the group. Possible values are `private`, `internal`, `public`.
 - `web_url` (String) Web URL of the group.
 - `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
+
+<a id="nestedatt--default_branch_protection_defaults"></a>
+### Nested Schema for `default_branch_protection_defaults`
+
+Read-Only:
+
+- `allow_force_push` (Boolean) Whether force-push is allowed to the default branch.
+- `allowed_to_merge` (Attributes List) Access levels allowed to merge into the default branch. (see [below for nested schema](#nestedatt--default_branch_protection_defaults--allowed_to_merge))
+- `allowed_to_push` (Attributes List) Access levels allowed to push to the default branch. (see [below for nested schema](#nestedatt--default_branch_protection_defaults--allowed_to_push))
+- `code_owner_approval_required` (Boolean) Whether code-owner approval is required on the default branch.
+- `developer_can_initial_push` (Boolean) Whether developers can make the initial push to the default branch.
+
+<a id="nestedatt--default_branch_protection_defaults--allowed_to_merge"></a>
+### Nested Schema for `default_branch_protection_defaults.allowed_to_merge`
+
+Read-Only:
+
+- `access_level` (Number) The access level integer.
+
+
+<a id="nestedatt--default_branch_protection_defaults--allowed_to_push"></a>
+### Nested Schema for `default_branch_protection_defaults.allowed_to_push`
+
+Read-Only:
+
+- `access_level` (Number) The access level integer.
+
+
+
+<a id="nestedatt--push_rules"></a>
+### Nested Schema for `push_rules`
+
+Read-Only:
+
+- `author_email_regex` (String) All commit author emails must match this regex, e.g. `@my-company.com$`.
+- `branch_name_regex` (String) All branch names must match this regex, e.g. `(feature|hotfix)\/*`.
+- `commit_committer_check` (Boolean) Users can only push commits to projects in this group that were committed with one of their own verified emails.
+- `commit_committer_name_check` (Boolean) Users can only push commits to projects in this group if the commit author name is consistent with their GitLab account name.
+- `commit_message_negative_regex` (String) No commit message is allowed to match this regex, for example `ssh\:\/\/`.
+- `commit_message_regex` (String) All commit messages must match this regex, e.g. `Fixed \d+\..*`.
+- `deny_delete_tag` (Boolean) Deny deleting a tag.
+- `file_name_regex` (String) All committed filenames must not match this regex, e.g. `(jar|exe)$`.
+- `max_file_size` (Number) Maximum file size (MB).
+- `member_check` (Boolean) Restrict commits by author (email) to existing GitLab users.
+- `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
+- `reject_non_dco_commits` (Boolean) Reject commit when it's not DCO certified.
+- `reject_unsigned_commits` (Boolean) Reject commit when it's not signed through GPG.
+
 
 <a id="nestedatt--shared_with_groups"></a>
 ### Nested Schema for `shared_with_groups`

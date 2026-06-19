@@ -151,12 +151,13 @@ resource "gitlab_project" "import_private" {
 - `ci_config_path` (String) Custom Path to CI config file.
 - `ci_default_git_depth` (Number) Default number of revisions for shallow cloning.
 - `ci_delete_pipelines_in_seconds` (Number) Pipelines older than the configured time are deleted.
+- `ci_display_pipeline_variables` (Boolean) Show pipeline variables on the pipeline details page. Introduced in GitLab 17.8.
 - `ci_forward_deployment_enabled` (Boolean) When a new deployment job starts, skip older deployment jobs that are still pending.
 - `ci_forward_deployment_rollback_allowed` (Boolean) Allow job retries even if the deployment job is outdated.
 - `ci_id_token_sub_claim_components` (List of String) Fields included in the sub claim of the ID Token. Accepts an array starting with project_path. The array might also include ref_type and ref. Defaults to ["project_path", "ref_type", "ref"]. Introduced in GitLab 17.10.
 - `ci_pipeline_variables_minimum_override_role` (String) The minimum role required to set variables when running pipelines and jobs. Introduced in GitLab 17.1. Valid values are `developer`, `maintainer`, `owner`, `no_one_allowed`
 - `ci_push_repository_for_job_token_allowed` (Boolean) Allow Git push requests to your project repository that are authenticated with a CI/CD job token.
-- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no one`
+- `ci_restrict_pipeline_cancellation_role` (String) The role required to cancel a pipeline or job. Premium and Ultimate only. Valid values are `developer`, `maintainer`, `no_one`
 - `ci_separated_caches` (Boolean) Use separate caches for protected branches.
 - `container_expiration_policy` (Block List, Max: 1) Set the image cleanup policy for this project. **Note**: this field is sometimes named `container_expiration_policy_attributes` in the GitLab Upstream API. (see [below for nested schema](#nestedblock--container_expiration_policy))
 - `container_registry_access_level` (String) Set visibility of container registry, for this project. Valid values are `disabled`, `private`, `enabled`.
@@ -204,6 +205,7 @@ resource "gitlab_project" "import_private" {
 - `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate.
 - `prevent_merge_without_jira_issue` (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
+- `protect_merge_request_pipelines` (Boolean) Whether pipelines triggered for merge requests run with project secrets and protected variables, instead of the contributor's lower-privileged context.
 - `public_builds` (Boolean, Deprecated) If true, jobs can be viewed by non-project members.
 - `public_jobs` (Boolean) If true, jobs can be viewed by non-project members.
 - `push_rules` (Block List, Max: 1) Push rules for the project. (see [below for nested schema](#nestedblock--push_rules))
