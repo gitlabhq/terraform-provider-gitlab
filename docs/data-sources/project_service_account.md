@@ -37,6 +37,7 @@ data "gitlab_project_service_account" "example" {
 
 ### Read-Only
 
+- `email` (String) The email of the service account user.
 - `id` (String) The ID of this Terraform resource. In the format of `<project>:<service_account_id>`.
 - `name` (String) The name of the user. If not specified, the default Service account user name is used.
 - `username` (String) The username of the user. If not specified, it's automatically generated.

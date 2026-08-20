@@ -31,6 +31,7 @@ resource "gitlab_user" "example" {
   projects_limit   = 4
   can_create_group = false
   is_external      = true
+  is_auditor       = false
   reset_password   = false
 }
 ```
@@ -49,6 +50,7 @@ resource "gitlab_user" "example" {
 - `can_create_group` (Boolean) Boolean, defaults to false. Whether to allow the user to create groups.
 - `force_random_password` (Boolean) Set user password to a random value
 - `is_admin` (Boolean) Boolean, defaults to false.  Whether to enable administrative privileges
+- `is_auditor` (Boolean) Boolean, defaults to false. Whether the user is an auditor. Requires GitLab 15.3+ and a Premium or Ultimate license.
 - `is_external` (Boolean) Boolean, defaults to false. Whether a user has access only to some internal or private projects. External users can only access projects to which they are explicitly granted access.
 - `namespace_id` (Number) The ID of the user's namespace.
 - `note` (String) The note associated to the user.

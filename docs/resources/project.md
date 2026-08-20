@@ -195,6 +195,7 @@ resource "gitlab_project" "import_private" {
 - `model_registry_access_level` (String) Set visibility of machine learning model registry. Valid values are `disabled`, `private`, `enabled`.
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
 - `mr_default_target_self` (Boolean) For forked projects, target merge requests to this project. If false, the target will be the upstream project.
+- `mr_default_title_template` (String) Template used to set the default title of merge requests.
 - `namespace_id` (Number) The namespace (group or user) of the project. Defaults to your user.
 - `only_allow_merge_if_all_discussions_are_resolved` (Boolean) Set to true if you want allow merges only if all discussions are resolved.
 - `only_allow_merge_if_pipeline_succeeds` (Boolean) Set to true if you want allow merges only if a pipeline succeeds.
@@ -203,7 +204,7 @@ resource "gitlab_project" "import_private" {
 - `pages_access_level` (String) Enable pages access control. Valid values are `public`, `private`, `enabled`, `disabled`.
 - `path` (String) The path of the repository.
 - `permanently_delete_on_destroy` (Boolean) Set to `true` to immediately permanently delete the project instead of scheduling a delete for Premium and Ultimate tiers.
-- `pre_receive_secret_detection_enabled` (Boolean) Whether Secret Push Detection is enabled. Requires GitLab Ultimate.
+- `pre_receive_secret_detection_enabled` (Boolean, Deprecated) Whether Secret Push Detection is enabled. Requires GitLab Ultimate.
 - `prevent_merge_without_jira_issue` (Boolean) Set whether merge requests require an associated issue from Jira. Premium and Ultimate only.
 - `printing_merge_request_link_enabled` (Boolean) Show link to create/view merge request when pushing from the command line
 - `protect_merge_request_pipelines` (Boolean) Whether pipelines triggered for merge requests run with project secrets and protected variables, instead of the contributor's lower-privileged context.
@@ -218,6 +219,7 @@ resource "gitlab_project" "import_private" {
 - `requirements_access_level` (String) Set the requirements access level. Valid values are `disabled`, `private`, `enabled`.
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
 - `resource_group_default_process_mode` (String) The default resource group process mode for the project.
+- `reviewer_assignment_strategy` (String) Set the strategy used to automatically assign reviewers to merge requests. Valid values are `disabled`, `code_owners`, `dap_powered`. Premium and Ultimate only.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.
 - `shared_runners_enabled` (Boolean) Enable shared runners for this project.
 - `skip_wait_for_default_branch_protection` (Boolean) If `true`, the default behavior to wait for the default branch protection to be created is skipped.

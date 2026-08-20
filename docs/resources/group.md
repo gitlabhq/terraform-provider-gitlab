@@ -99,6 +99,7 @@ resource "gitlab_group" "example-five" {
 - `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
+- `crm_enabled` (Boolean) Enable customer relations management (CRM) for the group.
 - `default_branch` (String) Initial default branch name.
 - `default_branch_protection` (Number, Deprecated) See https://docs.gitlab.com/api/groups/#options-for-default_branch_protection. Valid values are: `0`, `1`, `2`, `3`, `4`.
 - `default_branch_protection_defaults` (Block List, Max: 1) The default branch protection defaults (see [below for nested schema](#nestedblock--default_branch_protection_defaults))
@@ -124,6 +125,7 @@ resource "gitlab_group" "example-five" {
 - `shared_runners_minutes_limit` (Number) Available in Self-Managed, Premium and Ultimate plans. Can be set by administrators only. Maximum number of monthly CI/CD minutes for this group. Can be nil (default; inherit system default), 0 (unlimited), or > 0.
 - `shared_runners_setting` (String) Enable or disable shared runners for a group’s subgroups and projects. Valid values are: `enabled`, `disabled_and_overridable`, `disabled_and_unoverridable`, `disabled_with_override`.
 - `subgroup_creation_level` (String) Allowed to create subgroups. Valid values are: `owner`, `maintainer`.
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 - `two_factor_grace_period` (Number) Defaults to 48. Time before Two-factor authentication is enforced (in hours).
 - `visibility_level` (String) The group's visibility. Can be `private`, `internal`, or `public`. Valid values are: `private`, `internal`, `public`.
 - `wiki_access_level` (String) The group's wiki access level. Only available on Premium and Ultimate plans. Valid values are `disabled`, `private`, `enabled`.
@@ -167,6 +169,15 @@ Optional:
 - `prevent_secrets` (Boolean) GitLab will reject any files that are likely to contain secrets.
 - `reject_non_dco_commits` (Boolean) Reject commit when it’s not DCO certified.
 - `reject_unsigned_commits` (Boolean) Only commits signed through GPG are allowed.
+
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `create` (String)
+- `update` (String)
 
 ## Import
 

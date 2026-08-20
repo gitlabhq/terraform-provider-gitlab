@@ -127,6 +127,7 @@ data "gitlab_project" "example" {
 - `model_registry_access_level` (String) The visibility of machine learning model registry.
 - `monitor_access_level` (String) Set the monitor access level. Valid values are `disabled`, `private`, `enabled`.
 - `mr_default_target_self` (Boolean) For forks, whether merge requests target the fork itself rather than the upstream project by default.
+- `mr_default_title_template` (String) Template used to set the default title of merge requests.
 - `name` (String) The name of the project.
 - `name_with_namespace` (String) In `group / subgroup / project` or `user / project` format.
 - `namespace` (Attributes List) Namespace of the project (parent group/s). (see [below for nested schema](#nestedatt--namespace))
@@ -160,6 +161,7 @@ data "gitlab_project" "example" {
 - `resolve_outdated_diff_discussions` (Boolean) Automatically resolve merge request diffs discussions on lines changed with a push.
 - `resource_group_default_process_mode` (String) The default resource group process mode for the project.
 - `restrict_user_defined_variables` (Boolean, Deprecated) Allow only users with the Maintainer role to pass user-defined variables when triggering a pipeline.
+- `reviewer_assignment_strategy` (String) The strategy used to automatically assign reviewers to merge requests. Valid values are `disabled`, `code_owners`, `dap_powered`. Premium and Ultimate only.
 - `runner_token_expiration_interval` (Number) Runner token expiration interval, in seconds.
 - `runners_token` (String, Sensitive) Registration token to use during runner setup.
 - `security_and_compliance_access_level` (String) Set the security and compliance access level. Valid values are `disabled`, `private`, `enabled`.

@@ -59,7 +59,7 @@ resource "gitlab_group_membership" "example_membership" {
 - `name` (String) The name of the user. If not specified, the default Service account user name is used.
 - `skip_wait_for_deletion` (Boolean) If set to `true`, skip waiting for the service account to be fully deleted. This is recommended for gitlab.com where deletion can take a while due to asynchronous processing. Defaults to `false`.
 - `timeouts` (Attributes) (see [below for nested schema](#nestedatt--timeouts))
-- `username` (String) The username of the user. If not specified, it’s automatically generated.
+- `username` (String) The username of the user. If not specified, it's automatically generated.
 
 ### Read-Only
 

@@ -63,6 +63,7 @@ Read-Only:
 
 - `active` (Boolean)
 - `created_at` (String)
+- `description` (String)
 - `expires_at` (String)
 - `id` (String)
 - `name` (String)

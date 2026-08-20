@@ -58,6 +58,7 @@ Read-Only:
 - `auto_devops_enabled` (Boolean) Default to Auto DevOps pipeline for all projects within this group.
 - `avatar_url` (String) URL of the group avatar.
 - `created_at` (String) Timestamp at which the group was created.
+- `crm_enabled` (Boolean) Whether customer relations management (CRM) is enabled for the group.
 - `custom_attributes` (List of Map of String) Custom attributes attached to the group. Each entry is a map with `key` and `value`. Requires administrator privileges to read.
 - `default_branch` (String) The default branch of the group.
 - `default_branch_protection` (Number, Deprecated) Whether developers and maintainers can push to the applicable default branch. Use `default_branch_protection_defaults` instead, to be removed in 19.0.

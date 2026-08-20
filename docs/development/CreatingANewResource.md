@@ -147,6 +147,11 @@ Similar to the schema struct above, there are a couple things to take note of in
 
 For more information on various properties of the schema attributes, read the [Terraform Plugin Framework Schema Documentation](https://developer.hashicorp.com/terraform/plugin/framework/handling-data/schemas).
 
+For this repository's conventions on choosing between `Optional`, `Optional + Computed`, and
+`Computed`-only, and on picking the right `PlanModifiers` for each case (including the
+Set-nested-attribute gotcha), see the
+[`create-update-schema` skill](../../.agents/skills/create-update-schema/SKILL.md).
+
 ## Step 5: Create the `Configure` function
 
 After the schema function has been written, the `Configure` function needs to be written.
