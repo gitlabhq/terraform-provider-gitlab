@@ -48,7 +48,7 @@ resource "gitlab_compliance_framework" "sample" {
 ### Optional
 
 - `default` (Boolean) Set this compliance framework as the default framework for the group. Default: `false`
-- `pipeline_configuration_full_path` (String) Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/.compliance-gitlab-ci.yml@compliance/hipaa`. Required format: `path/file.y[a]ml@group-name/project-name` **Note**: Ultimate license required.
+- `pipeline_configuration_full_path` (String, Deprecated) Full path of the compliance pipeline configuration stored in a project repository, such as `.gitlab/.compliance-gitlab-ci.yml@compliance/hipaa`. Required format: `path/file.y[a]ml@group-name/project-name`. Deprecated in GitLab 17.4, to be removed in 20.0. Use pipeline execution policies instead. **Note**: Ultimate license required.
 
 ### Read-Only
 

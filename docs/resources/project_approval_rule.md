@@ -19,9 +19,9 @@ The `gitlab_project_approval_rule` resource manages the lifecycle of a project-l
 
 -> This resource requires a GitLab Enterprise instance.
 
-~> A project is limited to one "any_approver" rule at a time, any attempt to create a second rule of type "any_approver" will fail. As a result, if 
-   an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
-   to prevent a common error with this resource.
+~> A project is limited to one "any_approver" rule at a time, any attempt to create a second rule of type "any_approver" will fail. As a result, if
+  an "any_approver" rule is already present on a project at creation time, and that rule requires 0 approvers, the rule will be automatically imported
+  to prevent a common error with this resource.
 
 ~> Since a project is limited to one "any_approver" rule, attempting to add two "any_approver" rules to the same project in terraform will result in 
    terraform identifying changes with every "plan" operation, and may result in an error during the "apply" operation.
@@ -105,12 +105,12 @@ resource "gitlab_project_approval_rule" "example-four" {
 - `group_ids` (Set of Number) A list of group IDs whose members can approve of the merge request.
 - `protected_branch_ids` (Set of Number) A list of protected branch IDs (not branch names) for which the rule applies.
 - `report_type` (String) Report type is required when the rule_type is `report_approver`. Valid values are `code_coverage`.
-- `rule_type` (String) String, defaults to 'regular'. The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`, `report_approver`.
+- `rule_type` (String) The type of rule. `any_approver` is a pre-configured default rule with `approvals_required` at `0`. Valid values are `regular`, `any_approver`, `report_approver`.
 - `user_ids` (Set of Number) A list of specific User IDs to add to the list of approvers.
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
+- `id` (String) The ID of this Terraform resource. In the format `<project>:<rule-id>`.
 
 ## Import
 

@@ -1,3 +1,21 @@
+## 19.4.0 (2026-09-17)
+
+### FEATURES (3 changes)
+
+- resource/gitlab_compliance_framework, resource/gitlab_compliance_framework_from_template, resource/gitlab_compliance_requirement:  [Add new gitlab_compliance_framework_from_template resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/55c06fcdee7a3c2971c96d2fc5c8b2a4e5c10d8d) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3258))
+- resource/gitlab_group_integration_datadog:  [Add datadog group integration resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f976c98c2de5c600b5891a22828aff328cb6aa47) by @gkepas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3215))
+- resource/gitlab_project_approval_rules:  [Add gitlab_project_approval_rules resource](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/58952b1764e5a4c0b8ad0024d061d6137f1b404f) by @r.baradari ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3200))
+
+### BUG FIXES (7 changes)
+
+- resource/gitlab_user_runner:  [Read project_id back for project runners in gitlab_user_runner](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c0aaa8d79a60805ce1360c0f2cae5316d8569c4e) by @sjestonsingh ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3273))
+- resource/gitlab_member_role:  [Correct gitlab_member_role permission for security AI workflow](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/af187aa61bf13e20b21bc7c12f82e08a908d867f) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3272))
+- resource/gitlab_member_role:  [fix a bug where improper permission enumerations caused `gitlab_member_role` to fail](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8573e073866fd941e1e8d58e76783b5553753f6b) by @sjestonsingh ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3266))
+- resource/gitlab_pipeline_schedule:  [fix: preserve explicitly empty inputs set on gitlab_pipeline_schedule](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4cfcb18ae83982c227bf70a5dfb3033c7ad6bed0) by @aging1 ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3264))
+- [Improve confusing error during provider authentication](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/f61afce5759b7357a2a9875dd4b94410b1d2ea17) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3261))
+- resource/gitlab_project_approval_rule:  [Migrate resource gitlab_project_approval_rule](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/2a7b6ddbef11c8c511e7582970519c78e498702b) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3260))
+- resource/gitlab_project, resource/gitlab_group:  [Fixed a bug where transferring projects or groups could cause a subsequent plan operation error due to the wrong namespace being read into state]() by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3284))
+
 ## 19.3.0 (2026-08-20)
 
 ### FEATURES (12 changes)
