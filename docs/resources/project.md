@@ -210,7 +210,7 @@ resource "gitlab_project" "import_private" {
 - `protect_merge_request_pipelines` (Boolean) Whether pipelines triggered for merge requests run with project secrets and protected variables, instead of the contributor's lower-privileged context.
 - `public_builds` (Boolean, Deprecated) If true, jobs can be viewed by non-project members.
 - `public_jobs` (Boolean) If true, jobs can be viewed by non-project members.
-- `push_rules` (Block List, Max: 1) Push rules for the project. (see [below for nested schema](#nestedblock--push_rules))
+- `push_rules` (Block List, Max: 1, Deprecated) Push rules for the project. Deprecated, to be removed in 20.0. Use `gitlab_project_push_rules` instead. (see [below for nested schema](#nestedblock--push_rules))
 - `releases_access_level` (String) Set the releases access level. Valid values are `disabled`, `private`, `enabled`.
 - `remove_source_branch_after_merge` (Boolean) Enable `Delete source branch` option by default for all new merge requests.
 - `repository_access_level` (String) Set the repository access level. Valid values are `disabled`, `private`, `enabled`.

@@ -1,3 +1,22 @@
+## 19.4.1 (2026-10-02)
+
+NOTE: This release is primarily targeted at downgrading the Go version of the provider, which normally users don't need to be aware of.
+This is because of a newly introduced change in Go 1.27 changing the `ClientHello` packet length for SSL handshakes. If you've
+experienced issues with SSL handshakes in the 19.4.0 provider this release should resolve the issue, HOWEVER you should investigate
+which part of your network is causing the SSL handshake issues since the Go 1.27 version update _will_ be consumed in a later version (at the latest in 19.10 because of Go maintenance policies).
+
+### FEATURES (2 changes)
+
+- resource/gitlab_project:  [Deprecate gitlab_project.push_rules](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/7e681f68a86d067e049b0c2d17a16a8a99e7df18) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3295))
+- data/gitlab_group_service_account, resource/gitlab_group_service_account:  [Use the single group service account GET endpoint](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c58a55fc87fd298a72a9e3e46a25e706996a47cd) by @jspagnola ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3293))
+
+### BUG FIXES (4 changes)
+
+- [Downgrade Go to 1.26.5 to address tldr window issues](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/260fe95ba4ff00d27bdf07d302c460e4551908ea) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3305))
+- resource/gitlab_pipeline_schedule:  [Validate full git refs provided for gitlab_pipeline_schedule](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6aecd4b0e85aa2d1d7c2e0d10cbdc34ffdb6c2eb) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3294))
+- resource/gitlab_group:  [Allow configuring the "Delete" timeout](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/e5f2c1c468273e917ba65115457195fb5e9a4cd5) by @PatrickRice ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3285))
+- resource/gitlab_group_service_account_access_token:  [Allow destroy of group service account tokens without expiry with non-admin user](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/3f92d7e31891300098eca94371b1e45b6ba3cb99) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3275))
+
 ## 19.4.0 (2026-09-17)
 
 ### FEATURES (3 changes)

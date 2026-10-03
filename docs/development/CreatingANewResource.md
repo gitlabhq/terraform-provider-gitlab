@@ -302,13 +302,13 @@ func (r *gitlabApplicationResource) Create(ctx context.Context, req resource.Cre
 
     // configure GitLab API call
     options := &gitlab.CreateApplicationOptions{
-        Name:        gitlab.Ptr(data.Name.ValueString()),
-        RedirectURI: gitlab.Ptr(data.RedirectURL.ValueString()),
-        Scopes:      gitlab.Ptr(formatted_scopes),
+        Name:        new(data.Name.ValueString()),
+        RedirectURI: new(data.RedirectURL.ValueString()),
+        Scopes:      new(formatted_scopes),
     }
 
     if !data.Confidential.IsNull() {
-        options.Confidential = gitlab.Ptr(data.Confidential.ValueBool())
+        options.Confidential = new(data.Confidential.ValueBool())
     }
 
     // Create application
