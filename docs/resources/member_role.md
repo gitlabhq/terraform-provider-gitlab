@@ -33,7 +33,7 @@ Custom roles allow an organization to create user roles with the precise privile
 ```terraform
 # Example is creating a role for a security analyst to be able to read vulnerabilities for repos in example-org on gitlab.com.
 
-resource "gitlab_member_role" "example" {
+resource "gitlab_member_role" "security_analyst" {
   name              = "Security Analyst"
   description       = "This is a read only role for security analysts"
   group_path        = "example-org"
@@ -45,7 +45,7 @@ resource "gitlab_member_role" "example" {
 
 # Example is creating a role for an enhanced developer to be able to manage CI/CD variables and vulnerabilities on self managed gitlab instance.
 
-resource "gitlab_member_role" "example" {
+resource "gitlab_member_role" "enhanced_developer" {
   name              = "Enhanced Developer"
   description       = "This role gives the developers additional access to manage CI/CD variables and vulnerabilities"
   base_access_level = "DEVELOPER"

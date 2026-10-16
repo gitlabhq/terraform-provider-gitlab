@@ -35,14 +35,25 @@ The `gitlab_application_settings` resource manages the GitLab application settin
 
 ```terraform
 # Set the default branch
-resource "gitlab_application_settings" "this" {
+resource "gitlab_application_settings" "default_branch" {
   default_branch_name = "main"
 }
 
 # Set the 2FA settings
-resource "gitlab_application_settings" "this" {
+resource "gitlab_application_settings" "two_factor" {
   require_two_factor_authentication = true
   two_factor_grace_period           = 24
+}
+
+# Example Allow custom integrations
+resource "gitlab_application_settings" "allow_custom_integrations" {
+  allow_all_integrations = false
+  allowed_integrations   = ["jira"]
+}
+
+# Example allowing all integrations:
+resource "gitlab_application_settings" "allow_all_integrations" {
+  allow_all_integrations = true
 }
 ```
 
@@ -58,11 +69,13 @@ resource "gitlab_application_settings" "this" {
 - `akismet_api_key` (String, Sensitive) API key for Akismet spam protection.
 - `akismet_enabled` (Boolean) (If enabled, requires: akismet_api_key) Enable or disable Akismet spam protection.
 - `allow_account_deletion` (Boolean) Set to true to allow users to delete their accounts. Premium and Ultimate only.
+- `allow_all_integrations` (Boolean) Allow all project integrations instance-wide. Ultimate only.
 - `allow_group_owners_to_manage_ldap` (Boolean) Set to true to allow group owners to manage LDAP.
 - `allow_local_requests_from_system_hooks` (Boolean) Allow requests to the local network from system hooks.
 - `allow_local_requests_from_web_hooks_and_services` (Boolean) Allow requests to the local network from web hooks and services.
 - `allow_project_creation_for_guest_and_below` (Boolean) Indicates whether users assigned up to the Guest role can create groups and personal projects.
 - `allow_runner_registration_token` (Boolean) Allow using a registration token to create a runner.
+- `allowed_integrations` (Set of String) List of project integrations allowed instance-wide when allow_all_integrations is false. Ultimate only.
 - `archive_builds_in_human_readable` (String) Set the duration for which the jobs are considered as old and expired. After that time passes, the jobs are archived and no longer able to be retried. Make it empty to never expire jobs. It has to be no less than 1 day, for example: 15 days, 1 month, 2 years.
 - `asciidoc_max_includes` (Number) Maximum limit of AsciiDoc include directives being processed in any one document. Maximum: 64.
 - `asset_proxy_allowlist` (List of String) Assets that match these domains are not proxied. Wildcards allowed. Your GitLab installation URL is automatically allowlisted. GitLab restart is required to apply changes.

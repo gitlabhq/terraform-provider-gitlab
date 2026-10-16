@@ -26,7 +26,7 @@ resource "gitlab_group_variable" "example" {
 }
 
 # Example  with masked and hidden
-resource "gitlab_group_variable" "example" {
+resource "gitlab_group_variable" "masked_and_hidden" {
   group     = "12345"
   key       = "group_variable_key"
   value     = "group_variable_value"

@@ -62,7 +62,7 @@ resource "gitlab_group_hook" "all_attributes" {
 
 # Using Custom Headers
 # Values of headers can't be imported
-resource "gitlab_group_hook" "all_attributes" {
+resource "gitlab_group_hook" "custom_headers" {
   group                 = "example/hooked"
   url                   = "https://example.com/hook/example"
   merge_requests_events = true

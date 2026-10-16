@@ -34,7 +34,7 @@ resource "gitlab_project_environment" "this" {
 }
 
 # Example with access-level based approval rules
-resource "gitlab_project_protected_environment" "example_with_multiple" {
+resource "gitlab_project_protected_environment" "example_with_access_level" {
   project     = gitlab_project_environment.this.project
   environment = gitlab_project_environment.this.name
 

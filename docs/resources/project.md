@@ -51,6 +51,16 @@ resource "gitlab_project" "example-two" {
   }
 }
 
+# Project which automatically rebases the source branch before merging
+# NOTE: `automatic_rebase_enabled` requires GitLab 19.4 or later and only applies when
+#       `merge_method` is `ff` or `rebase_merge`.
+resource "gitlab_project" "example-automatic-rebase" {
+  name = "example-automatic-rebase"
+
+  merge_method             = "ff"
+  automatic_rebase_enabled = true
+}
+
 # Create a project for a given user (requires admin access)
 data "gitlab_user" "peter_parker" {
   username = "peter_parker"
@@ -70,7 +80,7 @@ resource "gitlab_project" "fork" {
 }
 
 # Fork a project and setup a pull mirror (Deprecated, use gitlab_project_pull_mirror instead)
-resource "gitlab_project" "fork" {
+resource "gitlab_project" "fork_with_mirror" {
   name                   = "my-fork"
   description            = "This is a fork"
   forked_from_project_id = gitlab_project.example.id
@@ -111,7 +121,7 @@ resource "gitlab_project" "import_private_with_mirror" {
 # Create a project by importing it from a private project and provide credentials in `import_url`
 # NOTE: only use this if you really must, use `import_url_username` and `import_url_password` whenever possible
 #       GitLab API will always return the `import_url` without credentials, therefore you must ignore the `import_url` for changes:
-resource "gitlab_project" "import_private" {
+resource "gitlab_project" "import_private_credentials_in_url" {
   name       = "import-from-public-project"
   import_url = "https://user:pass@gitlab.example.com/repo.git"
 
@@ -142,6 +152,10 @@ resource "gitlab_project" "import_private" {
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for this project.
 - `auto_duo_code_review_enabled` (Boolean) Enable automatic reviews by GitLab Duo on merge requests. Ultimate only. Automatic reviews only work with the GitLab Duo Enterprise add-on.
 - `autoclose_referenced_issues` (Boolean) Set whether auto-closing referenced issues on default branch.
+- `automatic_rebase_enabled` (Boolean) Set to true to automatically rebase the source branch onto the target branch before merging.
+Only applies when `merge_method` is `ff` or `rebase_merge`.
+Requires GitLab 19.4 or later; older instances ignore the attribute on write and omit it on read,
+so setting it there surfaces as a permanent difference on every plan.
 - `avatar` (String) A local path to the avatar image to upload. **Note**: not available for imported resources.
 - `avatar_hash` (String) The hash of the avatar image. Use `filesha256("path/to/avatar.png")` whenever possible. **Note**: this is used to trigger an update of the avatar. If it's not given, but an avatar is given, the avatar will be updated each time.
 - `branches` (String) Branches to fork (empty for all branches).

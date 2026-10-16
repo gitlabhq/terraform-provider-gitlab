@@ -25,7 +25,7 @@ resource "gitlab_pages_domain" "this" {
 }
 
 # Example using a manually generated certificate and key
-resource "gitlab_pages_domain" "this" {
+resource "gitlab_pages_domain" "manual_certificate" {
   project = 123
   domain  = "example.com"
 

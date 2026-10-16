@@ -1,3 +1,24 @@
+## 19.5.0 (2026-10-15)
+
+### FEATURES (4 changes)
+
+- resource/gitlab_application_settings:  [Add allow_all_integrations and allowed_integrations settings](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/bc6d2ee2ffc5fb70fc2119d9a0d10b50bac6dfc1) by @fredfrazao ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3297))
+- data/gitlab_compliance_framework_templates:  [Add new data source for compliance framework templates](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/3a4f780420216bca2e8bc2d46598558a00276dc9) by @mness ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3288))
+- resource/gitlab_project_container_scanning:  [feat: Support SetContainerScanningForRegistry](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/fe45bd2ce87bd66f97b7da14ec786fdc169d1bdd) by @gkepas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3282))
+- resource/gitlab_project:  [Add automatic_rebase_enabled to gitlab_project](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/c138532d6d96299885319c5710bf64ca25df2ad3) by @anton.kuligin ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3254))
+
+### BUG FIXES (9 changes)
+
+- resource/gitlab_group, resource/gitlab_project:  [Try to more gracefully handle group deletions](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/0deee0126e9d645d7122bf51008fe3cbbfd4bbe1) by @jspagnola ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3302))
+- resource/gitlab_project_integration_datadog, resource/gitlab_project_integration_harbor, resource/gitlab_project_integration_jenkins:  [Remove the Datadog, Jenkins and Harbor project integrations from state on 404](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/4f34b33b1864cae5d65597ac1175dfdd42d64f7f) by @jmrp ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3334))
+- data/gitlab_project_merge_requests:  [Read every page of merge requests in the gitlab_project_merge_requests data source](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/8b45590db2bb8b03445784ec80101788d8664d8c) by @jmrp ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3332))
+- resource/gitlab_project_pull_mirror:  [fix: Update project pull mirror to not pull `protected_branches` or `branch_regex` from state when not set](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/76927d369e2ab287715747199194384ed66516cd) by @gkepas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3312))
+- resource/gitlab_repository_file:  [fix: use a list of refresh error msgs on repository_file](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/80638f1e5700e1a54746d1534e02c8a5bae89201) by @gkepas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3296))
+- [chore: install acc tests external providers from a mirror](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/6cbee813425e5be102ea6f402c47a49a2ccbd605) by @gkepas ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3292))
+- resource/gitlab_project:  [Strip v query param from gitlab_project.avatar_url](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/47206ef59b5d897721e2805e90bc23da94d8edc5) by @heidi.berry ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3291))
+- resource/gitlab_group_integration_datadog, resource/gitlab_group_variable, resource/gitlab_project_variable:  [fix: don't send masked on update for hidden project/group variables](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/cf733c5beb3aa7eafe26814c44bc15eb41f35dcc) by @jspagnola ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3283))
+- resource/gitlab_group_access_token, resource/gitlab_group_service_account_access_token, resource/gitlab_personal_access_token, resource/gitlab_project_access_token, resource/gitlab_project_service_account_access_token:  [Mark active and revoked unknown when a token rotates](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/commit/1eb347676328ff82b67d039b760ec6be52721692) by @sjestonsingh ([merge request](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/merge_requests/3274))
+
 ## 19.4.1 (2026-10-02)
 
 NOTE: This release is primarily targeted at downgrading the Go version of the provider, which normally users don't need to be aware of.

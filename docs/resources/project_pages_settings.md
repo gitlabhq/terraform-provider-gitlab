@@ -35,7 +35,7 @@ resource "gitlab_project_pages_settings" "this" {
 }
 
 # Example where the resource will reset the settings to their original values on destroy
-resource "gitlab_project_pages_settings" "this" {
+resource "gitlab_project_pages_settings" "reset_on_destroy" {
   project                  = gitlab_project.example.id
   is_unique_domain_enabled = true
   keep_settings_on_destroy = false

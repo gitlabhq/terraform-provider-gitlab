@@ -39,7 +39,7 @@ resource "gitlab_application_appearance" "this" {
 }
 
 # Example where the resource will revert the appearance to its original values on destroy
-resource "gitlab_application_appearance" "this" {
+resource "gitlab_application_appearance" "revert_on_destroy" {
   title                    = "My GitLab"
   keep_settings_on_destroy = false
   description              = "My GitLab instance"
