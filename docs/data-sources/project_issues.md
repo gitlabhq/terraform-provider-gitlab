@@ -16,12 +16,12 @@ The `gitlab_project_issues` data source allows to retrieve details about issues 
 ## Example Usage
 
 ```terraform
-data "gitlab_project" "foo" {
-  id = "foo/bar/baz"
+data "gitlab_project" "example" {
+  path_with_namespace = "foo/bar/baz"
 }
 
 data "gitlab_project_issues" "all_with_foo" {
-  project = data.gitlab_project.foo.id
+  project = data.gitlab_project.example.id
   search  = "foo"
 }
 ```

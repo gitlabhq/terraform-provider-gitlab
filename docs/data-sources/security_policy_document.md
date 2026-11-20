@@ -5,7 +5,7 @@ subcategory: ""
 description: |-
   Generates a GitLab security policy YAML document from structured configuration.
   This data source performs pure transformation without any API calls.
-  Upstream API: GitLab Security Policies Documentation https://docs.gitlab.com/ee/user/application_security/policies/scan_execution_policies/
+  Upstream API: GitLab Security Policies Documentation https://docs.gitlab.com/user/application_security/policies/scan_execution_policies/
 ---
 
 # gitlab_security_policy_document (Data Source)
@@ -13,7 +13,7 @@ description: |-
 Generates a GitLab security policy YAML document from structured configuration.
 This data source performs pure transformation without any API calls.
 
-**Upstream API**: [GitLab Security Policies Documentation](https://docs.gitlab.com/ee/user/application_security/policies/scan_execution_policies/)
+**Upstream API**: [GitLab Security Policies Documentation](https://docs.gitlab.com/user/application_security/policies/scan_execution_policies/)
 
 ## Example Usage
 
@@ -46,11 +46,12 @@ data "gitlab_security_policy_document" "scan" {
 resource "gitlab_repository_file" "policy" {
   # The security policy project linked to the group or project
   project = 1234
-  ref     = "main"
+  branch  = "main"
 
   # This name is important, don't change it!
   # see https://docs.gitlab.com/user/application_security/policies/enforcement/security_policy_projects/
   file_path = ".gitlab/security-policies/policy.yml"
+  encoding  = "text"
   content   = data.gitlab_security_policy_document.scan.yaml
 }
 ```

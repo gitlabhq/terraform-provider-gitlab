@@ -18,19 +18,19 @@ The `gitlab_project_membership` data source allows you to list and filter all me
 ```terraform
 # By project's ID
 data "gitlab_project_membership" "example" {
-  project_id = 123
+  project = 123
 }
 
 # By project's full path
 data "gitlab_project_membership" "example" {
-  full_path = "foo/bar"
+  project = "foo/bar"
 }
 
 # Get members of a project including all members
 # through ancestor groups
 data "gitlab_project_membership" "example" {
-  project_id = 123
-  inherited  = true
+  project   = 123
+  inherited = true
 }
 ```
 

@@ -17,7 +17,7 @@ The `gitlab_group_hooks` data source retrieves details about hooks in a group.
 
 ```terraform
 data "gitlab_group" "example" {
-  id = "foo/bar/baz"
+  full_path = "foo/bar/baz"
 }
 
 data "gitlab_group_hooks" "examples" {

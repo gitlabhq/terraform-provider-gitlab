@@ -8,7 +8,7 @@ subcategory: "Upgrade Guides"
 Because the GitLab Provider has moved to [GitLab.com](https://gitlab.com/gitlab-org/terraform-provider-gitlab),
 the release cadence and versioning has been
 [aligned](https://gitlab.com/gitlab-org/terraform-provider-gitlab/-/issues/1331) with the GitLab
-[monthly self-managed release cadence](https://about.gitlab.com/handbook/engineering/releases/)
+[monthly self-managed release cadence](https://handbook.gitlab.com/handbook/engineering/releases/)
 starting with 15.7 (22nd Dec 2022).
 
 The version bump from [`3.20.0`](https://registry.terraform.io/providers/gitlabhq/gitlab/3.20.0) to

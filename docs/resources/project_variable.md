@@ -5,6 +5,8 @@ subcategory: ""
 description: |-
   The gitlab_project_variable resource allows creating and managing a GitLab project level variable.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_level_variables/
+  Use value_wo with an ephemeral input and value_wo_version to keep credentials out of Terraform plan and state. Write-only arguments require Terraform 1.11 or later. Change the version marker to update the value; changes to the value alone do not produce a plan difference. Every update sends the configured value, including updates to other attributes when the version marker is unchanged. Value drift outside Terraform is not detected in this mode.
+  Switching from value to value_wo removes the value from subsequent state snapshots, but does not remove it from historical states or saved plans. Rotate the old credential and manage retained artifacts separately. Importing a non-hidden variable with the ordinary import ID reads its value into state; use hidden variables when importing secret credentials. Hidden visibility is selected at creation and cannot be enabled in place.
 ---
 
 # gitlab_project_variable (Resource)
@@ -12,6 +14,10 @@ description: |-
 The `gitlab_project_variable` resource allows creating and managing a GitLab project level variable.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_level_variables/)
+
+Use `value_wo` with an ephemeral input and `value_wo_version` to keep credentials out of Terraform plan and state. Write-only arguments require Terraform 1.11 or later. Change the version marker to update the value; changes to the value alone do not produce a plan difference. Every update sends the configured value, including updates to other attributes when the version marker is unchanged. Value drift outside Terraform is not detected in this mode.
+
+Switching from `value` to `value_wo` removes the value from subsequent state snapshots, but does not remove it from historical states or saved plans. Rotate the old credential and manage retained artifacts separately. Importing a non-hidden variable with the ordinary import ID reads its value into state; use hidden variables when importing secret credentials. Hidden visibility is selected at creation and cannot be enabled in place.
 
 ## Example Usage
 
@@ -31,9 +37,10 @@ resource "gitlab_project_variable" "example" {
 
 - `key` (String) The name of the variable.
 - `project` (String) The name or id of the project.
-- `value` (String) The value of the variable.
 
 ### Optional
+
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
 - `description` (String) The description of the variable.
 - `environment_scope` (String) The environment scope of the variable. Defaults to all environment (`*`). Note that in Community Editions of Gitlab, values other than `*` will cause inconsistent plans.
@@ -41,6 +48,9 @@ resource "gitlab_project_variable" "example" {
 - `masked` (Boolean) If set to `true`, the value of the variable will be masked in job logs. The value must meet the [masking requirements](https://docs.gitlab.com/ci/variables/#mask-a-cicd-variable).
 - `protected` (Boolean) If set to `true`, the variable will be passed only to pipelines running on protected branches and tags.
 - `raw` (Boolean) Whether the variable is treated as a raw string. When true, variables in the value are not expanded.
+- `value` (String) The value of the variable. Exactly one of `value` or `value_wo` must be specified. This attribute persists the value in state.
+- `value_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Write-only value, omitted from Terraform plan and state. Requires Terraform 1.11 or later. Exactly one of `value` or `value_wo` must be specified. Change `value_wo_version` to update the remote value; changes made outside Terraform cannot be detected in this mode.
+- `value_wo_version` (String) Non-empty change marker for `value_wo`, stored in state. Change this string to publish a new value. Every update sends `value_wo`, even when this marker is unchanged.
 - `variable_type` (String) The type of a variable. Valid values are: `env_var`, `file`.
 
 ### Read-Only

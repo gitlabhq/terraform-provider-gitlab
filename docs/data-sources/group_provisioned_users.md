@@ -17,7 +17,7 @@ The `gitlab_group_provisioned_users` data source retrieves details of the provis
 
 ```terraform
 data "gitlab_group" "example" {
-  id = "foo/bar/baz"
+  full_path = "foo/bar/baz"
 }
 
 # Basic example

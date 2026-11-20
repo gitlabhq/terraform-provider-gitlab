@@ -17,7 +17,7 @@ The `gitlab_project_service_account` data source retrieves information about a G
 
 ```terraform
 data "gitlab_project" "example" {
-  id = "foo/bar"
+  path_with_namespace = "foo/bar"
 }
 
 # Basic example

@@ -19,7 +19,7 @@ The `gitlab_pipeline_schedule_variable` resource manages the lifecycle of a vari
 resource "gitlab_pipeline_schedule" "example" {
   project     = "12345"
   description = "Used to schedule builds"
-  ref         = "master"
+  ref         = "refs/heads/main"
   cron        = "0 1 * * *"
 }
 

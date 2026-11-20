@@ -35,5 +35,6 @@ data "gitlab_instance_service_account" "example" {
 
 - `email` (String) The email of the user.
 - `id` (String) The ID of this Terraform resource. This matches the service account id.
+- `is_external` (Boolean) Whether the service account is an external user.
 - `name` (String) The name of the user.
 - `username` (String) The username of the user.

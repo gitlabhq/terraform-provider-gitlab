@@ -17,7 +17,7 @@ The `gitlab_project_hook` data source retrieves details about a hook in a projec
 
 ```terraform
 data "gitlab_project" "example" {
-  id = "foo/bar/baz"
+  path_with_namespace = "foo/bar/baz"
 }
 
 data "gitlab_project_hook" "example" {

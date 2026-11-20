@@ -28,12 +28,12 @@ resource "gitlab_project_job_token_scope" "allowed_single_project" {
 
 # Allow multiple projects
 locals {
-  allowed_project_ids = [123, 456, 789]
-  allowed_group_ids   = [123, 456, 789]
+  allowed_project_ids = ["123", "456", "789"]
+  allowed_group_ids   = ["123", "456", "789"]
 }
 
 data "gitlab_project" "deployment_project" {
-  name = "example-project"
+  path_with_namespace = "example-group/example-project"
 }
 
 resource "gitlab_project_job_token_scope" "allowed_project" {

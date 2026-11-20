@@ -17,7 +17,7 @@ The `gitlab_group_saml_links` data source retrieves all SAML links for a specifi
 
 ```terraform
 data "gitlab_group" "example" {
-  id = "foo/bar/baz"
+  full_path = "foo/bar/baz"
 }
 
 data "gitlab_group_saml_links" "example" {

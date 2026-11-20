@@ -161,6 +161,7 @@ Read-Only:
 - `merge_requests_access_level` (String) Set the merge requests access level. Valid values are `disabled`, `private`, `enabled`.
 - `merge_requests_enabled` (Boolean, Deprecated) Whether merge requests are enabled for the project.
 - `merge_requests_template` (String) Default description template for new merge requests.
+- `merge_train_enforcement` (String) Merge train enforcement level. Valid values are `allow_bypass`, `enforce_for_all_users`, `enforce_with_owner_override`. Introduced in GitLab 19.3. Premium and Ultimate only.
 - `merge_trains_enabled` (Boolean) Enable or disable merge trains.
 - `merge_trains_skip_train_allowed` (Boolean) Allows merge train merge requests to be merged without waiting for pipelines to finish.
 - `mirror` (Boolean) Whether pull mirroring is enabled for the project.

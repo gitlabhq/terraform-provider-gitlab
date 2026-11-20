@@ -17,7 +17,7 @@ The `gitlab_project_hooks` data source allows to retrieve details about hooks in
 
 ```terraform
 data "gitlab_project" "example" {
-  id = "foo/bar/baz"
+  path_with_namespace = "foo/bar/baz"
 }
 
 data "gitlab_project_hooks" "examples" {

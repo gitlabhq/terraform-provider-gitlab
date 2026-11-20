@@ -55,6 +55,131 @@ resource "gitlab_application_settings" "allow_custom_integrations" {
 resource "gitlab_application_settings" "allow_all_integrations" {
   allow_all_integrations = true
 }
+
+
+# Rate limits: Git over HTTP, dependency proxy and files API
+resource "gitlab_application_settings" "this" {
+  throttle_authenticated_git_http_enabled             = true
+  throttle_authenticated_git_http_period_in_seconds   = 3600
+  throttle_authenticated_git_http_requests_per_period = 3600
+
+  throttle_unauthenticated_git_http_enabled             = true
+  throttle_unauthenticated_git_http_period_in_seconds   = 3600
+  throttle_unauthenticated_git_http_requests_per_period = 3600
+
+  throttle_authenticated_dependency_proxy_enabled             = true
+  throttle_authenticated_dependency_proxy_period_in_seconds   = 15
+  throttle_authenticated_dependency_proxy_requests_per_period = 1000
+
+  throttle_authenticated_files_api_enabled             = true
+  throttle_authenticated_files_api_period_in_seconds   = 15
+  throttle_authenticated_files_api_requests_per_period = 500
+
+  throttle_unauthenticated_files_api_enabled             = true
+  throttle_unauthenticated_files_api_period_in_seconds   = 15
+  throttle_unauthenticated_files_api_requests_per_period = 125
+}
+
+# Rate limits for requests to GitLab's deprecated API endpoints
+# (Admin > Settings > Network > Deprecated API rate limits). These settings are current and supported;
+# "deprecated" refers to the endpoints being throttled, not to the settings.
+resource "gitlab_application_settings" "this" {
+  throttle_authenticated_deprecated_api_enabled             = true
+  throttle_authenticated_deprecated_api_period_in_seconds   = 3600
+  throttle_authenticated_deprecated_api_requests_per_period = 3600
+
+  throttle_unauthenticated_deprecated_api_enabled             = true
+  throttle_unauthenticated_deprecated_api_period_in_seconds   = 3600
+  throttle_unauthenticated_deprecated_api_requests_per_period = 1800
+}
+
+# Rate limits: protected paths, MCP (GitLab 19.5+) and incident management notifications
+resource "gitlab_application_settings" "this" {
+  throttle_protected_paths_enabled             = true
+  throttle_protected_paths_period_in_seconds   = 60
+  throttle_protected_paths_requests_per_period = 10
+
+  throttle_authenticated_mcp_enabled             = true
+  throttle_authenticated_mcp_period_in_seconds   = 60
+  throttle_authenticated_mcp_requests_per_period = 600
+
+  throttle_incident_management_notification_enabled           = true
+  throttle_incident_management_notification_period_in_seconds = 3600
+  throttle_incident_management_notification_per_period        = 3600
+}
+
+# Per-endpoint limits: users, autocomplete and raw blobs
+resource "gitlab_application_settings" "this" {
+  users_api_limit_followers = 100
+  users_api_limit_following = 100
+  users_api_limit_status    = 240
+  users_api_limit_ssh_keys  = 120
+  users_api_limit_ssh_key   = 120
+  users_api_limit_gpg_keys  = 120
+  users_api_limit_gpg_key   = 120
+
+  users_get_by_id_limit               = 300
+  users_get_by_id_limit_allowlist_raw = "root"
+
+  autocomplete_users_limit                 = 300
+  autocomplete_users_unauthenticated_limit = 100
+
+  raw_blob_request_limit_unauthenticated = 800
+}
+
+# Per-endpoint limits: CI/CD pipelines, jobs, runners and tags
+resource "gitlab_application_settings" "this" {
+  pipeline_limit_per_user = 25
+  ci_lint_limit_per_user  = 30
+  git_push_pipeline_limit = 4
+  tags_create_limit       = 100
+
+  # GitLab 19.5+
+  job_play_limit_per_user_project        = 300
+  job_retry_limit_per_user_project       = 300
+  pipeline_cancel_limit_per_user_project = 300
+  pipeline_retry_limit_per_user_project  = 300
+
+  runner_jobs_request_api_limit     = 2000
+  runner_jobs_patch_trace_api_limit = 200
+  runner_jobs_endpoints_api_limit   = 200
+}
+
+# Per-endpoint limits: webhooks, notes, AI and outbound HTTP responses
+resource "gitlab_application_settings" "this" {
+  web_hook_test_limit         = 5
+  web_hook_event_resend_limit = 5
+
+  notes_create_limit       = 300
+  ai_action_api_rate_limit = 160
+
+  max_http_response_size_limit   = 100
+  max_github_response_size_limit = 8
+}
+
+# Per-endpoint limits: import and export
+resource "gitlab_application_settings" "this" {
+  project_import_limit          = 6
+  project_export_limit          = 6
+  project_download_export_limit = 1
+  group_import_limit            = 6
+  group_export_limit            = 6
+  group_download_export_limit   = 1
+
+  import_jobs_concurrency_limit             = 100
+  concurrent_pull_request_import_jobs_limit = 200
+  concurrent_relation_export_limit          = 25
+  concurrent_relation_batch_export_limit    = 8
+}
+
+# Per-endpoint limits: CI/CD secrets and security policies
+resource "gitlab_application_settings" "this" {
+  group_secrets_limit   = 500
+  project_secrets_limit = 100
+
+  scan_execution_policies_action_limit   = 10
+  scan_execution_policies_schedule_limit = 5
+}
 ```
 
 <!-- schema generated by tfplugindocs -->
@@ -66,6 +191,7 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `admin_mode` (Boolean) Require administrators to enable Admin Mode by re-authenticating for administrative tasks.
 - `after_sign_out_path` (String) Where to redirect users after logout.
 - `after_sign_up_text` (String) Text shown to the user after signing up.
+- `ai_action_api_rate_limit` (Number) Maximum number of requests allowed to the aiAction GraphQL mutation per user per eight hours. Default: 160. Set to 0 to disable the rate limit. Introduced in GitLab 17.2.
 - `akismet_api_key` (String, Sensitive) API key for Akismet spam protection.
 - `akismet_enabled` (Boolean) (If enabled, requires: akismet_api_key) Enable or disable Akismet spam protection.
 - `allow_account_deletion` (Boolean) Set to true to allow users to delete their accounts. Premium and Ultimate only.
@@ -86,6 +212,8 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `auto_ban_user_on_excessive_projects_download` (Boolean) When enabled, users will get automatically banned from the application when they download more than the maximum number of unique projects in the time period specified by max_number_of_repository_downloads and max_number_of_repository_downloads_within_time_period respectively. Self-managed, Ultimate only.
 - `auto_devops_domain` (String) Specify a domain to use by default for every project’s Auto Review Apps and Auto Deploy stages.
 - `auto_devops_enabled` (Boolean) Enable Auto DevOps for projects by default. It automatically builds, tests, and deploys applications based on a predefined CI/CD configuration.
+- `autocomplete_users_limit` (Number) Maximum number of authenticated requests per minute to the GET /autocomplete/users endpoint.
+- `autocomplete_users_unauthenticated_limit` (Number) Maximum number of unauthenticated requests per minute to the GET /autocomplete/users endpoint.
 - `automatic_purchased_storage_allocation` (Boolean) Enabling this permits automatic allocation of purchased storage in a namespace.
 - `bulk_import_concurrent_pipeline_batch_limit` (Number) Maximum simultaneous Direct Transfer batches to process.
 - `bulk_import_enabled` (Boolean) Enable migrating GitLab groups by direct transfer.
@@ -93,12 +221,16 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `can_create_group` (Boolean) Indicates whether users can create top-level groups.
 - `check_namespace_plan` (Boolean) Enabling this makes only licensed EE features available to projects if the project namespace’s plan includes the feature or if the project is public.
 - `ci_job_live_trace_enabled` (Boolean) Turns on incremental logging for job logs. When turned on, archived job logs are incrementally uploaded to object storage. Object storage must be configured.
+- `ci_lint_limit_per_user` (Number) Maximum number of CI Lint requests per minute per user. Disabled by default.
 - `ci_max_includes` (Number) The maximum number of includes per pipeline.
 - `ci_max_total_yaml_size_bytes` (Number) The maximum amount of memory, in bytes, that can be allocated for the pipeline configuration, with all included YAML configuration files.
 - `commit_email_hostname` (String) Custom hostname (for private commit emails).
 - `concurrent_bitbucket_import_jobs_limit` (Number) Maximum number of simultaneous import jobs for the Bitbucket Cloud importer.
 - `concurrent_bitbucket_server_import_jobs_limit` (Number) Maximum number of simultaneous import jobs for the Bitbucket Server importer.
 - `concurrent_github_import_jobs_limit` (Number) Maximum number of simultaneous import jobs for the GitHub importer.
+- `concurrent_pull_request_import_jobs_limit` (Number) Maximum number of simultaneous pull request import jobs for the GitHub, Bitbucket Cloud, and Bitbucket Server importers. Default is 200. Introduced in GitLab 19.4.
+- `concurrent_relation_batch_export_limit` (Number) Maximum number of simultaneous batch export jobs to process. Introduced in GitLab 17.6.
+- `concurrent_relation_export_limit` (Number) Maximum number of simultaneous project file exports to process. Default: 25. Introduced in GitLab 19.4 with a feature flag named limit_concurrent_project_exports. Disabled by default.
 - `container_expiration_policies_enable_historic_entries` (Boolean) Enable cleanup policies for all projects.
 - `container_registry_cleanup_tags_service_max_list_size` (Number) The maximum number of tags that can be deleted in a single execution of cleanup policies.
 - `container_registry_delete_tags_service_timeout` (Number) The maximum time, in seconds, that the cleanup process can take to delete a batch of tags for cleanup policies.
@@ -189,6 +321,7 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `first_day_of_week` (Number) Start day of the week for calendar views and date pickers. Valid values are 0 for Sunday, 1 for Monday, and 6 for Saturday.
 - `geo_node_allowed_ips` (String) Comma-separated list of IPs and CIDRs of allowed secondary nodes. For example, 1.1.1.1, 2.2.2.0/24.
 - `geo_status_timeout` (Number) The amount of seconds after which a request to get a secondary node status times out.
+- `git_push_pipeline_limit` (Number) Set the maximum number of tag or branch pipelines that can be triggered by a single Git push. For more information about this limit, see number of pipelines per Git push.
 - `git_rate_limit_users_alertlist` (List of Number) List of user IDs that are emailed when the Git abuse rate limit is exceeded. Maximum: 100 user IDs. Self-managed, Ultimate only.
 - `git_rate_limit_users_allowlist` (List of String) List of usernames excluded from Git anti-abuse rate limits. Maximum: 100 usernames. Self-managed, Ultimate only.
 - `git_two_factor_session_expiry` (Number) Maximum duration (in minutes) of a session for Git operations when 2FA is enabled.
@@ -202,7 +335,11 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `grafana_enabled` (Boolean) Enable Grafana.
 - `grafana_url` (String) Grafana URL.
 - `gravatar_enabled` (Boolean) Enable Gravatar.
+- `group_download_export_limit` (Number) Maximum number of group export downloads per minute per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `group_export_limit` (Number) Maximum number of group exports per minute per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `group_import_limit` (Number) Maximum number of group imports per minute per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
 - `group_owners_can_manage_default_branch_protection` (Boolean) Prevent overrides of default branch protection.
+- `group_secrets_limit` (Number) Maximum number of secrets allowed per group in Secrets Manager. Default: 500. To disable the limit, set to 0. Ultimate only. Introduced in GitLab 18.9.
 - `help_page_hide_commercial_content` (Boolean) Hide marketing-related entries from help.
 - `help_page_support_url` (String) Alternate support URL for help page and help dropdown.
 - `help_page_text` (String) Custom text displayed on the help page.
@@ -212,6 +349,7 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `housekeeping_enabled` (Boolean) Enable or disable Git housekeeping. If enabled, requires housekeeping_optimize_repository_period.
 - `housekeeping_optimize_repository_period` (Number) Number of Git pushes after which an incremental git-repack is run.
 - `html_emails_enabled` (Boolean) Enable HTML emails.
+- `import_jobs_concurrency_limit` (Number) Maximum number of concurrently running jobs for each import worker type (project and group file base import, Direct Transfer, and GitHub, Bitbucket Cloud, and Bitbucket Server importer stages). Applied independently per worker type. Default is 100. Introduced in GitLab 19.1.
 - `import_sources` (List of String) Sources to allow project import from. Valid values are: `github`, `bitbucket`, `bitbucket_server`, `fogbugz`, `git`, `gitlab_project`, `gitea`, `manifest`
 - `in_product_marketing_emails_enabled` (Boolean) Enable in-product marketing emails.
 - `inactive_projects_delete_after_months` (Number) If delete_inactive_projects is true, the time (in months) to wait before deleting inactive projects.
@@ -224,6 +362,8 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `jira_connect_application_key` (String) ID of the OAuth application used to authenticate with the GitLab for Jira Cloud app.
 - `jira_connect_proxy_url` (String) URL of the GitLab instance used as a proxy for the GitLab for Jira Cloud app.
 - `jira_connect_public_key_storage_enabled` (Boolean) Enable public key storage for the GitLab for Jira Cloud app.
+- `job_play_limit_per_user_project` (Number) Maximum number of manual job runs per minute per user per project. Introduced in GitLab 19.5 with a feature flag named rate_limit_job_play. Disabled by default.
+- `job_retry_limit_per_user_project` (Number) Maximum number of job retries per minute per user per project. Introduced in GitLab 19.5 with a feature flag named rate_limit_job_retry. Disabled by default.
 - `keep_latest_artifact` (Boolean) Prevent the deletion of the artifacts from the most recent successful jobs, regardless of the expiry time.
 - `kroki_enabled` (Boolean) (If enabled, requires: kroki_url) Enable Kroki integration.
 - `kroki_formats` (Map of Boolean) Configuration for formats supported by the Kroki instance.
@@ -241,6 +381,8 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `max_attachment_size` (Number) Limit attachment size in MB.
 - `max_decompressed_archive_size` (Number) Maximum decompressed archive size in bytes.
 - `max_export_size` (Number) Maximum export size in MB. 0 for unlimited.
+- `max_github_response_size_limit` (Number) Maximum allowed GitHub API response size in MB. 0 for unlimited.
+- `max_http_response_size_limit` (Number) Maximum allowed size in MiB for HTTP responses from outbound requests. 0 for unlimited. Applicable for integrations, importers, and webhooks. Introduced in GitLab 18.4.
 - `max_import_remote_file_size` (Number) Maximum remote file size for imports from external object storages.
 - `max_import_size` (Number) Maximum import size in MB. 0 for unlimited.
 - `max_login_attempts` (Number) Maximum number of sign-in attempts before locking out the user.
@@ -258,6 +400,7 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `mirror_capacity_threshold` (Number) Minimum capacity to be available before scheduling more mirrors preemptively.
 - `mirror_max_capacity` (Number) Maximum number of mirrors that can be synchronizing at the same time.
 - `mirror_max_delay` (Number) Maximum time (in minutes) between updates that a mirror can have when scheduled to synchronize.
+- `notes_create_limit` (Number) Maximum number of notes (comments) a user can create per minute. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
 - `notify_on_unknown_sign_in` (Boolean) Enable sending notification if sign in from unknown IP address happens
 - `npm_package_requests_forwarding` (Boolean) Use npmjs.org as a default remote repository when the package is not found in the GitLab Package Registry for npm.
 - `nuget_skip_metadata_url_validation` (Boolean) Indicates whether to skip metadata URL validation for the NuGet package.
@@ -275,14 +418,21 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `password_uppercase_required` (Boolean) Indicates whether passwords require at least one uppercase letter.
 - `performance_bar_allowed_group_path` (String) Path of the group that is allowed to toggle the performance bar.
 - `personal_access_token_prefix` (String) Prefix for all generated personal access tokens.
+- `pipeline_cancel_limit_per_user_project` (Number) Maximum number of pipeline cancellations per minute per user per project. Introduced in GitLab 19.5.
 - `pipeline_limit_per_project_user_sha` (Number) Maximum number of pipeline creation requests per minute per user and commit.
+- `pipeline_limit_per_user` (Number) Maximum number of pipeline creation requests per minute per user.
+- `pipeline_retry_limit_per_user_project` (Number) Maximum number of pipeline retries per minute per user per project. Introduced in GitLab 19.5 with a feature flag named rate_limit_pipeline_retry. Disabled by default.
 - `plantuml_enabled` (Boolean) (If enabled, requires: plantuml_url) Enable PlantUML integration.
 - `plantuml_url` (String) The PlantUML instance URL for integration.
 - `polling_interval_multiplier` (Number) Interval multiplier used by endpoints that perform polling. Set to 0 to disable polling.
 - `prevent_merge_requests_author_approval` (Boolean) Prevent approval by merge request creator (author).
 - `prevent_merge_requests_committers_approval` (Boolean) Prevent approval by committers to merge requests.
+- `project_download_export_limit` (Number) Maximum number of project export downloads per minute per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
 - `project_export_enabled` (Boolean) Enable project export.
+- `project_export_limit` (Number) Maximum number of project exports per minute per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `project_import_limit` (Number) Maximum number of project imports per minute per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
 - `project_jobs_api_rate_limit` (Number) Maximum authenticated requests to /project/:id/jobs per minute.
+- `project_secrets_limit` (Number) Maximum number of secrets allowed per project in Secrets Manager. Default: 100. To disable the limit, set to 0. Ultimate only. Introduced in GitLab 18.9.
 - `projects_api_rate_limit_unauthenticated` (Number) Max number of requests per 10 minutes per IP address for unauthenticated requests to the list all projects API. To disable throttling set to 0.
 - `prometheus_metrics_enabled` (Boolean) Enable Prometheus metrics.
 - `protected_ci_variables` (Boolean) CI/CD variables are protected by default.
@@ -291,6 +441,7 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `pypi_package_requests_forwarding` (Boolean) Use pypi.org as a default remote repository when the package is not found in the GitLab Package Registry for PyPI.
 - `rate_limiting_response_text` (String) When rate limiting is enabled via the throttle_* settings, send this plain text response when a rate limit is exceeded. ‘Retry later’ is sent if this is blank.
 - `raw_blob_request_limit` (Number) Max number of requests per minute for each raw path. To disable throttling set to 0.
+- `raw_blob_request_limit_unauthenticated` (Number) Maximum number of unauthenticated requests per minute across all raw paths in a project (default is 800). Set to 0 to disable throttling.
 - `recaptcha_enabled` (Boolean) (If enabled, requires: recaptcha_private_key and recaptcha_site_key) Enable reCAPTCHA.
 - `recaptcha_private_key` (String, Sensitive) Private key for reCAPTCHA.
 - `recaptcha_site_key` (String, Sensitive) Site key for reCAPTCHA.
@@ -306,6 +457,11 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `require_two_factor_authentication` (Boolean) (If enabled, requires: two_factor_grace_period) Require all users to set up Two-factor authentication.
 - `restricted_visibility_levels` (List of String) Selected levels cannot be used by non-Administrator users for groups, projects or snippets. Can take private, internal and public as a parameter. Null means there is no restriction.
 - `rsa_key_restriction` (Number) The minimum allowed bit length of an uploaded RSA key. 0 means no restriction. -1 disables RSA keys.
+- `runner_jobs_endpoints_api_limit` (Number) Maximum number of requests per minute per job token for requests to /jobs/* requests to the runner jobs API endpoints. Default: 200. To disable throttling, set to 0. Introduced in GitLab 18.5.
+- `runner_jobs_patch_trace_api_limit` (Number) Maximum number of requests per minute per runner token for requests to the PATCH /jobs/:id/trace runner jobs API endpoint. Default: 2000. To disable throttling, set to 0. Introduced in GitLab 18.5.
+- `runner_jobs_request_api_limit` (Number) Maximum number of requests per minute per runner token for requests to the /jobs/request runner jobs API endpoint. Default: 2000. To disable throttling, set to 0. Introduced in GitLab 18.5.
+- `scan_execution_policies_action_limit` (Number) Maximum number of actions per scan execution policy. Default: 0. Maximum: 20.
+- `scan_execution_policies_schedule_limit` (Number) Maximum number of type: schedule rules per scan execution policy. Default: 0. Maximum: 20.
 - `search_rate_limit` (Number) Max number of requests per minute for performing a search while authenticated. To disable throttling set to 0.
 - `search_rate_limit_unauthenticated` (Number) Max number of requests per minute for performing a search while unauthenticated. To disable throttling set to 0.
 - `secret_push_protection_available` (Boolean) Allow projects to enable secret push protection. This does not enable secret push protection. Ultimate only.
@@ -346,26 +502,60 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `static_objects_external_storage_auth_token` (String, Sensitive) Authentication token for the external storage linked in static_objects_external_storage_url.
 - `static_objects_external_storage_url` (String, Sensitive) URL to an external storage for repository static objects.
 - `suggest_pipeline_enabled` (Boolean) Enable pipeline suggestion banner.
+- `tags_create_limit` (Number) Maximum number of tag creation requests allowed per 30 minutes per project. Applies to the REST API endpoint for creating a tag, the GraphQL tagCreate mutation, tag creation in the UI, and the /tag quick action. Default: 100. Set to 0 to disable the rate limit. Introduced in GitLab 19.4.
 - `terminal_max_session_time` (Number) Maximum time for web terminal websocket connection (in seconds). Set to 0 for unlimited time.
 - `terms` (String) (Required by: enforce_terms) Markdown content for the ToS.
 - `throttle_authenticated_api_enabled` (Boolean) (If enabled, requires: throttle_authenticated_api_period_in_seconds and throttle_authenticated_api_requests_per_period) Enable authenticated API request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots).
 - `throttle_authenticated_api_period_in_seconds` (Number) Rate limit period (in seconds).
 - `throttle_authenticated_api_requests_per_period` (Number) Maximum requests per period per user.
+- `throttle_authenticated_dependency_proxy_enabled` (Boolean) If true, enforces the authenticated dependency proxy request rate limit. Default value: false. Introduced in GitLab 19.4.
+- `throttle_authenticated_dependency_proxy_period_in_seconds` (Number) Rate limit period in seconds. throttle_authenticated_dependency_proxy_enabled must be true. Default value: 15. Introduced in GitLab 19.4.
+- `throttle_authenticated_dependency_proxy_requests_per_period` (Number) Maximum requests per period per user. throttle_authenticated_dependency_proxy_enabled must be true. Default value: 1000. Introduced in GitLab 19.4.
+- `throttle_authenticated_deprecated_api_enabled` (Boolean) (If enabled, requires: throttle_authenticated_deprecated_api_period_in_seconds and throttle_authenticated_deprecated_api_requests_per_period) Enable authenticated deprecated API request rate limit. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_authenticated_deprecated_api_period_in_seconds` (Number) Rate limit period (in seconds) for authenticated deprecated API requests. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_authenticated_deprecated_api_requests_per_period` (Number) Maximum authenticated deprecated API requests per period per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_authenticated_files_api_enabled` (Boolean) (If enabled, requires: throttle_authenticated_files_api_period_in_seconds and throttle_authenticated_files_api_requests_per_period) Enable authenticated Files API request rate limit. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_authenticated_files_api_period_in_seconds` (Number) Rate limit period (in seconds) for authenticated Files API requests. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_authenticated_files_api_requests_per_period` (Number) Maximum authenticated Files API requests per period per user. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_authenticated_git_http_enabled` (Boolean) If true, enforces the authenticated Git HTTP request rate limit. Default value: false. Introduced in GitLab 18.1 behind the feature flag git_authenticated_http_limit, enabled by default in GitLab 18.3; the flag was removed in GitLab 18.4.
+- `throttle_authenticated_git_http_period_in_seconds` (Number) Rate limit period in seconds. throttle_authenticated_git_http_enabled must be true. Default value: 3600. Introduced in GitLab 18.1 behind the feature flag git_authenticated_http_limit, enabled by default in GitLab 18.3; the flag was removed in GitLab 18.4.
+- `throttle_authenticated_git_http_requests_per_period` (Number) Maximum requests per period per user. throttle_authenticated_git_http_enabled must be true. Default value: 3600. Introduced in GitLab 18.1 behind the feature flag git_authenticated_http_limit, enabled by default in GitLab 18.3; the flag was removed in GitLab 18.4.
 - `throttle_authenticated_git_lfs_enabled` (Boolean) Enable authenticated Git LFS request rate limit.
 - `throttle_authenticated_git_lfs_period_in_seconds` (Number) Rate limit period (in seconds).
 - `throttle_authenticated_git_lfs_requests_per_period` (Number) Maximum requests per period per user.
+- `throttle_authenticated_mcp_enabled` (Boolean) (If enabled, requires: throttle_authenticated_mcp_period_in_seconds and throttle_authenticated_mcp_requests_per_period) If true, enforces the rate limit on requests to the MCP Server endpoint, /api/v4/mcp, for any HTTP method. Does not apply to other MCP endpoints. Introduced in GitLab 19.5.
+- `throttle_authenticated_mcp_period_in_seconds` (Number) Rate limit period in seconds. throttle_authenticated_mcp_enabled must be true. Introduced in GitLab 19.5.
+- `throttle_authenticated_mcp_requests_per_period` (Number) Maximum requests per period per user. throttle_authenticated_mcp_enabled must be true. Introduced in GitLab 19.5.
 - `throttle_authenticated_packages_api_enabled` (Boolean) (If enabled, requires: throttle_authenticated_packages_api_period_in_seconds and throttle_authenticated_packages_api_requests_per_period) Enable authenticated API request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots). View Package Registry rate limits for more details.
 - `throttle_authenticated_packages_api_period_in_seconds` (Number) Rate limit period (in seconds). View Package Registry rate limits for more details.
 - `throttle_authenticated_packages_api_requests_per_period` (Number) Maximum requests per period per user. View Package Registry rate limits for more details.
 - `throttle_authenticated_web_enabled` (Boolean) (If enabled, requires: throttle_authenticated_web_period_in_seconds and throttle_authenticated_web_requests_per_period) Enable authenticated web request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots).
 - `throttle_authenticated_web_period_in_seconds` (Number) Rate limit period (in seconds).
 - `throttle_authenticated_web_requests_per_period` (Number) Maximum requests per period per user.
+- `throttle_incident_management_notification_enabled` (Boolean) If true, enforces the inbound incident management alert notification rate limit, per project. Default value: false.
+- `throttle_incident_management_notification_per_period` (Number) Maximum inbound incident management alert notifications per period, per project. throttle_incident_management_notification_enabled must be true. Default value: 3600.
+- `throttle_incident_management_notification_period_in_seconds` (Number) Rate limit period in seconds. throttle_incident_management_notification_enabled must be true. Default value: 3600.
+- `throttle_protected_paths_enabled` (Boolean) (If enabled, requires: throttle_protected_paths_period_in_seconds and throttle_protected_paths_requests_per_period) Enable rate limiting for protected paths (for example, sign-in and password reset). Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_protected_paths_period_in_seconds` (Number) Rate limit period (in seconds) for protected paths. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_protected_paths_requests_per_period` (Number) Maximum requests per period per IP for protected paths. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
 - `throttle_unauthenticated_api_enabled` (Boolean) (If enabled, requires: throttle_unauthenticated_api_period_in_seconds and throttle_unauthenticated_api_requests_per_period) Enable unauthenticated API request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots).
 - `throttle_unauthenticated_api_period_in_seconds` (Number) Rate limit period in seconds.
 - `throttle_unauthenticated_api_requests_per_period` (Number) Max requests per period per IP.
+- `throttle_unauthenticated_deprecated_api_enabled` (Boolean) (If enabled, requires: throttle_unauthenticated_deprecated_api_period_in_seconds and throttle_unauthenticated_deprecated_api_requests_per_period) Enable unauthenticated deprecated API request rate limit. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_unauthenticated_deprecated_api_period_in_seconds` (Number) Rate limit period (in seconds) for unauthenticated deprecated API requests. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_unauthenticated_deprecated_api_requests_per_period` (Number) Maximum unauthenticated deprecated API requests per period per IP. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_unauthenticated_enabled` (Boolean, Deprecated) (Deprecated in GitLab 14.3. Use throttle_unauthenticated_web_enabled or throttle_unauthenticated_api_enabled instead.) (**If enabled, requires**: throttle_unauthenticated_period_in_seconds and throttle_unauthenticated_requests_per_period) Enable unauthenticated web request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots).
+- `throttle_unauthenticated_files_api_enabled` (Boolean) (If enabled, requires: throttle_unauthenticated_files_api_period_in_seconds and throttle_unauthenticated_files_api_requests_per_period) Enable unauthenticated Files API request rate limit. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_unauthenticated_files_api_period_in_seconds` (Number) Rate limit period (in seconds) for unauthenticated Files API requests. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_unauthenticated_files_api_requests_per_period` (Number) Maximum unauthenticated Files API requests per period per IP. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `throttle_unauthenticated_git_http_enabled` (Boolean) If true, enforces the unauthenticated Git HTTP request rate limit. Default value: false. Introduced in GitLab 17.0.
+- `throttle_unauthenticated_git_http_period_in_seconds` (Number) Rate limit period in seconds. throttle_unauthenticated_git_http_enabled must be true. Default value: 3600. Introduced in GitLab 17.0.
+- `throttle_unauthenticated_git_http_requests_per_period` (Number) Maximum requests per period per IP. throttle_unauthenticated_git_http_enabled must be true. Default value: 3600. Introduced in GitLab 17.0.
 - `throttle_unauthenticated_packages_api_enabled` (Boolean) (If enabled, requires: throttle_unauthenticated_packages_api_period_in_seconds and throttle_unauthenticated_packages_api_requests_per_period) Enable authenticated API request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots). View Package Registry rate limits for more details.
 - `throttle_unauthenticated_packages_api_period_in_seconds` (Number) Rate limit period (in seconds). View Package Registry rate limits for more details.
 - `throttle_unauthenticated_packages_api_requests_per_period` (Number) Maximum requests per period per user. View Package Registry rate limits for more details.
+- `throttle_unauthenticated_period_in_seconds` (Number, Deprecated) (Deprecated in GitLab 14.3. Use throttle_unauthenticated_web_period_in_seconds or throttle_unauthenticated_api_period_in_seconds instead.) Rate limit period in seconds.
+- `throttle_unauthenticated_requests_per_period` (Number, Deprecated) (Deprecated in GitLab 14.3. Use throttle_unauthenticated_web_requests_per_period or throttle_unauthenticated_api_requests_per_period instead.) Maximum requests per period per IP.
 - `throttle_unauthenticated_web_enabled` (Boolean) (If enabled, requires: throttle_unauthenticated_web_period_in_seconds and throttle_unauthenticated_web_requests_per_period) Enable unauthenticated web request rate limit. Helps reduce request volume (for example, from crawlers or abusive bots).
 - `throttle_unauthenticated_web_period_in_seconds` (Number) Rate limit period in seconds.
 - `throttle_unauthenticated_web_requests_per_period` (Number) Max requests per period per IP.
@@ -385,8 +575,19 @@ resource "gitlab_application_settings" "allow_all_integrations" {
 - `user_defaults_to_private_profile` (Boolean) Newly created users have private profile by default.
 - `user_oauth_applications` (Boolean) Allow users to register any application to use GitLab as an OAuth provider.
 - `user_show_add_ssh_key_message` (Boolean) When set to false disable the You won't be able to pull or push project code via SSH warning shown to users with no uploaded SSH key.
+- `users_api_limit_followers` (Number) Maximum number of requests per minute, per user or IP address. Default: 100. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_api_limit_following` (Number) Maximum number of requests per minute, per user or IP address. Default: 100. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_api_limit_gpg_key` (Number) Maximum number of requests per minute, per user or IP address. Default: 120. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_api_limit_gpg_keys` (Number) Maximum number of requests per minute, per user or IP address. Default: 120. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_api_limit_ssh_key` (Number) Maximum number of requests per minute, per user or IP address. Default: 120. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_api_limit_ssh_keys` (Number) Maximum number of requests per minute, per user or IP address. Default: 120. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_api_limit_status` (Number) Maximum number of requests per minute, per user or IP address. Default: 240. Set to 0 to disable limits. Introduced in GitLab 17.10.
+- `users_get_by_id_limit` (Number) Maximum number of requests per minute per user to the GET /users/:id API endpoint. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
+- `users_get_by_id_limit_allowlist_raw` (String) Usernames excluded from the users_get_by_id_limit rate limit, separated by newlines, commas or whitespace. Not documented in the GitLab API reference, but accepted by PUT /application/settings.
 - `valid_runner_registrars` (List of String) List of types which are allowed to register a GitLab Runner. Can be [], ['group'], ['project'] or ['group', 'project'].
 - `version_check_enabled` (Boolean) Let GitLab inform you when an update is available.
+- `web_hook_event_resend_limit` (Number) Maximum number of webhook event resend requests per minute, per user, for a given project or group. Default: 5. Set to 0 to disable limits. Introduced in GitLab 19.3.
+- `web_hook_test_limit` (Number) Maximum number of webhook test requests per minute, per user, for a given project or group. Default: 5. Set to 0 to disable limits. Introduced in GitLab 19.3.
 - `web_ide_clientside_preview_enabled` (Boolean) Live Preview (allow live previews of JavaScript projects in the Web IDE using CodeSandbox Live Preview).
 - `whats_new_variant` (String) What's new variant, possible values: all_tiers, current_tier, and disabled.
 - `wiki_page_max_content_bytes` (Number) Maximum wiki page content size in bytes. The minimum value is 1024 bytes.

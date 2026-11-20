@@ -6,7 +6,7 @@ description: |-
   The gitlab_group_service_account_access_tokens data source allows to retrieve all access tokens for a group service account.
   ~> Note: The data source returns the token metadata only. The token value is not available.
   ~> Permissions: You must have administrator access or be an Owner of the group to list the tokens of a service account.
-  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/personal_access_tokens/#list-all-personal-access-tokens
+  Upstream API: GitLab REST API docs https://docs.gitlab.com/api/service_accounts/#list-all-personal-access-tokens-for-a-group-service-account
 ---
 
 # gitlab_group_service_account_access_tokens (Data Source)
@@ -17,13 +17,13 @@ The `gitlab_group_service_account_access_tokens` data source allows to retrieve 
 
 ~> **Permissions:** You must have administrator access or be an Owner of the group to list the tokens of a service account.
 
-**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/personal_access_tokens/#list-all-personal-access-tokens)
+**Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/service_accounts/#list-all-personal-access-tokens-for-a-group-service-account)
 
 ## Example Usage
 
 ```terraform
 data "gitlab_group" "example" {
-  id = "foo/bar/baz"
+  full_path = "foo/bar/baz"
 }
 
 # List all access tokens for a group service account

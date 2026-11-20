@@ -7,7 +7,7 @@ description: |-
   This resource controls whether a project is available as a CI/CD Catalog resource.
   ~> If keep_settings_on_destroy is set to false, destroying the resource will revert the catalog status to the value that was present when the resource was first created.
   You will need to apply the resource with the new setting before destroying the resource.
-  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/ee/api/graphql/reference/#mutationcatalogresourcescreate
+  Upstream API: GitLab GraphQL API docs https://docs.gitlab.com/api/graphql/reference/#mutationcatalogresourcescreate
 ---
 
 # gitlab_project_cicd_catalog (Resource)
@@ -19,7 +19,7 @@ This resource controls whether a project is available as a CI/CD Catalog resourc
 ~> If `keep_settings_on_destroy` is set to false, destroying the resource will revert the catalog status to the value that was present when the resource was first created.
 You will need to apply the resource with the new setting before destroying the resource.
 
-**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/ee/api/graphql/reference/#mutationcatalogresourcescreate)
+**Upstream API**: [GitLab GraphQL API docs](https://docs.gitlab.com/api/graphql/reference/#mutationcatalogresourcescreate)
 
 ## Example Usage
 

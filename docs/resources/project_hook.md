@@ -5,6 +5,7 @@ subcategory: ""
 description: |-
   The gitlab_project_hook resource manages the lifecycle of a project hook.
   ~> Note that push_events defaults to true.
+  Use token_wo and signing_token_wo with an ephemeral input, together with token_wo_version and signing_token_wo_version, to keep the hook secrets out of Terraform plan and state. Write-only arguments require Terraform 1.11 or later. Change the version marker to update the value; changes to the value alone do not produce a plan difference. Every update sends the configured value, including updates to other attributes when the version marker is unchanged.
   Upstream API: GitLab REST API docs https://docs.gitlab.com/api/project_webhooks/
 ---
 
@@ -13,6 +14,8 @@ description: |-
 The `gitlab_project_hook` resource manages the lifecycle of a project hook.
 
 ~> Note that `push_events` defaults to `true`.
+
+Use `token_wo` and `signing_token_wo` with an ephemeral input, together with `token_wo_version` and `signing_token_wo_version`, to keep the hook secrets out of Terraform plan and state. Write-only arguments require Terraform 1.11 or later. Change the version marker to update the value; changes to the value alone do not produce a plan difference. Every update sends the configured value, including updates to other attributes when the version marker is unchanged.
 
 **Upstream API**: [GitLab REST API docs](https://docs.gitlab.com/api/project_webhooks/)
 
@@ -75,6 +78,8 @@ resource "gitlab_project_hook" "url_variables" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `branch_filter_strategy` (String) Filter push events by branch. Valid values are: `wildcard`, `regex`, `all_branches`.
 - `confidential_issues_events` (Boolean) Invoke the hook for confidential issues events. Defaults to `false`.
 - `confidential_note_events` (Boolean) Invoke the hook for confidential note events. Defaults to `false`.
@@ -97,9 +102,13 @@ resource "gitlab_project_hook" "url_variables" {
 - `releases_events` (Boolean) Invoke the hook for release events. Defaults to `false`.
 - `resource_access_token_events` (Boolean) Invoke the hook for project access token expiry events. Defaults to `false`.
 - `resource_deploy_token_events` (Boolean) Invoke the hook for resource deploy token events. Defaults to `false`.
-- `signing_token` (String, Sensitive) Secret used to sign webhook payloads (HMAC-SHA256, sent as the `X-Gitlab-Signature` header). Requires GitLab 19.0 or later (feature flag `webhook_signing_token`, on by default). Write-only — the value is never returned by the API and is not available for imported resources.
+- `signing_token` (String, Sensitive) Secret used to sign webhook payloads (HMAC-SHA256, sent as the `X-Gitlab-Signature` header). Requires GitLab 19.0 or later (feature flag `webhook_signing_token`, on by default). The value is never returned by the API and is not available for imported resources. Conflicts with `signing_token_wo`. This attribute persists the value in state.
+- `signing_token_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Write-only secret used to sign webhook payloads, omitted from Terraform plan and state. Requires Terraform 1.11 or later and GitLab 19.0 or later. Conflicts with `signing_token`. Change `signing_token_wo_version` to update the remote value.
+- `signing_token_wo_version` (String) Non-empty change marker for `signing_token_wo`, stored in state. Change this string to publish a new signing token. Every update sends `signing_token_wo`, even when this marker is unchanged.
 - `tag_push_events` (Boolean) Invoke the hook for tag push events. Defaults to `false`.
-- `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources.
+- `token` (String, Sensitive) A token to present when invoking the hook. The token is not available for imported resources. Conflicts with `token_wo`. This attribute persists the value in state.
+- `token_wo` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Write-only token to present when invoking the hook, omitted from Terraform plan and state. Requires Terraform 1.11 or later. Conflicts with `token`. Change `token_wo_version` to update the remote value.
+- `token_wo_version` (String) Non-empty change marker for `token_wo`, stored in state. Change this string to publish a new token. Every update sends `token_wo`, even when this marker is unchanged.
 - `url_variables` (Attributes Set) Array of sensitive portions of the webhook URL to mask. (see [below for nested schema](#nestedatt--url_variables))
 - `vulnerability_events` (Boolean) Invoke the hook for vulnerability events. Defaults to `false`.
 - `wiki_page_events` (Boolean) Invoke the hook for wiki page events. Defaults to `false`.

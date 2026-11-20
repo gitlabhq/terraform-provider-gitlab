@@ -17,7 +17,7 @@ The `gitlab_group_service_account` data source retrieves information about a Git
 
 ```terraform
 data "gitlab_group" "example" {
-  id = "foo/bar/baz"
+  full_path = "foo/bar/baz"
 }
 
 # Basic example

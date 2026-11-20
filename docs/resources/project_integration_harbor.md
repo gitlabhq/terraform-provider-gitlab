@@ -26,6 +26,8 @@ resource "gitlab_project_integration_harbor" "harbor" {
   project      = gitlab_project.awesome_project.id
   url          = "http://harbor.example.com"
   project_name = "my_project_name"
+  username     = "my_username"
+  password     = "my_password"
 }
 ```
 
